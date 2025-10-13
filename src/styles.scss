@@ -1,1 +1,521 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import 'primeicons/primeicons.css';
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f1f4f7 !important;
+}
+
+:root {
+    /* Colors */
+    --dark-1: #171c28;
+    --dark-2: #292e39;
+    --dark-3: #b9babe;
+    --background-2: #f6f6f6;
+    --background-3: #eeeeee;
+    --secondary-color: #77dae6;
+    --secondary-color-secondary-1: #1a162e;
+    --secondary-color-secondary-2: #9e9da8;
+    --secondary-color-secondary-3: #d2d1d6;
+    --secondary-color-secondary-4: #ededf6;
+    --secondary-color-secondary-5: #f8f8fb;
+    --secondary-color-secondary-6: #fafafd;
+    --secondary-color-background: #ffffff;
+    --purple-purple-black-10: linear-gradient(to left,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.9)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-20: linear-gradient(to left,
+            rgba(0, 0, 0, 0.8),
+            rgba(0, 0, 0, 0.8)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-30: linear-gradient(to left,
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-40: linear-gradient(to left,
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-50: linear-gradient(to left,
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-60: linear-gradient(to left,
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-70: linear-gradient(to left,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-80: linear-gradient(to left,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-black-90: linear-gradient(to left,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple: #7644e1;
+    --purple-purple-90: linear-gradient(to left,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-80: linear-gradient(to left,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-70: linear-gradient(to left,
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.3)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-60: linear-gradient(to left,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-50: linear-gradient(to left,
+            rgba(255, 255, 255, 0.5),
+            rgba(255, 255, 255, 0.5)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-40: linear-gradient(to left,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.6)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-30: linear-gradient(to left,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-20: linear-gradient(to left,
+            rgba(255, 255, 255, 0.8),
+            rgba(255, 255, 255, 0.8)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --purple-purple-10: linear-gradient(to left,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.9)),
+        linear-gradient(to left, #7644e1, #7644e1);
+    --green-green-black-10: linear-gradient(to left,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.9)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-20: linear-gradient(to left,
+            rgba(0, 0, 0, 0.8),
+            rgba(0, 0, 0, 0.8)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-30: linear-gradient(to left,
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-40: linear-gradient(to left,
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-50: linear-gradient(to left,
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-60: linear-gradient(to left,
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-70: linear-gradient(to left,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-80: linear-gradient(to left,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-black-90: linear-gradient(to left,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green: #67b044;
+    --green-green-90: linear-gradient(to left,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-80: linear-gradient(to left,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-70: linear-gradient(to left,
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.3)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-60: linear-gradient(to left,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-50: linear-gradient(to left,
+            rgba(255, 255, 255, 0.5),
+            rgba(255, 255, 255, 0.5)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-40: linear-gradient(to left,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.6)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-30: linear-gradient(to left,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-20: linear-gradient(to left,
+            rgba(255, 255, 255, 0.8),
+            rgba(255, 255, 255, 0.8)),
+        linear-gradient(to left, #67b044, #67b044);
+    --green-green-10: linear-gradient(to left,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.9)),
+        linear-gradient(to left, #67b044, #67b044);
+    --blue-blue-black-10: linear-gradient(to left,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.9)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-20: linear-gradient(to left,
+            rgba(0, 0, 0, 0.8),
+            rgba(0, 0, 0, 0.8)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-30: linear-gradient(to left,
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-40: linear-gradient(to left,
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-50: linear-gradient(to left,
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-60: linear-gradient(to left,
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-70: linear-gradient(to left,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-80: linear-gradient(to left,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-black-90: linear-gradient(to left,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue: #0071dc;
+    --blue-blue-90: linear-gradient(to left,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-80: linear-gradient(to left,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-70: linear-gradient(to left,
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.3)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-60: linear-gradient(to left,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-50: linear-gradient(to left,
+            rgba(255, 255, 255, 0.5),
+            rgba(255, 255, 255, 0.5)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-40: linear-gradient(to left,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.6)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-30: linear-gradient(to left,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-20: linear-gradient(to left,
+            rgba(255, 255, 255, 0.8),
+            rgba(255, 255, 255, 0.8)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --blue-blue-10: linear-gradient(to left,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.9)),
+        linear-gradient(to left, #0071dc, #0071dc);
+    --yellow-yellow-black-10: linear-gradient(to left,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.9)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-20: linear-gradient(to left,
+            rgba(0, 0, 0, 0.8),
+            rgba(0, 0, 0, 0.8)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-30: linear-gradient(to left,
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-40: linear-gradient(to left,
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-50: linear-gradient(to left,
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-60: linear-gradient(to left,
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-70: linear-gradient(to left,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-80: linear-gradient(to left,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-black-90: linear-gradient(to left,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow: #ffb700;
+    --yellow-yellow-90: linear-gradient(to left,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-80: linear-gradient(to left,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-70: linear-gradient(to left,
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.3)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-60: linear-gradient(to left,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-50: linear-gradient(to left,
+            rgba(255, 255, 255, 0.5),
+            rgba(255, 255, 255, 0.5)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-40: linear-gradient(to left,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.6)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-30: linear-gradient(to left,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-20: linear-gradient(to left,
+            rgba(255, 255, 255, 0.8),
+            rgba(255, 255, 255, 0.8)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --yellow-yellow-10: linear-gradient(to left,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.9)),
+        linear-gradient(to left, #ffb700, #ffb700);
+    --red-red-black-10: linear-gradient(to left,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.9)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-20: linear-gradient(to left,
+            rgba(0, 0, 0, 0.8),
+            rgba(0, 0, 0, 0.8)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-30: linear-gradient(to left,
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 0, 0, 0.7)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-40: linear-gradient(to left,
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-50: linear-gradient(to left,
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-60: linear-gradient(to left,
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-70: linear-gradient(to left,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-80: linear-gradient(to left,
+            rgba(0, 0, 0, 0.2),
+            rgba(0, 0, 0, 0.2)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-black-90: linear-gradient(to left,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red: #f94545;
+    --red-red-90: linear-gradient(to left,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-80: linear-gradient(to left,
+            rgba(255, 255, 255, 0.2),
+            rgba(255, 255, 255, 0.2)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-70: linear-gradient(to left,
+            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.3)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-60: linear-gradient(to left,
+            rgba(255, 255, 255, 0.4),
+            rgba(255, 255, 255, 0.4)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-50: linear-gradient(to left,
+            rgba(255, 255, 255, 0.5),
+            rgba(255, 255, 255, 0.5)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-40: linear-gradient(to left,
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 255, 255, 0.6)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-30: linear-gradient(to left,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 0.7)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-20: linear-gradient(to left,
+            rgba(255, 255, 255, 0.8),
+            rgba(255, 255, 255, 0.8)),
+        linear-gradient(to left, #f94545, #f94545);
+    --red-red-10: linear-gradient(to left,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.9)),
+        linear-gradient(to left, #f94545, #f94545);
+
+    /* Fonts */
+    --regular-14-font-family: Poppins, sans-serif;
+    --regular-14-font-size: 14px;
+    --regular-14-line-height: 20px;
+    --regular-14-font-weight: 400;
+    --regular-14-font-style: normal;
+    --medium-14-font-family: Poppins, sans-serif;
+    --medium-14-font-size: 14px;
+    --medium-14-line-height: 20px;
+    --medium-14-font-weight: 500;
+    --medium-14-font-style: normal;
+    --bold-14-font-family: Poppins, sans-serif;
+    --bold-14-font-size: 14px;
+    --bold-14-line-height: 20px;
+    --bold-14-font-weight: 700;
+    --bold-14-font-style: normal;
+    --regular-15-font-family: Poppins, sans-serif;
+    --regular-15-font-size: 15px;
+    --regular-15-line-height: 22px;
+    --regular-15-font-weight: 400;
+    --regular-15-font-style: normal;
+    --medium-15-font-family: Poppins, sans-serif;
+    --medium-15-font-size: 15px;
+    --medium-15-line-height: 22px;
+    --medium-15-font-weight: 500;
+    --medium-15-font-style: normal;
+    --bold-15-font-family: Poppins, sans-serif;
+    --bold-15-font-size: 15px;
+    --bold-15-line-height: 22px;
+    --bold-15-font-weight: 700;
+    --bold-15-font-style: normal;
+    --regular-16-font-family: Poppins, sans-serif;
+    --regular-16-font-size: 16px;
+    --regular-16-line-height: 24px;
+    --regular-16-font-weight: 400;
+    --regular-16-font-style: normal;
+    --medium-16-font-family: Poppins, sans-serif;
+    --medium-16-font-size: 16px;
+    --medium-16-line-height: 24px;
+    --medium-16-font-weight: 500;
+    --medium-16-font-style: normal;
+    --bold-16-font-family: Poppins, sans-serif;
+    --bold-16-font-size: 16px;
+    --bold-16-line-height: 24px;
+    --bold-16-font-weight: 700;
+    --bold-16-font-style: normal;
+    --regular-18-font-family: Poppins, sans-serif;
+    --regular-18-font-size: 18px;
+    --regular-18-line-height: 26px;
+    --regular-18-font-weight: 400;
+    --regular-18-font-style: normal;
+    --medium-18-font-family: Poppins, sans-serif;
+    --medium-18-font-size: 18px;
+    --medium-18-line-height: 26px;
+    --medium-18-font-weight: 500;
+    --medium-18-font-style: normal;
+    --bold-18-font-family: Poppins, sans-serif;
+    --bold-18-font-size: 18px;
+    --bold-18-line-height: 26px;
+    --bold-18-font-weight: 700;
+    --bold-18-font-style: normal;
+    --regular-22-font-family: Poppins, sans-serif;
+    --regular-22-font-size: 22px;
+    --regular-22-line-height: 32px;
+    --regular-22-font-weight: 400;
+    --regular-22-font-style: normal;
+    --medium-22-font-family: Poppins, sans-serif;
+    --medium-22-font-size: 22px;
+    --medium-22-line-height: 32px;
+    --medium-22-font-weight: 500;
+    --medium-22-font-style: normal;
+    --bold-22-font-family: Poppins, sans-serif;
+    --bold-22-font-size: 22px;
+    --bold-22-line-height: 32px;
+    --bold-22-font-weight: 700;
+    --bold-22-font-style: normal;
+    --medium-30-font-family: Poppins, sans-serif;
+    --medium-30-font-size: 30px;
+    --medium-30-line-height: 44px;
+    --medium-30-font-weight: 500;
+    --medium-30-font-style: normal;
+    --bold-30-font-family: Poppins, sans-serif;
+    --bold-30-font-size: 30px;
+    --bold-30-line-height: 44px;
+    --bold-30-font-weight: 700;
+    --bold-30-font-style: normal;
+    --bold-36-font-family: Poppins, sans-serif;
+    --bold-36-font-size: 36px;
+    --bold-36-line-height: 50px;
+    --bold-36-font-weight: 700;
+    --bold-36-font-style: normal;
+    --medium-42-font-family: Poppins, sans-serif;
+    --medium-42-font-size: 42px;
+    --medium-42-line-height: 60px;
+    --medium-42-font-weight: 500;
+    --medium-42-font-style: normal;
+    --bold-42-font-family: Poppins, sans-serif;
+    --bold-42-font-size: 42px;
+    --bold-42-line-height: 60px;
+    --bold-42-font-weight: 700;
+    --bold-42-font-style: normal;
+    --medium-36-font-family: Poppins, sans-serif;
+    --medium-36-font-size: 36px;
+    --medium-36-line-height: 54px;
+    --medium-36-font-weight: 500;
+    --medium-36-font-style: normal;
+    --medium-26-font-family: Poppins, sans-serif;
+    --medium-26-font-size: 26px;
+    --medium-26-line-height: 36px;
+    --medium-26-font-weight: 500;
+    --medium-26-font-style: normal;
+    --bold-26-font-family: Poppins, sans-serif;
+    --bold-26-font-size: 26px;
+    --bold-26-line-height: 36px;
+    --bold-26-font-weight: 700;
+    --bold-26-font-style: normal;
+    --bold-24-font-family: Poppins, sans-serif;
+    --bold-24-font-size: 24px;
+    --bold-24-line-height: 34px;
+    --bold-24-font-weight: 700;
+    --bold-24-font-style: normal;
+
+    /* Effects */
+}
+
+/* Figma Color Variables of your File */

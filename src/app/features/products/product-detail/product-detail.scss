@@ -1,0 +1,232 @@
+.product-page {
+  background-color: #f1f4f7;
+  font-family: "Poppins", sans-serif;
+  padding: 100px;
+}
+
+.product-details {
+  background-color: #f1f4f7;
+}
+
+.product-img {
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.product-info {
+  background: #fff;
+  border-radius: 8px;
+  padding: 15px 24px;
+}
+
+.size-form select {
+  background: transparent;
+  font-size: 15px;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.size-form .weight-divider {
+  width: 1px;
+  height: 36px;
+  background-color: #d2d1d6;
+}
+
+.size-option {
+  background: #ededf6;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+.size-text {
+  color: #9e9da8;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.purchase-section {
+  border: 1px solid #b9babe;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.discount-badge {
+  background: linear-gradient(to left, #67b044, #67b044);
+  background-blend-mode: overlay;
+}
+
+.discount-text {
+  color: #fff;
+  font-weight: 500;
+}
+
+.btn-checkout {
+  background-color: #ffb700;
+  border: none;
+}
+
+.add-to-cart-button i {
+  color: #171c28;
+}
+
+/* ===== Reviews Section ===== */
+.reviews-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+}
+
+.reviews-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a162e;
+}
+
+.filter {
+  height: 40px;
+  background-color: #f1f4f7;
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  color: #000;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.filter i {
+  font-size: 0.8rem;
+}
+
+.filter:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 6px 20px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Review Card */
+.review-card {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.reviewer-avatar {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.reviewer-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a162e;
+}
+
+.stars img {
+  width: 20px;
+  height: 20px;
+}
+
+.review-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 575px) {
+  .reviews-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #171C28;
+  }
+
+  .reviews-list {
+    gap: 1.25rem;
+  }
+
+  .review-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px 10px rgba(237, 237, 246, 0.2);
+    border: 1px solid #EDEDF6;
+    padding: 1rem;
+  }
+
+  .reviewer {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .reviewer-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .reviewer-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .reviewer-name {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .review-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+
+/* primeNg custom style */
+/* Bọc toàn bộ tab */
+:host ::ng-deep .p-tablist-tab-list {
+  background-color: #fff !important;
+  font-family: 'Poppins', sans-serif !important;
+  border: none;
+  border-radius: 10px 10px 0 0;
+}
+
+:host ::ng-deep .p-tabpanels {
+  background-color: #fff;
+  color: #1a162e;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+:host ::ng-deep .p-ripple.p-tab {
+  padding-bottom: 12px;
+}
+
+:host ::ng-deep .p-ripple.p-tab:hover {
+  color: #57595c !important;
+}
+
+:host ::ng-deep .p-ripple.p-tab-active {
+  color: #171C28;
+  border-bottom: 3px solid #171C28;
+}
+
+::ng-deep .weight-field .mat-mdc-form-field-infix {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+::ng-deep .mat-mdc-select-panel.mdc-menu-surface.mdc-menu-surface--open.mat-primary {
+  background-color: #fff
+}
+
+::ng-deep .mdc-list-item:hover {
+  background-color: #dcdce4 !important;
+}

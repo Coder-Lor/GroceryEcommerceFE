@@ -1,0 +1,43 @@
+<div class="product-list container">
+  <p-dataview #dv [value]="products" [layout]="layout">
+    <!-- Header -->
+    <ng-template #header>
+      <div class="d-flex justify-content-between">
+        <h4 style="color: black;">product list</h4>
+        <p-selectbutton [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
+          <ng-template #item let-item>
+            <i class="pi" [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"></i>
+          </ng-template>
+        </p-selectbutton>
+      </div>
+    </ng-template>
+
+    <!-- LIST layout -->
+    <ng-template #list let-items>
+      @for (item of products; track $index; let first = $first) {
+      <div class="border-top pt-4">
+        <product-card [product]="item" [layout]="'list'" [first]="first"
+          [getSeverity]="getSeverity.bind(this)"></product-card>
+      </div>
+      }
+      <!-- <div *ngFor="let item of items; let first = first">
+          <product-card [product]="item" [layout]="'list'" [first]="first"
+            [getSeverity]="getSeverity.bind(this)"></product-card>
+        </div> -->
+    </ng-template>
+
+    <!-- GRID layout -->
+    <ng-template #grid let-items>
+      <div class="row g-4">
+        @for (item of products; track $index) {
+        <div class="col-12 col-sm-6 col-lg-3">
+          <product-card [product]="item" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
+        </div>
+        }
+        <!-- <div *ngFor="let product of items" class="col-12 col-sm-6 col-md-4 col-xl-6">
+            <product-card [product]="product" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
+          </div> -->
+      </div>
+    </ng-template>
+  </p-dataview>
+</div>
