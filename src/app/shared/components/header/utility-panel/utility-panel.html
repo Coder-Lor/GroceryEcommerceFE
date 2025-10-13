@@ -1,0 +1,97 @@
+<!-- cart panel -->
+@if(showCart) {
+<div class="overlay" [ngClass]="{'active': showCart}" (click)="onClose_1()">
+    <div class="cart-side-bar" (click)="$event.stopPropagation()">
+        <div class="cart-title">
+            <h4>My cart</h4>
+            <div class="close-icon" (click)="onClose_1()">
+                <i class="pi pi-times"></i>
+            </div>
+        </div>
+        <div class="cart-items">
+            @for (item of Cart; track item.id) {
+            <div class="item">
+                <div class="item-img">
+                    <img [src]="item.image" alt="item-image">
+                </div>
+                <div class="item-detail">
+                    <h4>{{item.name}}</h4>
+                    <p>{{item.price}}$</p>
+                    <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [step]="1" [showButtons]="true"
+                        buttonLayout="horizontal" inputId="{{item.id}}">
+                        <ng-template pTemplate="incrementbuttonicon">
+                            <span class="pi pi-plus"></span>
+                        </ng-template>
+                        <ng-template pTemplate="decrementbuttonicon">
+                            <span class="pi pi-minus"></span>
+                        </ng-template>
+                    </p-inputNumber>
+
+                </div>
+                <i class="pi pi-times"></i>
+            </div>
+            }
+        </div>
+        <hr>
+        <div class="cart-sub-total">
+            <table>
+                <tr>
+                    <td class="left">Sub-Total:</td>
+                    <td class="right">100$</td>
+                </tr>
+                <tr>
+                    <td class="left">Voucher:</td>
+                    <td class="right">-25$</td>
+                </tr>
+                <tr>
+                    <td class="left">Ship:</td>
+                    <td class="right">0.5$</td>
+                </tr>
+                <tr>
+                    <td class="left">Total:</td>
+                    <td class="right">70$</td>
+                </tr>
+            </table>
+        </div>
+        <div class="cart-btns">
+            <button (click)="navigationToCart()">Go to cart ></button>
+            <button>Checkout ></button>
+        </div>
+    </div>
+</div>
+}
+@if(showSearch) {
+<div class="overlay" [ngClass]="{'active': showSearch}" (click)="onClose_2()">
+    <!-- Search Panel -->
+    <div class="search-panel" (click)="$event.stopPropagation()">
+        <div class="search-header d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-semibold mb-0">Search</h5>
+            <div class="close-icon" (click)="onClose_2()">
+                <i class="pi pi-times"></i>
+            </div>
+        </div>
+
+        <!-- Search box -->
+        <div class="search-box mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control search-input" placeholder="Search here...">
+                <button class="btn-search"><i class="pi pi-search"></i></button>
+            </div>
+        </div>
+
+        <p class="text-muted small mb-4">Please try to search other products!</p>
+
+        <!-- Recently searches -->
+        <h6 class="fw-semibold mb-3">Recently searches</h6>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge rounded-pill bg-white text-dark border px-3 py-2">T-Shirts</span>
+            <span class="badge rounded-pill bg-white text-dark border px-3 py-2">Watches</span>
+            <span class="badge rounded-pill bg-white text-dark border px-3 py-2">Bags</span>
+            <span class="badge rounded-pill bg-white text-dark border px-3 py-2">Belts</span>
+        </div>
+
+        <!-- Background decoration -->
+        <div class="search-bg"></div>
+    </div>
+</div>
+}

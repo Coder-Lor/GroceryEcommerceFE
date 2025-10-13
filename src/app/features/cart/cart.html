@@ -1,0 +1,124 @@
+<div class="container-fluid cart-page">
+    <div class="container">
+        <div class="row">
+            <!-- <app-breadcrumb></app-breadcrumb> -->
+        </div>
+        <div class="row g-4" style="padding-top: 40px; padding-bottom: 40px;">
+            <!-- 🛒 Main Cart Section -->
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0 rounded-4 p-4">
+                    <!-- Product Item -->
+                    @for (item of Cart; track $index) {
+                    <div class="cart-item d-flex gap-4 align-items-center border-bottom pb-4 mb-2">
+                        <img [src]="item.image" class="rounded img-fluid"
+                            style="width:175px; height:172px; object-fit:cover;" alt="Coffee Beans">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-semibold fs-7 text-dark mb-0">
+                                    {{item.name}}
+                                </h6>
+                                <span class="fw-bold fs-8 text-dark">${{item.price * item.quantity}}</span>
+                            </div>
+                            <p class="mb-2 text-muted">${{item.price}} | <span class="fw-medium"
+                                    [ngClass]="{'text-success': item.inventory, 'text-warning': !item.inventory}">
+                                    {{ item.inventory ? 'In stock' : 'Out of stock'}}</span></p>
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                <div class="d-flex gap-2">
+                                    <!-- Brand Dropdown -->
+                                    <button class="btn btn-outline-secondary rounded-3 d-flex align-items-center gap-1">
+                                        LavAzza <i class="pi pi-chevron-down"></i>
+                                    </button>
+
+                                    <!-- Quantity Selector -->
+                                    <div class="d-flex align-items-center px-2">
+                                        <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [step]="1"
+                                            [showButtons]="true" buttonLayout="horizontal" inputId="{{item.id}}">
+                                            <ng-template pTemplate="incrementbuttonicon">
+                                                <span class="pi pi-plus"></span>
+                                            </ng-template>
+                                            <ng-template pTemplate="decrementbuttonicon">
+                                                <span class="pi pi-minus"></span>
+                                            </ng-template>
+                                        </p-inputNumber>
+                                    </div>
+                                </div>
+
+                                <!-- Save & Delete -->
+                                <div class="d-flex gap-4">
+                                    <button class="btn text-muted d-flex align-items-center gap-2 p-0">
+                                        <i class="pi pi-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+
+                    <!-- Bottom Summary -->
+                    <div class="d-flex justify-content-between flex-wrap align-items-end mt-1">
+                        <a routerLink="/home"
+                            class="text-decoration-none d-flex align-items-center gap-2 fw-medium text-dark">
+                            <i class="pi pi-chevron-left"></i> Continue Shopping
+                        </a>
+
+                        <div>
+                            <div class="d-flex justify-content-between gap-5">
+                                <span class="fw-medium">Subtotal:</span>
+                                <span class="fw-medium">$191.65</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-medium">Shipping:</span>
+                                <span class="fw-medium">$10.00</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total:</span>
+                                <span>$201.65</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 💳 Sidebar Checkout -->
+            <div class="col-lg-4">
+                <div class="card shadow-lg border-0 rounded-4 p-4 mb-4">
+                    <h6 class="fw-semibold mb-3">Order Summary</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal (items)</span>
+                        <span class="fw-semibold">3</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Price (Total)</span>
+                        <span class="fw-semibold">$191.65</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span class="fw-semibold">$10.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                        <span>Estimated Total</span>
+                        <span>$201.65</span>
+                    </div>
+                    <button class="btn btn-warning w-100 rounded-pill fw-medium py-3">Continue to checkout</button>
+                </div>
+
+                <!-- 🎁 Gift Card -->
+                <div class="card shadow-lg border-0 rounded-4 p-4 d-flex flex-row align-items-center gap-3">
+                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center"
+                        style="width:76px; height:76px;">
+                        <i class="pi pi-gift"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-semibold mb-1">Send this order as a gift.</h6>
+                        <p class="text-muted small mb-0">Available items will be shipped to your gift recipient.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

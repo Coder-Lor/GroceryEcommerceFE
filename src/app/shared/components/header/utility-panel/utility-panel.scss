@@ -1,0 +1,342 @@
+/* Ẩn overlay khi chưa mở */
+.overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 999999999;
+}
+
+/* Khi mở */
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Sidebar hiệu ứng trượt */
+.cart-side-bar {
+    background: #fff;
+    width: 350px;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    transform: translateX(100%);
+    /* ban đầu ẩn bên phải */
+    transition: transform 0.4s ease;
+}
+
+/* Khi overlay active thì trượt vào */
+.overlay.active .cart-side-bar {
+    transform: translateX(0);
+}
+
+h4,
+button {
+    font-size: 18px;
+    font-family: "Poppins", sans-serif;
+}
+
+.cart-side-bar {
+    background: #fff;
+    max-width: 350px;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.cart-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.cart-title h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.cart-title .close-btn {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.cart-items {
+    flex: 1;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    position: relative;
+}
+
+.item fa-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+
+.item-img {
+    padding: 10px;
+    background-color: #f0ecec;
+    border-radius: 5px;
+}
+
+.item-img img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.item-detail {
+    margin-left: 10px;
+    flex: 1;
+}
+
+.item-detail h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.item-detail .price {
+    color: #333;
+    font-size: 14px;
+}
+
+.item-detail .price span {
+    color: #888;
+}
+
+.item-cart-quantity {
+    display: flex;
+    width: 40px;
+}
+
+.item-cart-quantity input {
+    width: 20px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.quantity button {
+    width: 25px;
+    height: 25px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.quantity span {
+    margin: 0 8px;
+}
+
+.remove {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+}
+
+.cart-sub-total {
+    margin: 20px 0;
+    font-family: "Poppins", sans-serif;
+}
+
+.cart-sub-total table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-sub-total td {
+    padding: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.cart-sub-total .total td {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.cart-sub-total .left {
+    text-align: left;
+    font-weight: 600;
+}
+
+.cart-sub-total .right {
+    text-align: right;
+}
+
+.cart-btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cart-btns button {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background-color: #f2b632;
+}
+
+.cart-btn {
+    background: #ffce54;
+    color: #333;
+}
+
+.checkout-btn {
+    background: #2a54d9;
+    color: #fff;
+}
+
+.cart-btn:hover {
+    background: #f2b632;
+}
+
+.checkout-btn:hover {
+    background: #1e3fad;
+}
+
+.close-icon {
+    cursor: pointer;
+}
+
+/* Bọc input */
+:host ::ng-deep .p-inputnumber.p-component {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    padding: 2px 5px;
+}
+
+/* Input ở giữa */
+:host ::ng-deep .p-inputnumber-input {
+    border: none !important;
+    text-align: center;
+    width: 40px !important;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333 !important;
+    outline: none;
+    background-color: #fff !important;
+    box-shadow: none !important;
+}
+
+/* Nút - và + */
+:host ::ng-deep .p-inputnumber-button {
+    border: 2px solid #000 !important;
+    border-radius: 5px;
+    background: transparent !important;
+    color: #666 !important;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+
+/* Hover */
+:host ::ng-deep .p-inputnumber-button:hover {
+    color: #000 !important;
+}
+
+/* Click scale nhỏ để có cảm giác nhấn */
+:host ::ng-deep .p-inputnumber-button:active {
+    transform: scale(0.9);
+}
+
+
+/* search panel css */
+.search-panel {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.search-close {
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.search-input {
+    border-radius: 10px 0 0 10px;
+    border: 1px solid #ddd;
+    box-shadow: none !important;
+}
+
+.search-box .btn {
+    border-radius: 0 10px 10px 0;
+    border: 1px solid #ddd;
+    border-left: none;
+}
+
+.search-box .btn i {
+    font-size: 1.2rem;
+    color: #444;
+}
+
+.search-bg {
+    position: absolute;
+    bottom: -40px;
+    left: -20px;
+    right: -20px;
+    height: 200px;
+    background: url('data:image/svg+xml;utf8,<svg width="300" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0,50 Q75,100 150,50 T300,50 L300,100 L0,100 Z" fill="%23f9f9fb"/></svg>') no-repeat center/cover;
+    opacity: 0.6;
+    z-index: 0;
+}
+
+.btn-search {
+    background-color: #f2b632;
+    padding: 4px 8px;
+    color: #000;
+    border-radius: 0 5px 5px 0;
+    border: none;
+}
