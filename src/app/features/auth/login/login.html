@@ -1,0 +1,65 @@
+<!-- Overlay -->
+<div class="login-overlay active">
+  <div class="login-modal">
+    <button class="btn-close" (click)="exitLoginForm()"></button>
+
+    <!-- Left side -->
+    <div class="login-left">
+      <img src="/images/background.png" alt="Login banner" class="login-banner" />
+      <div class="login-left-content">
+        <h3>
+          <img src="/icons/Icon.svg" alt="GroceryMart icon" style="width: 28px; height: 28px; margin-bottom: 5px" />
+          GroceryMart
+        </h3>
+        <p>Premium grocery products, quality & trust.</p>
+      </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="login-right">
+      <h4 style="text-align: center;">Login</h4>
+      <p class="text-muted" style="text-align: center;">
+        Welcome back to sign in. As a returning customer, you have access to your previously saved all
+        information.
+      </p>
+
+      <form style="margin-bottom: 10px;">
+        <!-- Email -->
+        <div class="form-group position-relative">
+          <label>Email</label>
+          <input type="email" placeholder="Enter your email" class="form-control input-with-icon" />
+          <i class="pi pi-envelope input-icon"></i>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group position-relative">
+          <label>Password</label>
+          <input [type]="showPassword ? 'text' : 'password'" placeholder="Enter your password"
+            class="form-control input-with-icon" />
+          <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
+            (click)="togglePassword()"></i>
+        </div>
+
+        <!-- Bottom -->
+        <div class="form-bottom">
+          <label class="remember">
+            <input type="checkbox" /> Remember me
+          </label>
+          <a href="#" class="text-link">Forgot password?</a>
+        </div>
+
+        <!-- Buttons -->
+        <button type="submit" class="btn-login">Login</button>
+
+        <button type="button" class="btn-google">
+          <i class="pi pi-google"></i>
+          Sign in with Google
+        </button>
+      </form>
+      <p class="text-muted">
+        Don’t have an account yet?
+        <a routerLink="/register" class="text-link">Sign up now</a>
+      </p>
+    </div>
+  </div>
+</div>
