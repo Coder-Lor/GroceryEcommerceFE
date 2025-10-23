@@ -1,28 +1,34 @@
 <div class="homepage">
-
   <!-- Hero banner -->
   <section class="hero container position-relative mb-5">
     <div class="hero-bg bg-info rounded-4 position-absolute w-100 h-100 top-0 start-0"></div>
-    <img class="hero-vector hero-vector-1 position-absolute" src="vector-40.svg" alt="">
-    <img class="hero-vector hero-vector-2 position-absolute" src="vector-50.svg" alt="">
+    <img class="hero-vector hero-vector-1 position-absolute" src="vector-40.svg" alt="" />
+    <img class="hero-vector hero-vector-2 position-absolute" src="vector-50.svg" alt="" />
     <div class="hero-shadow hero-shadow-1 position-absolute"></div>
     <div class="hero-shadow hero-shadow-2 position-absolute"></div>
 
-    <img class="hero-img hero-img-main position-absolute end-0 top-0 img-fluid"
-      src="mk-2-q-g-0-z-wwd-53-jk-unsplash-10.png" alt="coffee">
-    <img class="hero-img hero-img-side position-absolute" src="mk-2-q-g-0-z-wwd-53-jk-unsplash-02-10.png"
-      alt="coffee cup">
+    <img
+      class="hero-img hero-img-main position-absolute end-0 top-0 img-fluid"
+      src="mk-2-q-g-0-z-wwd-53-jk-unsplash-10.png"
+      alt="coffee"
+    />
+    <img
+      class="hero-img hero-img-side position-absolute"
+      src="mk-2-q-g-0-z-wwd-53-jk-unsplash-02-10.png"
+      alt="coffee cup"
+    />
 
     <h1 class="hero-title position-absolute fw-bold text-white">
-      ORDER YOUR <br> FAVORITE COFFEE
+      ORDER YOUR <br />
+      FAVORITE COFFEE
     </h1>
 
     <div class="hero-pagination position-absolute d-flex align-items-center gap-2 text-white">
       <span class="current fw-bold">1</span>
       <span class="total">5</span>
-      <div class="line bg-white opacity-50" style="width: 40px; height: 2px;"></div>
-      <div class="dot active bg-white rounded-circle" style="width: 10px; height: 10px;"></div>
-      <div class="dot bg-white rounded-circle opacity-50" style="width: 10px; height: 10px;"></div>
+      <div class="line bg-white opacity-50" style="width: 40px; height: 2px"></div>
+      <div class="dot active bg-white rounded-circle" style="width: 10px; height: 10px"></div>
+      <div class="dot bg-white rounded-circle opacity-50" style="width: 10px; height: 10px"></div>
     </div>
   </section>
 
@@ -30,11 +36,12 @@
   <section class="categories container mb-5">
     <h2 class="section-title fw-bold mb-4">Browse Categories</h2>
     <div class="categories-list row g-4">
-
-      <div class="category-card col-md-4">
-        <div class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3">
+      <div class="category-card col-md-4" (click)="navigationToProductList()">
+        <div
+          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
+        >
           <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded">
+            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
           </div>
           <div class="category-info">
             <p class="category-price fw-bold fs-5">$24 - $150</p>
@@ -43,10 +50,12 @@
         </div>
       </div>
 
-      <div class="category-card col-md-4">
-        <div class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3">
+      <div class="category-card col-md-4" (click)="navigationToProductList()">
+        <div
+          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
+        >
           <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded">
+            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
           </div>
           <div class="category-info">
             <p class="category-price fw-bold fs-5">$37 - $160</p>
@@ -55,10 +64,12 @@
         </div>
       </div>
 
-      <div class="category-card col-md-4">
-        <div class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3">
+      <div class="category-card col-md-4" (click)="navigationToProductList()">
+        <div
+          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
+        >
           <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded">
+            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
           </div>
           <div class="category-info">
             <p class="category-price fw-bold fs-5">$32 - $160</p>
@@ -66,11 +77,32 @@
           </div>
         </div>
       </div>
-
     </div>
   </section>
 
   <!-- Product list -->
-  <product-list></product-list>
-
+  <div class="product-list container">
+    <p-dataview #dv [value]="products" [layout]="layout">
+      <!-- Header -->
+      <ng-template #header>
+        <div class="d-flex justify-content-center">
+          <h4>product list</h4>
+        </div>
+      </ng-template>
+      <!-- GRID layout -->
+      <ng-template #grid let-items>
+        <div class="row g-4">
+          @for (item of products; track $index) {
+          <div class="col-12 col-sm-6 col-lg-3">
+            <product-card
+              [product]="item"
+              [layout]="'grid'"
+              [getSeverity]="getSeverity.bind(this)"
+            ></product-card>
+          </div>
+          }
+        </div>
+      </ng-template>
+    </p-dataview>
+  </div>
 </div>

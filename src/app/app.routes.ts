@@ -1,9 +1,15 @@
-import { InMemoryScrollingOptions, provideRouter, Routes, withInMemoryScrolling } from '@angular/router';
+import {
+  InMemoryScrollingOptions,
+  provideRouter,
+  Routes,
+  withInMemoryScrolling,
+} from '@angular/router';
 import { Cart } from './features/cart/cart';
 import { Home } from './features/home/home';
 import { ProductDetail } from './features/products/product-detail/product-detail';
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
+import { ProductList } from './features/products/product-list/product-list';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -11,13 +17,14 @@ const scrollOpts: InMemoryScrollingOptions = {
 };
 
 export const routes: Routes = [
-    { path: '', component: Home },
-    { path: 'home', component: Home },
-    { path: 'cart', component: Cart },
-    { path: 'login', component: Login},
-    { path: 'register', component: Register},
-    { path: 'product-detail', component: ProductDetail},
-    { path: '**', redirectTo: "home"}
+  { path: '', component: Home },
+  { path: 'home', component: Home },
+  { path: 'cart', component: Cart },
+  { path: 'login', component: Login },
+  { path: 'register', component: Register },
+  { path: 'product-detail', component: ProductDetail },
+  { path: 'product-list', component: ProductList },
+  { path: '**', redirectTo: 'home' },
 ];
 
 export const appRouter = provideRouter(routes, withInMemoryScrolling(scrollOpts));
