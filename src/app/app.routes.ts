@@ -4,12 +4,21 @@ import {
   Routes,
   withInMemoryScrolling,
 } from '@angular/router';
-import { Cart } from './features/cart/cart';
-import { Home } from './features/home/home';
-import { ProductDetail } from './features/products/product-detail/product-detail';
-import { Login } from './features/auth/login/login';
-import { Register } from './features/auth/register/register';
-import { ProductList } from './features/products/product-list/product-list';
+import { Cart } from './customer/features/cart/cart';
+import { Home } from './customer/features/home/home';
+import { ProductDetail } from './customer/features/products/product-detail/product-detail';
+import { Login } from './customer/features/auth/login/login';
+import { Register } from './customer/features/auth/register/register';
+import { ProductList } from './customer/features/products/product-list/product-list';
+import { CustomerPage } from './customer/pages/customer-page/customer-page';
+import { AdminLayoutComponent } from './admin/layout/admin-layout.component';
+import { HomePageComponent } from './admin/home/home-page.component';
+import { UsersPageComponent } from './admin/users/users-page.component';
+import { InventoryPageComponent } from './admin/inventory/inventory-page.component';
+import { OrdersPageComponent } from './admin/orders/orders-page.component';
+import { CategoriesPageComponent } from './admin/categories/categories-page.component';
+
+
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -17,13 +26,46 @@ const scrollOpts: InMemoryScrollingOptions = {
 };
 
 export const routes: Routes = [
-  { path: '', component: Home },
-  { path: 'home', component: Home },
-  { path: 'cart', component: Cart },
-  { path: 'login', component: Login },
-  { path: 'register', component: Register },
-  { path: 'product-detail', component: ProductDetail },
-  { path: 'product-list', component: ProductList },
+  {
+    path: '',
+    component: CustomerPage,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
+      { path: 'home', component: Home },
+      { path: 'cart', component: Cart },
+      { path: 'login', component: Login },
+      { path: 'register', component: Register },
+      { path: 'product-detail', component: ProductDetail },
+      { path: 'product-list', component: ProductList },
+    ],
+  },
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
+      {
+        path: 'home',
+        component: HomePageComponent,
+      },
+      {
+        path: 'users',
+        component: UsersPageComponent,
+      },
+      {
+        path: 'inventory',
+        component: InventoryPageComponent,
+      },
+      {
+        path: 'orders',
+        component: OrdersPageComponent,
+      },
+      {
+        path: 'categories',
+        component: CategoriesPageComponent,
+      },
+    ],
+  },
   { path: '**', redirectTo: 'home' },
 ];
 
