@@ -1,0 +1,396 @@
+<div class="inventory-container">
+  <div class="page-header">
+    <h2>Quản lý kho hàng</h2>
+    <div class="header-actions">
+      <button class="btn btn-success" (click)="openAddModal()">
+        <fa-icon [icon]="faPlus" size="1x"></fa-icon>
+        Thêm sản phẩm
+      </button>
+      <button class="btn btn-info" (click)="showInventoryReport()">
+        <fa-icon [icon]="faChartSimple"></fa-icon>
+        Báo cáo
+      </button>
+      <button class="btn btn-secondary" (click)="exportReport()">
+        <fa-icon [icon]="faDownload"></fa-icon>
+        Xuất CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- Tìm kiếm -->
+  <div class="search-box">
+    <div class="search-wrapper">
+      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="filterProducts()"
+        placeholder="Tìm kiếm theo tên, SKU hoặc mô tả..."
+        class="search-input"
+      />
+    </div>
+    <span class="search-result"
+      >Hiển thị {{ filteredProducts.length }} / {{ products.length }} sản phẩm</span
+    >
+  </div>
+
+  <!-- Bảng danh sách sản phẩm -->
+  <div class="table-container">
+    @if (isLoading) {
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
+        <p class="loading-text">Đang xử lý...</p>
+      </div>
+    </div>
+    }
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th (click)="changeSortColumn('sku')" class="sortable">
+            SKU
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'sku' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th (click)="changeSortColumn('name')" class="sortable">
+            Tên sản phẩm
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'name' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th (click)="changeSortColumn('cost')" class="sortable text-right">
+            Giá vốn
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'cost' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th (click)="changeSortColumn('price')" class="sortable text-right">
+            Giá bán
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'price' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th (click)="changeSortColumn('stockQuantity')" class="sortable text-center">
+            Tồn kho
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'stockQuantity' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th class="text-center status-header">
+            Trạng thái
+            <button class="btn-icon filter-btn" (click)="openStatusFilterModal($event)">
+              <fa-icon [icon]="faFilter"></fa-icon>
+            </button>
+          </th>
+          <th class="text-right">Giá trị tồn</th>
+          <th class="text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let product of filteredProducts"
+          [class.low-stock]="product.stockQuantity <= product.minStockLevel"
+        >
+          <td class="sku">{{ product.sku }}</td>
+          <td>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-desc">{{ product.shortDescription }}</div>
+          </td>
+          <td class="text-right">{{ formatCurrency(product.cost) }}</td>
+          <td class="text-right">
+            <div class="price">{{ formatCurrency(product.price) }}</div>
+            <div class="discount" *ngIf="product.discountPrice > 0">
+              {{ formatCurrency(product.discountPrice) }}
+            </div>
+          </td>
+          <td class="text-center">
+            <span class="stock-badge">{{ product.stockQuantity }}</span>
+            <div class="min-stock">Min: {{ product.minStockLevel }}</div>
+          </td>
+          <td class="text-center">
+            <span [class]="'status-badge ' + getStockStatusClass(product)">
+              {{ getStockStatus(product) }}
+            </span>
+          </td>
+          <td class="text-right stock-value">{{ formatCurrency(calculateStockValue(product)) }}</td>
+          <td class="text-center actions">
+            <button class="btn-icon btn-edit" (click)="openEditModal(product)" title="Sửa">
+              <fa-icon [icon]="faPenToSquare"></fa-icon>
+            </button>
+            <button class="btn-icon btn-delete" (click)="confirmDelete(product)" title="Xóa">
+              <fa-icon [icon]="faTrashCan"></fa-icon>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredProducts.length === 0">
+          <td colspan="8" class="no-data">Không tìm thấy sản phẩm nào</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal thêm/sửa sản phẩm -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ modalMode === 'add' ? 'Thêm sản phẩm mới' : 'Sửa sản phẩm' }}</h3>
+      <button class="btn-close" (click)="closeModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form #productForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mã SKU <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="currentProduct.sku"
+              name="sku"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Slug</label>
+            <input type="text" [(ngModel)]="currentProduct.slug" name="slug" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tên sản phẩm <span class="required">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="currentProduct.name"
+            name="name"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả ngắn</label>
+          <input
+            type="text"
+            [(ngModel)]="currentProduct.shortDescription"
+            name="shortDescription"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả chi tiết</label>
+          <textarea
+            [(ngModel)]="currentProduct.description"
+            name="description"
+            class="form-control"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Giá vốn <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.cost"
+              name="cost"
+              class="form-control"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Giá bán <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.price"
+              name="price"
+              class="form-control"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Giá giảm</label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.discountPrice"
+              name="discountPrice"
+              class="form-control"
+              min="0"
+              step="0.01"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Số lượng tồn kho <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.stockQuantity"
+              name="stockQuantity"
+              class="form-control"
+              min="0"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Mức tồn tối thiểu <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.minStockLevel"
+              name="minStockLevel"
+              class="form-control"
+              min="0"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Trọng lượng (kg)</label>
+            <input
+              type="number"
+              [(ngModel)]="currentProduct.weight"
+              name="weight"
+              class="form-control"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Kích thước</label>
+            <input
+              type="text"
+              [(ngModel)]="currentProduct.dimensions"
+              name="dimensions"
+              class="form-control"
+              placeholder="DxRxC (mm)"
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveProduct()">
+        {{ modalMode === 'add' ? 'Thêm' : 'Cập nhật' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal báo cáo -->
+<div class="modal-overlay" *ngIf="showReport" (click)="closeReport()">
+  <div class="modal-content report-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faChartSimple"></fa-icon>
+        Báo cáo kho hàng
+      </h3>
+      <button class="btn-close" (click)="closeReport()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="report">
+      <div class="report-summary">
+        <div class="report-card">
+          <div class="card-icon">
+            <fa-icon [icon]="faBox" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.totalProducts }}</div>
+            <div class="card-label">Tổng sản phẩm</div>
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="card-icon">
+            <fa-icon [icon]="faCoins" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ formatCurrency(report.totalStockValue) }}</div>
+            <div class="card-label">Tổng giá trị tồn kho</div>
+          </div>
+        </div>
+
+        <div class="report-card warning">
+          <div class="card-icon">
+            <fa-icon [icon]="faTriangleExclamation" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.lowStockProducts }}</div>
+            <div class="card-label">Sản phẩm sắp hết</div>
+          </div>
+        </div>
+
+        <div class="report-card danger">
+          <div class="card-icon">
+            <fa-icon [icon]="faCircleXmark" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.outOfStockProducts }}</div>
+            <div class="card-label">Sản phẩm hết hàng</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h4>Phân loại theo khoảng giá</h4>
+        <div class="category-list">
+          <div class="category-item" *ngFor="let key of objectKeys(report.productsByCategory)">
+            <span class="category-name">{{ key }}</span>
+            <span class="category-count">{{ report.productsByCategory[key] }} sản phẩm</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeReport()">Đóng</button>
+      <button class="btn btn-primary" (click)="exportReport()">
+        <fa-icon [icon]="faFileExport"></fa-icon>
+        Xuất CSV
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal lọc trạng thái -->
+<div class="modal-overlay" *ngIf="showStatusFilterModal" (click)="closeStatusFilterModal()">
+  <div class="modal-content filter-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Lọc theo trạng thái</h3>
+      <button class="btn-close" (click)="closeStatusFilterModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="filter-options-container">
+        <div *ngFor="let status of statusOptions" class="filter-option">
+          <input type="checkbox" [id]="'status-modal-' + status" [(ngModel)]="statusFilters[status]" (ngModelChange)="filterProducts()">
+          <label [for]="'status-modal-' + status">{{ status }}</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="closeStatusFilterModal()">Áp dụng</button>
+    </div>
+  </div>
+</div>

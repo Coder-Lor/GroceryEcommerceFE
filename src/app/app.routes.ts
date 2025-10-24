@@ -4,12 +4,12 @@ import {
   Routes,
   withInMemoryScrolling,
 } from '@angular/router';
-import { Cart } from './features/cart/cart';
-import { Home } from './features/home/home';
-import { ProductDetail } from './features/products/product-detail/product-detail';
-import { Login } from './features/auth/login/login';
-import { Register } from './features/auth/register/register';
-import { ProductList } from './features/products/product-list/product-list';
+import { Cart } from './customer/features/cart/cart';
+import { Home } from './customer/features/home/home';
+import { ProductDetail } from './customer/features/products/product-detail/product-detail';
+import { Login } from './customer/features/auth/login/login';
+import { Register } from './customer/features/auth/register/register';
+import { ProductList } from './customer/features/products/product-list/product-list';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
