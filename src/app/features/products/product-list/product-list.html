@@ -1,43 +1,97 @@
-<div class="product-list container">
-  <p-dataview #dv [value]="products" [layout]="layout">
-    <!-- Header -->
-    <ng-template #header>
-      <div class="d-flex justify-content-between">
-        <h4 style="color: black;">product list</h4>
-        <p-selectbutton [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
-          <ng-template #item let-item>
-            <i class="pi" [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"></i>
-          </ng-template>
-        </p-selectbutton>
+<div class="product-page container-fluid">
+  <div class="row">
+    <!-- LEFT SIDEBAR -->
+    <aside class="col-lg-2 col-md-4 filter-sidebar">
+      <div class="filter-section category">
+        <h6 class="filter-title"><i class="pi pi-list mr-2"></i> Tất Cả Danh Mục</h6>
+        <ul class="filter-list">
+          <li class="category-main">Thời Trang Nam</li>
+          <li>Áo Khoác</li>
+          <li>Áo Vest và Blazer</li>
+          <li>Áo Hoodie, Áo Len & Áo Nỉ</li>
+          <li>Quần Jeans</li>
+          <li>Quần Dài/Quần Âu</li>
+          <li class="see-more" (click)="toggleCategory()">
+            {{ showMoreCategory ? 'Thu gọn ▲' : 'Thêm ▼' }}
+          </li>
+          <ng-container *ngIf="showMoreCategory">
+            <li>Áo Polo</li>
+            <li>Đồ Bộ</li>
+          </ng-container>
+        </ul>
       </div>
-    </ng-template>
 
-    <!-- LIST layout -->
-    <ng-template #list let-items>
-      @for (item of products; track $index; let first = $first) {
-      <div class="border-top pt-4">
-        <product-card [product]="item" [layout]="'list'" [first]="first"
-          [getSeverity]="getSeverity.bind(this)"></product-card>
-      </div>
-      }
-      <!-- <div *ngFor="let item of items; let first = first">
-          <product-card [product]="item" [layout]="'list'" [first]="first"
-            [getSeverity]="getSeverity.bind(this)"></product-card>
-        </div> -->
-    </ng-template>
-
-    <!-- GRID layout -->
-    <ng-template #grid let-items>
-      <div class="row g-4">
-        @for (item of products; track $index) {
-        <div class="col-12 col-sm-6 col-lg-3">
-          <product-card [product]="item" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
+      <div class="filter-section location mt-4">
+        <h6 class="filter-title"><i class="pi pi-filter mr-2"></i> BỘ LỌC TÌM KIẾM</h6>
+        <div class="filter-subtitle">Nơi Bán</div>
+        <div class="checkbox-list">
+          <div *ngFor="let city of cities">
+            <input type="checkbox" [id]="city" />
+            <label [for]="city">{{ city }}</label>
+          </div>
+          <p class="see-more" (click)="toggleLocation()">
+            {{ showMoreLocation ? 'Thu gọn ▲' : 'Thêm ▼' }}
+          </p>
+          <div *ngIf="showMoreLocation">
+            <div *ngFor="let city of moreCities">
+              <input type="checkbox" [id]="city" />
+              <label [for]="city">{{ city }}</label>
+            </div>
+          </div>
         </div>
-        }
-        <!-- <div *ngFor="let product of items" class="col-12 col-sm-6 col-md-4 col-xl-6">
+      </div>
+    </aside>
+
+    <!-- RIGHT PRODUCT LIST -->
+    <section class="col-lg-9 col-md-8">
+      <div class="product-list container-fluid">
+        <p-dataview #dv [value]="products" [layout]="layout">
+          <!-- Header -->
+          <ng-template #header>
+            <div class="d-flex" style="gap: 10px">
+              <p style="color: #111; margin-top: 6px">Sort by</p>
+              <p-button label="Phổ biến" severity="secondary" />
+              <p-button label="Mới nhất" severity="secondary" />
+              <p-button label="Bán chạy" severity="secondary" />
+              <p-select
+                [options]="sortByPrice"
+                [(ngModel)]="selectField"
+                optionLabel="title"
+                placeholder="Giá: "
+                class="w-full md:w-56"
+              />
+            </div>
+          </ng-template>
+
+          <!-- GRID layout -->
+          <ng-template #grid let-items>
+            <div class="row g-4">
+              @for (item of products; track $index) {
+              <div class="col-12 col-sm-6 col-lg-3">
+                <product-card
+                  [product]="item"
+                  [layout]="'grid'"
+                  [getSeverity]="getSeverity.bind(this)"
+                ></product-card>
+              </div>
+              }
+              <!-- <div *ngFor="let product of items" class="col-12 col-sm-6 col-md-4 col-xl-6">
             <product-card [product]="product" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
           </div> -->
+            </div>
+          </ng-template>
+        </p-dataview>
       </div>
-    </ng-template>
-  </p-dataview>
+    </section>
+  </div>
+  <div class="row">
+    <div class="d-flex justify-content-center mt-4">
+      <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="first"
+        [rows]="rows"
+        [totalRecords]="120"
+      />
+    </div>
+  </div>
 </div>

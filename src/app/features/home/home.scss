@@ -81,32 +81,6 @@
   width: auto !important;
 }
 
-.product-list {
-  background-color: #fff;
-}
-
-:host ::ng-deep .p-dataview-grid {
-  background-color: #fff !important;
-}
-
-:host ::ng-deep .p-dataview .p-dataview-header {
-  background-color: #f1f4f7 !important;
-  padding: 12px 0 !important;
-}
-
-:host ::ng-deep .p-dataview .p-dataview-header .p-selectbutton {
-  background-color: none !important;
-}
-
-:host ::ng-deep .p-ripple.p-component.p-togglebutton {
-  background-color: #fff !important;
-  border: none !important;
-  color: #bbb !important;
-}
-
-:host ::ng-deep .p-ripple.p-component.p-togglebutton.p-togglebutton-checked .p-togglebutton-content {
-  background-color: #f1f4f7 !important;
-}
 
 /* Extra: đảm bảo card nhỏ trên mobile hiển thị OK */
 @media (max-width: 767.98px) {
