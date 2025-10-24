@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InventoryService } from '../../core/services/inventory.service';
+import { InventoryService } from '../../core/service/inventory.service';
 import { Product, InventoryReport } from './models/product.model';
 import { faPlus, faChartSimple, faFile, faFileArrowDown, faDownload, faMagnifyingGlass, faPenToSquare, faTrashCan, faXmark, faBox, faMoneyBill, faTriangleExclamation, faCircleXmark, faFileExport, faHurricane, faCoins, faSort, faSortUp, faSortDown, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-inventory-page',
