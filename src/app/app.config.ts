@@ -1,4 +1,10 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+  provideAppInitializer,
+  inject
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
@@ -9,12 +15,14 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
+import { AuthService } from '@core/service/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes), provideClientHydration(withEventReplay()),
+    provideRouter(routes),
+    provideClientHydration(withEventReplay()),
     provideAnimations(),
     providePrimeNG({
       theme: {
@@ -22,13 +30,20 @@ export const appConfig: ApplicationConfig = {
         options: {
           prefix: 'p',
           darkModeSelector: 'system',
-          cssLayer: false
-        }
+          cssLayer: false,
+        },
       },
       ripple: true,
-      inputVariant: 'filled'
+      inputVariant: 'filled',
     }),
     provideCharts(withDefaultRegisterables()),
     provideHttpClient(),
-  ]
+    // provideAppInitializer(() => {
+    //   // Dùng 'inject()' để lấy service
+    //   const authService = inject(AuthService); 
+      
+    //   // Trả về hàm mà bạn muốn chạy
+    //   return authService.refreshOnLoad();
+    // })
+  ],
 };

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthClient, RegisterCommand } from '@core/service/apiClient';
+import { AuthClient, RegisterCommand } from '@core/service/system-admin.service';
 
 
 @Component({
@@ -53,6 +53,7 @@ export class Register {
   }
 
   onSubmit() {
+    console.log(this.registerForm);
     if (this.registerForm.invalid) {
       // Đánh dấu tất cả các field là đã touched để hiển thị lỗi
       Object.keys(this.registerForm.controls).forEach(key => {
@@ -72,12 +73,34 @@ export class Register {
 
     this.authClient.registerAccount(registerCommand).subscribe({
       next: (response: any) => {
+        console.log("in next");
         this.isSubmitting = false;
         if (response.isSuccess) {
+          // Lưu token vào localStorage
+          if (response.data?.token) {
+            localStorage.setItem('accessToken', response.data.token);
+          }
+          
+          // Lưu refresh token nếu có
+          if (response.data?.refreshToken) {
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+          }
+          
+          // Lưu userId nếu có
+          if (response.data?.userId) {
+            localStorage.setItem('userId', response.data.userId);
+          }
+          
+          // Lưu thời gian hết hạn nếu có
+          if (response.data?.expiresAt) {
+            localStorage.setItem('tokenExpiresAt', response.data.expiresAt);
+          }
+          
           // Đăng ký thành công, chuyển đến trang đăng nhập
           alert('Đăng ký thành công! Vui lòng đăng nhập.');
-          this.router.navigate(['/login']);
+          // this.router.navigate(['/login']);
         } else {
+
           // Hiển thị lỗi từ server
           this.errorMessage = response.errorMessage || 'Đăng ký thất bại. Vui lòng thử lại.';
         }

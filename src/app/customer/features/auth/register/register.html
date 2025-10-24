@@ -23,12 +23,13 @@
     <div class="register-right">
       <h4 style="text-align: center; margin-bottom: 5px">Đăng ký</h4>
 
-      <form style="margin-bottom: 10px">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" style="margin-bottom: 10px">
         <!-- Email -->
         <div class="form-group position-relative">
           <label>Email</label>
           <input
             type="email"
+            formControlName="email"
             placeholder="Nhập email của bạn"
             class="form-control input-with-icon"
           />
@@ -52,6 +53,7 @@
           <label>Mật khẩu</label>
           <input
             [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
             placeholder="Nhập mật khẩu của bạn"
             class="form-control input-with-icon"
           />
@@ -66,6 +68,7 @@
           <label>Xác nhận mật khẩu</label>
           <input
             [type]="showPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
             placeholder="Xác nhận mật khẩu của bạn"
             class="form-control input-with-icon"
           />

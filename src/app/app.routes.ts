@@ -17,6 +17,8 @@ import { UsersPageComponent } from './admin/users/users-page.component';
 import { InventoryPageComponent } from './admin/inventory/inventory-page.component';
 import { OrdersPageComponent } from './admin/orders/orders-page.component';
 import { CategoriesPageComponent } from './admin/categories/categories-page.component';
+import { authGuard } from './core/service/auth.guard';
+import { NotFoundComponent } from './core/components/not-found/not-found.component';
 
 
 
@@ -42,6 +44,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
+    // canActivate: [authGuard], // Bảo vệ toàn bộ route admin
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       {
@@ -66,7 +69,7 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', component: NotFoundComponent }, // Trang 404
 ];
 
 export const appRouter = provideRouter(routes, withInMemoryScrolling(scrollOpts));
