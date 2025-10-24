@@ -1,14 +1,18 @@
 <!-- Overlay -->
-<div class="login-overlay active">
-  <div class="login-modal">
+<div class="register-overlay active">
+  <div class="register-modal">
     <button class="btn-close" (click)="exitLoginForm()"></button>
 
     <!-- Left side -->
-    <div class="login-left">
-      <img src="/images/background.png" alt="Banner đăng nhập" class="login-banner" />
-      <div class="login-left-content">
+    <div class="register-left">
+      <img src="/images/background.png" alt="Banner đăng ký" class="register-banner" />
+      <div class="register-left-content">
         <h3>
-          <img src="/icons/Icon.svg" alt="Biểu tượng GroceryMart" style="width: 28px; height: 28px; margin-bottom: 5px" />
+          <img
+            src="/icons/Icon.svg"
+            alt="Biểu tượng GroceryMart"
+            style="width: 28px; height: 28px; margin-bottom: 5px"
+          />
           GroceryMart
         </h3>
         <p>Sản phẩm tạp hóa cao cấp, chất lượng &amp; đáng tin cậy.</p>
@@ -16,47 +20,73 @@
     </div>
 
     <!-- Right side -->
-    <div class="login-right">
-      <h4 style="text-align: center; margin-bottom: 5px;">Đăng ký</h4>
-      <p class="text-muted" style="text-align: center; margin-bottom: 20px;">
-        Hãy tạo tài khoản của bạn để mua sắm như chuyên gia và tiết kiệm tiền.
-      </p>
+    <div class="register-right">
+      <h4 style="text-align: center; margin-bottom: 5px">Đăng ký</h4>
 
-      <form style="margin-bottom: 10px;">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" style="margin-bottom: 10px">
         <!-- Email -->
         <div class="form-group position-relative">
           <label>Email</label>
-          <input type="email" placeholder="Nhập email của bạn" class="form-control input-with-icon" />
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Nhập email của bạn"
+            class="form-control input-with-icon"
+          />
           <i class="pi pi-envelope input-icon"></i>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group position-relative">
+          <label>Tên người dùng</label>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="Nhập tên người dùng"
+            class="form-control input-with-icon"
+          />
+          <i class="pi pi-user input-icon"></i>
         </div>
 
         <!-- Password -->
         <div class="form-group position-relative">
           <label>Mật khẩu</label>
-          <input [type]="showPassword ? 'text' : 'password'" placeholder="Nhập mật khẩu của bạn"
-            class="form-control input-with-icon" />
-          <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
-            (click)="togglePassword()"></i>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Nhập mật khẩu của bạn"
+            class="form-control input-with-icon"
+          />
+          <i
+            [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+            class="input-icon clickable"
+            (click)="togglePassword()"
+          ></i>
         </div>
 
         <div class="form-group position-relative">
           <label>Xác nhận mật khẩu</label>
-          <input [type]="showPassword ? 'text' : 'password'" placeholder="Xác nhận mật khẩu của bạn"
-            class="form-control input-with-icon" />
-          <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
-            (click)="togglePassword()"></i>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Xác nhận mật khẩu của bạn"
+            class="form-control input-with-icon"
+          />
+          <i
+            [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+            class="input-icon clickable"
+            (click)="togglePassword()"
+          ></i>
         </div>
 
         <!-- Bottom -->
         <div class="form-bottom">
-          <label class="remember">
-            <input type="checkbox" /> Ghi nhớ đăng nhập
-          </label>
+          <label class="remember"> <input type="checkbox" /> Ghi nhớ đăng nhập </label>
           <!-- <a href="#" class="text-link">Forgot password?</a> -->
         </div>
 
         <!-- Buttons -->
-        <button type="submit" class="btn-login">Đăng ký</button>
+        <button type="submit" class="btn-register">Đăng ký</button>
 
         <button type="button" class="btn-google">
           <i class="pi pi-google"></i>
