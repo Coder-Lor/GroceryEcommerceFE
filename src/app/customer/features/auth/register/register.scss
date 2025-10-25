@@ -1,5 +1,5 @@
 /* ===== Overlay layer ===== */
-.login-overlay {
+.register-overlay {
   position: fixed;
   inset: 0;
   /* Lighter, subtle white overlay for a light theme */
@@ -13,13 +13,13 @@
   font-family: "Poppins", sans-serif;
 }
 
-.login-overlay.active {
+.register-overlay.active {
   display: flex;
   opacity: 1;
 }
 
-/* ===== Login Modal ===== */
-.login-modal {
+/* ===== Register Modal ===== */
+.register-modal {
   display: flex;
   background: #ffffff;
   border-radius: 12px;
@@ -31,6 +31,7 @@
   position: relative;
   animation: fadeIn 0.4s ease;
   box-shadow: 0 8px 40px rgba(16, 24, 40, 0.08);
+  height: 600px;
 }
 
 .btn-close {
@@ -48,11 +49,11 @@
 }
 
 .btn-close:hover {
-  opacity: 1;
+  opacity: 0.5;
 }
 
 /* ===== Left side ===== */
-.login-left {
+.register-left {
   flex: 1;
   /* use a soft pastel tone for contrast with the white modal */
   background: linear-gradient(180deg, #f6f7fb 0%, #eef2fb 100%);
@@ -64,11 +65,11 @@
 
 }
 
-.login-left h3 {
+.register-left h3 {
   vertical-align: middle;
 }
 
-.login-banner {
+.register-banner {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -78,40 +79,51 @@
   /* slightly more visible on light background */
 }
 
-.login-left-content {
+.register-left-content {
   position: relative;
   padding: 40px;
   z-index: 1;
 }
 
-.login-left-content h3 {
+.register-left-content h3 {
   font-size: 28px;
   font-weight: 700;
   color: #f1f4f7;
 }
 
-.login-left-content p {
+.register-left-content p {
   color: #f1f4f7;
   font-size: 15px;
 }
 
 /* ===== Right side ===== */
-.login-right {
+.register-right {
   flex: 1;
   padding: 40px 50px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  // justify-content: center;
   background: #ffffff;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-track {
+    background: --background-3;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: --secondary-color;
+    border-radius: 12px;
+  }
 }
 
-.login-right h4 {
+.register-right h4 {
   font-size: 26px;
   margin-bottom: 8px;
   color: #111;
 }
 
-.login-right p {
+.register-right p {
   font-size: 15px;
   color: #666;
   margin-bottom: 24px;
@@ -202,7 +214,7 @@
 }
 
 /* ===== Buttons ===== */
-.btn-login {
+.btn-register {
   width: 100%;
   padding: 12px;
   border-radius: 6px;
@@ -215,7 +227,7 @@
   transition: background 0.15s ease, transform 0.05s ease;
 }
 
-.btn-login:hover {
+.btn-register:hover {
   opacity: 0.9;
   transform: translateY(-1px);
 }
@@ -288,16 +300,16 @@ small {
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .login-modal {
+  .register-modal {
     flex-direction: column;
     width: 90%;
   }
 
-  .login-left {
+  .register-left {
     display: none;
   }
 
-  .login-right {
+  .register-right {
     padding: 40px 24px;
   }
 }

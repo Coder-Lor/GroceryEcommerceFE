@@ -1,0 +1,370 @@
+<div class="categories-container">
+  <div class="page-header">
+    <h2>Quản lý danh mục</h2>
+    <div class="header-actions">
+      <button class="btn btn-success" (click)="openAddModal()">
+        <fa-icon [icon]="faPlus" size="1x"></fa-icon>
+        Thêm danh mục
+      </button>
+      <button class="btn btn-info" (click)="showCategoryReport()">
+        <fa-icon [icon]="faChartSimple"></fa-icon>
+        Báo cáo
+      </button>
+      <button class="btn btn-secondary" (click)="exportReport()">
+        <fa-icon [icon]="faDownload"></fa-icon>
+        Xuất CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- Tìm kiếm -->
+  <div class="search-box">
+    <div class="search-wrapper">
+      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="filterCategories()"
+        placeholder="Tìm kiếm theo tên danh mục..."
+        class="search-input"
+      />
+    </div>
+    <span class="search-result"
+      >Hiển thị {{ filteredCategories.length }} / {{ categories.length }} danh mục</span
+    >
+  </div>
+
+  <!-- Bảng danh sách danh mục -->
+  <div class="table-container">
+    @if (isLoading) {
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
+        <p class="loading-text">Đang tải dữ liệu...</p>
+      </div>
+    </div>
+    }
+    <table class="category-table">
+      <thead>
+        <tr>
+          <th (click)="changeSortColumn('name')" class="sortable">
+            Tên danh mục
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'name' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th>Slug</th>
+          <th>Danh mục cha</th>
+          <th (click)="changeSortColumn('displayOrder')" class="sortable text-center">
+            Thứ tự
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'displayOrder' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th (click)="changeSortColumn('productCount')" class="sortable text-center">
+            Số sản phẩm
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'productCount' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th class="text-center">Trạng thái</th>
+          <th class="text-center">Ngày tạo</th>
+          <th class="text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of filteredCategories">
+          <td>
+            <div class="category-name">
+              <fa-icon [icon]="faFolder" class="category-icon"></fa-icon>
+              {{ category.name || '' }}
+            </div>
+            <div class="category-desc" *ngIf="category.description">{{ category.description }}</div>
+          </td>
+          <td class="slug">{{ category.slug || '' }}</td>
+          <td>
+            <span class="parent-badge" *ngIf="category.parentCategoryName">
+              {{ category.parentCategoryName }}
+            </span>
+            <span class="parent-badge root" *ngIf="!category.parentCategoryName">
+              Danh mục gốc
+            </span>
+          </td>
+          <td class="text-center">
+            <span class="order-badge">{{ category.displayOrder || 0 }}</span>
+          </td>
+          <td class="text-center">
+            <span class="count-badge">{{ category.productCount || 0 }}</span>
+          </td>
+          <td class="text-center">
+            <span [class]="'status-badge ' + getStatusClass(category)">
+              {{ getStatusText(category) }}
+            </span>
+          </td>
+          <td class="text-center">{{ formatDate(category.createdAt) }}</td>
+          <td class="text-center actions">
+            <button class="btn-icon btn-view" (click)="viewSubCategories(category)" title="Xem danh mục con">
+              <fa-icon [icon]="faEye"></fa-icon>
+            </button>
+            <button class="btn-icon btn-edit" (click)="openEditModal(category)" title="Sửa">
+              <fa-icon [icon]="faPenToSquare"></fa-icon>
+            </button>
+            <button class="btn-icon btn-delete" (click)="confirmDelete(category)" title="Xóa">
+              <fa-icon [icon]="faTrashCan"></fa-icon>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredCategories.length === 0">
+          <td colspan="8" class="no-data">Không tìm thấy danh mục nào</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal thêm/sửa danh mục -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ modalMode === 'add' ? 'Thêm danh mục mới' : 'Sửa danh mục' }}</h3>
+      <button class="btn-close" (click)="closeModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form #categoryForm="ngForm">
+        <div class="form-group">
+          <label>Tên danh mục <span class="required">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="currentCategory.name"
+            name="name"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Slug <span class="required">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="currentCategory.slug"
+            name="slug"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả</label>
+          <textarea
+            [(ngModel)]="currentCategory.description"
+            name="description"
+            class="form-control"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Danh mục cha</label>
+            <select
+              [(ngModel)]="currentCategory.parentCategoryId"
+              name="parentCategoryId"
+              class="form-control"
+            >
+              <option [ngValue]="undefined">-- Danh mục gốc --</option>
+              <option *ngFor="let cat of allCategories" [ngValue]="cat.categoryId">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Thứ tự hiển thị <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentCategory.displayOrder"
+              name="displayOrder"
+              class="form-control"
+              min="0"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Meta Title</label>
+            <input
+              type="text"
+              [(ngModel)]="currentCategory.metaTitle"
+              name="metaTitle"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Meta Description</label>
+            <input
+              type="text"
+              [(ngModel)]="currentCategory.metaDescription"
+              name="metaDescription"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Trạng thái <span class="required">*</span></label>
+          <select
+            [(ngModel)]="currentCategory.status"
+            name="status"
+            class="form-control"
+            required
+          >
+            <option [ngValue]="1">Hoạt động</option>
+            <option [ngValue]="0">Tạm ẩn</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveCategory()">
+        {{ modalMode === 'add' ? 'Thêm' : 'Cập nhật' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal xem danh mục con -->
+<div class="modal-overlay" *ngIf="showSubCategoriesModal" (click)="closeSubCategoriesModal()">
+  <div class="modal-content sub-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faFolder"></fa-icon>
+        Danh mục con của "{{ selectedCategory?.name }}"
+      </h3>
+      <button class="btn-close" (click)="closeSubCategoriesModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="selectedCategory && selectedCategory.subCategories && selectedCategory.subCategories.length > 0">
+        <div class="sub-category-list">
+          <div
+            class="sub-category-item"
+            *ngFor="let subCat of selectedCategory.subCategories"
+          >
+            <div class="sub-cat-info">
+              <fa-icon [icon]="faFolder" class="sub-icon"></fa-icon>
+              <div>
+                <div class="sub-cat-name">{{ subCat.name }}</div>
+                <div class="sub-cat-meta">
+                  <span>{{ subCat.productCount || 0 }} sản phẩm</span>
+                  <span class="separator">•</span>
+                  <span>Thứ tự: {{ subCat.displayOrder || 0 }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="sub-cat-actions">
+              <button class="btn-icon btn-edit" (click)="openEditModal(subCat)" title="Sửa">
+                <fa-icon [icon]="faPenToSquare"></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!selectedCategory || !selectedCategory.subCategories || selectedCategory.subCategories.length === 0" class="no-sub-categories">
+        <fa-icon [icon]="faFolderOpen" size="3x"></fa-icon>
+        <p>Danh mục này chưa có danh mục con</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeSubCategoriesModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal báo cáo -->
+<div class="modal-overlay" *ngIf="showReport" (click)="closeReport()">
+  <div class="modal-content report-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faChartSimple"></fa-icon>
+        Báo cáo danh mục
+      </h3>
+      <button class="btn-close" (click)="closeReport()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="report">
+      <div class="report-summary">
+        <div class="report-card">
+          <div class="card-icon">
+            <fa-icon [icon]="faFolder" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.totalCategories }}</div>
+            <div class="card-label">Tổng danh mục</div>
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="card-icon">
+            <fa-icon [icon]="faBox" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.totalProducts }}</div>
+            <div class="card-label">Tổng số sản phẩm</div>
+          </div>
+        </div>
+
+        <div class="report-card warning">
+          <div class="card-icon">
+            <fa-icon [icon]="faCheckCircle" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.activeCategories }}</div>
+            <div class="card-label">Đang hoạt động</div>
+          </div>
+        </div>
+
+        <div class="report-card danger">
+          <div class="card-icon">
+            <fa-icon [icon]="faTimesCircle" size="1x"></fa-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ report.inactiveCategories }}</div>
+            <div class="card-label">Đã ẩn</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h4>Top danh mục có nhiều sản phẩm nhất</h4>
+        <div class="category-list">
+          <div class="category-item" *ngFor="let item of report.topCategories">
+            <span class="category-name">{{ item.name }}</span>
+            <span class="category-count">{{ item.count }} sản phẩm</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeReport()">Đóng</button>
+      <button class="btn btn-primary" (click)="exportReport()">
+        <fa-icon [icon]="faFileExport"></fa-icon>
+        Xuất CSV
+      </button>
+    </div>
+  </div>
+</div>
