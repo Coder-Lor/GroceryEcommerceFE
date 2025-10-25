@@ -1,0 +1,264 @@
+<div class="add-product-container">
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <fa-icon [icon]="faArrowLeft"></fa-icon>
+      Quay lại
+    </button>
+    <h2>Thêm sản phẩm mới</h2>
+    <button class="btn-generate-sample" (click)="generateSampleData()" type="button">
+      <fa-icon [icon]="faMagic"></fa-icon>
+      Sinh dữ liệu mẫu
+    </button>
+  </div>
+
+  <div class="form-container">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3 class="section-title">Thông tin cơ bản</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mã SKU <span class="required">*</span></label>
+            <input
+              type="text"
+              formControlName="sku"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('sku')"
+              placeholder="Nhập mã SKU"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('sku')">
+              {{ getErrorMessage('sku') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Slug</label>
+            <input
+              type="text"
+              formControlName="slug"
+              class="form-control"
+              placeholder="Nhập slug (tự động tạo nếu để trống)"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tên sản phẩm <span class="required">*</span></label>
+          <input
+            type="text"
+            formControlName="name"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('name')"
+            placeholder="Nhập tên sản phẩm"
+          />
+          <div class="error-message" *ngIf="isFieldInvalid('name')">
+            {{ getErrorMessage('name') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Danh mục <span class="required">*</span></label>
+          <button type="button" class="btn-select-category" (click)="openCategoryModal()">
+            <fa-icon [icon]="faFolder"></fa-icon>
+            <span *ngIf="!selectedCategory">Chọn danh mục</span>
+            <span *ngIf="selectedCategory">{{ selectedCategory.name }}</span>
+          </button>
+          <div class="error-message" *ngIf="isFieldInvalid('categoryId')">
+            {{ getErrorMessage('categoryId') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả ngắn</label>
+          <input
+            type="text"
+            formControlName="shortDescription"
+            class="form-control"
+            placeholder="Nhập mô tả ngắn"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả chi tiết</label>
+          <textarea
+            formControlName="description"
+            class="form-control"
+            rows="5"
+            placeholder="Nhập mô tả chi tiết về sản phẩm"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Pricing Section -->
+      <div class="form-section">
+        <h3 class="section-title">Thông tin giá</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Giá vốn <span class="required">*</span></label>
+            <input
+              type="number"
+              formControlName="cost"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('cost')"
+              min="0"
+              step="1000"
+              placeholder="0"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('cost')">
+              {{ getErrorMessage('cost') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Giá bán <span class="required">*</span></label>
+            <input
+              type="number"
+              formControlName="price"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('price')"
+              min="0"
+              step="1000"
+              placeholder="0"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('price')">
+              {{ getErrorMessage('price') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Giá giảm</label>
+            <input
+              type="number"
+              formControlName="discountPrice"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('discountPrice')"
+              min="0"
+              step="1000"
+              placeholder="0"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('discountPrice')">
+              {{ getErrorMessage('discountPrice') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Section -->
+      <div class="form-section">
+        <h3 class="section-title">Thông tin kho hàng</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Số lượng tồn kho <span class="required">*</span></label>
+            <input
+              type="number"
+              formControlName="stockQuantity"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('stockQuantity')"
+              min="0"
+              placeholder="0"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('stockQuantity')">
+              {{ getErrorMessage('stockQuantity') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Mức tồn tối thiểu <span class="required">*</span></label>
+            <input
+              type="number"
+              formControlName="minStockLevel"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('minStockLevel')"
+              min="0"
+              placeholder="10"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('minStockLevel')">
+              {{ getErrorMessage('minStockLevel') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Physical Properties Section -->
+      <div class="form-section">
+        <h3 class="section-title">Thông tin vật lý</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Trọng lượng (kg)</label>
+            <input
+              type="number"
+              formControlName="weight"
+              class="form-control"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Kích thước (DxRxC mm)</label>
+            <input
+              type="text"
+              formControlName="dimensions"
+              class="form-control"
+              placeholder="VD: 100x200x50"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="goBack()" [disabled]="isSubmitting">
+          Hủy
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+          <fa-icon [icon]="faSave" *ngIf="!isSubmitting"></fa-icon>
+          <span *ngIf="!isSubmitting">Thêm sản phẩm</span>
+          <span *ngIf="isSubmitting">Đang xử lý...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Category Selection Modal -->
+<div class="modal-overlay" *ngIf="showCategoryModal" (click)="closeCategoryModal()">
+  <div class="modal-content category-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faFolder"></fa-icon>
+        Chọn danh mục
+      </h3>
+      <button class="btn-close" (click)="closeCategoryModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="category-list">
+        <div 
+          *ngFor="let item of getFlatCategoryList(categories)" 
+          class="category-item"
+          [style.padding-left.px]="20 + (item.level * 20)"
+          (click)="selectCategory(item.category)"
+          [class.selected]="selectedCategory?.categoryId === item.category.categoryId"
+        >
+          <fa-icon [icon]="faCheck" class="check-icon" *ngIf="selectedCategory?.categoryId === item.category.categoryId"></fa-icon>
+          <span class="category-name">{{ item.category.name }}</span>
+        </div>
+        <div *ngIf="categories.length === 0" class="no-data">
+          Không có danh mục nào
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeCategoryModal()">Đóng</button>
+    </div>
+  </div>
+</div>

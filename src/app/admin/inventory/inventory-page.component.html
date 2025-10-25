@@ -91,23 +91,23 @@
       <tbody>
         <tr
           *ngFor="let product of filteredProducts"
-          [class.low-stock]="product.stockQuantity <= product.minStockLevel"
+          [class.low-stock]="(product.stockQuantity || 0) <= (product.minStockLevel || 0)"
         >
-          <td class="sku">{{ product.sku }}</td>
+          <td class="sku">{{ product.sku || '' }}</td>
           <td>
-            <div class="product-name">{{ product.name }}</div>
-            <div class="product-desc">{{ product.shortDescription }}</div>
+            <div class="product-name">{{ product.name || '' }}</div>
+            <div class="product-desc">{{ product.shortDescription || '' }}</div>
           </td>
-          <td class="text-right">{{ formatCurrency(product.cost) }}</td>
+          <td class="text-right">{{ formatCurrency(product.cost || 0) }}</td>
           <td class="text-right">
-            <div class="price">{{ formatCurrency(product.price) }}</div>
-            <div class="discount" *ngIf="product.discountPrice > 0">
-              {{ formatCurrency(product.discountPrice) }}
+            <div class="price">{{ formatCurrency(product.price || 0) }}</div>
+            <div class="discount" *ngIf="(product.discountPrice || 0) > 0">
+              {{ formatCurrency(product.discountPrice || 0) }}
             </div>
           </td>
           <td class="text-center">
-            <span class="stock-badge">{{ product.stockQuantity }}</span>
-            <div class="min-stock">Min: {{ product.minStockLevel }}</div>
+            <span class="stock-badge">{{ product.stockQuantity || 0 }}</span>
+            <div class="min-stock">Min: {{ product.minStockLevel || 0 }}</div>
           </td>
           <td class="text-center">
             <span [class]="'status-badge ' + getStockStatusClass(product)">

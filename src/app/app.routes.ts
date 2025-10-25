@@ -15,6 +15,7 @@ import { AdminLayoutComponent } from './admin/layout/admin-layout.component';
 import { HomePageComponent } from './admin/home/home-page.component';
 import { UsersPageComponent } from './admin/users/users-page.component';
 import { InventoryPageComponent } from './admin/inventory/inventory-page.component';
+import { AddNewProductComponent } from './admin/inventory/add-new-product/add-new-product.component';
 import { OrdersPageComponent } from './admin/orders/orders-page.component';
 import { CategoriesPageComponent } from './admin/categories/categories-page.component';
 import { authGuard } from './core/service/auth.guard';
@@ -58,6 +59,10 @@ export const routes: Routes = [
       {
         path: 'inventory',
         component: InventoryPageComponent,
+      },
+      {
+        path: 'inventory/add-new-product',
+        component: AddNewProductComponent,
       },
       {
         path: 'orders',

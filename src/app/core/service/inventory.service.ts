@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Product, InventoryReport } from '../../admin/inventory/models/product.model';
+import { ProductBaseResponse } from '@services/system-admin.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,38 +21,38 @@ export class InventoryService {
 
   // Lấy sản phẩm theo ID
   getProductById(id: number): Product | undefined {
-    return this.productsSubject.value.find(p => p.id === id);
+    return this.productsSubject.value.find(p => p.productId === id.toString());
   }
 
   // Thêm sản phẩm mới
   addProduct(product: Product): void {
     const products = this.productsSubject.value;
-    const newProduct = {
-      ...product,
-      id: this.nextId++,
+    const newProduct = ProductBaseResponse.fromJS({
+      ...product.toJSON(),
+      productId: (this.nextId++).toString(),
       createdAt: new Date(),
       updatedAt: new Date()
-    };
+    });
     this.productsSubject.next([...products, newProduct]);
   }
 
   // Cập nhật sản phẩm
   updateProduct(id: number, product: Partial<Product>): void {
     const products = this.productsSubject.value;
-    const index = products.findIndex(p => p.id === id);
+    const index = products.findIndex(p => p.productId === id.toString());
     if (index !== -1) {
-      products[index] = {
-        ...products[index],
+      products[index] = ProductBaseResponse.fromJS({
+        ...products[index].toJSON(),
         ...product,
         updatedAt: new Date()
-      };
+      });
       this.productsSubject.next([...products]);
     }
   }
 
   // Xóa sản phẩm
   deleteProduct(id: number): void {
-    const products = this.productsSubject.value.filter(p => p.id !== id);
+    const products = this.productsSubject.value.filter(p => p.productId !== id.toString());
     this.productsSubject.next(products);
   }
 
@@ -61,9 +62,9 @@ export class InventoryService {
     
     return {
       totalProducts: products.length,
-      totalStockValue: products.reduce((sum, p) => sum + (p.stockQuantity * p.cost), 0),
-      lowStockProducts: products.filter(p => p.stockQuantity <= p.minStockLevel && p.stockQuantity > 0).length,
-      outOfStockProducts: products.filter(p => p.stockQuantity === 0).length,
+      totalStockValue: products.reduce((sum, p) => sum + ((p.stockQuantity || 0) * (p.cost || 0)), 0),
+      lowStockProducts: products.filter(p => (p.stockQuantity || 0) <= (p.minStockLevel || 0) && (p.stockQuantity || 0) > 0).length,
+      outOfStockProducts: products.filter(p => (p.stockQuantity || 0) === 0).length,
       productsByCategory: this.groupProductsByPriceRange(products)
     };
   }
@@ -72,11 +73,12 @@ export class InventoryService {
   private groupProductsByPriceRange(products: Product[]): { [key: string]: number } {
     return products.reduce((acc, product) => {
       let range: string;
-      if (product.price < 100000) {
+      const price = product.price || 0;
+      if (price < 100000) {
         range = 'Dưới 100k';
-      } else if (product.price < 500000) {
+      } else if (price < 500000) {
         range = '100k - 500k';
-      } else if (product.price < 1000000) {
+      } else if (price < 1000000) {
         range = '500k - 1tr';
       } else {
         range = 'Trên 1tr';
@@ -89,8 +91,8 @@ export class InventoryService {
   // Dữ liệu mẫu để test
   private getMockProducts(): Product[] {
     return [
-      {
-        id: 1,
+      ProductBaseResponse.fromJS({
+        productId: '1',
         sku: 'HW-EPH-007',
         name: 'Tai Nghe Không Dây Cao Cấp',
         slug: 'tai-nghe-khong-day-cao-cap',
@@ -102,12 +104,12 @@ export class InventoryService {
         stockQuantity: 150,
         minStockLevel: 10,
         weight: 0.35,
-        dimensions: null,
+        dimensions: undefined,
         createdAt: new Date('2025-01-15'),
         updatedAt: new Date('2025-01-15')
-      },
-      {
-        id: 2,
+      }),
+      ProductBaseResponse.fromJS({
+        productId: '2',
         sku: 'PHONE-IP15-PRO',
         name: 'iPhone 15 Pro Max',
         slug: 'iphone-15-pro-max',
@@ -122,9 +124,9 @@ export class InventoryService {
         dimensions: '159.9 x 76.7 x 8.25 mm',
         createdAt: new Date('2025-02-01'),
         updatedAt: new Date('2025-02-01')
-      },
-      {
-        id: 3,
+      }),
+      ProductBaseResponse.fromJS({
+        productId: '3',
         sku: 'LAP-DELL-XPS13',
         name: 'Dell XPS 13',
         slug: 'dell-xps-13',
@@ -139,9 +141,9 @@ export class InventoryService {
         dimensions: '296 x 199 x 15 mm',
         createdAt: new Date('2025-03-10'),
         updatedAt: new Date('2025-03-10')
-      },
-      {
-        id: 4,
+      }),
+      ProductBaseResponse.fromJS({
+        productId: '4',
         sku: 'WATCH-APPLE-S9',
         name: 'Apple Watch Series 9',
         slug: 'apple-watch-series-9',
@@ -156,9 +158,9 @@ export class InventoryService {
         dimensions: '45 x 38 x 10.7 mm',
         createdAt: new Date('2025-04-05'),
         updatedAt: new Date('2025-04-05')
-      },
-      {
-        id: 5,
+      }),
+      ProductBaseResponse.fromJS({
+        productId: '5',
         sku: 'KB-MECH-RGB',
         name: 'Bàn Phím Cơ RGB',
         slug: 'ban-phim-co-rgb',
@@ -173,9 +175,9 @@ export class InventoryService {
         dimensions: '440 x 135 x 35 mm',
         createdAt: new Date('2025-05-20'),
         updatedAt: new Date('2025-05-20')
-      },
-      {
-        id: 6,
+      }),
+      ProductBaseResponse.fromJS({
+        productId: '6',
         sku: 'MOUSE-LOG-MX',
         name: 'Chuột Logitech MX Master 3S',
         slug: 'chuot-logitech-mx-master-3s',
@@ -190,9 +192,9 @@ export class InventoryService {
         dimensions: '124.9 x 84.3 x 51 mm',
         createdAt: new Date('2025-06-15'),
         updatedAt: new Date('2025-06-15')
-      },
-      {
-        id: 7,
+      }),
+      ProductBaseResponse.fromJS({
+        productId: '7',
         sku: 'CAM-WEBCAM-HD',
         name: 'Webcam Full HD 1080p',
         slug: 'webcam-full-hd-1080p',
@@ -207,7 +209,7 @@ export class InventoryService {
         dimensions: '90 x 60 x 50 mm',
         createdAt: new Date('2025-07-01'),
         updatedAt: new Date('2025-07-01')
-      }
+      })
     ];
   }
 }
