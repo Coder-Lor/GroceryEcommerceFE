@@ -5,7 +5,8 @@ import { InventoryService } from '../../core/service/inventory.service';
 import { Product, InventoryReport } from './models/product.model';
 import { faPlus, faChartSimple, faFile, faFileArrowDown, faDownload, faMagnifyingGlass, faPenToSquare, faTrashCan, faXmark, faBox, faMoneyBill, faTriangleExclamation, faCircleXmark, faFileExport, faHurricane, faCoins, faSort, faSortUp, faSortDown, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-
+import { CategoryClient, CategoryDto, ResultOfListOfCategoryDto } from "@services/system-admin.service"
+import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-inventory-page',
   standalone: true,
@@ -16,6 +17,8 @@ import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 export class InventoryPageComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
+  categories: CategoryDto[] = [];
+  private destroy$ = new Subject<void>();
   searchTerm: string = '';
   
   showModal: boolean = false;
@@ -57,12 +60,27 @@ export class InventoryPageComponent implements OnInit {
   faSortDown = faSortDown;
   faFilter = faFilter;
 
-  constructor(private inventoryService: InventoryService) {}
+  constructor(private inventoryService: InventoryService, private categoryClient : CategoryClient) {}
+
 
   ngOnInit(): void {
     this.inventoryService.getProducts().subscribe(products => {
       this.products = products;
       this.filterProducts();
+    });
+    this.categoryClient.getCategoryTree().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe( {
+      next: (response: ResultOfListOfCategoryDto) => {
+        if (response.isSuccess){
+          this.categories = response.data ?? [];
+        }
+        console.log(response);
+      },
+      error: (error: ResultOfListOfCategoryDto) => {
+        
+      }
+      
     });
     this.startLoading();
   }
