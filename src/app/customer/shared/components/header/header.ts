@@ -1,25 +1,46 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UtilityPanel } from "./utility-panel/utility-panel";
+import { UtilityPanel } from './utility-panel/utility-panel';
 import { Router, RouterModule } from '@angular/router';
-
+import { AuthService } from '../../../../core/service/auth.service';
+import { log } from 'console';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, UtilityPanel, RouterModule],
   templateUrl: './header.html',
-  styleUrl: './header.scss'
+  styleUrl: './header.scss',
 })
-export class Header {
+export class Header implements OnInit {
+  private authService: AuthService = inject(AuthService);
+  private router: Router = inject(Router);
 
   isShowSidebar: boolean = false;
   isShowSubMenu: boolean = false;
   isShowSearchBox: boolean = false;
   isShowPanel: boolean = false;
 
-  router: Router = inject(Router);
+  username: string = '';
+  isLoggedIn: boolean = false;
 
+  userName: string | null = null;
+
+  ngOnInit(): void {
+    this.authService.isLoggedIn$.subscribe((res) => {
+      this.isLoggedIn = res;
+    });
+    this.authService.currentUser$.subscribe((res) => {
+      this.userName = res?.name ?? null;
+    });
+  }
+
+  onLogout() {
+    this.authService.logout();
+    this.authService.isLoggedIn$.subscribe((res) => {
+      this.isLoggedIn = res;
+    });
+  }
 
   toggleSidebar() {
     this.isShowSidebar = !this.isShowSidebar;
@@ -40,5 +61,4 @@ export class Header {
   backToHomePage() {
     this.router.navigate(['']);
   }
-
 }

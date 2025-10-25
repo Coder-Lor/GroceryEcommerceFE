@@ -10,6 +10,7 @@
   align-items: center;
   z-index: 2000;
   transition: opacity 0.3s ease;
+  font-family: 'poppins', sans-serif;
 }
 
 .login-overlay.active {
@@ -181,9 +182,14 @@
   color: #333;
 }
 
+.input {
+  position: relative;
+}
+
 /* Input có icon bên phải */
 .input-with-icon {
-  width: 430px !important;
+  width: 100% !important;
+  max-width: 430px;
   padding: 10px 44px 10px 14px !important;
   /* tăng padding-right để chừa chỗ cho icon */
   border-radius: 8px;
@@ -193,6 +199,7 @@
   background-color: #fff;
   box-sizing: border-box;
   overflow: hidden;
+  position: relative;
 }
 
 .input-with-icon:focus {
@@ -212,6 +219,11 @@
   color: #000;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.btn-login:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 
 .btn-login:hover {
@@ -242,8 +254,8 @@
 /* Icon position */
 .input-icon {
   position: absolute;
-  right: 12px;
-  top: 70%;
+  right: 14px;
+  top: 50%;
   transform: translateY(-50%);
   color: #aaa;
   font-size: 1.1rem;
@@ -257,6 +269,11 @@
 
 .input-icon.clickable:hover {
   color: #ffb700;
+}
+small {
+  color: red;
+  font-style: italic;
+  font-size: 12px;
 }
 
 /* ===== Animation ===== */

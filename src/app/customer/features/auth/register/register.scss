@@ -244,11 +244,24 @@
 .input-icon {
   position: absolute;
   right: 12px;
-  top: 70%;
+  top: 50%;
   transform: translateY(-50%);
   color: #aaa;
   font-size: 1.1rem;
   pointer-events: none;
+}
+.input{
+  position: relative;
+}
+.btn-login:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+small {
+  color: red;
+  font-style: italic;
+  font-size: 12px;
 }
 
 .input-icon.clickable {

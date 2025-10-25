@@ -1,147 +1,162 @@
 <div class="header-container fixed-top">
-    <div class="header-bar container-fluid">
-        <div class="header-content d-flex justify-content-between align-items-center">
-
-            <!-- Left Section -->
-            <div class="header-left d-flex align-items-center">
-                <!-- mobile toggle -->
-                <div class="mobile-menu-toggle d-md-none me-2" (click)="toggleSidebar()">
-                    <img src="/icons/icon-catelogy.svg" alt="Menu">
-                </div>
-
-                <!-- brand -->
-                <div class="brand-logo d-flex align-items-center me-3" (click)="backToHomePage()">
-                    <img class="logo-icon" src="/icons/Icon.svg" />
-                    <div class="brand-name">grocerymart</div>
-                </div>
-
-                <!-- nav (hidden on small screens) -->
-                <div class="navigation-menu d-none d-md-flex align-items-center">
-                    <div class="nav-item d-flex align-items-center me-3">
-                        <span>Departments</span>
-                        <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
-                    </div>
-                    <div class="nav-item d-flex align-items-center me-3">
-                        <span>Grocery</span>
-                        <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
-                    </div>
-                    <div class="nav-item d-flex align-items-center">
-                        <span>Beauty</span>
-                        <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Section -->
-            <div class="header-right d-flex align-items-center">
-                <div class="search-button me-2" style="cursor: pointer;" (click)="toggleSearchBox()">
-                    <i class="pi pi-search"></i>
-                </div>
-                <!-- Cart & wishlist -->
-                <div class="cart-wishlist me-3" (click)="toggleUtilPanel()">
-                    <div class="cart-wishlist-content d-flex align-items-center">
-                        <div class="cart-section">
-                            <div class="cart-icon-wrapper">
-                                <span class="cart-icon" style="cursor: pointer;">
-                                    <i class="pi pi-shopping-cart"></i>
-                                </span>
-                                <span class="cart-badge">5</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- User / Login -->
-                <div class="user-avatar-container d-flex align-items-center" style="cursor: pointer;">
-                    <div class="user-avatar me-2">
-                        <i class="pi pi-user"></i>
-                    </div>
-                    <a routerLink="/login" class="text-decoration-none">Login <i class="pi pi-sign-in"></i></a>
-                </div>
-
-            </div>
+  <div class="header-bar container-fluid">
+    <div class="header-content d-flex justify-content-between align-items-center">
+      <!-- Left Section -->
+      <div class="header-left d-flex align-items-center">
+        <!-- mobile toggle -->
+        <div class="mobile-menu-toggle d-md-none me-2" (click)="toggleSidebar()">
+          <img src="/icons/icon-catelogy.svg" alt="Menu" />
         </div>
+
+        <!-- brand -->
+        <div class="brand-logo d-flex align-items-center me-3" (click)="backToHomePage()">
+          <img class="logo-icon" src="/icons/Icon.svg" />
+          <div class="brand-name">grocerymart</div>
+        </div>
+
+        <!-- nav (hidden on small screens) -->
+        <div class="navigation-menu d-none d-md-flex align-items-center">
+          <div class="nav-item d-flex align-items-center me-3">
+            <span>Departments</span>
+            <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
+          </div>
+          <div class="nav-item d-flex align-items-center me-3">
+            <span>Grocery</span>
+            <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
+          </div>
+          <div class="nav-item d-flex align-items-center">
+            <span>Beauty</span>
+            <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section -->
+      <div class="header-right d-flex align-items-center">
+        <div class="search-button me-2" style="cursor: pointer" (click)="toggleSearchBox()">
+          <i class="pi pi-search"></i>
+        </div>
+        <!-- Cart & wishlist -->
+        <div class="cart-wishlist me-3" (click)="toggleUtilPanel()">
+          <div class="cart-wishlist-content d-flex align-items-center">
+            <div class="cart-section">
+              <div class="cart-icon-wrapper">
+                <span class="cart-icon" style="cursor: pointer">
+                  <i class="pi pi-shopping-cart"></i>
+                </span>
+                <span class="cart-badge">5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User / Login -->
+        @if(!isLoggedIn) {
+        <div class="user-avatar-container d-flex align-items-center" style="cursor: pointer">
+          <div class="user-avatar me-2">
+            <i class="pi pi-user"></i>
+          </div>
+          <a routerLink="/login" class="text-decoration-none"
+            >Login <i class="pi pi-sign-in"></i
+          ></a>
+        </div>
+        }@else {
+        <div class="user-avatar me-2">
+          <i class="pi pi-user"></i>
+          {{ userName }}
+        </div>
+        <button (click)="onLogout()">logout</button>
+        }
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- sidebar mobile -->
-<div class="overlay" [ngClass]="{'open': isShowSidebar}" (click)="toggleSidebar()">
-    <div class="sidebar-menu" [ngClass]="{'active-menu': isShowSidebar}" (click)="$event.stopPropagation()">
+<div class="overlay" [ngClass]="{ open: isShowSidebar }" (click)="toggleSidebar()">
+  <div
+    class="sidebar-menu"
+    [ngClass]="{ 'active-menu': isShowSidebar }"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="back-btn" (click)="toggleSidebar()">
+      <img src="icons/arrow-left.svg" alt="Back" />
+    </button>
 
-        <button class="back-btn" (click)="toggleSidebar()">
-            <img src="icons/arrow-left.svg" alt="Back" />
-        </button>
-
-        <!-- Card -->
-        <div class="menu-item">
-            <div class="menu-item-left">
-                <img class="icon" src="icons/buy.svg" alt="Cart" />
-                <span class="menu-label">Cart</span>
-            </div>
-            <span class="menu-count">3</span>
-        </div>
-
-        <!-- Favorite -->
-        <div class="menu-item">
-            <div class="menu-item-left">
-                <img class="icon" src="icons/heart.svg" alt="Favorite" />
-                <span class="menu-label">Favorite</span>
-            </div>
-            <span class="menu-count">3</span>
-        </div>
-
-        <!-- Departments -->
-        <div class="menu-item has-arrow">
-            <span class="menu-label">Departments</span>
-            <img class="arrow" src="icons/arrow-right.svg" alt="Next" />
-        </div>
-
-        <!-- Grocery -->
-        <div class="menu-item has-arrow open" (click)="togggleSubmenu()">
-            <span class="menu-label">Grocery</span>
-            <img class="arrow" src="icons/arrow-down.svg" alt="Expand" />
-        </div>
-
-        <div class="submenu" [ngClass]="{'open': isShowSubMenu}">
-            <div class="submenu-header">
-                <div class="icon-box purple">
-                    <img class="icon" src="buy1.svg" alt="Grocery Icon" />
-                </div>
-                <span class="submenu-label">Grocery</span>
-            </div>
-            <ul class="submenu-list">
-                <li class="submenu-item">Shop All</li>
-                <li class="submenu-item">Grilling Foods</li>
-                <li class="submenu-item">Spring Flavors</li>
-            </ul>
-
-            <div class="submenu-header">
-                <div class="icon-box green">
-                    <img class="icon" src="group0.svg" alt="Fresh Produce Icon" />
-                </div>
-                <span class="submenu-label">Fresh Produce</span>
-            </div>
-            <ul class="submenu-list">
-                <li class="submenu-item">Shop All</li>
-                <li class="submenu-item">Celebrate Salad Month</li>
-                <li class="submenu-item">Healthy Living</li>
-                <li class="submenu-item">Fresh Flowers</li>
-                <li class="submenu-item">Chilled Dressing</li>
-                <li class="submenu-item">Fresh Fruit</li>
-                <li class="submenu-item">Salad Kits &amp; Bowls</li>
-                <li class="submenu-item">Organic Produce</li>
-                <li class="submenu-item">Fresh Vegetables</li>
-            </ul>
-        </div>
-
-        <!-- Beauty -->
-        <div class="menu-item has-arrow">
-            <span class="menu-label">Beauty</span>
-            <img class="arrow" src="icons/arrow-right.svg" alt="Next" />
-        </div>
+    <!-- Card -->
+    <div class="menu-item">
+      <div class="menu-item-left">
+        <img class="icon" src="icons/buy.svg" alt="Cart" />
+        <span class="menu-label">Cart</span>
+      </div>
+      <span class="menu-count">3</span>
     </div>
+
+    <!-- Favorite -->
+    <div class="menu-item">
+      <div class="menu-item-left">
+        <img class="icon" src="icons/heart.svg" alt="Favorite" />
+        <span class="menu-label">Favorite</span>
+      </div>
+      <span class="menu-count">3</span>
+    </div>
+
+    <!-- Departments -->
+    <div class="menu-item has-arrow">
+      <span class="menu-label">Departments</span>
+      <img class="arrow" src="icons/arrow-right.svg" alt="Next" />
+    </div>
+
+    <!-- Grocery -->
+    <div class="menu-item has-arrow open" (click)="togggleSubmenu()">
+      <span class="menu-label">Grocery</span>
+      <img class="arrow" src="icons/arrow-down.svg" alt="Expand" />
+    </div>
+
+    <div class="submenu" [ngClass]="{ open: isShowSubMenu }">
+      <div class="submenu-header">
+        <div class="icon-box purple">
+          <img class="icon" src="buy1.svg" alt="Grocery Icon" />
+        </div>
+        <span class="submenu-label">Grocery</span>
+      </div>
+      <ul class="submenu-list">
+        <li class="submenu-item">Shop All</li>
+        <li class="submenu-item">Grilling Foods</li>
+        <li class="submenu-item">Spring Flavors</li>
+      </ul>
+
+      <div class="submenu-header">
+        <div class="icon-box green">
+          <img class="icon" src="group0.svg" alt="Fresh Produce Icon" />
+        </div>
+        <span class="submenu-label">Fresh Produce</span>
+      </div>
+      <ul class="submenu-list">
+        <li class="submenu-item">Shop All</li>
+        <li class="submenu-item">Celebrate Salad Month</li>
+        <li class="submenu-item">Healthy Living</li>
+        <li class="submenu-item">Fresh Flowers</li>
+        <li class="submenu-item">Chilled Dressing</li>
+        <li class="submenu-item">Fresh Fruit</li>
+        <li class="submenu-item">Salad Kits &amp; Bowls</li>
+        <li class="submenu-item">Organic Produce</li>
+        <li class="submenu-item">Fresh Vegetables</li>
+      </ul>
+    </div>
+
+    <!-- Beauty -->
+    <div class="menu-item has-arrow">
+      <span class="menu-label">Beauty</span>
+      <img class="arrow" src="icons/arrow-right.svg" alt="Next" />
+    </div>
+  </div>
 </div>
 
 <!-- utility panel component stays the same -->
-<app-utility-panel [showCart]="isShowPanel" [showSearch]="isShowSearchBox" (closeCartPanel)="toggleUtilPanel()"
-    (closeSearchPanel)="toggleSearchBox()"></app-utility-panel>
+<app-utility-panel
+  [showCart]="isShowPanel"
+  [showSearch]="isShowSearchBox"
+  (closeCartPanel)="toggleUtilPanel()"
+  (closeSearchPanel)="toggleSearchBox()"
+></app-utility-panel>

@@ -8,7 +8,11 @@
       <img src="/images/background.png" alt="Banner đăng nhập" class="login-banner" />
       <div class="login-left-content">
         <h3>
-          <img src="/icons/Icon.svg" alt="Biểu tượng GroceryMart" style="width: 28px; height: 28px; margin-bottom: 5px" />
+          <img
+            src="/icons/Icon.svg"
+            alt="Biểu tượng GroceryMart"
+            style="width: 28px; height: 28px; margin-bottom: 5px"
+          />
           GroceryMart
         </h3>
         <p>Sản phẩm tạp hóa cao cấp, chất lượng &amp; đáng tin cậy.</p>
@@ -17,46 +21,84 @@
 
     <!-- Right side -->
     <div class="login-right">
-      <h4 style="text-align: center; margin-bottom: 5px;">Đăng ký</h4>
-      <p class="text-muted" style="text-align: center; margin-bottom: 20px;">
+      <h4 style="text-align: center; margin-bottom: 5px">Đăng ký</h4>
+      <p class="text-muted" style="text-align: center; margin-bottom: 20px">
         Hãy tạo tài khoản của bạn để mua sắm như chuyên gia và tiết kiệm tiền.
       </p>
 
-      <form style="margin-bottom: 10px;">
+      <form style="margin-bottom: 10px" (ngSubmit)="onFormSubmitted()" #registerForm="ngForm">
+        <!-- username -->
+        <div class="form-group position-relative">
+          <div class="input">
+            <input
+              type="text"
+              name="username"
+              placeholder="Tên đăng nhập"
+              class="form-control input-with-icon"
+              ngModel
+              #uname="ngModel"
+              required
+            />
+            <i class="input-icon pi pi-user"></i>
+          </div>
+          @if(uname.invalid && uname.touched) {
+          <small>*Vui lòng điền trường này.</small>
+          }
+        </div>
         <!-- Email -->
         <div class="form-group position-relative">
-          <label>Email</label>
-          <input type="email" placeholder="Nhập email của bạn" class="form-control input-with-icon" />
-          <i class="pi pi-envelope input-icon"></i>
+          <div class="input">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              class="form-control input-with-icon"
+              ngModel
+              #email="ngModel"
+              required
+              email
+            />
+            <i class="pi pi-envelope input-icon"></i>
+          </div>
+          @if(email.invalid && email.touched && !email.errors?.['email']) {
+          <small>*Vui lòng điền trường này.</small>
+          } @if(email.errors?.['email'] && email.touched) {
+          <small>*Email không đúng định dạng.</small>
+          }
         </div>
 
         <!-- Password -->
-        <div class="form-group position-relative">
-          <label>Mật khẩu</label>
-          <input [type]="showPassword ? 'text' : 'password'" placeholder="Nhập mật khẩu của bạn"
-            class="form-control input-with-icon" />
-          <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
-            (click)="togglePassword()"></i>
-        </div>
 
         <div class="form-group position-relative">
-          <label>Xác nhận mật khẩu</label>
-          <input [type]="showPassword ? 'text' : 'password'" placeholder="Xác nhận mật khẩu của bạn"
-            class="form-control input-with-icon" />
-          <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
-            (click)="togglePassword()"></i>
+          <div class="input">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Mật khẩu của bạn"
+              class="form-control input-with-icon"
+              name="password"
+              ngModel
+              #password="ngModel"
+              required
+            />
+            <i
+              [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+              class="input-icon clickable"
+              (click)="togglePassword()"
+            ></i>
+          </div>
+          @if(password.invalid && password.touched) {
+          <small>*Vui lòng điền trường này.</small>
+          }
         </div>
 
         <!-- Bottom -->
-        <div class="form-bottom">
-          <label class="remember">
-            <input type="checkbox" /> Ghi nhớ đăng nhập
-          </label>
-          <!-- <a href="#" class="text-link">Forgot password?</a> -->
-        </div>
+        <!-- <div class="form-bottom">
+          <label class="remember"> <input type="checkbox" /> Ghi nhớ đăng nhập </label>
+          <a href="#" class="text-link">Forgot password?</a>
+        </div> -->
 
         <!-- Buttons -->
-        <button type="submit" class="btn-login">Đăng ký</button>
+        <button type="submit" class="btn-login" [disabled]="form?.invalid">Đăng ký</button>
 
         <button type="button" class="btn-google">
           <i class="pi pi-google"></i>
