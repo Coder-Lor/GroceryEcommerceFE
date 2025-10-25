@@ -120,9 +120,36 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     }
 
     this.isSubmitting = true;
-    const productData: CreateProductCommand = this.productForm.value;
+    const formValue = this.productForm.value;
 
-    this.productClient.createWithUrls(productData)
+    this.productClient.create(
+      formValue.name,
+      formValue.slug,
+      formValue.sku,
+      formValue.description,
+      formValue.shortDescription,
+      formValue.price,
+      formValue.discountPrice,
+      formValue.cost,
+      formValue.stockQuantity,
+      formValue.minStockLevel,
+      formValue.weight,
+      formValue.dimensions,
+      formValue.categoryId,
+      null, // brandId
+      1, // status (Active)
+      false, // isFeatured
+      false, // isDigital
+      null, // metaTitle
+      null, // metaDescription
+      null, // imageFiles
+      null, // imageAltTexts
+      null, // imageDisplayOrders
+      null, // imageIsPrimary
+      null, // variants
+      null, // attributes
+      null  // tagIds
+    )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {

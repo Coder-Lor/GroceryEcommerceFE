@@ -234,6 +234,58 @@ export class AuthClient {
         }
         return _observableOf(null as any);
     }
+
+    refreshToken(request: RefreshTokenCommand): Observable<RefreshTokenResponse> {
+        let url_ = this.baseUrl + "/api/Auth/refresh-token";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRefreshToken(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRefreshToken(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RefreshTokenResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RefreshTokenResponse>;
+        }));
+    }
+
+    protected processRefreshToken(response: HttpResponseBase): Observable<RefreshTokenResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RefreshTokenResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable({
@@ -7098,6 +7150,9 @@ export interface IResultOfRegisterResponse {
 
 export class RegisterResponse implements IRegisterResponse {
     userId?: string;
+    email?: string;
+    username?: string;
+    role?: string;
     token?: string;
     refreshToken?: string;
     expiresAt?: Date;
@@ -7114,6 +7169,9 @@ export class RegisterResponse implements IRegisterResponse {
     init(_data?: any) {
         if (_data) {
             this.userId = _data["userId"];
+            this.email = _data["email"];
+            this.username = _data["username"];
+            this.role = _data["role"];
             this.token = _data["token"];
             this.refreshToken = _data["refreshToken"];
             this.expiresAt = _data["expiresAt"] ? new Date(_data["expiresAt"].toString()) : undefined as any;
@@ -7130,6 +7188,9 @@ export class RegisterResponse implements IRegisterResponse {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["userId"] = this.userId;
+        data["email"] = this.email;
+        data["username"] = this.username;
+        data["role"] = this.role;
         data["token"] = this.token;
         data["refreshToken"] = this.refreshToken;
         data["expiresAt"] = this.expiresAt ? this.expiresAt.toISOString() : undefined as any;
@@ -7139,6 +7200,9 @@ export class RegisterResponse implements IRegisterResponse {
 
 export interface IRegisterResponse {
     userId?: string;
+    email?: string;
+    username?: string;
+    role?: string;
     token?: string;
     refreshToken?: string;
     expiresAt?: Date;
@@ -7250,6 +7314,8 @@ export interface IResultOfLoginResponse {
 
 export class LoginResponse implements ILoginResponse {
     userId?: string;
+    username?: string;
+    role?: string;
     email?: string;
     token?: string;
     refreshToken?: string;
@@ -7267,6 +7333,8 @@ export class LoginResponse implements ILoginResponse {
     init(_data?: any) {
         if (_data) {
             this.userId = _data["userId"];
+            this.username = _data["username"];
+            this.role = _data["role"];
             this.email = _data["email"];
             this.token = _data["token"];
             this.refreshToken = _data["refreshToken"];
@@ -7284,6 +7352,8 @@ export class LoginResponse implements ILoginResponse {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["userId"] = this.userId;
+        data["username"] = this.username;
+        data["role"] = this.role;
         data["email"] = this.email;
         data["token"] = this.token;
         data["refreshToken"] = this.refreshToken;
@@ -7294,6 +7364,8 @@ export class LoginResponse implements ILoginResponse {
 
 export interface ILoginResponse {
     userId?: string;
+    username?: string;
+    role?: string;
     email?: string;
     token?: string;
     refreshToken?: string;
@@ -7482,6 +7554,86 @@ export interface IResetPasswordCommand {
     resetToken?: string;
     oldPassword?: string | undefined;
     newPassword?: string | undefined;
+}
+
+export class RefreshTokenResponse implements IRefreshTokenResponse {
+    accessToken?: string;
+    refreshToken?: string;
+    expiresAt?: Date;
+
+    constructor(data?: IRefreshTokenResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"];
+            this.refreshToken = _data["refreshToken"];
+            this.expiresAt = _data["expiresAt"] ? new Date(_data["expiresAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RefreshTokenResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new RefreshTokenResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken;
+        data["refreshToken"] = this.refreshToken;
+        data["expiresAt"] = this.expiresAt ? this.expiresAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRefreshTokenResponse {
+    accessToken?: string;
+    refreshToken?: string;
+    expiresAt?: Date;
+}
+
+export class RefreshTokenCommand implements IRefreshTokenCommand {
+    refreshToken?: string;
+
+    constructor(data?: IRefreshTokenCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.refreshToken = _data["refreshToken"];
+        }
+    }
+
+    static fromJS(data: any): RefreshTokenCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new RefreshTokenCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["refreshToken"] = this.refreshToken;
+        return data;
+    }
+}
+
+export interface IRefreshTokenCommand {
+    refreshToken?: string;
 }
 
 export enum SortDirection {
