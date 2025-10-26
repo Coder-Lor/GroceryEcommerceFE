@@ -211,6 +211,152 @@
         </div>
       </div>
 
+      <!-- Additional Information Section -->
+      <div class="form-section">
+        <h3 class="section-title">Thông tin bổ sung</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Brand ID</label>
+            <input
+              type="text"
+              formControlName="brandId"
+              class="form-control"
+              placeholder="Nhập Brand ID (nếu có)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <select formControlName="status" class="form-control">
+              <option [value]="1">Hoạt động</option>
+              <option [value]="2">Nháp</option>
+              <option [value]="3">Đã lưu trữ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="isFeatured" />
+              <span>Sản phẩm nổi bật</span>
+            </label>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="isDigital" />
+              <span>Sản phẩm số</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Section -->
+      <div class="form-section">
+        <h3 class="section-title">SEO</h3>
+        
+        <div class="form-group">
+          <label>Meta Title</label>
+          <input
+            type="text"
+            formControlName="metaTitle"
+            class="form-control"
+            placeholder="Nhập tiêu đề SEO"
+            maxlength="60"
+          />
+          <small class="form-hint">Tối đa 60 ký tự</small>
+        </div>
+
+        <div class="form-group">
+          <label>Meta Description</label>
+          <textarea
+            formControlName="metaDescription"
+            class="form-control"
+            rows="3"
+            placeholder="Nhập mô tả SEO"
+            maxlength="160"
+          ></textarea>
+          <small class="form-hint">Tối đa 160 ký tự</small>
+        </div>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="form-section">
+        <h3 class="section-title">Hình ảnh sản phẩm</h3>
+        
+        <!-- Upload Area -->
+        <div 
+          class="image-upload-area"
+          [class.dragging]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="triggerFileInput()"
+        >
+          <input
+            type="file"
+            id="imageFileInput"
+            multiple
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none;"
+          />
+          <div class="upload-content">
+            <fa-icon [icon]="faCloudUpload" class="upload-icon"></fa-icon>
+            <p class="upload-text">Kéo thả ảnh vào đây hoặc click để chọn</p>
+            <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (Tối đa 5MB mỗi ảnh)</p>
+          </div>
+        </div>
+
+        <!-- Image Preview List -->
+        <div class="image-preview-list" *ngIf="selectedImages.length > 0">
+          <div 
+            *ngFor="let image of selectedImages; let i = index" 
+            class="image-preview-item"
+            [class.primary]="image.isPrimary"
+          >
+            <div class="image-preview-wrapper">
+              <img [src]="image.preview" [alt]="image.altText || 'Preview'" />
+              <div class="image-overlay">
+                <button 
+                  type="button" 
+                  class="btn-icon btn-primary-img" 
+                  (click)="setPrimaryImage(i)"
+                  [class.active]="image.isPrimary"
+                  title="Đặt làm ảnh chính"
+                >
+                  <fa-icon [icon]="faStar"></fa-icon>
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-icon btn-delete" 
+                  (click)="removeImage(i)"
+                  title="Xóa ảnh"
+                >
+                  <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
+              </div>
+              <span class="primary-badge" *ngIf="image.isPrimary">
+                <fa-icon [icon]="faStar"></fa-icon> Ảnh chính
+              </span>
+            </div>
+            <div class="image-info">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Nhập mô tả ảnh (Alt text)"
+                [value]="image.altText"
+                (input)="updateImageAltText(i, $any($event.target).value)"
+              />
+              <small class="image-name">{{ image.file.name }}</small>
+              <small class="image-order">Thứ tự: {{ image.displayOrder }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Form Actions -->
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" (click)="goBack()" [disabled]="isSubmitting">

@@ -70,9 +70,11 @@ export class InventoryPageComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.inventoryService.getProducts().subscribe(products => {
       this.products = products;
       this.filterProducts();
+      this.isLoading = false;
     });
     this.categoryClient.getCategoryTree().pipe(
       takeUntil(this.destroy$),        

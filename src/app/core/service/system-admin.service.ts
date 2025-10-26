@@ -17,6 +17,672 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 @Injectable({
     providedIn: 'root'
 })
+export class AuditLogClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "https://localhost:44394";
+    }
+
+    getPaged(request: PagedRequest): Observable<ResultOfPagedResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/paged";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaged(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPaged(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetPaged(response: HttpResponseBase): Observable<ResultOfPagedResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getById(id: string): Observable<ResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<ResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string): Observable<ResultOfBoolean> {
+        let url_ = this.baseUrl + "/api/AuditLog/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<ResultOfBoolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfBoolean.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(auditLog: AuditLog): Observable<ResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(auditLog);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfAuditLog>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getByUser(userId: string, request: PagedRequest): Observable<ResultOfPagedResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/by-user/{userId}";
+        if (userId === undefined || userId === null)
+            throw new globalThis.Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByUser(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByUser(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetByUser(response: HttpResponseBase): Observable<ResultOfPagedResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getByEntity(entity: string | undefined, entityId: string | undefined, request: PagedRequest): Observable<ResultOfPagedResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/by-entity?";
+        if (entity === null)
+            throw new globalThis.Error("The parameter 'entity' cannot be null.");
+        else if (entity !== undefined)
+            url_ += "entity=" + encodeURIComponent("" + entity) + "&";
+        if (entityId === null)
+            throw new globalThis.Error("The parameter 'entityId' cannot be null.");
+        else if (entityId !== undefined)
+            url_ += "entityId=" + encodeURIComponent("" + entityId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByEntity(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByEntity(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetByEntity(response: HttpResponseBase): Observable<ResultOfPagedResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getByAction(action: string | undefined, request: PagedRequest): Observable<ResultOfPagedResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/by-action?";
+        if (action === null)
+            throw new globalThis.Error("The parameter 'action' cannot be null.");
+        else if (action !== undefined)
+            url_ += "action=" + encodeURIComponent("" + action) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByAction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByAction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetByAction(response: HttpResponseBase): Observable<ResultOfPagedResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getByDateRange(from: Date | undefined, to: Date | undefined, request: PagedRequest): Observable<ResultOfPagedResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/by-date-range?";
+        if (from === null)
+            throw new globalThis.Error("The parameter 'from' cannot be null.");
+        else if (from !== undefined)
+            url_ += "from=" + encodeURIComponent(from ? "" + from.toISOString() : "") + "&";
+        if (to === null)
+            throw new globalThis.Error("The parameter 'to' cannot be null.");
+        else if (to !== undefined)
+            url_ += "to=" + encodeURIComponent(to ? "" + to.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByDateRange(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByDateRange(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetByDateRange(response: HttpResponseBase): Observable<ResultOfPagedResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getRecent(count: number | undefined, request: PagedRequest): Observable<ResultOfPagedResultOfAuditLog> {
+        let url_ = this.baseUrl + "/api/AuditLog/recent?";
+        if (count === null)
+            throw new globalThis.Error("The parameter 'count' cannot be null.");
+        else if (count !== undefined)
+            url_ += "count=" + encodeURIComponent("" + count) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRecent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRecent(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfAuditLog>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfAuditLog>;
+        }));
+    }
+
+    protected processGetRecent(response: HttpResponseBase): Observable<ResultOfPagedResultOfAuditLog> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfAuditLog.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getLogCountByUser(userId: string): Observable<ResultOfInteger> {
+        let url_ = this.baseUrl + "/api/AuditLog/count/by-user/{userId}";
+        if (userId === undefined || userId === null)
+            throw new globalThis.Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLogCountByUser(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLogCountByUser(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfInteger>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfInteger>;
+        }));
+    }
+
+    protected processGetLogCountByUser(response: HttpResponseBase): Observable<ResultOfInteger> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfInteger.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getLogCountByAction(action: string | undefined): Observable<ResultOfInteger> {
+        let url_ = this.baseUrl + "/api/AuditLog/count/by-action?";
+        if (action === null)
+            throw new globalThis.Error("The parameter 'action' cannot be null.");
+        else if (action !== undefined)
+            url_ += "action=" + encodeURIComponent("" + action) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLogCountByAction(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLogCountByAction(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfInteger>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfInteger>;
+        }));
+    }
+
+    protected processGetLogCountByAction(response: HttpResponseBase): Observable<ResultOfInteger> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfInteger.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getActionStatistics(from: Date | undefined, to: Date | undefined): Observable<ResultOfDictionaryOfStringAndInteger> {
+        let url_ = this.baseUrl + "/api/AuditLog/stats?";
+        if (from === null)
+            throw new globalThis.Error("The parameter 'from' cannot be null.");
+        else if (from !== undefined)
+            url_ += "from=" + encodeURIComponent(from ? "" + from.toISOString() : "") + "&";
+        if (to === null)
+            throw new globalThis.Error("The parameter 'to' cannot be null.");
+        else if (to !== undefined)
+            url_ += "to=" + encodeURIComponent(to ? "" + to.toISOString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetActionStatistics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetActionStatistics(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfDictionaryOfStringAndInteger>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfDictionaryOfStringAndInteger>;
+        }));
+    }
+
+    protected processGetActionStatistics(response: HttpResponseBase): Observable<ResultOfDictionaryOfStringAndInteger> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfDictionaryOfStringAndInteger.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable({
+    providedIn: 'root'
+})
 export class AuthClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -235,7 +901,59 @@ export class AuthClient {
         return _observableOf(null as any);
     }
 
-    refreshToken(request: RefreshTokenCommand): Observable<RefreshTokenResponse> {
+    logout(request: LogoutCommand): Observable<ResultOfBoolean> {
+        let url_ = this.baseUrl + "/api/Auth/logout";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLogout(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLogout(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        }));
+    }
+
+    protected processLogout(response: HttpResponseBase): Observable<ResultOfBoolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfBoolean.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    refreshToken(request: RefreshTokenCommand): Observable<ResultOfRefreshTokenResponse> {
         let url_ = this.baseUrl + "/api/Auth/refresh-token";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -258,14 +976,14 @@ export class AuthClient {
                 try {
                     return this.processRefreshToken(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<RefreshTokenResponse>;
+                    return _observableThrow(e) as any as Observable<ResultOfRefreshTokenResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<RefreshTokenResponse>;
+                return _observableThrow(response_) as any as Observable<ResultOfRefreshTokenResponse>;
         }));
     }
 
-    protected processRefreshToken(response: HttpResponseBase): Observable<RefreshTokenResponse> {
+    protected processRefreshToken(response: HttpResponseBase): Observable<ResultOfRefreshTokenResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -276,7 +994,7 @@ export class AuthClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = RefreshTokenResponse.fromJS(resultData200);
+            result200 = ResultOfRefreshTokenResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -5147,6 +5865,100 @@ export class ProductClient {
         }
         return _observableOf(null as any);
     }
+
+    getProductsPaging(page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<ResultOfPagedResultOfProductBaseResponse> {
+        let url_ = this.baseUrl + "/api/Product/paging?";
+        if (page === null)
+            throw new globalThis.Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "Page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (search !== undefined && search !== null)
+            url_ += "Search=" + encodeURIComponent("" + search) + "&";
+        if (sortBy !== undefined && sortBy !== null)
+            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
+        if (sortDirection === null)
+            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+        else if (sortDirection !== undefined)
+            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
+        if (filters === null)
+            throw new globalThis.Error("The parameter 'filters' cannot be null.");
+        else if (filters !== undefined)
+            filters && filters.forEach((item, index) => {
+                for (const attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (entityType !== undefined && entityType !== null)
+            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
+        if (availableFields !== undefined && availableFields !== null)
+            availableFields && availableFields.forEach((item, index) => {
+                for (const attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (hasFilters === null)
+            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+        else if (hasFilters !== undefined)
+            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
+        if (hasSearch === null)
+            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+        else if (hasSearch !== undefined)
+            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
+        if (hasSorting === null)
+            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+        else if (hasSorting !== undefined)
+            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProductsPaging(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProductsPaging(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfPagedResultOfProductBaseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfPagedResultOfProductBaseResponse>;
+        }));
+    }
+
+    protected processGetProductsPaging(response: HttpResponseBase): Observable<ResultOfPagedResultOfProductBaseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfPagedResultOfProductBaseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable({
@@ -7088,6 +7900,4304 @@ export class ProductVariantClient {
     }
 }
 
+export class ResultOfPagedResultOfAuditLog implements IResultOfPagedResultOfAuditLog {
+    isSuccess?: boolean;
+    data?: PagedResultOfAuditLog | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfPagedResultOfAuditLog) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"] ? PagedResultOfAuditLog.fromJS(_data["data"]) : undefined as any;
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfPagedResultOfAuditLog {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfPagedResultOfAuditLog();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfPagedResultOfAuditLog {
+    isSuccess?: boolean;
+    data?: PagedResultOfAuditLog | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class PagedResultOfAuditLog implements IPagedResultOfAuditLog {
+    items?: AuditLog[];
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+    totalPages?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+
+    constructor(data?: IPagedResultOfAuditLog) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AuditLog.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+            this.page = _data["page"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.hasPreviousPage = _data["hasPreviousPage"];
+            this.hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): PagedResultOfAuditLog {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultOfAuditLog();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["totalCount"] = this.totalCount;
+        data["page"] = this.page;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IPagedResultOfAuditLog {
+    items?: AuditLog[];
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+    totalPages?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class AuditLog implements IAuditLog {
+    auditId?: string;
+    userId?: string | undefined;
+    action!: string;
+    entity?: string | undefined;
+    entityId?: string | undefined;
+    detail?: string | undefined;
+    createdAt?: Date;
+    user?: User | undefined;
+
+    constructor(data?: IAuditLog) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.auditId = _data["auditId"];
+            this.userId = _data["userId"];
+            this.action = _data["action"];
+            this.entity = _data["entity"];
+            this.entityId = _data["entityId"];
+            this.detail = _data["detail"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AuditLog {
+        data = typeof data === 'object' ? data : {};
+        let result = new AuditLog();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["auditId"] = this.auditId;
+        data["userId"] = this.userId;
+        data["action"] = this.action;
+        data["entity"] = this.entity;
+        data["entityId"] = this.entityId;
+        data["detail"] = this.detail;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAuditLog {
+    auditId?: string;
+    userId?: string | undefined;
+    action: string;
+    entity?: string | undefined;
+    entityId?: string | undefined;
+    detail?: string | undefined;
+    createdAt?: Date;
+    user?: User | undefined;
+}
+
+export class User implements IUser {
+    userId?: string;
+    email!: string;
+    passwordHash!: string;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    phoneNumber?: string | undefined;
+    dateOfBirth?: Date | undefined;
+    username!: string;
+    status?: number;
+    emailVerified?: boolean;
+    phoneVerified?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    lastLoginAt?: Date | undefined;
+    failedLoginAttempts?: number;
+    lastFailedLogin?: Date | undefined;
+    lockedUntil?: Date | undefined;
+    userRoleAssignments?: UserRoleAssignment[];
+    userAddresses?: UserAddress[];
+    userSessions?: UserSession[];
+    auditLogs?: AuditLog[];
+    refreshTokens?: RefreshToken[];
+    shoppingCarts?: ShoppingCart[];
+    wishlists?: Wishlist[];
+    abandonedCarts?: AbandonedCart[];
+    orders?: Order[];
+    couponUsages?: CouponUsage[];
+    rewardPoints?: RewardPoint[];
+    productReviews?: ProductReview[];
+
+    constructor(data?: IUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.email = _data["email"];
+            this.passwordHash = _data["passwordHash"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.dateOfBirth = _data["dateOfBirth"] ? new Date(_data["dateOfBirth"].toString()) : undefined as any;
+            this.username = _data["username"];
+            this.status = _data["status"];
+            this.emailVerified = _data["emailVerified"];
+            this.phoneVerified = _data["phoneVerified"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.lastLoginAt = _data["lastLoginAt"] ? new Date(_data["lastLoginAt"].toString()) : undefined as any;
+            this.failedLoginAttempts = _data["failedLoginAttempts"];
+            this.lastFailedLogin = _data["lastFailedLogin"] ? new Date(_data["lastFailedLogin"].toString()) : undefined as any;
+            this.lockedUntil = _data["lockedUntil"] ? new Date(_data["lockedUntil"].toString()) : undefined as any;
+            if (Array.isArray(_data["userRoleAssignments"])) {
+                this.userRoleAssignments = [] as any;
+                for (let item of _data["userRoleAssignments"])
+                    this.userRoleAssignments!.push(UserRoleAssignment.fromJS(item));
+            }
+            if (Array.isArray(_data["userAddresses"])) {
+                this.userAddresses = [] as any;
+                for (let item of _data["userAddresses"])
+                    this.userAddresses!.push(UserAddress.fromJS(item));
+            }
+            if (Array.isArray(_data["userSessions"])) {
+                this.userSessions = [] as any;
+                for (let item of _data["userSessions"])
+                    this.userSessions!.push(UserSession.fromJS(item));
+            }
+            if (Array.isArray(_data["auditLogs"])) {
+                this.auditLogs = [] as any;
+                for (let item of _data["auditLogs"])
+                    this.auditLogs!.push(AuditLog.fromJS(item));
+            }
+            if (Array.isArray(_data["refreshTokens"])) {
+                this.refreshTokens = [] as any;
+                for (let item of _data["refreshTokens"])
+                    this.refreshTokens!.push(RefreshToken.fromJS(item));
+            }
+            if (Array.isArray(_data["shoppingCarts"])) {
+                this.shoppingCarts = [] as any;
+                for (let item of _data["shoppingCarts"])
+                    this.shoppingCarts!.push(ShoppingCart.fromJS(item));
+            }
+            if (Array.isArray(_data["wishlists"])) {
+                this.wishlists = [] as any;
+                for (let item of _data["wishlists"])
+                    this.wishlists!.push(Wishlist.fromJS(item));
+            }
+            if (Array.isArray(_data["abandonedCarts"])) {
+                this.abandonedCarts = [] as any;
+                for (let item of _data["abandonedCarts"])
+                    this.abandonedCarts!.push(AbandonedCart.fromJS(item));
+            }
+            if (Array.isArray(_data["orders"])) {
+                this.orders = [] as any;
+                for (let item of _data["orders"])
+                    this.orders!.push(Order.fromJS(item));
+            }
+            if (Array.isArray(_data["couponUsages"])) {
+                this.couponUsages = [] as any;
+                for (let item of _data["couponUsages"])
+                    this.couponUsages!.push(CouponUsage.fromJS(item));
+            }
+            if (Array.isArray(_data["rewardPoints"])) {
+                this.rewardPoints = [] as any;
+                for (let item of _data["rewardPoints"])
+                    this.rewardPoints!.push(RewardPoint.fromJS(item));
+            }
+            if (Array.isArray(_data["productReviews"])) {
+                this.productReviews = [] as any;
+                for (let item of _data["productReviews"])
+                    this.productReviews!.push(ProductReview.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["email"] = this.email;
+        data["passwordHash"] = this.passwordHash;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["phoneNumber"] = this.phoneNumber;
+        data["dateOfBirth"] = this.dateOfBirth ? this.dateOfBirth.toISOString() : undefined as any;
+        data["username"] = this.username;
+        data["status"] = this.status;
+        data["emailVerified"] = this.emailVerified;
+        data["phoneVerified"] = this.phoneVerified;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["lastLoginAt"] = this.lastLoginAt ? this.lastLoginAt.toISOString() : undefined as any;
+        data["failedLoginAttempts"] = this.failedLoginAttempts;
+        data["lastFailedLogin"] = this.lastFailedLogin ? this.lastFailedLogin.toISOString() : undefined as any;
+        data["lockedUntil"] = this.lockedUntil ? this.lockedUntil.toISOString() : undefined as any;
+        if (Array.isArray(this.userRoleAssignments)) {
+            data["userRoleAssignments"] = [];
+            for (let item of this.userRoleAssignments)
+                data["userRoleAssignments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.userAddresses)) {
+            data["userAddresses"] = [];
+            for (let item of this.userAddresses)
+                data["userAddresses"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.userSessions)) {
+            data["userSessions"] = [];
+            for (let item of this.userSessions)
+                data["userSessions"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.auditLogs)) {
+            data["auditLogs"] = [];
+            for (let item of this.auditLogs)
+                data["auditLogs"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.refreshTokens)) {
+            data["refreshTokens"] = [];
+            for (let item of this.refreshTokens)
+                data["refreshTokens"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.shoppingCarts)) {
+            data["shoppingCarts"] = [];
+            for (let item of this.shoppingCarts)
+                data["shoppingCarts"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.wishlists)) {
+            data["wishlists"] = [];
+            for (let item of this.wishlists)
+                data["wishlists"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.abandonedCarts)) {
+            data["abandonedCarts"] = [];
+            for (let item of this.abandonedCarts)
+                data["abandonedCarts"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.orders)) {
+            data["orders"] = [];
+            for (let item of this.orders)
+                data["orders"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.couponUsages)) {
+            data["couponUsages"] = [];
+            for (let item of this.couponUsages)
+                data["couponUsages"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.rewardPoints)) {
+            data["rewardPoints"] = [];
+            for (let item of this.rewardPoints)
+                data["rewardPoints"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.productReviews)) {
+            data["productReviews"] = [];
+            for (let item of this.productReviews)
+                data["productReviews"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IUser {
+    userId?: string;
+    email: string;
+    passwordHash: string;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    phoneNumber?: string | undefined;
+    dateOfBirth?: Date | undefined;
+    username: string;
+    status?: number;
+    emailVerified?: boolean;
+    phoneVerified?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    lastLoginAt?: Date | undefined;
+    failedLoginAttempts?: number;
+    lastFailedLogin?: Date | undefined;
+    lockedUntil?: Date | undefined;
+    userRoleAssignments?: UserRoleAssignment[];
+    userAddresses?: UserAddress[];
+    userSessions?: UserSession[];
+    auditLogs?: AuditLog[];
+    refreshTokens?: RefreshToken[];
+    shoppingCarts?: ShoppingCart[];
+    wishlists?: Wishlist[];
+    abandonedCarts?: AbandonedCart[];
+    orders?: Order[];
+    couponUsages?: CouponUsage[];
+    rewardPoints?: RewardPoint[];
+    productReviews?: ProductReview[];
+}
+
+export class UserRoleAssignment implements IUserRoleAssignment {
+    userId?: string;
+    roleId?: string;
+    assignedAt?: Date;
+    assignedBy?: string;
+    user?: User;
+    role?: UserRole;
+    assignedByUser?: User;
+
+    constructor(data?: IUserRoleAssignment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.roleId = _data["roleId"];
+            this.assignedAt = _data["assignedAt"] ? new Date(_data["assignedAt"].toString()) : undefined as any;
+            this.assignedBy = _data["assignedBy"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.role = _data["role"] ? UserRole.fromJS(_data["role"]) : undefined as any;
+            this.assignedByUser = _data["assignedByUser"] ? User.fromJS(_data["assignedByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UserRoleAssignment {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRoleAssignment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["roleId"] = this.roleId;
+        data["assignedAt"] = this.assignedAt ? this.assignedAt.toISOString() : undefined as any;
+        data["assignedBy"] = this.assignedBy;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["role"] = this.role ? this.role.toJSON() : undefined as any;
+        data["assignedByUser"] = this.assignedByUser ? this.assignedByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUserRoleAssignment {
+    userId?: string;
+    roleId?: string;
+    assignedAt?: Date;
+    assignedBy?: string;
+    user?: User;
+    role?: UserRole;
+    assignedByUser?: User;
+}
+
+export class UserRole implements IUserRole {
+    roleId?: string;
+    roleName!: string;
+    description?: string | undefined;
+    createdAt?: Date;
+
+    constructor(data?: IUserRole) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.roleId = _data["roleId"];
+            this.roleName = _data["roleName"];
+            this.description = _data["description"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UserRole {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRole();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["roleId"] = this.roleId;
+        data["roleName"] = this.roleName;
+        data["description"] = this.description;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUserRole {
+    roleId?: string;
+    roleName: string;
+    description?: string | undefined;
+    createdAt?: Date;
+}
+
+export class UserAddress implements IUserAddress {
+    addressId?: string;
+    userId?: string;
+    addressType?: number;
+    addressLine1!: string;
+    addressLine2?: string | undefined;
+    city!: string;
+    state!: string;
+    zipCode!: string;
+    country!: string;
+    isDefault?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    user?: User;
+
+    constructor(data?: IUserAddress) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.addressId = _data["addressId"];
+            this.userId = _data["userId"];
+            this.addressType = _data["addressType"];
+            this.addressLine1 = _data["addressLine1"];
+            this.addressLine2 = _data["addressLine2"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.zipCode = _data["zipCode"];
+            this.country = _data["country"];
+            this.isDefault = _data["isDefault"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UserAddress {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserAddress();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["addressId"] = this.addressId;
+        data["userId"] = this.userId;
+        data["addressType"] = this.addressType;
+        data["addressLine1"] = this.addressLine1;
+        data["addressLine2"] = this.addressLine2;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["zipCode"] = this.zipCode;
+        data["country"] = this.country;
+        data["isDefault"] = this.isDefault;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUserAddress {
+    addressId?: string;
+    userId?: string;
+    addressType?: number;
+    addressLine1: string;
+    addressLine2?: string | undefined;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    isDefault?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    user?: User;
+}
+
+export class UserSession implements IUserSession {
+    sessionId?: string;
+    userId?: string | undefined;
+    sessionToken!: string;
+    deviceInfo?: string | undefined;
+    ipAddress?: string | undefined;
+    createdAt?: Date;
+    expiresAt?: Date | undefined;
+    revoked?: boolean;
+    user?: User | undefined;
+
+    constructor(data?: IUserSession) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sessionId = _data["sessionId"];
+            this.userId = _data["userId"];
+            this.sessionToken = _data["sessionToken"];
+            this.deviceInfo = _data["deviceInfo"];
+            this.ipAddress = _data["ipAddress"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.expiresAt = _data["expiresAt"] ? new Date(_data["expiresAt"].toString()) : undefined as any;
+            this.revoked = _data["revoked"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UserSession {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserSession();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sessionId"] = this.sessionId;
+        data["userId"] = this.userId;
+        data["sessionToken"] = this.sessionToken;
+        data["deviceInfo"] = this.deviceInfo;
+        data["ipAddress"] = this.ipAddress;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["expiresAt"] = this.expiresAt ? this.expiresAt.toISOString() : undefined as any;
+        data["revoked"] = this.revoked;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUserSession {
+    sessionId?: string;
+    userId?: string | undefined;
+    sessionToken: string;
+    deviceInfo?: string | undefined;
+    ipAddress?: string | undefined;
+    createdAt?: Date;
+    expiresAt?: Date | undefined;
+    revoked?: boolean;
+    user?: User | undefined;
+}
+
+export class RefreshToken implements IRefreshToken {
+    tokenId?: string;
+    userId?: string;
+    refreshTokenValue!: string;
+    expiresAt?: Date;
+    revoked?: boolean;
+    createdAt?: Date;
+    createdByIp?: string | undefined;
+    replacedByToken?: string | undefined;
+    user?: User;
+
+    constructor(data?: IRefreshToken) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tokenId = _data["tokenId"];
+            this.userId = _data["userId"];
+            this.refreshTokenValue = _data["refreshTokenValue"];
+            this.expiresAt = _data["expiresAt"] ? new Date(_data["expiresAt"].toString()) : undefined as any;
+            this.revoked = _data["revoked"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.createdByIp = _data["createdByIp"];
+            this.replacedByToken = _data["replacedByToken"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RefreshToken {
+        data = typeof data === 'object' ? data : {};
+        let result = new RefreshToken();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tokenId"] = this.tokenId;
+        data["userId"] = this.userId;
+        data["refreshTokenValue"] = this.refreshTokenValue;
+        data["expiresAt"] = this.expiresAt ? this.expiresAt.toISOString() : undefined as any;
+        data["revoked"] = this.revoked;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["createdByIp"] = this.createdByIp;
+        data["replacedByToken"] = this.replacedByToken;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRefreshToken {
+    tokenId?: string;
+    userId?: string;
+    refreshTokenValue: string;
+    expiresAt?: Date;
+    revoked?: boolean;
+    createdAt?: Date;
+    createdByIp?: string | undefined;
+    replacedByToken?: string | undefined;
+    user?: User;
+}
+
+export class ShoppingCart implements IShoppingCart {
+    cartId?: string;
+    userId?: string | undefined;
+    sessionId?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    user?: User | undefined;
+    shoppingCartItems?: ShoppingCartItem[];
+
+    constructor(data?: IShoppingCart) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.cartId = _data["cartId"];
+            this.userId = _data["userId"];
+            this.sessionId = _data["sessionId"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            if (Array.isArray(_data["shoppingCartItems"])) {
+                this.shoppingCartItems = [] as any;
+                for (let item of _data["shoppingCartItems"])
+                    this.shoppingCartItems!.push(ShoppingCartItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ShoppingCart {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShoppingCart();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["cartId"] = this.cartId;
+        data["userId"] = this.userId;
+        data["sessionId"] = this.sessionId;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        if (Array.isArray(this.shoppingCartItems)) {
+            data["shoppingCartItems"] = [];
+            for (let item of this.shoppingCartItems)
+                data["shoppingCartItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IShoppingCart {
+    cartId?: string;
+    userId?: string | undefined;
+    sessionId?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    user?: User | undefined;
+    shoppingCartItems?: ShoppingCartItem[];
+}
+
+export class ShoppingCartItem implements IShoppingCartItem {
+    cartItemId?: string;
+    cartId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    quantity?: number;
+    unitPrice!: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    shoppingCart?: ShoppingCart;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+
+    constructor(data?: IShoppingCartItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.cartItemId = _data["cartItemId"];
+            this.cartId = _data["cartId"];
+            this.productId = _data["productId"];
+            this.productVariantId = _data["productVariantId"];
+            this.quantity = _data["quantity"];
+            this.unitPrice = _data["unitPrice"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.shoppingCart = _data["shoppingCart"] ? ShoppingCart.fromJS(_data["shoppingCart"]) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ShoppingCartItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShoppingCartItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["cartItemId"] = this.cartItemId;
+        data["cartId"] = this.cartId;
+        data["productId"] = this.productId;
+        data["productVariantId"] = this.productVariantId;
+        data["quantity"] = this.quantity;
+        data["unitPrice"] = this.unitPrice;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["shoppingCart"] = this.shoppingCart ? this.shoppingCart.toJSON() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IShoppingCartItem {
+    cartItemId?: string;
+    cartId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    quantity?: number;
+    unitPrice: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    shoppingCart?: ShoppingCart;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+}
+
+export class Product implements IProduct {
+    productId?: string;
+    name!: string;
+    slug?: string | undefined;
+    sku!: string;
+    description!: string;
+    shortDescription?: string | undefined;
+    price!: number;
+    discountPrice?: number | undefined;
+    cost?: number | undefined;
+    stockQuantity?: number;
+    minStockLevel?: number;
+    weight?: number | undefined;
+    dimensions?: string | undefined;
+    categoryId?: string;
+    brandId?: string | undefined;
+    status?: number;
+    isFeatured?: boolean;
+    isDigital?: boolean;
+    metaTitle?: string | undefined;
+    metaDescription?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    category?: Category;
+    brand?: Brand | undefined;
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+    productImages?: ProductImage[];
+    productAttributeValues?: ProductAttributeValue[];
+    productVariants?: ProductVariant[];
+    productTagAssignments?: ProductTagAssignment[];
+    productQuestions?: ProductQuestion[];
+    reviews?: ProductReview[];
+    stockMovements?: StockMovement[];
+
+    constructor(data?: IProduct) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.name = _data["name"];
+            this.slug = _data["slug"];
+            this.sku = _data["sku"];
+            this.description = _data["description"];
+            this.shortDescription = _data["shortDescription"];
+            this.price = _data["price"];
+            this.discountPrice = _data["discountPrice"];
+            this.cost = _data["cost"];
+            this.stockQuantity = _data["stockQuantity"];
+            this.minStockLevel = _data["minStockLevel"];
+            this.weight = _data["weight"];
+            this.dimensions = _data["dimensions"];
+            this.categoryId = _data["categoryId"];
+            this.brandId = _data["brandId"];
+            this.status = _data["status"];
+            this.isFeatured = _data["isFeatured"];
+            this.isDigital = _data["isDigital"];
+            this.metaTitle = _data["metaTitle"];
+            this.metaDescription = _data["metaDescription"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.updatedBy = _data["updatedBy"];
+            this.category = _data["category"] ? Category.fromJS(_data["category"]) : undefined as any;
+            this.brand = _data["brand"] ? Brand.fromJS(_data["brand"]) : undefined as any;
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            this.updatedByUser = _data["updatedByUser"] ? User.fromJS(_data["updatedByUser"]) : undefined as any;
+            if (Array.isArray(_data["productImages"])) {
+                this.productImages = [] as any;
+                for (let item of _data["productImages"])
+                    this.productImages!.push(ProductImage.fromJS(item));
+            }
+            if (Array.isArray(_data["productAttributeValues"])) {
+                this.productAttributeValues = [] as any;
+                for (let item of _data["productAttributeValues"])
+                    this.productAttributeValues!.push(ProductAttributeValue.fromJS(item));
+            }
+            if (Array.isArray(_data["productVariants"])) {
+                this.productVariants = [] as any;
+                for (let item of _data["productVariants"])
+                    this.productVariants!.push(ProductVariant.fromJS(item));
+            }
+            if (Array.isArray(_data["productTagAssignments"])) {
+                this.productTagAssignments = [] as any;
+                for (let item of _data["productTagAssignments"])
+                    this.productTagAssignments!.push(ProductTagAssignment.fromJS(item));
+            }
+            if (Array.isArray(_data["productQuestions"])) {
+                this.productQuestions = [] as any;
+                for (let item of _data["productQuestions"])
+                    this.productQuestions!.push(ProductQuestion.fromJS(item));
+            }
+            if (Array.isArray(_data["reviews"])) {
+                this.reviews = [] as any;
+                for (let item of _data["reviews"])
+                    this.reviews!.push(ProductReview.fromJS(item));
+            }
+            if (Array.isArray(_data["stockMovements"])) {
+                this.stockMovements = [] as any;
+                for (let item of _data["stockMovements"])
+                    this.stockMovements!.push(StockMovement.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Product {
+        data = typeof data === 'object' ? data : {};
+        let result = new Product();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["name"] = this.name;
+        data["slug"] = this.slug;
+        data["sku"] = this.sku;
+        data["description"] = this.description;
+        data["shortDescription"] = this.shortDescription;
+        data["price"] = this.price;
+        data["discountPrice"] = this.discountPrice;
+        data["cost"] = this.cost;
+        data["stockQuantity"] = this.stockQuantity;
+        data["minStockLevel"] = this.minStockLevel;
+        data["weight"] = this.weight;
+        data["dimensions"] = this.dimensions;
+        data["categoryId"] = this.categoryId;
+        data["brandId"] = this.brandId;
+        data["status"] = this.status;
+        data["isFeatured"] = this.isFeatured;
+        data["isDigital"] = this.isDigital;
+        data["metaTitle"] = this.metaTitle;
+        data["metaDescription"] = this.metaDescription;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["updatedBy"] = this.updatedBy;
+        data["category"] = this.category ? this.category.toJSON() : undefined as any;
+        data["brand"] = this.brand ? this.brand.toJSON() : undefined as any;
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        data["updatedByUser"] = this.updatedByUser ? this.updatedByUser.toJSON() : undefined as any;
+        if (Array.isArray(this.productImages)) {
+            data["productImages"] = [];
+            for (let item of this.productImages)
+                data["productImages"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.productAttributeValues)) {
+            data["productAttributeValues"] = [];
+            for (let item of this.productAttributeValues)
+                data["productAttributeValues"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.productVariants)) {
+            data["productVariants"] = [];
+            for (let item of this.productVariants)
+                data["productVariants"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.productTagAssignments)) {
+            data["productTagAssignments"] = [];
+            for (let item of this.productTagAssignments)
+                data["productTagAssignments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.productQuestions)) {
+            data["productQuestions"] = [];
+            for (let item of this.productQuestions)
+                data["productQuestions"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.reviews)) {
+            data["reviews"] = [];
+            for (let item of this.reviews)
+                data["reviews"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.stockMovements)) {
+            data["stockMovements"] = [];
+            for (let item of this.stockMovements)
+                data["stockMovements"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProduct {
+    productId?: string;
+    name: string;
+    slug?: string | undefined;
+    sku: string;
+    description: string;
+    shortDescription?: string | undefined;
+    price: number;
+    discountPrice?: number | undefined;
+    cost?: number | undefined;
+    stockQuantity?: number;
+    minStockLevel?: number;
+    weight?: number | undefined;
+    dimensions?: string | undefined;
+    categoryId?: string;
+    brandId?: string | undefined;
+    status?: number;
+    isFeatured?: boolean;
+    isDigital?: boolean;
+    metaTitle?: string | undefined;
+    metaDescription?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    category?: Category;
+    brand?: Brand | undefined;
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+    productImages?: ProductImage[];
+    productAttributeValues?: ProductAttributeValue[];
+    productVariants?: ProductVariant[];
+    productTagAssignments?: ProductTagAssignment[];
+    productQuestions?: ProductQuestion[];
+    reviews?: ProductReview[];
+    stockMovements?: StockMovement[];
+}
+
+export class Category implements ICategory {
+    categoryId?: string;
+    name!: string;
+    slug?: string | undefined;
+    description?: string | undefined;
+    imageUrl?: string | undefined;
+    parentCategoryId?: string | undefined;
+    displayOrder?: number;
+    status?: number;
+    metaTitle?: string | undefined;
+    metaDescription?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    parentCategory?: Category | undefined;
+    subCategories?: Category[];
+    products?: Product[];
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+
+    constructor(data?: ICategory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.categoryId = _data["categoryId"];
+            this.name = _data["name"];
+            this.slug = _data["slug"];
+            this.description = _data["description"];
+            this.imageUrl = _data["imageUrl"];
+            this.parentCategoryId = _data["parentCategoryId"];
+            this.displayOrder = _data["displayOrder"];
+            this.status = _data["status"];
+            this.metaTitle = _data["metaTitle"];
+            this.metaDescription = _data["metaDescription"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.updatedBy = _data["updatedBy"];
+            this.parentCategory = _data["parentCategory"] ? Category.fromJS(_data["parentCategory"]) : undefined as any;
+            if (Array.isArray(_data["subCategories"])) {
+                this.subCategories = [] as any;
+                for (let item of _data["subCategories"])
+                    this.subCategories!.push(Category.fromJS(item));
+            }
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(Product.fromJS(item));
+            }
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            this.updatedByUser = _data["updatedByUser"] ? User.fromJS(_data["updatedByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): Category {
+        data = typeof data === 'object' ? data : {};
+        let result = new Category();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["categoryId"] = this.categoryId;
+        data["name"] = this.name;
+        data["slug"] = this.slug;
+        data["description"] = this.description;
+        data["imageUrl"] = this.imageUrl;
+        data["parentCategoryId"] = this.parentCategoryId;
+        data["displayOrder"] = this.displayOrder;
+        data["status"] = this.status;
+        data["metaTitle"] = this.metaTitle;
+        data["metaDescription"] = this.metaDescription;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["updatedBy"] = this.updatedBy;
+        data["parentCategory"] = this.parentCategory ? this.parentCategory.toJSON() : undefined as any;
+        if (Array.isArray(this.subCategories)) {
+            data["subCategories"] = [];
+            for (let item of this.subCategories)
+                data["subCategories"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        data["updatedByUser"] = this.updatedByUser ? this.updatedByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICategory {
+    categoryId?: string;
+    name: string;
+    slug?: string | undefined;
+    description?: string | undefined;
+    imageUrl?: string | undefined;
+    parentCategoryId?: string | undefined;
+    displayOrder?: number;
+    status?: number;
+    metaTitle?: string | undefined;
+    metaDescription?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    parentCategory?: Category | undefined;
+    subCategories?: Category[];
+    products?: Product[];
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+}
+
+export class Brand implements IBrand {
+    brandId?: string;
+    name!: string;
+    slug?: string | undefined;
+    description?: string | undefined;
+    logoUrl?: string | undefined;
+    website?: string | undefined;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    products?: Product[];
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+
+    constructor(data?: IBrand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.brandId = _data["brandId"];
+            this.name = _data["name"];
+            this.slug = _data["slug"];
+            this.description = _data["description"];
+            this.logoUrl = _data["logoUrl"];
+            this.website = _data["website"];
+            this.status = _data["status"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.updatedBy = _data["updatedBy"];
+            if (Array.isArray(_data["products"])) {
+                this.products = [] as any;
+                for (let item of _data["products"])
+                    this.products!.push(Product.fromJS(item));
+            }
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            this.updatedByUser = _data["updatedByUser"] ? User.fromJS(_data["updatedByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): Brand {
+        data = typeof data === 'object' ? data : {};
+        let result = new Brand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["brandId"] = this.brandId;
+        data["name"] = this.name;
+        data["slug"] = this.slug;
+        data["description"] = this.description;
+        data["logoUrl"] = this.logoUrl;
+        data["website"] = this.website;
+        data["status"] = this.status;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["updatedBy"] = this.updatedBy;
+        if (Array.isArray(this.products)) {
+            data["products"] = [];
+            for (let item of this.products)
+                data["products"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        data["updatedByUser"] = this.updatedByUser ? this.updatedByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IBrand {
+    brandId?: string;
+    name: string;
+    slug?: string | undefined;
+    description?: string | undefined;
+    logoUrl?: string | undefined;
+    website?: string | undefined;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    products?: Product[];
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+}
+
+export class ProductImage implements IProductImage {
+    imageId?: string;
+    productId?: string;
+    imageUrl!: string;
+    altText?: string | undefined;
+    displayOrder?: number;
+    isPrimary?: boolean;
+    createdAt?: Date;
+    product?: Product;
+
+    constructor(data?: IProductImage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.imageId = _data["imageId"];
+            this.productId = _data["productId"];
+            this.imageUrl = _data["imageUrl"];
+            this.altText = _data["altText"];
+            this.displayOrder = _data["displayOrder"];
+            this.isPrimary = _data["isPrimary"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProductImage {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductImage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["imageId"] = this.imageId;
+        data["productId"] = this.productId;
+        data["imageUrl"] = this.imageUrl;
+        data["altText"] = this.altText;
+        data["displayOrder"] = this.displayOrder;
+        data["isPrimary"] = this.isPrimary;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProductImage {
+    imageId?: string;
+    productId?: string;
+    imageUrl: string;
+    altText?: string | undefined;
+    displayOrder?: number;
+    isPrimary?: boolean;
+    createdAt?: Date;
+    product?: Product;
+}
+
+export class ProductAttributeValue implements IProductAttributeValue {
+    valueId?: string;
+    productId?: string;
+    attributeId?: string;
+    value!: string;
+    createdAt?: Date;
+    product?: Product;
+    attribute?: ProductAttribute;
+
+    constructor(data?: IProductAttributeValue) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.valueId = _data["valueId"];
+            this.productId = _data["productId"];
+            this.attributeId = _data["attributeId"];
+            this.value = _data["value"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.attribute = _data["attribute"] ? ProductAttribute.fromJS(_data["attribute"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProductAttributeValue {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductAttributeValue();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["valueId"] = this.valueId;
+        data["productId"] = this.productId;
+        data["attributeId"] = this.attributeId;
+        data["value"] = this.value;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["attribute"] = this.attribute ? this.attribute.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProductAttributeValue {
+    valueId?: string;
+    productId?: string;
+    attributeId?: string;
+    value: string;
+    createdAt?: Date;
+    product?: Product;
+    attribute?: ProductAttribute;
+}
+
+export class ProductAttribute implements IProductAttribute {
+    attributeId?: string;
+    name!: string;
+    displayName!: string;
+    attributeType?: number;
+    isRequired?: boolean;
+    displayOrder?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    productAttributeValues?: ProductAttributeValue[];
+
+    constructor(data?: IProductAttribute) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.attributeId = _data["attributeId"];
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.attributeType = _data["attributeType"];
+            this.isRequired = _data["isRequired"];
+            this.displayOrder = _data["displayOrder"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["productAttributeValues"])) {
+                this.productAttributeValues = [] as any;
+                for (let item of _data["productAttributeValues"])
+                    this.productAttributeValues!.push(ProductAttributeValue.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductAttribute {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductAttribute();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["attributeId"] = this.attributeId;
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["attributeType"] = this.attributeType;
+        data["isRequired"] = this.isRequired;
+        data["displayOrder"] = this.displayOrder;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        if (Array.isArray(this.productAttributeValues)) {
+            data["productAttributeValues"] = [];
+            for (let item of this.productAttributeValues)
+                data["productAttributeValues"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProductAttribute {
+    attributeId?: string;
+    name: string;
+    displayName: string;
+    attributeType?: number;
+    isRequired?: boolean;
+    displayOrder?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    productAttributeValues?: ProductAttributeValue[];
+}
+
+export class ProductVariant implements IProductVariant {
+    variantId?: string;
+    productId?: string;
+    sku!: string;
+    name!: string;
+    price!: number;
+    discountPrice?: number | undefined;
+    stockQuantity?: number;
+    weight?: number | undefined;
+    imageUrl?: string | undefined;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    product?: Product;
+    variantAttributeValues?: ProductAttributeValue[];
+
+    constructor(data?: IProductVariant) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.variantId = _data["variantId"];
+            this.productId = _data["productId"];
+            this.sku = _data["sku"];
+            this.name = _data["name"];
+            this.price = _data["price"];
+            this.discountPrice = _data["discountPrice"];
+            this.stockQuantity = _data["stockQuantity"];
+            this.weight = _data["weight"];
+            this.imageUrl = _data["imageUrl"];
+            this.status = _data["status"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            if (Array.isArray(_data["variantAttributeValues"])) {
+                this.variantAttributeValues = [] as any;
+                for (let item of _data["variantAttributeValues"])
+                    this.variantAttributeValues!.push(ProductAttributeValue.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductVariant {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductVariant();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["variantId"] = this.variantId;
+        data["productId"] = this.productId;
+        data["sku"] = this.sku;
+        data["name"] = this.name;
+        data["price"] = this.price;
+        data["discountPrice"] = this.discountPrice;
+        data["stockQuantity"] = this.stockQuantity;
+        data["weight"] = this.weight;
+        data["imageUrl"] = this.imageUrl;
+        data["status"] = this.status;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        if (Array.isArray(this.variantAttributeValues)) {
+            data["variantAttributeValues"] = [];
+            for (let item of this.variantAttributeValues)
+                data["variantAttributeValues"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProductVariant {
+    variantId?: string;
+    productId?: string;
+    sku: string;
+    name: string;
+    price: number;
+    discountPrice?: number | undefined;
+    stockQuantity?: number;
+    weight?: number | undefined;
+    imageUrl?: string | undefined;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    product?: Product;
+    variantAttributeValues?: ProductAttributeValue[];
+}
+
+export class ProductTagAssignment implements IProductTagAssignment {
+    productId?: string;
+    tagId?: string;
+    product?: Product;
+    productTag?: ProductTag;
+
+    constructor(data?: IProductTagAssignment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productId = _data["productId"];
+            this.tagId = _data["tagId"];
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.productTag = _data["productTag"] ? ProductTag.fromJS(_data["productTag"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProductTagAssignment {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductTagAssignment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productId"] = this.productId;
+        data["tagId"] = this.tagId;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["productTag"] = this.productTag ? this.productTag.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProductTagAssignment {
+    productId?: string;
+    tagId?: string;
+    product?: Product;
+    productTag?: ProductTag;
+}
+
+export class ProductTag implements IProductTag {
+    tagId?: string;
+    name!: string;
+    slug?: string | undefined;
+    description?: string | undefined;
+    createdAt?: Date;
+    productTagAssignments?: ProductTagAssignment[];
+
+    constructor(data?: IProductTag) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tagId = _data["tagId"];
+            this.name = _data["name"];
+            this.slug = _data["slug"];
+            this.description = _data["description"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["productTagAssignments"])) {
+                this.productTagAssignments = [] as any;
+                for (let item of _data["productTagAssignments"])
+                    this.productTagAssignments!.push(ProductTagAssignment.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductTag {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductTag();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tagId"] = this.tagId;
+        data["name"] = this.name;
+        data["slug"] = this.slug;
+        data["description"] = this.description;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        if (Array.isArray(this.productTagAssignments)) {
+            data["productTagAssignments"] = [];
+            for (let item of this.productTagAssignments)
+                data["productTagAssignments"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProductTag {
+    tagId?: string;
+    name: string;
+    slug?: string | undefined;
+    description?: string | undefined;
+    createdAt?: Date;
+    productTagAssignments?: ProductTagAssignment[];
+}
+
+export class ProductQuestion implements IProductQuestion {
+    questionId?: string;
+    productId?: string;
+    userId?: string | undefined;
+    question!: string;
+    answer?: string | undefined;
+    answeredBy?: string | undefined;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    product?: Product;
+    user?: User | undefined;
+    answeredByUser?: User | undefined;
+
+    constructor(data?: IProductQuestion) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.questionId = _data["questionId"];
+            this.productId = _data["productId"];
+            this.userId = _data["userId"];
+            this.question = _data["question"];
+            this.answer = _data["answer"];
+            this.answeredBy = _data["answeredBy"];
+            this.status = _data["status"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.answeredByUser = _data["answeredByUser"] ? User.fromJS(_data["answeredByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProductQuestion {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductQuestion();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["questionId"] = this.questionId;
+        data["productId"] = this.productId;
+        data["userId"] = this.userId;
+        data["question"] = this.question;
+        data["answer"] = this.answer;
+        data["answeredBy"] = this.answeredBy;
+        data["status"] = this.status;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["answeredByUser"] = this.answeredByUser ? this.answeredByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProductQuestion {
+    questionId?: string;
+    productId?: string;
+    userId?: string | undefined;
+    question: string;
+    answer?: string | undefined;
+    answeredBy?: string | undefined;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    product?: Product;
+    user?: User | undefined;
+    answeredByUser?: User | undefined;
+}
+
+export class ProductReview implements IProductReview {
+    reviewId?: string;
+    productId?: string;
+    userId?: string;
+    orderId?: string | undefined;
+    rating!: number;
+    title?: string | undefined;
+    content?: string | undefined;
+    isVerifiedPurchase?: boolean;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    product?: Product;
+    user?: User;
+    order?: Order | undefined;
+    reviewImages?: ReviewImage[];
+    reviewVotes?: ReviewVote[];
+    reviewReports?: ReviewReport[];
+
+    constructor(data?: IProductReview) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reviewId = _data["reviewId"];
+            this.productId = _data["productId"];
+            this.userId = _data["userId"];
+            this.orderId = _data["orderId"];
+            this.rating = _data["rating"];
+            this.title = _data["title"];
+            this.content = _data["content"];
+            this.isVerifiedPurchase = _data["isVerifiedPurchase"];
+            this.status = _data["status"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+            if (Array.isArray(_data["reviewImages"])) {
+                this.reviewImages = [] as any;
+                for (let item of _data["reviewImages"])
+                    this.reviewImages!.push(ReviewImage.fromJS(item));
+            }
+            if (Array.isArray(_data["reviewVotes"])) {
+                this.reviewVotes = [] as any;
+                for (let item of _data["reviewVotes"])
+                    this.reviewVotes!.push(ReviewVote.fromJS(item));
+            }
+            if (Array.isArray(_data["reviewReports"])) {
+                this.reviewReports = [] as any;
+                for (let item of _data["reviewReports"])
+                    this.reviewReports!.push(ReviewReport.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProductReview {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductReview();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reviewId"] = this.reviewId;
+        data["productId"] = this.productId;
+        data["userId"] = this.userId;
+        data["orderId"] = this.orderId;
+        data["rating"] = this.rating;
+        data["title"] = this.title;
+        data["content"] = this.content;
+        data["isVerifiedPurchase"] = this.isVerifiedPurchase;
+        data["status"] = this.status;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        if (Array.isArray(this.reviewImages)) {
+            data["reviewImages"] = [];
+            for (let item of this.reviewImages)
+                data["reviewImages"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.reviewVotes)) {
+            data["reviewVotes"] = [];
+            for (let item of this.reviewVotes)
+                data["reviewVotes"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.reviewReports)) {
+            data["reviewReports"] = [];
+            for (let item of this.reviewReports)
+                data["reviewReports"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProductReview {
+    reviewId?: string;
+    productId?: string;
+    userId?: string;
+    orderId?: string | undefined;
+    rating: number;
+    title?: string | undefined;
+    content?: string | undefined;
+    isVerifiedPurchase?: boolean;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    product?: Product;
+    user?: User;
+    order?: Order | undefined;
+    reviewImages?: ReviewImage[];
+    reviewVotes?: ReviewVote[];
+    reviewReports?: ReviewReport[];
+}
+
+export class Order implements IOrder {
+    orderId?: string;
+    orderNumber!: string;
+    userId?: string;
+    orderDate?: Date;
+    subTotal!: number;
+    taxAmount?: number;
+    shippingAmount?: number;
+    discountAmount?: number;
+    totalAmount!: number;
+    status?: number;
+    paymentStatus?: number;
+    paymentMethod?: number;
+    shippingFirstName!: string;
+    shippingLastName!: string;
+    shippingEmail!: string;
+    shippingPhone?: string | undefined;
+    shippingAddress!: string;
+    shippingCity!: string;
+    shippingState!: string;
+    shippingZipCode!: string;
+    shippingCountry!: string;
+    billingFirstName!: string;
+    billingLastName!: string;
+    billingEmail!: string;
+    billingPhone?: string | undefined;
+    billingAddress!: string;
+    billingCity!: string;
+    billingState!: string;
+    billingZipCode!: string;
+    billingCountry!: string;
+    notes?: string | undefined;
+    estimatedDeliveryDate?: Date | undefined;
+    deliveredAt?: Date | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string | undefined;
+    user?: User;
+    createdByUser?: User | undefined;
+    orderItems?: OrderItem[];
+    orderStatusHistories?: OrderStatusHistory[];
+    orderPayments?: OrderPayment[];
+    orderShipments?: OrderShipment[];
+    orderRefunds?: OrderRefund[];
+
+    constructor(data?: IOrder) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderId = _data["orderId"];
+            this.orderNumber = _data["orderNumber"];
+            this.userId = _data["userId"];
+            this.orderDate = _data["orderDate"] ? new Date(_data["orderDate"].toString()) : undefined as any;
+            this.subTotal = _data["subTotal"];
+            this.taxAmount = _data["taxAmount"];
+            this.shippingAmount = _data["shippingAmount"];
+            this.discountAmount = _data["discountAmount"];
+            this.totalAmount = _data["totalAmount"];
+            this.status = _data["status"];
+            this.paymentStatus = _data["paymentStatus"];
+            this.paymentMethod = _data["paymentMethod"];
+            this.shippingFirstName = _data["shippingFirstName"];
+            this.shippingLastName = _data["shippingLastName"];
+            this.shippingEmail = _data["shippingEmail"];
+            this.shippingPhone = _data["shippingPhone"];
+            this.shippingAddress = _data["shippingAddress"];
+            this.shippingCity = _data["shippingCity"];
+            this.shippingState = _data["shippingState"];
+            this.shippingZipCode = _data["shippingZipCode"];
+            this.shippingCountry = _data["shippingCountry"];
+            this.billingFirstName = _data["billingFirstName"];
+            this.billingLastName = _data["billingLastName"];
+            this.billingEmail = _data["billingEmail"];
+            this.billingPhone = _data["billingPhone"];
+            this.billingAddress = _data["billingAddress"];
+            this.billingCity = _data["billingCity"];
+            this.billingState = _data["billingState"];
+            this.billingZipCode = _data["billingZipCode"];
+            this.billingCountry = _data["billingCountry"];
+            this.notes = _data["notes"];
+            this.estimatedDeliveryDate = _data["estimatedDeliveryDate"] ? new Date(_data["estimatedDeliveryDate"].toString()) : undefined as any;
+            this.deliveredAt = _data["deliveredAt"] ? new Date(_data["deliveredAt"].toString()) : undefined as any;
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            if (Array.isArray(_data["orderItems"])) {
+                this.orderItems = [] as any;
+                for (let item of _data["orderItems"])
+                    this.orderItems!.push(OrderItem.fromJS(item));
+            }
+            if (Array.isArray(_data["orderStatusHistories"])) {
+                this.orderStatusHistories = [] as any;
+                for (let item of _data["orderStatusHistories"])
+                    this.orderStatusHistories!.push(OrderStatusHistory.fromJS(item));
+            }
+            if (Array.isArray(_data["orderPayments"])) {
+                this.orderPayments = [] as any;
+                for (let item of _data["orderPayments"])
+                    this.orderPayments!.push(OrderPayment.fromJS(item));
+            }
+            if (Array.isArray(_data["orderShipments"])) {
+                this.orderShipments = [] as any;
+                for (let item of _data["orderShipments"])
+                    this.orderShipments!.push(OrderShipment.fromJS(item));
+            }
+            if (Array.isArray(_data["orderRefunds"])) {
+                this.orderRefunds = [] as any;
+                for (let item of _data["orderRefunds"])
+                    this.orderRefunds!.push(OrderRefund.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Order {
+        data = typeof data === 'object' ? data : {};
+        let result = new Order();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderId"] = this.orderId;
+        data["orderNumber"] = this.orderNumber;
+        data["userId"] = this.userId;
+        data["orderDate"] = this.orderDate ? this.orderDate.toISOString() : undefined as any;
+        data["subTotal"] = this.subTotal;
+        data["taxAmount"] = this.taxAmount;
+        data["shippingAmount"] = this.shippingAmount;
+        data["discountAmount"] = this.discountAmount;
+        data["totalAmount"] = this.totalAmount;
+        data["status"] = this.status;
+        data["paymentStatus"] = this.paymentStatus;
+        data["paymentMethod"] = this.paymentMethod;
+        data["shippingFirstName"] = this.shippingFirstName;
+        data["shippingLastName"] = this.shippingLastName;
+        data["shippingEmail"] = this.shippingEmail;
+        data["shippingPhone"] = this.shippingPhone;
+        data["shippingAddress"] = this.shippingAddress;
+        data["shippingCity"] = this.shippingCity;
+        data["shippingState"] = this.shippingState;
+        data["shippingZipCode"] = this.shippingZipCode;
+        data["shippingCountry"] = this.shippingCountry;
+        data["billingFirstName"] = this.billingFirstName;
+        data["billingLastName"] = this.billingLastName;
+        data["billingEmail"] = this.billingEmail;
+        data["billingPhone"] = this.billingPhone;
+        data["billingAddress"] = this.billingAddress;
+        data["billingCity"] = this.billingCity;
+        data["billingState"] = this.billingState;
+        data["billingZipCode"] = this.billingZipCode;
+        data["billingCountry"] = this.billingCountry;
+        data["notes"] = this.notes;
+        data["estimatedDeliveryDate"] = this.estimatedDeliveryDate ? this.estimatedDeliveryDate.toISOString() : undefined as any;
+        data["deliveredAt"] = this.deliveredAt ? this.deliveredAt.toISOString() : undefined as any;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        if (Array.isArray(this.orderItems)) {
+            data["orderItems"] = [];
+            for (let item of this.orderItems)
+                data["orderItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.orderStatusHistories)) {
+            data["orderStatusHistories"] = [];
+            for (let item of this.orderStatusHistories)
+                data["orderStatusHistories"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.orderPayments)) {
+            data["orderPayments"] = [];
+            for (let item of this.orderPayments)
+                data["orderPayments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.orderShipments)) {
+            data["orderShipments"] = [];
+            for (let item of this.orderShipments)
+                data["orderShipments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.orderRefunds)) {
+            data["orderRefunds"] = [];
+            for (let item of this.orderRefunds)
+                data["orderRefunds"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IOrder {
+    orderId?: string;
+    orderNumber: string;
+    userId?: string;
+    orderDate?: Date;
+    subTotal: number;
+    taxAmount?: number;
+    shippingAmount?: number;
+    discountAmount?: number;
+    totalAmount: number;
+    status?: number;
+    paymentStatus?: number;
+    paymentMethod?: number;
+    shippingFirstName: string;
+    shippingLastName: string;
+    shippingEmail: string;
+    shippingPhone?: string | undefined;
+    shippingAddress: string;
+    shippingCity: string;
+    shippingState: string;
+    shippingZipCode: string;
+    shippingCountry: string;
+    billingFirstName: string;
+    billingLastName: string;
+    billingEmail: string;
+    billingPhone?: string | undefined;
+    billingAddress: string;
+    billingCity: string;
+    billingState: string;
+    billingZipCode: string;
+    billingCountry: string;
+    notes?: string | undefined;
+    estimatedDeliveryDate?: Date | undefined;
+    deliveredAt?: Date | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string | undefined;
+    user?: User;
+    createdByUser?: User | undefined;
+    orderItems?: OrderItem[];
+    orderStatusHistories?: OrderStatusHistory[];
+    orderPayments?: OrderPayment[];
+    orderShipments?: OrderShipment[];
+    orderRefunds?: OrderRefund[];
+}
+
+export class OrderItem implements IOrderItem {
+    orderItemId?: string;
+    orderId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    productName!: string;
+    productSku!: string;
+    quantity?: number;
+    unitPrice!: number;
+    totalPrice!: number;
+    order?: Order;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+    shipmentItems?: ShipmentItem[];
+
+    constructor(data?: IOrderItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderItemId = _data["orderItemId"];
+            this.orderId = _data["orderId"];
+            this.productId = _data["productId"];
+            this.productVariantId = _data["productVariantId"];
+            this.productName = _data["productName"];
+            this.productSku = _data["productSku"];
+            this.quantity = _data["quantity"];
+            this.unitPrice = _data["unitPrice"];
+            this.totalPrice = _data["totalPrice"];
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
+            if (Array.isArray(_data["shipmentItems"])) {
+                this.shipmentItems = [] as any;
+                for (let item of _data["shipmentItems"])
+                    this.shipmentItems!.push(ShipmentItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): OrderItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderItemId"] = this.orderItemId;
+        data["orderId"] = this.orderId;
+        data["productId"] = this.productId;
+        data["productVariantId"] = this.productVariantId;
+        data["productName"] = this.productName;
+        data["productSku"] = this.productSku;
+        data["quantity"] = this.quantity;
+        data["unitPrice"] = this.unitPrice;
+        data["totalPrice"] = this.totalPrice;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
+        if (Array.isArray(this.shipmentItems)) {
+            data["shipmentItems"] = [];
+            for (let item of this.shipmentItems)
+                data["shipmentItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IOrderItem {
+    orderItemId?: string;
+    orderId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    productName: string;
+    productSku: string;
+    quantity?: number;
+    unitPrice: number;
+    totalPrice: number;
+    order?: Order;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+    shipmentItems?: ShipmentItem[];
+}
+
+export class ShipmentItem implements IShipmentItem {
+    shipmentItemId?: string;
+    shipmentId?: string;
+    orderItemId?: string;
+    quantity?: number;
+    orderShipment?: OrderShipment;
+    orderItem?: OrderItem;
+
+    constructor(data?: IShipmentItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.shipmentItemId = _data["shipmentItemId"];
+            this.shipmentId = _data["shipmentId"];
+            this.orderItemId = _data["orderItemId"];
+            this.quantity = _data["quantity"];
+            this.orderShipment = _data["orderShipment"] ? OrderShipment.fromJS(_data["orderShipment"]) : undefined as any;
+            this.orderItem = _data["orderItem"] ? OrderItem.fromJS(_data["orderItem"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ShipmentItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShipmentItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["shipmentItemId"] = this.shipmentItemId;
+        data["shipmentId"] = this.shipmentId;
+        data["orderItemId"] = this.orderItemId;
+        data["quantity"] = this.quantity;
+        data["orderShipment"] = this.orderShipment ? this.orderShipment.toJSON() : undefined as any;
+        data["orderItem"] = this.orderItem ? this.orderItem.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IShipmentItem {
+    shipmentItemId?: string;
+    shipmentId?: string;
+    orderItemId?: string;
+    quantity?: number;
+    orderShipment?: OrderShipment;
+    orderItem?: OrderItem;
+}
+
+export class OrderShipment implements IOrderShipment {
+    shipmentId?: string;
+    orderId?: string;
+    shipmentNumber?: string | undefined;
+    carrierId?: string | undefined;
+    trackingNumber?: string | undefined;
+    shippedAt?: Date | undefined;
+    deliveredAt?: Date | undefined;
+    status?: number;
+    shippingCost?: number;
+    warehouseId?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    shippedBy?: string | undefined;
+    order?: Order;
+    shipmentCarrier?: ShipmentCarrier | undefined;
+    warehouse?: Warehouse | undefined;
+    shippedByUser?: User | undefined;
+    shipmentItems?: ShipmentItem[];
+
+    constructor(data?: IOrderShipment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.shipmentId = _data["shipmentId"];
+            this.orderId = _data["orderId"];
+            this.shipmentNumber = _data["shipmentNumber"];
+            this.carrierId = _data["carrierId"];
+            this.trackingNumber = _data["trackingNumber"];
+            this.shippedAt = _data["shippedAt"] ? new Date(_data["shippedAt"].toString()) : undefined as any;
+            this.deliveredAt = _data["deliveredAt"] ? new Date(_data["deliveredAt"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.shippingCost = _data["shippingCost"];
+            this.warehouseId = _data["warehouseId"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.shippedBy = _data["shippedBy"];
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+            this.shipmentCarrier = _data["shipmentCarrier"] ? ShipmentCarrier.fromJS(_data["shipmentCarrier"]) : undefined as any;
+            this.warehouse = _data["warehouse"] ? Warehouse.fromJS(_data["warehouse"]) : undefined as any;
+            this.shippedByUser = _data["shippedByUser"] ? User.fromJS(_data["shippedByUser"]) : undefined as any;
+            if (Array.isArray(_data["shipmentItems"])) {
+                this.shipmentItems = [] as any;
+                for (let item of _data["shipmentItems"])
+                    this.shipmentItems!.push(ShipmentItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): OrderShipment {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderShipment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["shipmentId"] = this.shipmentId;
+        data["orderId"] = this.orderId;
+        data["shipmentNumber"] = this.shipmentNumber;
+        data["carrierId"] = this.carrierId;
+        data["trackingNumber"] = this.trackingNumber;
+        data["shippedAt"] = this.shippedAt ? this.shippedAt.toISOString() : undefined as any;
+        data["deliveredAt"] = this.deliveredAt ? this.deliveredAt.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["shippingCost"] = this.shippingCost;
+        data["warehouseId"] = this.warehouseId;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["shippedBy"] = this.shippedBy;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        data["shipmentCarrier"] = this.shipmentCarrier ? this.shipmentCarrier.toJSON() : undefined as any;
+        data["warehouse"] = this.warehouse ? this.warehouse.toJSON() : undefined as any;
+        data["shippedByUser"] = this.shippedByUser ? this.shippedByUser.toJSON() : undefined as any;
+        if (Array.isArray(this.shipmentItems)) {
+            data["shipmentItems"] = [];
+            for (let item of this.shipmentItems)
+                data["shipmentItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IOrderShipment {
+    shipmentId?: string;
+    orderId?: string;
+    shipmentNumber?: string | undefined;
+    carrierId?: string | undefined;
+    trackingNumber?: string | undefined;
+    shippedAt?: Date | undefined;
+    deliveredAt?: Date | undefined;
+    status?: number;
+    shippingCost?: number;
+    warehouseId?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    shippedBy?: string | undefined;
+    order?: Order;
+    shipmentCarrier?: ShipmentCarrier | undefined;
+    warehouse?: Warehouse | undefined;
+    shippedByUser?: User | undefined;
+    shipmentItems?: ShipmentItem[];
+}
+
+export class ShipmentCarrier implements IShipmentCarrier {
+    carrierId?: string;
+    name!: string;
+    code?: string | undefined;
+    website?: string | undefined;
+    phone?: string | undefined;
+    createdAt?: Date;
+    orderShipments?: OrderShipment[];
+
+    constructor(data?: IShipmentCarrier) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.carrierId = _data["carrierId"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.website = _data["website"];
+            this.phone = _data["phone"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["orderShipments"])) {
+                this.orderShipments = [] as any;
+                for (let item of _data["orderShipments"])
+                    this.orderShipments!.push(OrderShipment.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ShipmentCarrier {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShipmentCarrier();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["carrierId"] = this.carrierId;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["website"] = this.website;
+        data["phone"] = this.phone;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        if (Array.isArray(this.orderShipments)) {
+            data["orderShipments"] = [];
+            for (let item of this.orderShipments)
+                data["orderShipments"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IShipmentCarrier {
+    carrierId?: string;
+    name: string;
+    code?: string | undefined;
+    website?: string | undefined;
+    phone?: string | undefined;
+    createdAt?: Date;
+    orderShipments?: OrderShipment[];
+}
+
+export class Warehouse implements IWarehouse {
+    warehouseId?: string;
+    name!: string;
+    code?: string | undefined;
+    address?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    purchaseOrders?: PurchaseOrder[];
+    orderShipments?: OrderShipment[];
+    stockMovements?: StockMovement[];
+
+    constructor(data?: IWarehouse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.warehouseId = _data["warehouseId"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.address = _data["address"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.country = _data["country"];
+            this.phone = _data["phone"];
+            this.isActive = _data["isActive"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["purchaseOrders"])) {
+                this.purchaseOrders = [] as any;
+                for (let item of _data["purchaseOrders"])
+                    this.purchaseOrders!.push(PurchaseOrder.fromJS(item));
+            }
+            if (Array.isArray(_data["orderShipments"])) {
+                this.orderShipments = [] as any;
+                for (let item of _data["orderShipments"])
+                    this.orderShipments!.push(OrderShipment.fromJS(item));
+            }
+            if (Array.isArray(_data["stockMovements"])) {
+                this.stockMovements = [] as any;
+                for (let item of _data["stockMovements"])
+                    this.stockMovements!.push(StockMovement.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Warehouse {
+        data = typeof data === 'object' ? data : {};
+        let result = new Warehouse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["warehouseId"] = this.warehouseId;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["address"] = this.address;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["country"] = this.country;
+        data["phone"] = this.phone;
+        data["isActive"] = this.isActive;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        if (Array.isArray(this.purchaseOrders)) {
+            data["purchaseOrders"] = [];
+            for (let item of this.purchaseOrders)
+                data["purchaseOrders"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.orderShipments)) {
+            data["orderShipments"] = [];
+            for (let item of this.orderShipments)
+                data["orderShipments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.stockMovements)) {
+            data["stockMovements"] = [];
+            for (let item of this.stockMovements)
+                data["stockMovements"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IWarehouse {
+    warehouseId?: string;
+    name: string;
+    code?: string | undefined;
+    address?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    isActive?: boolean;
+    createdAt?: Date;
+    purchaseOrders?: PurchaseOrder[];
+    orderShipments?: OrderShipment[];
+    stockMovements?: StockMovement[];
+}
+
+export class PurchaseOrder implements IPurchaseOrder {
+    purchaseOrderId?: string;
+    supplierId?: string;
+    warehouseId?: string | undefined;
+    orderNumber!: string;
+    orderDate?: Date;
+    expectedDate?: Date | undefined;
+    status?: number;
+    totalAmount?: number;
+    createdBy?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    supplier?: Supplier;
+    createdByUser?: User | undefined;
+    warehouse?: Warehouse | undefined;
+    purchaseOrderItems?: PurchaseOrderItem[];
+
+    constructor(data?: IPurchaseOrder) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.purchaseOrderId = _data["purchaseOrderId"];
+            this.supplierId = _data["supplierId"];
+            this.warehouseId = _data["warehouseId"];
+            this.orderNumber = _data["orderNumber"];
+            this.orderDate = _data["orderDate"] ? new Date(_data["orderDate"].toString()) : undefined as any;
+            this.expectedDate = _data["expectedDate"] ? new Date(_data["expectedDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.totalAmount = _data["totalAmount"];
+            this.createdBy = _data["createdBy"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            this.warehouse = _data["warehouse"] ? Warehouse.fromJS(_data["warehouse"]) : undefined as any;
+            if (Array.isArray(_data["purchaseOrderItems"])) {
+                this.purchaseOrderItems = [] as any;
+                for (let item of _data["purchaseOrderItems"])
+                    this.purchaseOrderItems!.push(PurchaseOrderItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PurchaseOrder {
+        data = typeof data === 'object' ? data : {};
+        let result = new PurchaseOrder();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["purchaseOrderId"] = this.purchaseOrderId;
+        data["supplierId"] = this.supplierId;
+        data["warehouseId"] = this.warehouseId;
+        data["orderNumber"] = this.orderNumber;
+        data["orderDate"] = this.orderDate ? this.orderDate.toISOString() : undefined as any;
+        data["expectedDate"] = this.expectedDate ? this.expectedDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["totalAmount"] = this.totalAmount;
+        data["createdBy"] = this.createdBy;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        data["warehouse"] = this.warehouse ? this.warehouse.toJSON() : undefined as any;
+        if (Array.isArray(this.purchaseOrderItems)) {
+            data["purchaseOrderItems"] = [];
+            for (let item of this.purchaseOrderItems)
+                data["purchaseOrderItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IPurchaseOrder {
+    purchaseOrderId?: string;
+    supplierId?: string;
+    warehouseId?: string | undefined;
+    orderNumber: string;
+    orderDate?: Date;
+    expectedDate?: Date | undefined;
+    status?: number;
+    totalAmount?: number;
+    createdBy?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    supplier?: Supplier;
+    createdByUser?: User | undefined;
+    warehouse?: Warehouse | undefined;
+    purchaseOrderItems?: PurchaseOrderItem[];
+}
+
+export class Supplier implements ISupplier {
+    supplierId?: string;
+    name!: string;
+    contactName?: string | undefined;
+    contactEmail?: string | undefined;
+    contactPhone?: string | undefined;
+    address?: string | undefined;
+    note?: string | undefined;
+    createdAt?: Date;
+    purchaseOrders?: PurchaseOrder[];
+
+    constructor(data?: ISupplier) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.supplierId = _data["supplierId"];
+            this.name = _data["name"];
+            this.contactName = _data["contactName"];
+            this.contactEmail = _data["contactEmail"];
+            this.contactPhone = _data["contactPhone"];
+            this.address = _data["address"];
+            this.note = _data["note"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["purchaseOrders"])) {
+                this.purchaseOrders = [] as any;
+                for (let item of _data["purchaseOrders"])
+                    this.purchaseOrders!.push(PurchaseOrder.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Supplier {
+        data = typeof data === 'object' ? data : {};
+        let result = new Supplier();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["supplierId"] = this.supplierId;
+        data["name"] = this.name;
+        data["contactName"] = this.contactName;
+        data["contactEmail"] = this.contactEmail;
+        data["contactPhone"] = this.contactPhone;
+        data["address"] = this.address;
+        data["note"] = this.note;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        if (Array.isArray(this.purchaseOrders)) {
+            data["purchaseOrders"] = [];
+            for (let item of this.purchaseOrders)
+                data["purchaseOrders"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ISupplier {
+    supplierId?: string;
+    name: string;
+    contactName?: string | undefined;
+    contactEmail?: string | undefined;
+    contactPhone?: string | undefined;
+    address?: string | undefined;
+    note?: string | undefined;
+    createdAt?: Date;
+    purchaseOrders?: PurchaseOrder[];
+}
+
+export class PurchaseOrderItem implements IPurchaseOrderItem {
+    poiId?: string;
+    purchaseOrderId?: string;
+    productId?: string;
+    variantId?: string | undefined;
+    quantity?: number;
+    unitCost!: number;
+    totalCost!: number;
+    purchaseOrder?: PurchaseOrder;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+
+    constructor(data?: IPurchaseOrderItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.poiId = _data["poiId"];
+            this.purchaseOrderId = _data["purchaseOrderId"];
+            this.productId = _data["productId"];
+            this.variantId = _data["variantId"];
+            this.quantity = _data["quantity"];
+            this.unitCost = _data["unitCost"];
+            this.totalCost = _data["totalCost"];
+            this.purchaseOrder = _data["purchaseOrder"] ? PurchaseOrder.fromJS(_data["purchaseOrder"]) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): PurchaseOrderItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new PurchaseOrderItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["poiId"] = this.poiId;
+        data["purchaseOrderId"] = this.purchaseOrderId;
+        data["productId"] = this.productId;
+        data["variantId"] = this.variantId;
+        data["quantity"] = this.quantity;
+        data["unitCost"] = this.unitCost;
+        data["totalCost"] = this.totalCost;
+        data["purchaseOrder"] = this.purchaseOrder ? this.purchaseOrder.toJSON() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IPurchaseOrderItem {
+    poiId?: string;
+    purchaseOrderId?: string;
+    productId?: string;
+    variantId?: string | undefined;
+    quantity?: number;
+    unitCost: number;
+    totalCost: number;
+    purchaseOrder?: PurchaseOrder;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+}
+
+export class StockMovement implements IStockMovement {
+    movementId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    warehouseId?: string | undefined;
+    movementType?: number;
+    quantity?: number;
+    previousStock?: number;
+    newStock?: number;
+    reason?: string | undefined;
+    referenceId?: string | undefined;
+    referenceType?: number | undefined;
+    createdAt?: Date;
+    createdBy?: string;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+    warehouse?: Warehouse | undefined;
+    createdByUser?: User;
+
+    constructor(data?: IStockMovement) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.movementId = _data["movementId"];
+            this.productId = _data["productId"];
+            this.productVariantId = _data["productVariantId"];
+            this.warehouseId = _data["warehouseId"];
+            this.movementType = _data["movementType"];
+            this.quantity = _data["quantity"];
+            this.previousStock = _data["previousStock"];
+            this.newStock = _data["newStock"];
+            this.reason = _data["reason"];
+            this.referenceId = _data["referenceId"];
+            this.referenceType = _data["referenceType"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
+            this.warehouse = _data["warehouse"] ? Warehouse.fromJS(_data["warehouse"]) : undefined as any;
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): StockMovement {
+        data = typeof data === 'object' ? data : {};
+        let result = new StockMovement();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["movementId"] = this.movementId;
+        data["productId"] = this.productId;
+        data["productVariantId"] = this.productVariantId;
+        data["warehouseId"] = this.warehouseId;
+        data["movementType"] = this.movementType;
+        data["quantity"] = this.quantity;
+        data["previousStock"] = this.previousStock;
+        data["newStock"] = this.newStock;
+        data["reason"] = this.reason;
+        data["referenceId"] = this.referenceId;
+        data["referenceType"] = this.referenceType;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
+        data["warehouse"] = this.warehouse ? this.warehouse.toJSON() : undefined as any;
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IStockMovement {
+    movementId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    warehouseId?: string | undefined;
+    movementType?: number;
+    quantity?: number;
+    previousStock?: number;
+    newStock?: number;
+    reason?: string | undefined;
+    referenceId?: string | undefined;
+    referenceType?: number | undefined;
+    createdAt?: Date;
+    createdBy?: string;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+    warehouse?: Warehouse | undefined;
+    createdByUser?: User;
+}
+
+export class OrderStatusHistory implements IOrderStatusHistory {
+    historyId?: string;
+    orderId?: string;
+    fromStatus?: number | undefined;
+    toStatus!: number;
+    comment?: string | undefined;
+    createdAt?: Date;
+    createdBy?: string;
+    order?: Order;
+    createdByUser?: User;
+    oldStatus?: number | undefined;
+    newStatus?: number;
+    changedByUser?: User | undefined;
+
+    constructor(data?: IOrderStatusHistory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.historyId = _data["historyId"];
+            this.orderId = _data["orderId"];
+            this.fromStatus = _data["fromStatus"];
+            this.toStatus = _data["toStatus"];
+            this.comment = _data["comment"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            this.oldStatus = _data["oldStatus"];
+            this.newStatus = _data["newStatus"];
+            this.changedByUser = _data["changedByUser"] ? User.fromJS(_data["changedByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): OrderStatusHistory {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderStatusHistory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["historyId"] = this.historyId;
+        data["orderId"] = this.orderId;
+        data["fromStatus"] = this.fromStatus;
+        data["toStatus"] = this.toStatus;
+        data["comment"] = this.comment;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        data["oldStatus"] = this.oldStatus;
+        data["newStatus"] = this.newStatus;
+        data["changedByUser"] = this.changedByUser ? this.changedByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IOrderStatusHistory {
+    historyId?: string;
+    orderId?: string;
+    fromStatus?: number | undefined;
+    toStatus: number;
+    comment?: string | undefined;
+    createdAt?: Date;
+    createdBy?: string;
+    order?: Order;
+    createdByUser?: User;
+    oldStatus?: number | undefined;
+    newStatus?: number;
+    changedByUser?: User | undefined;
+}
+
+export class OrderPayment implements IOrderPayment {
+    paymentId?: string;
+    orderId?: string;
+    paymentMethod?: number;
+    transactionId?: string | undefined;
+    gatewayResponse?: string | undefined;
+    amount!: number;
+    currency!: string;
+    status?: number;
+    paidAt?: Date | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    processedBy?: string | undefined;
+    order?: Order;
+    processedByUser?: User | undefined;
+    orderRefunds?: OrderRefund[];
+
+    constructor(data?: IOrderPayment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentId = _data["paymentId"];
+            this.orderId = _data["orderId"];
+            this.paymentMethod = _data["paymentMethod"];
+            this.transactionId = _data["transactionId"];
+            this.gatewayResponse = _data["gatewayResponse"];
+            this.amount = _data["amount"];
+            this.currency = _data["currency"];
+            this.status = _data["status"];
+            this.paidAt = _data["paidAt"] ? new Date(_data["paidAt"].toString()) : undefined as any;
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.processedBy = _data["processedBy"];
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+            this.processedByUser = _data["processedByUser"] ? User.fromJS(_data["processedByUser"]) : undefined as any;
+            if (Array.isArray(_data["orderRefunds"])) {
+                this.orderRefunds = [] as any;
+                for (let item of _data["orderRefunds"])
+                    this.orderRefunds!.push(OrderRefund.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): OrderPayment {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderPayment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentId"] = this.paymentId;
+        data["orderId"] = this.orderId;
+        data["paymentMethod"] = this.paymentMethod;
+        data["transactionId"] = this.transactionId;
+        data["gatewayResponse"] = this.gatewayResponse;
+        data["amount"] = this.amount;
+        data["currency"] = this.currency;
+        data["status"] = this.status;
+        data["paidAt"] = this.paidAt ? this.paidAt.toISOString() : undefined as any;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["processedBy"] = this.processedBy;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        data["processedByUser"] = this.processedByUser ? this.processedByUser.toJSON() : undefined as any;
+        if (Array.isArray(this.orderRefunds)) {
+            data["orderRefunds"] = [];
+            for (let item of this.orderRefunds)
+                data["orderRefunds"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IOrderPayment {
+    paymentId?: string;
+    orderId?: string;
+    paymentMethod?: number;
+    transactionId?: string | undefined;
+    gatewayResponse?: string | undefined;
+    amount: number;
+    currency: string;
+    status?: number;
+    paidAt?: Date | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    processedBy?: string | undefined;
+    order?: Order;
+    processedByUser?: User | undefined;
+    orderRefunds?: OrderRefund[];
+}
+
+export class OrderRefund implements IOrderRefund {
+    refundId?: string;
+    orderId?: string;
+    paymentId?: string | undefined;
+    amount!: number;
+    reason?: string | undefined;
+    status?: number;
+    requestedAt?: Date;
+    processedAt?: Date | undefined;
+    processedBy?: string | undefined;
+    requestedBy?: string | undefined;
+    order?: Order;
+    orderPayment?: OrderPayment | undefined;
+    processedByUser?: User | undefined;
+    requestedByUser?: User | undefined;
+
+    constructor(data?: IOrderRefund) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.refundId = _data["refundId"];
+            this.orderId = _data["orderId"];
+            this.paymentId = _data["paymentId"];
+            this.amount = _data["amount"];
+            this.reason = _data["reason"];
+            this.status = _data["status"];
+            this.requestedAt = _data["requestedAt"] ? new Date(_data["requestedAt"].toString()) : undefined as any;
+            this.processedAt = _data["processedAt"] ? new Date(_data["processedAt"].toString()) : undefined as any;
+            this.processedBy = _data["processedBy"];
+            this.requestedBy = _data["requestedBy"];
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+            this.orderPayment = _data["orderPayment"] ? OrderPayment.fromJS(_data["orderPayment"]) : undefined as any;
+            this.processedByUser = _data["processedByUser"] ? User.fromJS(_data["processedByUser"]) : undefined as any;
+            this.requestedByUser = _data["requestedByUser"] ? User.fromJS(_data["requestedByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): OrderRefund {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderRefund();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["refundId"] = this.refundId;
+        data["orderId"] = this.orderId;
+        data["paymentId"] = this.paymentId;
+        data["amount"] = this.amount;
+        data["reason"] = this.reason;
+        data["status"] = this.status;
+        data["requestedAt"] = this.requestedAt ? this.requestedAt.toISOString() : undefined as any;
+        data["processedAt"] = this.processedAt ? this.processedAt.toISOString() : undefined as any;
+        data["processedBy"] = this.processedBy;
+        data["requestedBy"] = this.requestedBy;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        data["orderPayment"] = this.orderPayment ? this.orderPayment.toJSON() : undefined as any;
+        data["processedByUser"] = this.processedByUser ? this.processedByUser.toJSON() : undefined as any;
+        data["requestedByUser"] = this.requestedByUser ? this.requestedByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IOrderRefund {
+    refundId?: string;
+    orderId?: string;
+    paymentId?: string | undefined;
+    amount: number;
+    reason?: string | undefined;
+    status?: number;
+    requestedAt?: Date;
+    processedAt?: Date | undefined;
+    processedBy?: string | undefined;
+    requestedBy?: string | undefined;
+    order?: Order;
+    orderPayment?: OrderPayment | undefined;
+    processedByUser?: User | undefined;
+    requestedByUser?: User | undefined;
+}
+
+export class ReviewImage implements IReviewImage {
+    imageId?: string;
+    reviewId?: string;
+    imageUrl!: string;
+    createdAt?: Date;
+    productReview?: ProductReview;
+
+    constructor(data?: IReviewImage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.imageId = _data["imageId"];
+            this.reviewId = _data["reviewId"];
+            this.imageUrl = _data["imageUrl"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.productReview = _data["productReview"] ? ProductReview.fromJS(_data["productReview"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ReviewImage {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewImage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["imageId"] = this.imageId;
+        data["reviewId"] = this.reviewId;
+        data["imageUrl"] = this.imageUrl;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["productReview"] = this.productReview ? this.productReview.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IReviewImage {
+    imageId?: string;
+    reviewId?: string;
+    imageUrl: string;
+    createdAt?: Date;
+    productReview?: ProductReview;
+}
+
+export class ReviewVote implements IReviewVote {
+    voteId?: string;
+    reviewId?: string;
+    userId?: string;
+    helpful?: boolean;
+    createdAt?: Date;
+    productReview?: ProductReview;
+    user?: User;
+
+    constructor(data?: IReviewVote) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.voteId = _data["voteId"];
+            this.reviewId = _data["reviewId"];
+            this.userId = _data["userId"];
+            this.helpful = _data["helpful"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.productReview = _data["productReview"] ? ProductReview.fromJS(_data["productReview"]) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ReviewVote {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewVote();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["voteId"] = this.voteId;
+        data["reviewId"] = this.reviewId;
+        data["userId"] = this.userId;
+        data["helpful"] = this.helpful;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["productReview"] = this.productReview ? this.productReview.toJSON() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IReviewVote {
+    voteId?: string;
+    reviewId?: string;
+    userId?: string;
+    helpful?: boolean;
+    createdAt?: Date;
+    productReview?: ProductReview;
+    user?: User;
+}
+
+export class ReviewReport implements IReviewReport {
+    reportId?: string;
+    reviewId?: string;
+    userId?: string;
+    reason?: string | undefined;
+    createdAt?: Date;
+    processed?: boolean;
+    processedAt?: Date | undefined;
+    processedBy?: string | undefined;
+    productReview?: ProductReview;
+    user?: User;
+    processedByUser?: User | undefined;
+
+    constructor(data?: IReviewReport) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reportId = _data["reportId"];
+            this.reviewId = _data["reviewId"];
+            this.userId = _data["userId"];
+            this.reason = _data["reason"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.processed = _data["processed"];
+            this.processedAt = _data["processedAt"] ? new Date(_data["processedAt"].toString()) : undefined as any;
+            this.processedBy = _data["processedBy"];
+            this.productReview = _data["productReview"] ? ProductReview.fromJS(_data["productReview"]) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.processedByUser = _data["processedByUser"] ? User.fromJS(_data["processedByUser"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ReviewReport {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewReport();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reportId"] = this.reportId;
+        data["reviewId"] = this.reviewId;
+        data["userId"] = this.userId;
+        data["reason"] = this.reason;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["processed"] = this.processed;
+        data["processedAt"] = this.processedAt ? this.processedAt.toISOString() : undefined as any;
+        data["processedBy"] = this.processedBy;
+        data["productReview"] = this.productReview ? this.productReview.toJSON() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["processedByUser"] = this.processedByUser ? this.processedByUser.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IReviewReport {
+    reportId?: string;
+    reviewId?: string;
+    userId?: string;
+    reason?: string | undefined;
+    createdAt?: Date;
+    processed?: boolean;
+    processedAt?: Date | undefined;
+    processedBy?: string | undefined;
+    productReview?: ProductReview;
+    user?: User;
+    processedByUser?: User | undefined;
+}
+
+export class Wishlist implements IWishlist {
+    wishlistId?: string;
+    userId?: string;
+    name!: string;
+    isDefault?: boolean;
+    isPublic?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    user?: User;
+    wishlistItems?: WishlistItem[];
+
+    constructor(data?: IWishlist) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.wishlistId = _data["wishlistId"];
+            this.userId = _data["userId"];
+            this.name = _data["name"];
+            this.isDefault = _data["isDefault"];
+            this.isPublic = _data["isPublic"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            if (Array.isArray(_data["wishlistItems"])) {
+                this.wishlistItems = [] as any;
+                for (let item of _data["wishlistItems"])
+                    this.wishlistItems!.push(WishlistItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Wishlist {
+        data = typeof data === 'object' ? data : {};
+        let result = new Wishlist();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["wishlistId"] = this.wishlistId;
+        data["userId"] = this.userId;
+        data["name"] = this.name;
+        data["isDefault"] = this.isDefault;
+        data["isPublic"] = this.isPublic;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        if (Array.isArray(this.wishlistItems)) {
+            data["wishlistItems"] = [];
+            for (let item of this.wishlistItems)
+                data["wishlistItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IWishlist {
+    wishlistId?: string;
+    userId?: string;
+    name: string;
+    isDefault?: boolean;
+    isPublic?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    user?: User;
+    wishlistItems?: WishlistItem[];
+}
+
+export class WishlistItem implements IWishlistItem {
+    wishlistItemId?: string;
+    wishlistId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    createdAt?: Date;
+    wishlist?: Wishlist;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+
+    constructor(data?: IWishlistItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.wishlistItemId = _data["wishlistItemId"];
+            this.wishlistId = _data["wishlistId"];
+            this.productId = _data["productId"];
+            this.productVariantId = _data["productVariantId"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.wishlist = _data["wishlist"] ? Wishlist.fromJS(_data["wishlist"]) : undefined as any;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
+            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): WishlistItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new WishlistItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["wishlistItemId"] = this.wishlistItemId;
+        data["wishlistId"] = this.wishlistId;
+        data["productId"] = this.productId;
+        data["productVariantId"] = this.productVariantId;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["wishlist"] = this.wishlist ? this.wishlist.toJSON() : undefined as any;
+        data["product"] = this.product ? this.product.toJSON() : undefined as any;
+        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IWishlistItem {
+    wishlistItemId?: string;
+    wishlistId?: string;
+    productId?: string;
+    productVariantId?: string | undefined;
+    createdAt?: Date;
+    wishlist?: Wishlist;
+    product?: Product;
+    productVariant?: ProductVariant | undefined;
+}
+
+export class AbandonedCart implements IAbandonedCart {
+    abandonedId?: string;
+    cartId?: string;
+    userId?: string | undefined;
+    abandonedAt?: Date;
+    notified?: boolean;
+    shoppingCart?: ShoppingCart;
+    user?: User | undefined;
+
+    constructor(data?: IAbandonedCart) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.abandonedId = _data["abandonedId"];
+            this.cartId = _data["cartId"];
+            this.userId = _data["userId"];
+            this.abandonedAt = _data["abandonedAt"] ? new Date(_data["abandonedAt"].toString()) : undefined as any;
+            this.notified = _data["notified"];
+            this.shoppingCart = _data["shoppingCart"] ? ShoppingCart.fromJS(_data["shoppingCart"]) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AbandonedCart {
+        data = typeof data === 'object' ? data : {};
+        let result = new AbandonedCart();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["abandonedId"] = this.abandonedId;
+        data["cartId"] = this.cartId;
+        data["userId"] = this.userId;
+        data["abandonedAt"] = this.abandonedAt ? this.abandonedAt.toISOString() : undefined as any;
+        data["notified"] = this.notified;
+        data["shoppingCart"] = this.shoppingCart ? this.shoppingCart.toJSON() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAbandonedCart {
+    abandonedId?: string;
+    cartId?: string;
+    userId?: string | undefined;
+    abandonedAt?: Date;
+    notified?: boolean;
+    shoppingCart?: ShoppingCart;
+    user?: User | undefined;
+}
+
+export class CouponUsage implements ICouponUsage {
+    usageId?: string;
+    couponId?: string;
+    userId?: string;
+    orderId?: string;
+    discountAmount!: number;
+    usedAt?: Date;
+    coupon?: Coupon;
+    user?: User;
+    order?: Order;
+
+    constructor(data?: ICouponUsage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.usageId = _data["usageId"];
+            this.couponId = _data["couponId"];
+            this.userId = _data["userId"];
+            this.orderId = _data["orderId"];
+            this.discountAmount = _data["discountAmount"];
+            this.usedAt = _data["usedAt"] ? new Date(_data["usedAt"].toString()) : undefined as any;
+            this.coupon = _data["coupon"] ? Coupon.fromJS(_data["coupon"]) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): CouponUsage {
+        data = typeof data === 'object' ? data : {};
+        let result = new CouponUsage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["usageId"] = this.usageId;
+        data["couponId"] = this.couponId;
+        data["userId"] = this.userId;
+        data["orderId"] = this.orderId;
+        data["discountAmount"] = this.discountAmount;
+        data["usedAt"] = this.usedAt ? this.usedAt.toISOString() : undefined as any;
+        data["coupon"] = this.coupon ? this.coupon.toJSON() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["order"] = this.order ? this.order.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICouponUsage {
+    usageId?: string;
+    couponId?: string;
+    userId?: string;
+    orderId?: string;
+    discountAmount: number;
+    usedAt?: Date;
+    coupon?: Coupon;
+    user?: User;
+    order?: Order;
+}
+
+export class Coupon implements ICoupon {
+    couponId?: string;
+    code!: string;
+    name!: string;
+    description?: string | undefined;
+    discountType?: number;
+    discountValue!: number;
+    minOrderAmount?: number | undefined;
+    maxDiscountAmount?: number | undefined;
+    usageLimit?: number | undefined;
+    usageCount?: number;
+    userUsageLimit?: number;
+    validFrom?: Date;
+    validTo?: Date;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+    couponUsages?: CouponUsage[];
+
+    constructor(data?: ICoupon) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.couponId = _data["couponId"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.discountType = _data["discountType"];
+            this.discountValue = _data["discountValue"];
+            this.minOrderAmount = _data["minOrderAmount"];
+            this.maxDiscountAmount = _data["maxDiscountAmount"];
+            this.usageLimit = _data["usageLimit"];
+            this.usageCount = _data["usageCount"];
+            this.userUsageLimit = _data["userUsageLimit"];
+            this.validFrom = _data["validFrom"] ? new Date(_data["validFrom"].toString()) : undefined as any;
+            this.validTo = _data["validTo"] ? new Date(_data["validTo"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            this.createdBy = _data["createdBy"];
+            this.updatedBy = _data["updatedBy"];
+            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
+            this.updatedByUser = _data["updatedByUser"] ? User.fromJS(_data["updatedByUser"]) : undefined as any;
+            if (Array.isArray(_data["couponUsages"])) {
+                this.couponUsages = [] as any;
+                for (let item of _data["couponUsages"])
+                    this.couponUsages!.push(CouponUsage.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Coupon {
+        data = typeof data === 'object' ? data : {};
+        let result = new Coupon();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["couponId"] = this.couponId;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["discountType"] = this.discountType;
+        data["discountValue"] = this.discountValue;
+        data["minOrderAmount"] = this.minOrderAmount;
+        data["maxDiscountAmount"] = this.maxDiscountAmount;
+        data["usageLimit"] = this.usageLimit;
+        data["usageCount"] = this.usageCount;
+        data["userUsageLimit"] = this.userUsageLimit;
+        data["validFrom"] = this.validFrom ? this.validFrom.toISOString() : undefined as any;
+        data["validTo"] = this.validTo ? this.validTo.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        data["createdBy"] = this.createdBy;
+        data["updatedBy"] = this.updatedBy;
+        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
+        data["updatedByUser"] = this.updatedByUser ? this.updatedByUser.toJSON() : undefined as any;
+        if (Array.isArray(this.couponUsages)) {
+            data["couponUsages"] = [];
+            for (let item of this.couponUsages)
+                data["couponUsages"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICoupon {
+    couponId?: string;
+    code: string;
+    name: string;
+    description?: string | undefined;
+    discountType?: number;
+    discountValue: number;
+    minOrderAmount?: number | undefined;
+    maxDiscountAmount?: number | undefined;
+    usageLimit?: number | undefined;
+    usageCount?: number;
+    userUsageLimit?: number;
+    validFrom?: Date;
+    validTo?: Date;
+    status?: number;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    createdBy?: string;
+    updatedBy?: string | undefined;
+    createdByUser?: User;
+    updatedByUser?: User | undefined;
+    couponUsages?: CouponUsage[];
+}
+
+export class RewardPoint implements IRewardPoint {
+    rewardId?: string;
+    userId?: string;
+    points?: number;
+    reason?: string | undefined;
+    createdAt?: Date;
+    expiresAt?: Date | undefined;
+    user?: User;
+
+    constructor(data?: IRewardPoint) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.rewardId = _data["rewardId"];
+            this.userId = _data["userId"];
+            this.points = _data["points"];
+            this.reason = _data["reason"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.expiresAt = _data["expiresAt"] ? new Date(_data["expiresAt"].toString()) : undefined as any;
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RewardPoint {
+        data = typeof data === 'object' ? data : {};
+        let result = new RewardPoint();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["rewardId"] = this.rewardId;
+        data["userId"] = this.userId;
+        data["points"] = this.points;
+        data["reason"] = this.reason;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["expiresAt"] = this.expiresAt ? this.expiresAt.toISOString() : undefined as any;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRewardPoint {
+    rewardId?: string;
+    userId?: string;
+    points?: number;
+    reason?: string | undefined;
+    createdAt?: Date;
+    expiresAt?: Date | undefined;
+    user?: User;
+}
+
+export class PagedRequest implements IPagedRequest {
+    page?: number;
+    pageSize?: number;
+    search?: string | undefined;
+    sortBy?: string | undefined;
+    sortDirection?: SortDirection;
+    filters?: FilterCriteria[];
+    hasFilters?: boolean;
+    hasSearch?: boolean;
+    hasSorting?: boolean;
+
+    constructor(data?: IPagedRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.page = _data["page"];
+            this.pageSize = _data["pageSize"];
+            this.search = _data["search"];
+            this.sortBy = _data["sortBy"];
+            this.sortDirection = _data["sortDirection"];
+            if (Array.isArray(_data["filters"])) {
+                this.filters = [] as any;
+                for (let item of _data["filters"])
+                    this.filters!.push(FilterCriteria.fromJS(item));
+            }
+            this.hasFilters = _data["hasFilters"];
+            this.hasSearch = _data["hasSearch"];
+            this.hasSorting = _data["hasSorting"];
+        }
+    }
+
+    static fromJS(data: any): PagedRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["page"] = this.page;
+        data["pageSize"] = this.pageSize;
+        data["search"] = this.search;
+        data["sortBy"] = this.sortBy;
+        data["sortDirection"] = this.sortDirection;
+        if (Array.isArray(this.filters)) {
+            data["filters"] = [];
+            for (let item of this.filters)
+                data["filters"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["hasFilters"] = this.hasFilters;
+        data["hasSearch"] = this.hasSearch;
+        data["hasSorting"] = this.hasSorting;
+        return data;
+    }
+}
+
+export interface IPagedRequest {
+    page?: number;
+    pageSize?: number;
+    search?: string | undefined;
+    sortBy?: string | undefined;
+    sortDirection?: SortDirection;
+    filters?: FilterCriteria[];
+    hasFilters?: boolean;
+    hasSearch?: boolean;
+    hasSorting?: boolean;
+}
+
+export enum SortDirection {
+    Ascending = "Ascending",
+    Descending = "Descending",
+}
+
+export class FilterCriteria implements IFilterCriteria {
+    fieldName?: string;
+    value?: any;
+    operator?: FilterOperator;
+
+    constructor(data?: IFilterCriteria) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fieldName = _data["fieldName"];
+            this.value = _data["value"];
+            this.operator = _data["operator"];
+        }
+    }
+
+    static fromJS(data: any): FilterCriteria {
+        data = typeof data === 'object' ? data : {};
+        let result = new FilterCriteria();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fieldName"] = this.fieldName;
+        data["value"] = this.value;
+        data["operator"] = this.operator;
+        return data;
+    }
+}
+
+export interface IFilterCriteria {
+    fieldName?: string;
+    value?: any;
+    operator?: FilterOperator;
+}
+
+export enum FilterOperator {
+    Equals = 0,
+    NotEquals = 1,
+    Contains = 2,
+    NotContains = 3,
+    StartsWith = 4,
+    EndsWith = 5,
+    GreaterThan = 6,
+    GreaterThanOrEqual = 7,
+    LessThan = 8,
+    LessThanOrEqual = 9,
+    In = 10,
+    NotIn = 11,
+    IsNull = 12,
+    IsNotNull = 13,
+}
+
+export class ResultOfAuditLog implements IResultOfAuditLog {
+    isSuccess?: boolean;
+    data?: AuditLog;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfAuditLog) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"] ? AuditLog.fromJS(_data["data"]) : undefined as any;
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfAuditLog {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfAuditLog();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfAuditLog {
+    isSuccess?: boolean;
+    data?: AuditLog;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class ResultOfBoolean implements IResultOfBoolean {
+    isSuccess?: boolean;
+    data?: boolean;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfBoolean) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfBoolean {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfBoolean();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfBoolean {
+    isSuccess?: boolean;
+    data?: boolean;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class ResultOfInteger implements IResultOfInteger {
+    isSuccess?: boolean;
+    data?: number;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfInteger) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"];
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfInteger {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfInteger();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfInteger {
+    isSuccess?: boolean;
+    data?: number;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class ResultOfDictionaryOfStringAndInteger implements IResultOfDictionaryOfStringAndInteger {
+    isSuccess?: boolean;
+    data?: { [key: string]: number; } | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfDictionaryOfStringAndInteger) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            if (_data["data"]) {
+                this.data = {} as any;
+                for (let key in _data["data"]) {
+                    if (_data["data"].hasOwnProperty(key))
+                        (this.data as any)![key] = _data["data"][key];
+                }
+            }
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfDictionaryOfStringAndInteger {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfDictionaryOfStringAndInteger();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        if (this.data) {
+            data["data"] = {};
+            for (let key in this.data) {
+                if (this.data.hasOwnProperty(key))
+                    (data["data"] as any)[key] = (this.data as any)[key];
+            }
+        }
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfDictionaryOfStringAndInteger {
+    isSuccess?: boolean;
+    data?: { [key: string]: number; } | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
 export class ResultOfRegisterResponse implements IResultOfRegisterResponse {
     isSuccess?: boolean;
     data?: RegisterResponse | undefined;
@@ -7412,66 +12522,6 @@ export interface ILoginCommand {
     password?: string;
 }
 
-export class ResultOfBoolean implements IResultOfBoolean {
-    isSuccess?: boolean;
-    data?: boolean;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-
-    constructor(data?: IResultOfBoolean) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.data = _data["data"];
-            this.errorMessage = _data["errorMessage"];
-            this.errorCode = _data["errorCode"];
-            if (Array.isArray(_data["errors"])) {
-                this.errors = [] as any;
-                for (let item of _data["errors"])
-                    this.errors!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): ResultOfBoolean {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResultOfBoolean();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["data"] = this.data;
-        data["errorMessage"] = this.errorMessage;
-        data["errorCode"] = this.errorCode;
-        if (Array.isArray(this.errors)) {
-            data["errors"] = [];
-            for (let item of this.errors)
-                data["errors"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface IResultOfBoolean {
-    isSuccess?: boolean;
-    data?: boolean;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-}
-
 export class ForgotPasswordCommand implements IForgotPasswordCommand {
     email?: string;
 
@@ -7556,6 +12606,102 @@ export interface IResetPasswordCommand {
     newPassword?: string | undefined;
 }
 
+export class LogoutCommand implements ILogoutCommand {
+    refreshToken?: string;
+
+    constructor(data?: ILogoutCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.refreshToken = _data["refreshToken"];
+        }
+    }
+
+    static fromJS(data: any): LogoutCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new LogoutCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["refreshToken"] = this.refreshToken;
+        return data;
+    }
+}
+
+export interface ILogoutCommand {
+    refreshToken?: string;
+}
+
+export class ResultOfRefreshTokenResponse implements IResultOfRefreshTokenResponse {
+    isSuccess?: boolean;
+    data?: RefreshTokenResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfRefreshTokenResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"] ? RefreshTokenResponse.fromJS(_data["data"]) : undefined as any;
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfRefreshTokenResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfRefreshTokenResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfRefreshTokenResponse {
+    isSuccess?: boolean;
+    data?: RefreshTokenResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
 export class RefreshTokenResponse implements IRefreshTokenResponse {
     accessToken?: string;
     refreshToken?: string;
@@ -7634,72 +12780,6 @@ export class RefreshTokenCommand implements IRefreshTokenCommand {
 
 export interface IRefreshTokenCommand {
     refreshToken?: string;
-}
-
-export enum SortDirection {
-    Ascending = "Ascending",
-    Descending = "Descending",
-}
-
-export class FilterCriteria implements IFilterCriteria {
-    fieldName?: string;
-    value?: any;
-    operator?: FilterOperator;
-
-    constructor(data?: IFilterCriteria) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.fieldName = _data["fieldName"];
-            this.value = _data["value"];
-            this.operator = _data["operator"];
-        }
-    }
-
-    static fromJS(data: any): FilterCriteria {
-        data = typeof data === 'object' ? data : {};
-        let result = new FilterCriteria();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["fieldName"] = this.fieldName;
-        data["value"] = this.value;
-        data["operator"] = this.operator;
-        return data;
-    }
-}
-
-export interface IFilterCriteria {
-    fieldName?: string;
-    value?: any;
-    operator?: FilterOperator;
-}
-
-export enum FilterOperator {
-    Equals = 0,
-    NotEquals = 1,
-    Contains = 2,
-    NotContains = 3,
-    StartsWith = 4,
-    EndsWith = 5,
-    GreaterThan = 6,
-    GreaterThanOrEqual = 7,
-    LessThan = 8,
-    LessThanOrEqual = 9,
-    In = 10,
-    NotIn = 11,
-    IsNull = 12,
-    IsNotNull = 13,
 }
 
 export class SearchableField implements ISearchableField {
@@ -8195,66 +13275,6 @@ export class ResultOfDecimal implements IResultOfDecimal {
 }
 
 export interface IResultOfDecimal {
-    isSuccess?: boolean;
-    data?: number;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-}
-
-export class ResultOfInteger implements IResultOfInteger {
-    isSuccess?: boolean;
-    data?: number;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-
-    constructor(data?: IResultOfInteger) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.data = _data["data"];
-            this.errorMessage = _data["errorMessage"];
-            this.errorCode = _data["errorCode"];
-            if (Array.isArray(_data["errors"])) {
-                this.errors = [] as any;
-                for (let item of _data["errors"])
-                    this.errors!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): ResultOfInteger {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResultOfInteger();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["data"] = this.data;
-        data["errorMessage"] = this.errorMessage;
-        data["errorCode"] = this.errorCode;
-        if (Array.isArray(this.errors)) {
-            data["errors"] = [];
-            for (let item of this.errors)
-                data["errors"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface IResultOfInteger {
     isSuccess?: boolean;
     data?: number;
     errorMessage?: string | undefined;
@@ -11731,6 +16751,134 @@ export interface ICreateProductImageRequest {
     altText?: string | undefined;
     displayOrder?: number;
     isPrimary?: boolean;
+}
+
+export class ResultOfPagedResultOfProductBaseResponse implements IResultOfPagedResultOfProductBaseResponse {
+    isSuccess?: boolean;
+    data?: PagedResultOfProductBaseResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfPagedResultOfProductBaseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"] ? PagedResultOfProductBaseResponse.fromJS(_data["data"]) : undefined as any;
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfPagedResultOfProductBaseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfPagedResultOfProductBaseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfPagedResultOfProductBaseResponse {
+    isSuccess?: boolean;
+    data?: PagedResultOfProductBaseResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class PagedResultOfProductBaseResponse implements IPagedResultOfProductBaseResponse {
+    items?: ProductBaseResponse[];
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+    totalPages?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+
+    constructor(data?: IPagedResultOfProductBaseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ProductBaseResponse.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+            this.page = _data["page"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.hasPreviousPage = _data["hasPreviousPage"];
+            this.hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): PagedResultOfProductBaseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultOfProductBaseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["totalCount"] = this.totalCount;
+        data["page"] = this.page;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IPagedResultOfProductBaseResponse {
+    items?: ProductBaseResponse[];
+    totalCount?: number;
+    page?: number;
+    pageSize?: number;
+    totalPages?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
 }
 
 export class ResultOfProductImageDto implements IResultOfProductImageDto {
