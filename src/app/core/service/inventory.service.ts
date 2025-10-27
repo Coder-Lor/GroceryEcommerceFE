@@ -1,18 +1,109 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
 import { Product, InventoryReport } from '../../admin/inventory/models/product.model';
-import { ProductBaseResponse } from '@services/system-admin.service';
+import { ProductBaseResponse, ProductClient, SortDirection, PagedResultOfProductBaseResponse } from '@services/system-admin.service';
+
+export interface PagingInfo {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryService {
-  private productsSubject = new BehaviorSubject<Product[]>(this.getMockProducts());
+  private productsSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productsSubject.asObservable();
+  
+  private pagingInfoSubject = new BehaviorSubject<PagingInfo>({
+    totalCount: 0,
+    totalPages: 0,
+    currentPage: 1,
+    pageSize: 10,
+    hasPreviousPage: false,
+    hasNextPage: false
+  });
+  public pagingInfo$ = this.pagingInfoSubject.asObservable();
   
   private nextId = 8;
 
-  constructor() {}
+  constructor(private productClient: ProductClient) {
+    this.loadProducts(1, 10);
+  }
+
+  // Load products from API with paging
+  loadProducts(page: number = 1, pageSize: number = 10): void {
+    this.productClient.getProductsPaging(
+      page,
+      pageSize,
+      undefined, // search
+      undefined, // sortBy
+      SortDirection.Ascending, // sortDirection
+      [], // filters
+      undefined, // entityType
+      undefined, // availableFields
+      false, // hasFilters
+      false, // hasSearch
+      false // hasSorting
+    ).pipe(
+      map(response => {
+        if (response.isSuccess && response.data) {
+          return response.data;
+        }
+        return null;
+      }),
+      catchError(error => {
+        console.error('Error loading products:', error);
+        return of(null);
+      })
+    ).subscribe(pagedResult => {
+      if (pagedResult) {
+        this.productsSubject.next(pagedResult.items || []);
+        
+        // Update paging info
+        this.pagingInfoSubject.next({
+          totalCount: pagedResult.totalCount || 0,
+          totalPages: pagedResult.totalPages || 0,
+          currentPage: pagedResult.page || 1,
+          pageSize: pagedResult.pageSize || 10,
+          hasPreviousPage: pagedResult.hasPreviousPage || false,
+          hasNextPage: pagedResult.hasNextPage || false
+        });
+      }
+    });
+  }
+
+  // Refresh products from server
+  refreshProducts(page?: number, pageSize?: number): void {
+    const currentPaging = this.pagingInfoSubject.value;
+    this.loadProducts(
+      page || currentPaging.currentPage,
+      pageSize || currentPaging.pageSize
+    );
+  }
+
+  // Get current paging info
+  getPagingInfo(): Observable<PagingInfo> {
+    return this.pagingInfo$;
+  }
+
+  // Change page
+  changePage(page: number): void {
+    const currentPaging = this.pagingInfoSubject.value;
+    if (page >= 1 && page <= currentPaging.totalPages) {
+      this.loadProducts(page, currentPaging.pageSize);
+    }
+  }
+
+  // Change page size
+  changePageSize(pageSize: number): void {
+    this.loadProducts(1, pageSize); // Reset to page 1 when changing page size
+  }
 
   // Lấy danh sách sản phẩm
   getProducts(): Observable<Product[]> {
@@ -34,6 +125,7 @@ export class InventoryService {
       updatedAt: new Date()
     });
     this.productsSubject.next([...products, newProduct]);
+    // TODO: Call API to persist the new product
   }
 
   // Cập nhật sản phẩm
@@ -47,6 +139,7 @@ export class InventoryService {
         updatedAt: new Date()
       });
       this.productsSubject.next([...products]);
+      // TODO: Call API to persist the updated product
     }
   }
 
@@ -54,6 +147,7 @@ export class InventoryService {
   deleteProduct(id: number): void {
     const products = this.productsSubject.value.filter(p => p.productId !== id.toString());
     this.productsSubject.next(products);
+    // TODO: Call API to persist the deletion
   }
 
   // Tạo báo cáo kho hàng
@@ -86,130 +180,5 @@ export class InventoryService {
       acc[range] = (acc[range] || 0) + 1;
       return acc;
     }, {} as { [key: string]: number });
-  }
-
-  // Dữ liệu mẫu để test
-  private getMockProducts(): Product[] {
-    return [
-      ProductBaseResponse.fromJS({
-        productId: '1',
-        sku: 'HW-EPH-007',
-        name: 'Tai Nghe Không Dây Cao Cấp',
-        slug: 'tai-nghe-khong-day-cao-cap',
-        shortDescription: 'Tai nghe chống ồn, thời lượng pin 20h.',
-        description: 'Đây là mô tả chi tiết và đầy đủ về sản phẩm này.',
-        cost: 15.50,
-        price: 49.99,
-        discountPrice: 35.00,
-        stockQuantity: 150,
-        minStockLevel: 10,
-        weight: 0.35,
-        dimensions: undefined,
-        createdAt: new Date('2025-01-15'),
-        updatedAt: new Date('2025-01-15')
-      }),
-      ProductBaseResponse.fromJS({
-        productId: '2',
-        sku: 'PHONE-IP15-PRO',
-        name: 'iPhone 15 Pro Max',
-        slug: 'iphone-15-pro-max',
-        shortDescription: 'Điện thoại flagship mới nhất của Apple.',
-        description: 'iPhone 15 Pro Max với chip A17 Pro, camera 48MP, màn hình 6.7 inch Super Retina XDR.',
-        cost: 25000000,
-        price: 35000000,
-        discountPrice: 33000000,
-        stockQuantity: 25,
-        minStockLevel: 5,
-        weight: 0.221,
-        dimensions: '159.9 x 76.7 x 8.25 mm',
-        createdAt: new Date('2025-02-01'),
-        updatedAt: new Date('2025-02-01')
-      }),
-      ProductBaseResponse.fromJS({
-        productId: '3',
-        sku: 'LAP-DELL-XPS13',
-        name: 'Dell XPS 13',
-        slug: 'dell-xps-13',
-        shortDescription: 'Laptop cao cấp nhỏ gọn, mạnh mẽ.',
-        description: 'Dell XPS 13 với Intel Core i7 thế hệ 13, RAM 16GB, SSD 512GB, màn hình 13.4 inch FHD+.',
-        cost: 18000000,
-        price: 25000000,
-        discountPrice: 23000000,
-        stockQuantity: 8,
-        minStockLevel: 3,
-        weight: 1.2,
-        dimensions: '296 x 199 x 15 mm',
-        createdAt: new Date('2025-03-10'),
-        updatedAt: new Date('2025-03-10')
-      }),
-      ProductBaseResponse.fromJS({
-        productId: '4',
-        sku: 'WATCH-APPLE-S9',
-        name: 'Apple Watch Series 9',
-        slug: 'apple-watch-series-9',
-        shortDescription: 'Smartwatch thông minh với nhiều tính năng sức khỏe.',
-        description: 'Apple Watch Series 9 với chip S9, màn hình luôn bật, theo dõi sức khỏe toàn diện.',
-        cost: 7000000,
-        price: 10000000,
-        discountPrice: 9500000,
-        stockQuantity: 45,
-        minStockLevel: 10,
-        weight: 0.042,
-        dimensions: '45 x 38 x 10.7 mm',
-        createdAt: new Date('2025-04-05'),
-        updatedAt: new Date('2025-04-05')
-      }),
-      ProductBaseResponse.fromJS({
-        productId: '5',
-        sku: 'KB-MECH-RGB',
-        name: 'Bàn Phím Cơ RGB',
-        slug: 'ban-phim-co-rgb',
-        shortDescription: 'Bàn phím cơ gaming với đèn RGB.',
-        description: 'Bàn phím cơ với switch blue, đèn LED RGB 16 triệu màu, chống nước.',
-        cost: 800000,
-        price: 1500000,
-        discountPrice: 1200000,
-        stockQuantity: 2,
-        minStockLevel: 5,
-        weight: 1.1,
-        dimensions: '440 x 135 x 35 mm',
-        createdAt: new Date('2025-05-20'),
-        updatedAt: new Date('2025-05-20')
-      }),
-      ProductBaseResponse.fromJS({
-        productId: '6',
-        sku: 'MOUSE-LOG-MX',
-        name: 'Chuột Logitech MX Master 3S',
-        slug: 'chuot-logitech-mx-master-3s',
-        shortDescription: 'Chuột không dây cao cấp cho dân văn phòng.',
-        description: 'Chuột Logitech MX Master 3S với cảm biến 8000 DPI, pin 70 ngày, kết nối đa thiết bị.',
-        cost: 1500000,
-        price: 2500000,
-        discountPrice: 2200000,
-        stockQuantity: 30,
-        minStockLevel: 8,
-        weight: 0.141,
-        dimensions: '124.9 x 84.3 x 51 mm',
-        createdAt: new Date('2025-06-15'),
-        updatedAt: new Date('2025-06-15')
-      }),
-      ProductBaseResponse.fromJS({
-        productId: '7',
-        sku: 'CAM-WEBCAM-HD',
-        name: 'Webcam Full HD 1080p',
-        slug: 'webcam-full-hd-1080p',
-        shortDescription: 'Webcam cho họp online chất lượng cao.',
-        description: 'Webcam 1080p với micro tích hợp, tự động lấy nét, góc quay 90 độ.',
-        cost: 500000,
-        price: 900000,
-        discountPrice: 750000,
-        stockQuantity: 0,
-        minStockLevel: 5,
-        weight: 0.15,
-        dimensions: '90 x 60 x 50 mm',
-        createdAt: new Date('2025-07-01'),
-        updatedAt: new Date('2025-07-01')
-      })
-    ];
   }
 }
