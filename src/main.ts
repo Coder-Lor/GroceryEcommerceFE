@@ -6,12 +6,5 @@ import { appRouter } from './app/app.routes';
 
 bootstrapApplication(App, {
   ...appConfig,
-  providers: [
-    ...(appConfig.providers || []),
-    appRouter,
-    // importProvidersFrom(HttpClientModule),
-    // { provide: AppServices.API_BASE_URL, useValue: 'http://localhost:5026'},
-    // AppServices.Service
-  ]
-})
-  .catch((err) => console.error(err));
+  providers: [...(appConfig.providers || []), appRouter],
+}).catch((err) => console.error(err));

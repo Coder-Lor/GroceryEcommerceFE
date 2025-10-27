@@ -74,7 +74,8 @@
               "buildTarget": "GroceryEcommerceFE:build:production"
             },
             "development": {
-              "buildTarget": "GroceryEcommerceFE:build:development"
+              "buildTarget": "GroceryEcommerceFE:build:development",
+              "port": 3000
             }
           },
           "defaultConfiguration": "development"

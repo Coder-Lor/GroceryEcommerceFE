@@ -3,7 +3,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
   provideAppInitializer,
-  inject
+  inject,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -13,8 +13,9 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { MessageService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AuthService } from '@core/service/auth.service';
 
 export const appConfig: ApplicationConfig = {
@@ -37,11 +38,12 @@ export const appConfig: ApplicationConfig = {
       inputVariant: 'filled',
     }),
     provideCharts(withDefaultRegisterables()),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
+    MessageService,
     // provideAppInitializer(() => {
     //   // Dùng 'inject()' để lấy service
-    //   const authService = inject(AuthService); 
-      
+    //   const authService = inject(AuthService);
+
     //   // Trả về hàm mà bạn muốn chạy
     //   return authService.refreshOnLoad();
     // })

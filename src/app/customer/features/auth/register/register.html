@@ -26,57 +26,89 @@
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" style="margin-bottom: 10px">
         <!-- Email -->
         <div class="form-group position-relative">
-          <label>Email</label>
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="Nhập email của bạn"
-            class="form-control input-with-icon"
-          />
-          <i class="pi pi-envelope input-icon"></i>
+          <div class="input">
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Nhập email của bạn"
+              class="form-control input-with-icon"
+            />
+            <i class="pi pi-envelope input-icon"></i>
+          </div>
+          <small
+            *ngIf="registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched"
+          >
+            *Không được bỏ trống.
+          </small>
+          @if (registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.dirty) {
+          <small> *Email không đúng định dạng. </small>}
         </div>
 
         <!-- Username -->
         <div class="form-group position-relative">
-          <label>Tên người dùng</label>
-          <input
-            type="text"
-            formControlName="username"
-            placeholder="Nhập tên người dùng"
-            class="form-control input-with-icon"
-          />
-          <i class="pi pi-user input-icon"></i>
+          <div class="input">
+            <input
+              type="text"
+              formControlName="username"
+              placeholder="Nhập tên người dùng"
+              class="form-control input-with-icon"
+            />
+            <i class="pi pi-user input-icon"></i>
+          </div>
+          @if(registerForm.get('username')?.errors?.['required'] &&
+          registerForm.get('username')?.touched) {
+          <small> *Không được để trống. </small>
+          } @if(registerForm.get('username')?.errors?.['minlength'] &&
+          registerForm.get('username')?.touched) {
+          <small> *Tên người dùng tối thiểu 3 ký tự. </small>
+          }
         </div>
 
         <!-- Password -->
         <div class="form-group position-relative">
-          <label>Mật khẩu</label>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Nhập mật khẩu của bạn"
-            class="form-control input-with-icon"
-          />
-          <i
-            [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-            class="input-icon clickable"
-            (click)="togglePassword()"
-          ></i>
+          <div class="input">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Nhập mật khẩu của bạn"
+              class="form-control input-with-icon"
+            />
+            <i
+              [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+              class="input-icon clickable"
+              (click)="togglePassword()"
+            ></i>
+          </div>
+          @if(registerForm.get('password')?.errors?.['required'] &&
+          registerForm.get('password')?.touched) {
+          <small> *Không được để trống. </small>
+          } @if(registerForm.get('password')?.errors?.['minlength'] &&
+          registerForm.get('password')?.touched) {
+          <small> *Mật khẩu phải có tối thiểu 6 ký tự. </small>
+          }
         </div>
 
         <div class="form-group position-relative">
-          <label>Xác nhận mật khẩu</label>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="confirmPassword"
-            placeholder="Xác nhận mật khẩu của bạn"
-            class="form-control input-with-icon"
-          />
-          <i
-            [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-            class="input-icon clickable"
-            (click)="togglePassword()"
-          ></i>
+          <div class="input">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Xác nhận mật khẩu của bạn"
+              class="form-control input-with-icon"
+            />
+            <i
+              [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+              class="input-icon clickable"
+              (click)="togglePassword()"
+            ></i>
+          </div>
+          @if(registerForm.get('confirmPassword')?.errors?.['required'] &&
+          registerForm.get('confirmPassword')?.touched) {
+          <small> *Không được để trống. </small>
+          } @if(registerForm.get('confirmPassword')?.errors?.['passwordMismatch'] &&
+          registerForm.get('confirmPassword')?.touched) {
+          <small> *Mật khẩu không đúng. </small>
+          }
         </div>
 
         <!-- Bottom -->
@@ -86,7 +118,13 @@
         </div>
 
         <!-- Buttons -->
-        <button type="submit" class="btn-register">Đăng ký</button>
+        <button
+          type="submit"
+          class="btn-register"
+          [disabled]="isSubmitting || registerForm.invalid"
+        >
+          Đăng ký
+        </button>
 
         <button type="button" class="btn-google">
           <i class="pi pi-google"></i>

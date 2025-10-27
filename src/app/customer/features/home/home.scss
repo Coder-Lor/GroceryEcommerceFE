@@ -81,6 +81,42 @@
   width: auto !important;
 }
 
+.recomment {
+  font-weight: 550;
+  position: relative;
+
+  h4 {
+    background-color: #fff;
+    padding: 10px 14px;
+    z-index: 10;
+    border-radius: 5px;
+  }
+}
+
+.recomment::before {
+  content: "";
+  height: 1px;
+  width: 520px;
+  background-color: #111;
+  position: absolute;
+  top: 50%;
+  right: 0px;
+  transform: translateY(50%);
+
+}
+
+.recomment::after {
+  content: "";
+  height: 1px;
+  width: 520px;
+  background-color: #111;
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  transform: translateY(50%);
+
+}
+
 
 /* Extra: đảm bảo card nhỏ trên mobile hiển thị OK */
 @media (max-width: 767.98px) {

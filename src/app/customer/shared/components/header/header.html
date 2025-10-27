@@ -51,21 +51,23 @@
         </div>
 
         <!-- User / Login -->
-        @if(!isLoggedIn) {
+        @if (isLoggedIn$ | async; as isLoggedIn) {
+        <div class="user-avatar-container d-flex align-items-center" style="cursor: pointer">
+          <div class="user-avatar me-2">
+            <i class="pi pi-user"></i>
+            {{ (user$ | async)?.username }}
+          </div>
+          <button (click)="onLogout()">Logout</button>
+        </div>
+        } @else {
         <div class="user-avatar-container d-flex align-items-center" style="cursor: pointer">
           <div class="user-avatar me-2">
             <i class="pi pi-user"></i>
           </div>
-          <a routerLink="/login" class="text-decoration-none"
-            >Login <i class="pi pi-sign-in"></i
-          ></a>
+          <a routerLink="/login" class="text-decoration-none">
+            Login <i class="pi pi-sign-in"></i>
+          </a>
         </div>
-        }@else {
-        <div class="user-avatar me-2">
-          <i class="pi pi-user"></i>
-          {{ userName }}
-        </div>
-        <button (click)="onLogout()">logout</button>
         }
       </div>
     </div>

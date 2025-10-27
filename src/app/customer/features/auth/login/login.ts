@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '@core/service/auth.service';
 import { AuthClient, LoginCommand } from '@core/service/system-admin.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +15,7 @@ import { AuthClient, LoginCommand } from '@core/service/system-admin.service';
 })
 export class Login {
   router: Router = inject(Router);
-  private authClient = inject(AuthClient);
+  private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
   loginForm: FormGroup;
@@ -21,7 +23,7 @@ export class Login {
   isSubmitting = false;
   errorMessage = '';
 
-  constructor() {
+  constructor(private messageService: MessageService) {
     this.loginForm = this.fb.group({
       emailOrUsername: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -54,7 +56,7 @@ export class Login {
       password: this.loginForm.value.password,
     });
 
-    this.authClient.login(loginCommand).subscribe({
+    this.authService.login(loginCommand).subscribe({
       next: (response: any) => {
         console.log('in next');
         this.isSubmitting = false;
@@ -80,17 +82,37 @@ export class Login {
           }
 
           // Đăng nhập thành công, chuyển đến trang home
-          alert('Đăng nhập thành công!');
-          this.router.navigate(['/home']);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Thành công',
+            detail: 'Đăng nhập thành công!',
+            life: 1000,
+          });
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 300);
         } else {
           // Hiển thị lỗi từ server
           this.errorMessage = response.errorMessage || 'Đăng nhập thất bại. Vui lòng thử lại.';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Tài khoản hoặc mật khẩu không đúng!',
+            life: 1000,
+          });
         }
       },
       error: (error: any) => {
         this.isSubmitting = false;
         this.errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại sau.';
         console.error('Login error:', error);
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Đăng nhập thất bại. Vui lòng thử lại.',
+          life: 1000,
+        });
       },
     });
   }

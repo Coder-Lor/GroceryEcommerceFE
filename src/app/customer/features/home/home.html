@@ -34,7 +34,55 @@
 
   <!-- Categories -->
   <section class="categories container mb-5">
-    <h2 class="section-title fw-bold mb-4">Browse Categories</h2>
+    <h3 class="section-title fw-bold mb-4">DANH MỤC SẢN PHẨM</h3>
+    <div class="categories-list row g-4">
+      <div class="category-card col-md-4" (click)="navigationToProductList()">
+        <div
+          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
+        >
+          <div class="category-img flex-shrink-0">
+            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
+          </div>
+          <div class="category-info">
+            <p class="category-price fw-bold fs-5">$24 - $150</p>
+            <p class="category-name text-secondary">New sumatra mandeling coffe blend</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-card col-md-4" (click)="navigationToProductList()">
+        <div
+          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
+        >
+          <div class="category-img flex-shrink-0">
+            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
+          </div>
+          <div class="category-info">
+            <p class="category-price fw-bold fs-5">$37 - $160</p>
+            <p class="category-name text-secondary">Espresso arabica and robusta beans</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-card col-md-4" (click)="navigationToProductList()">
+        <div
+          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
+        >
+          <div class="category-img flex-shrink-0">
+            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
+          </div>
+          <div class="category-info">
+            <p class="category-price fw-bold fs-5">$32 - $160</p>
+            <p class="category-name text-secondary">Lavazza top class whole bean coffee blend</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- brands -->
+  <section class="categories container mb-5">
+    <h3 class="section-title fw-bold mb-4">THƯƠNG HIỆU NỔI BẬT</h3>
     <div class="categories-list row g-4">
       <div class="category-card col-md-4" (click)="navigationToProductList()">
         <div
@@ -85,8 +133,8 @@
     <p-dataview #dv [value]="products" [layout]="layout">
       <!-- Header -->
       <ng-template #header>
-        <div class="d-flex justify-content-center">
-          <h4>product list</h4>
+        <div class="recomment d-flex justify-content-center">
+          <h4>ĐỀ XUẤT CHO BẠN</h4>
         </div>
       </ng-template>
       <!-- GRID layout -->

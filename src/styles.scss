@@ -515,6 +515,12 @@ body {
     --bold-24-font-weight: 700;
     --bold-24-font-style: normal;
 
+    /* primeNg colors */
+      --p-toast-success-background: color-mix(in srgb, var(--p-green-500), transparent 45%) !important;
+      --p-toast-info-background: color-mix(in srgb, var(--p-blue-500), transparent 45%) !important;
+      --p-toast-warn-background: color-mix(in srgb, var(--p-orange-500), transparent 45%) !important;
+      --p-toast-error-background: color-mix(in srgb, var(--p-red-500), transparent 55%) !important;
+
     /* Effects */
 }
 

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, InputTextModule, FormsModule, InputNumberModule],
   templateUrl: './utility-panel.html',
-  styleUrl: './utility-panel.scss'
+  styleUrl: './utility-panel.scss',
 })
 export class UtilityPanel {
   @Input() showCart: boolean = false;
@@ -21,14 +21,13 @@ export class UtilityPanel {
 
   router: Router = inject(Router);
 
-
   Cart: any[] = [
-    { id: 1, name: "product 1", price: 25.5, quantity: 1, image: '/images/product-image-1.png' },
-    { id: 2, name: "product 2", price: 15.5, quantity: 1, image: '/images/product-image-1.png' },
-    { id: 3, name: "product 3", price: 45.5, quantity: 1, image: '/images/product-image-1.png' },
-    { id: 4, name: "product 4", price: 35.5, quantity: 1, image: '/images/product-image-1.png' },
-    { id: 4, name: "product 4", price: 35.5, quantity: 1, image: '/images/product-image-1.png' },
-  ]
+    { id: 1, name: 'product 1', price: 25.5, quantity: 1, image: '/images/product-image-1.png' },
+    { id: 2, name: 'product 2', price: 15.5, quantity: 1, image: '/images/product-image-1.png' },
+    { id: 3, name: 'product 3', price: 45.5, quantity: 1, image: '/images/product-image-1.png' },
+    { id: 4, name: 'product 4', price: 35.5, quantity: 1, image: '/images/product-image-1.png' },
+    { id: 5, name: 'product 4', price: 35.5, quantity: 1, image: '/images/product-image-1.png' },
+  ];
 
   onClose_1() {
     this.closeCartPanel.emit();
@@ -42,6 +41,4 @@ export class UtilityPanel {
     this.router.navigate(['/cart']);
     this.closeCartPanel.emit();
   }
-
-
 }

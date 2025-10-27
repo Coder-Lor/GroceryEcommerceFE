@@ -1,8 +1,19 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, catchError, finalize, map, filter, take, switchMap } from 'rxjs/operators';
+import {
+  AuthClient,
+  LoginCommand,
+  LoginResponse,
+  LogoutCommand,
+  RegisterCommand,
+  RegisterResponse,
+  ResultOfBoolean,
+  ResultOfLoginResponse,
+  ResultOfRegisterResponse,
+} from './system-admin.service';
 
 // --- ĐỊNH NGHĨA CÁC INTERFACE (NÊN ĐẶT Ở FILE RIÊNG) ---
 
@@ -28,11 +39,14 @@ export interface AuthResponse {
 // --- AUTH SERVICE ---
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   // URL API của bạn (chỉ cần phần base, ví dụ /api/auth)
   private apiUrl = '/api/auth';
+
+  // khai báo biến inject authClient từ system-admin
+  private authClient = inject(AuthClient);
 
   // 1. Quản lý State: Dùng BehaviorSubject để lưu trữ user hiện tại
   // private: Chỉ service này được phép .next() (phát) giá trị mới
@@ -47,10 +61,7 @@ export class AuthService {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     // Khởi tạo state: Mặc định là null (chưa đăng nhập)
     this.currentUserSubject = new BehaviorSubject<User | null>(null);
     this.currentUser = this.currentUserSubject.asObservable();
@@ -69,7 +80,7 @@ export class AuthService {
    * Observable trả về true/false, cho biết đã đăng nhập hay chưa
    */
   public get isAuthenticated$(): Observable<boolean> {
-    return this.currentUser.pipe(map(user => !!user));
+    return this.currentUser.pipe(map((user) => !!user));
   }
 
   // --- 2. Hàm xử lý Auth chính (Login, Register, Logout) ---
@@ -77,46 +88,60 @@ export class AuthService {
   /**
    * API Đăng nhập
    */
-  public login(credentials: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
-      .pipe(
-        tap(response => {
-          // Khi login thành công, lưu state
-          // Backend đã tự động set HttpOnly Cookie
-          this.setAuthState(response.token, response.user);
-        })
-      );
+  public login(command: LoginCommand): Observable<ResultOfLoginResponse> {
+    return this.authClient.login(command).pipe(
+      tap((data: LoginResponse) => {
+        // ✅ Cập nhật state
+        const user: User = {
+          id: data.userId!,
+          username: data.username!,
+          email: data.email!,
+        };
+        this.setAuthState(data.token!, user);
+      })
+    );
   }
 
   /**
    * API Đăng ký (Giả sử đăng ký xong sẽ tự động đăng nhập)
    */
-  public register(registerData: any): Observable<AuthResponse> {
+  public register(registerData: RegisterCommand): Observable<ResultOfRegisterResponse> {
     // Dùng method của AuthClient bạn đã có, hoặc gọi http trực tiếp
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, registerData)
-      .pipe(
-        tap(response => {
-          // Khi đăng ký thành công, lưu state
-          this.setAuthState(response.token, response.user);
-        })
-      );
+    return this.authClient.registerAccount(registerData).pipe(
+      tap((response: RegisterResponse) => {
+        // Khi đăng ký thành công, lưu state
+        const user: User = {
+          id: response.userId!,
+          username: response.username!,
+          email: response.email!,
+        };
+        this.setAuthState(response.token!, user);
+      })
+    );
   }
 
   /**
    * Đăng xuất
    */
-  public logout(): void {
+  public logout(request: LogoutCommand): Observable<ResultOfBoolean> {
     // 1. Gọi API để backend xóa HttpOnly Cookie
     // Gửi kèm cookie để backend biết cái nào cần xóa
-    this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
-      .pipe(
-        // Dù API thành công hay thất bại, frontend cũng phải clear state
-        finalize(() => {
-          this.clearAuthState();
-          this.router.navigate(['/login']);
-        })
-      )
-      .subscribe();
+    // this.http
+    //   .post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+    //   .pipe(
+    //     // Dù API thành công hay thất bại, frontend cũng phải clear state
+    //     finalize(() => {
+    //       this.clearAuthState();
+    //       this.router.navigate(['/login']);
+    //     })
+    //   )
+    //   .subscribe();
+    return this.authClient.logout(request).pipe(
+      finalize(() => {
+        this.clearAuthState();
+        this.router.navigate(['/login']);
+      })
+    );
   }
 
   // --- 3. Logic Refresh Token (Quan trọng nhất) ---
@@ -126,9 +151,10 @@ export class AuthService {
    * Cố gắng "đăng nhập thầm lặng" bằng HttpOnly Cookie
    */
   public refreshOnLoad(): Observable<any> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
       .pipe(
-        tap(response => {
+        tap((response) => {
           // Thành công: Lưu accessToken mới và thông tin user
           this.setAuthState(response.token, response.user);
         }),
@@ -151,15 +177,16 @@ export class AuthService {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null); // Báo cho các request khác "đang refresh"
 
-      return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
+      return this.http
+        .post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
         .pipe(
-          tap(response => {
+          tap((response) => {
             // 1. Lưu state mới
             this.setAuthState(response.token, response.user);
             // 2. Phát accessToken MỚI cho các request đang chờ
             this.refreshTokenSubject.next(response.token);
           }),
-          map(response => response.token), // Trả về token mới cho Interceptor
+          map((response) => response.token), // Trả về token mới cho Interceptor
           catchError((error) => {
             // Refresh thất bại (HttpOnly cookie hết hạn)
             // Đăng xuất người dùng
@@ -176,7 +203,7 @@ export class AuthService {
       // --- Các request sau (trong khi đang refresh) ---
       // Sẽ bị "treo" lại, chờ refreshTokenSubject phát ra giá trị
       return this.refreshTokenSubject.pipe(
-        filter(token => token != null), // Chỉ chạy khi nhận được token (không phải null)
+        filter((token) => token != null), // Chỉ chạy khi nhận được token (không phải null)
         take(1) // Lấy giá trị token mới 1 lần rồi unsubscribe
       );
     }

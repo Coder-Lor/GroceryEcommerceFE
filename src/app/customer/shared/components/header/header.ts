@@ -1,9 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnChanges, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UtilityPanel } from './utility-panel/utility-panel';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/service/auth.service';
 import { log } from 'console';
+import { LogoutCommand } from '@core/service/system-admin.service';
 
 @Component({
   selector: 'app-header',
@@ -12,9 +13,10 @@ import { log } from 'console';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
-export class Header implements OnInit {
+export class Header implements OnInit, OnChanges {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   isShowSidebar: boolean = false;
   isShowSubMenu: boolean = false;
@@ -22,24 +24,37 @@ export class Header implements OnInit {
   isShowPanel: boolean = false;
 
   username: string = '';
-  isLoggedIn: boolean = false;
+  isLoggedIn$ = this.authService.isAuthenticated$;
+  user$ = this.authService.currentUser;
+  private refreshtoken: any;
 
-  userName: string | null = null;
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.refreshtoken = new LogoutCommand({
+        refreshToken: localStorage.getItem('refreshToken') ?? undefined,
+      });
+    }
+  }
 
   ngOnInit(): void {
-    this.authService.isLoggedIn$.subscribe((res) => {
-      this.isLoggedIn = res;
-    });
-    this.authService.currentUser$.subscribe((res) => {
-      this.userName = res?.name ?? null;
-    });
+    // this.authService.isAuthenticated$.subscribe((res) => {
+    //   this.isLoggedIn = res;
+    //   console.log(res);
+    // });
+    // this.authService.currentUser.subscribe((res) => {
+    //   this.userName = res?.username ?? null;
+    // });
+  }
+  ngOnChanges() {
+    console.log(this.isLoggedIn$);
   }
 
   onLogout() {
-    this.authService.logout();
-    this.authService.isLoggedIn$.subscribe((res) => {
-      this.isLoggedIn = res;
-    });
+    this.authService.logout(this.refreshtoken);
+    localStorage.clear();
+    // this.authService.isLoggedIn$.subscribe((res) => {
+    //   this.isLoggedIn = res;
+    // });
   }
 
   toggleSidebar() {
