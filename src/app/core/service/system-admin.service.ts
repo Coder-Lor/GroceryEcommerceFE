@@ -16749,6 +16749,41 @@ export interface ILoginCommand {
   password?: string;
 }
 
+export class ForgotPasswordCommand implements IForgotPasswordCommand {
+  email?: string;
+
+  constructor(data?: IForgotPasswordCommand) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.email = _data['email'];
+    }
+  }
+
+  static fromJS(data: any): ForgotPasswordCommand {
+    data = typeof data === 'object' ? data : {};
+    let result = new ForgotPasswordCommand();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['email'] = this.email;
+    return data;
+  }
+}
+
+export interface IForgotPasswordCommand {
+  email?: string;
+}
+
 export class ResetPasswordCommand implements IResetPasswordCommand {
   email?: string;
   resetToken?: string;
@@ -16794,41 +16829,6 @@ export interface IResetPasswordCommand {
   resetToken?: string;
   oldPassword?: string | undefined;
   newPassword?: string | undefined;
-}
-
-export class LogoutCommand implements ILogoutCommand {
-  refreshToken?: string;
-
-  constructor(data?: ILogoutCommand) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.refreshToken = _data['refreshToken'];
-    }
-  }
-
-  static fromJS(data: any): LogoutCommand {
-    data = typeof data === 'object' ? data : {};
-    let result = new LogoutCommand();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['refreshToken'] = this.refreshToken;
-    return data;
-  }
-}
-
-export interface ILogoutCommand {
-  refreshToken?: string;
 }
 
 export class LogoutCommand implements ILogoutCommand {
