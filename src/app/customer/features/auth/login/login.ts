@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@core/service/auth.service';
-import { AuthClient, LoginCommand } from '@core/service/system-admin.service';
+import { AuthClient, LoginCommand, LoginResponse } from '@core/service/system-admin.service';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -57,61 +57,57 @@ export class Login {
     });
 
     this.authService.login(loginCommand).subscribe({
-      next: (response: any) => {
+      next: (response: LoginResponse) => {
         console.log('in next');
         this.isSubmitting = false;
-        if (response.isSuccess) {
-          // Lưu token vào localStorage
-          if (response.data?.token) {
-            localStorage.setItem('accessToken', response.data.token);
-          }
 
-          // Lưu refresh token nếu có
-          if (response.data?.refreshToken) {
-            localStorage.setItem('refreshToken', response.data.refreshToken);
-          }
-
-          // Lưu userId nếu có
-          if (response.data?.userId) {
-            localStorage.setItem('userId', response.data.userId);
-          }
-
-          // Lưu thời gian hết hạn nếu có
-          if (response.data?.expiresAt) {
-            localStorage.setItem('tokenExpiresAt', response.data.expiresAt);
-          }
-
-          // Đăng nhập thành công, chuyển đến trang home
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Thành công',
-            detail: 'Đăng nhập thành công!',
-            life: 1000,
-          });
-          setTimeout(() => {
-            this.router.navigate(['/home']);
-          }, 300);
-        } else {
-          // Hiển thị lỗi từ server
-          this.errorMessage = response.errorMessage || 'Đăng nhập thất bại. Vui lòng thử lại.';
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Lỗi',
-            detail: 'Tài khoản hoặc mật khẩu không đúng!',
-            life: 1000,
-          });
-        }
+        // Đăng nhập thành công, chuyển đến trang home
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Thành công',
+          detail: 'Đăng nhập thành công!',
+          life: 1000,
+        });
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 300);
       },
       error: (error: any) => {
         this.isSubmitting = false;
         this.errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại sau.';
         console.error('Login error:', error);
 
+        let detailMessage = 'Đăng nhập thất bại. Vui lòng thử lại sau.';
+        let specificErrorMessage: string | null = null;
+
+        // 🧩 Trường hợp đặc biệt: lỗi từ NSwag (ApiException)
+        if (error?.response) {
+          try {
+            const parsed = JSON.parse(error.response);
+            if (parsed?.errorMessage) {
+              specificErrorMessage = parsed.errorMessage;
+            }
+          } catch (e) {
+            console.warn('Không thể parse error.response:', e);
+          }
+        }
+
+        // 🧩 Ưu tiên thông báo cụ thể
+        if (specificErrorMessage === 'Invalid credentials') {
+          detailMessage = 'Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.';
+        } else if (specificErrorMessage) {
+          detailMessage = specificErrorMessage;
+        } else if (error.status === 400 || error.status === 401) {
+          detailMessage = 'Yêu cầu không hợp lệ hoặc không được phép.';
+        }
+
+        this.errorMessage = detailMessage;
+
         this.messageService.add({
           severity: 'error',
           summary: 'Lỗi',
-          detail: 'Đăng nhập thất bại. Vui lòng thử lại.',
-          life: 1000,
+          detail: detailMessage,
+          life: 2000,
         });
       },
     });

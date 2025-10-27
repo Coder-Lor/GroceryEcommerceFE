@@ -30,9 +30,13 @@ export class Header implements OnInit, OnChanges {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this.refreshtoken = new LogoutCommand({
-        refreshToken: localStorage.getItem('refreshToken') ?? undefined,
-      });
+      const stored = localStorage.getItem('currentUser');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this.refreshtoken = new LogoutCommand({
+          refreshToken: parsed.refreshToken ?? undefined,
+        });
+      }
     }
   }
 
@@ -50,8 +54,18 @@ export class Header implements OnInit, OnChanges {
   }
 
   onLogout() {
-    this.authService.logout(this.refreshtoken);
-    localStorage.clear();
+    this.authService.logout(this.refreshtoken).subscribe({
+      next: () => {
+        localStorage.clear();
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('❌ Lỗi khi logout:', err);
+        // Dù lỗi cũng clear localStorage để chắc chắn đăng xuất
+        localStorage.clear();
+        this.router.navigate(['/login']);
+      },
+    });
     // this.authService.isLoggedIn$.subscribe((res) => {
     //   this.isLoggedIn = res;
     // });

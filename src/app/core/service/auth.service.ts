@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
@@ -14,6 +14,7 @@ import {
   ResultOfLoginResponse,
   ResultOfRegisterResponse,
 } from './system-admin.service';
+import { isPlatformBrowser } from '@angular/common';
 
 // --- ĐỊNH NGHĨA CÁC INTERFACE (NÊN ĐẶT Ở FILE RIÊNG) ---
 
@@ -42,6 +43,8 @@ export interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
+  private platformId = inject(PLATFORM_ID);
+
   // URL API của bạn (chỉ cần phần base, ví dụ /api/auth)
   private apiUrl = '/api/auth';
 
@@ -65,6 +68,9 @@ export class AuthService {
     // Khởi tạo state: Mặc định là null (chưa đăng nhập)
     this.currentUserSubject = new BehaviorSubject<User | null>(null);
     this.currentUser = this.currentUserSubject.asObservable();
+    if (isPlatformBrowser(this.platformId)) {
+      this.restoreAuthState();
+    }
   }
 
   // --- 1. Getters (Hàm truy cập) ---
@@ -88,16 +94,22 @@ export class AuthService {
   /**
    * API Đăng nhập
    */
-  public login(command: LoginCommand): Observable<ResultOfLoginResponse> {
+  public login(command: LoginCommand): Observable<LoginResponse> {
     return this.authClient.login(command).pipe(
-      tap((data: LoginResponse) => {
-        // ✅ Cập nhật state
+      map((result: ResultOfLoginResponse) => {
+        if (!result.isSuccess || !result.data) {
+          throw new Error(result.errorMessage || 'Đăng nhập thất bại');
+        }
+
+        const data = result.data;
         const user: User = {
-          id: data.userId!,
-          username: data.username!,
-          email: data.email!,
+          id: data.userId ?? '',
+          username: data.username ?? '',
+          email: data.email ?? '',
         };
-        this.setAuthState(data.token!, user);
+        this.setAuthState(data.token ?? '', user);
+        this.saveAuthToLocalStorage(data);
+        return data;
       })
     );
   }
@@ -139,7 +151,6 @@ export class AuthService {
     return this.authClient.logout(request).pipe(
       finalize(() => {
         this.clearAuthState();
-        this.router.navigate(['/login']);
       })
     );
   }
@@ -225,5 +236,44 @@ export class AuthService {
   private clearAuthState(): void {
     this.accessToken = null;
     this.currentUserSubject.next(null);
+  }
+
+  /**
+   * ✅ Lưu token và user vào localStorage
+   */
+  private saveAuthToLocalStorage(data: LoginResponse): void {
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        localStorage.setItem('currentUser', JSON.stringify(data));
+        console.log('💾 Auth data saved to localStorage');
+      } catch (error) {
+        console.error('❌ Không thể lưu vào localStorage:', error);
+      }
+    }
+  }
+
+  /**
+   * hàm private lấy user khi F5
+   */
+  private restoreAuthState(): void {
+    const user = localStorage.getItem('currentUser');
+
+    if (user) {
+      try {
+        const data: LoginResponse = JSON.parse(user);
+        const userInfo: User = {
+          id: data.userId!,
+          email: data.email!,
+          username: data.username!,
+        };
+        this.accessToken = data.token!;
+        this.currentUserSubject.next(userInfo);
+      } catch (e) {
+        console.error('❌ Không thể parse user từ localStorage:', e);
+        this.clearAuthState();
+      }
+    } else {
+      console.log('ℹ️ Chưa có user trong localStorage');
+    }
   }
 }
