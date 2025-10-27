@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { InventoryService } from '../../core/service/inventory.service';
-import { faPlus, faChartSimple, faFile, faFileArrowDown, faDownload, faMagnifyingGlass, faPenToSquare, faTrashCan, faXmark, faBox, faMoneyBill, faTriangleExclamation, faCircleXmark, faFileExport, faHurricane, faCoins, faSort, faSortUp, faSortDown, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { InventoryService, PagingInfo } from '../../core/service/inventory.service';
+import { faPlus, faChartSimple, faFile, faFileArrowDown, faDownload, faMagnifyingGlass, faPenToSquare, faTrashCan, faXmark, faBox, faMoneyBill, faTriangleExclamation, faCircleXmark, faFileExport, faHurricane, faCoins, faSort, faSortUp, faSortDown, faFilter, faChevronLeft, faChevronRight, faAnglesLeft, faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { CategoryClient, CategoryDto, ResultOfListOfCategoryDto, CreateProductCommand, ProductBaseResponse } from "@services/system-admin.service"
 import { Subject, take, takeUntil } from 'rxjs';
@@ -21,6 +21,17 @@ export class InventoryPageComponent implements OnInit {
   categories: CategoryDto[] | undefined = [];
   private destroy$ = new Subject<void>();
   searchTerm: string = '';
+  
+  // Paging properties
+  pagingInfo: PagingInfo = {
+    totalCount: 0,
+    totalPages: 0,
+    currentPage: 1,
+    pageSize: 10,
+    hasPreviousPage: false,
+    hasNextPage: false
+  };
+  pageSizeOptions: number[] = [5, 10, 20, 50, 100];
   
   showModal: boolean = false;
   modalMode: 'add' | 'edit' = 'add';
@@ -61,6 +72,10 @@ export class InventoryPageComponent implements OnInit {
   faSortUp = faSortUp;
   faSortDown = faSortDown;
   faFilter = faFilter;
+  faChevronLeft = faChevronLeft;
+  faChevronRight = faChevronRight;
+  faAnglesLeft = faAnglesLeft;
+  faAnglesRight = faAnglesRight;
 
   constructor(
     private inventoryService: InventoryService, 
@@ -71,11 +86,19 @@ export class InventoryPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true;
+    
+    // Subscribe to products
     this.inventoryService.getProducts().subscribe(products => {
       this.products = products;
-      this.filterProducts();
+      this.filteredProducts = [...products];
       this.isLoading = false;
     });
+    
+    // Subscribe to paging info
+    this.inventoryService.getPagingInfo().subscribe(pagingInfo => {
+      this.pagingInfo = pagingInfo;
+    });
+    
     this.categoryClient.getCategoryTree().pipe(
       takeUntil(this.destroy$),        
     ).subscribe({
@@ -90,21 +113,81 @@ export class InventoryPageComponent implements OnInit {
     })
   }
 
-  // Lọc sản phẩm theo từ khóa
+  // Paging methods
+  onPageSizeChange(): void {
+    this.isLoading = true;
+    this.inventoryService.changePageSize(this.pagingInfo.pageSize);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.pagingInfo.totalPages) {
+      this.isLoading = true;
+      this.inventoryService.changePage(page);
+    }
+  }
+
+  goToFirstPage(): void {
+    this.goToPage(1);
+  }
+
+  goToLastPage(): void {
+    this.goToPage(this.pagingInfo.totalPages);
+  }
+
+  goToPreviousPage(): void {
+    if (this.pagingInfo.hasPreviousPage) {
+      this.goToPage(this.pagingInfo.currentPage - 1);
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.pagingInfo.hasNextPage) {
+      this.goToPage(this.pagingInfo.currentPage + 1);
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const totalPages = this.pagingInfo.totalPages;
+    const currentPage = this.pagingInfo.currentPage;
+    
+    if (totalPages <= 7) {
+      // Show all pages if total is 7 or less
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first page
+      pages.push(1);
+      
+      if (currentPage <= 3) {
+        // Near the start
+        pages.push(2, 3, 4, 5);
+        pages.push(-1); // Ellipsis
+      } else if (currentPage >= totalPages - 2) {
+        // Near the end
+        pages.push(-1); // Ellipsis
+        pages.push(totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1);
+      } else {
+        // In the middle
+        pages.push(-1); // Ellipsis
+        pages.push(currentPage - 1, currentPage, currentPage + 1);
+        pages.push(-1); // Ellipsis
+      }
+      
+      // Always show last page
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  }
+
+  // Lọc sản phẩm theo từ khóa - Note: Filtering is now done on server side via API
+  // This method is kept for client-side filtering of status only
   filterProducts(): void {
     let productsToFilter = [...this.products];
 
-    // Lọc theo từ khóa
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      productsToFilter = productsToFilter.filter(p =>
-        p.name?.toLowerCase().includes(term) ||
-        p.sku?.toLowerCase().includes(term) ||
-        p.shortDescription?.toLowerCase().includes(term)
-      );
-    }
-
-    // Lọc theo trạng thái
+    // Lọc theo trạng thái (client-side)
     const activeStatusFilters = this.statusOptions.filter(status => this.statusFilters[status]);
     // Only filter if not all options are selected
     if (activeStatusFilters.length > 0 && activeStatusFilters.length < this.statusOptions.length) {
@@ -112,10 +195,10 @@ export class InventoryPageComponent implements OnInit {
     }
 
     this.filteredProducts = productsToFilter;
-    this.sortProducts();
   }
 
-  // Sắp xếp sản phẩm
+  // Sắp xếp sản phẩm - Note: Sorting is now done on server side via API
+  // This method is kept for client-side sorting only if needed
   sortProducts(): void {
     this.filteredProducts.sort((a, b) => {
       let aValue: any = (a as any)[this.sortColumn];
@@ -132,7 +215,7 @@ export class InventoryPageComponent implements OnInit {
     });
   }
 
-  // Thay đổi cột sắp xếp
+  // Thay đổi cột sắp xếp - Note: In future, this should trigger server-side sorting
   changeSortColumn(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';

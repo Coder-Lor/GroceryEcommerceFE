@@ -225,6 +225,8 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           if (response.isSuccess) {
             alert('Thêm sản phẩm thành công!');
+            // Refresh danh sách sản phẩm để cập nhật danh sách mới nhất
+            this.inventoryService.refreshProducts();
             this.router.navigate(['/admin/inventory']);
           } else {
             alert(response.errorMessage || 'Không thể thêm sản phẩm');

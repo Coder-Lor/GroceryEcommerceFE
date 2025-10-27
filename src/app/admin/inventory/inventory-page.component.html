@@ -30,7 +30,7 @@
       />
     </div>
     <span class="search-result"
-      >Hiển thị {{ filteredProducts.length }} / {{ products.length }} sản phẩm</span
+      >Hiển thị {{ filteredProducts.length }} sản phẩm / Tổng {{ pagingInfo.totalCount }} sản phẩm</span
     >
   </div>
 
@@ -129,6 +129,75 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-container">
+    <div class="pagination-info">
+      <span>Hiển thị trang {{ pagingInfo.currentPage }} / {{ pagingInfo.totalPages }}</span>
+      <div class="page-size-selector">
+        <label for="pageSize">Số dòng mỗi trang:</label>
+        <select 
+          id="pageSize" 
+          [(ngModel)]="pagingInfo.pageSize" 
+          (change)="onPageSizeChange()"
+          class="page-size-select"
+        >
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="btn-pagination" 
+        (click)="goToFirstPage()" 
+        [disabled]="!pagingInfo.hasPreviousPage"
+        title="Trang đầu"
+      >
+        <fa-icon [icon]="faAnglesLeft"></fa-icon>
+      </button>
+      
+      <button 
+        class="btn-pagination" 
+        (click)="goToPreviousPage()" 
+        [disabled]="!pagingInfo.hasPreviousPage"
+        title="Trang trước"
+      >
+        <fa-icon [icon]="faChevronLeft"></fa-icon>
+      </button>
+      
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          class="btn-page"
+          [class.active]="page === pagingInfo.currentPage"
+          [disabled]="page === -1"
+          (click)="goToPage(page)"
+        >
+          <span *ngIf="page === -1">...</span>
+          <span *ngIf="page !== -1">{{ page }}</span>
+        </button>
+      </div>
+      
+      <button 
+        class="btn-pagination" 
+        (click)="goToNextPage()" 
+        [disabled]="!pagingInfo.hasNextPage"
+        title="Trang sau"
+      >
+        <fa-icon [icon]="faChevronRight"></fa-icon>
+      </button>
+      
+      <button 
+        class="btn-pagination" 
+        (click)="goToLastPage()" 
+        [disabled]="!pagingInfo.hasNextPage"
+        title="Trang cuối"
+      >
+        <fa-icon [icon]="faAnglesRight"></fa-icon>
+      </button>
+    </div>
   </div>
 </div>
 

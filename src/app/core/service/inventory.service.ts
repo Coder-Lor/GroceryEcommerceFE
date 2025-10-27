@@ -2,7 +2,16 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { Product, InventoryReport } from '../../admin/inventory/models/product.model';
-import { ProductBaseResponse, ProductClient, SortDirection } from '@services/system-admin.service';
+import { ProductBaseResponse, ProductClient, SortDirection, PagedResultOfProductBaseResponse } from '@services/system-admin.service';
+
+export interface PagingInfo {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,17 +20,27 @@ export class InventoryService {
   private productsSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productsSubject.asObservable();
   
+  private pagingInfoSubject = new BehaviorSubject<PagingInfo>({
+    totalCount: 0,
+    totalPages: 0,
+    currentPage: 1,
+    pageSize: 10,
+    hasPreviousPage: false,
+    hasNextPage: false
+  });
+  public pagingInfo$ = this.pagingInfoSubject.asObservable();
+  
   private nextId = 8;
 
   constructor(private productClient: ProductClient) {
-    this.loadProducts();
+    this.loadProducts(1, 10);
   }
 
-  // Load products from API
-  private loadProducts(): void {
+  // Load products from API with paging
+  loadProducts(page: number = 1, pageSize: number = 10): void {
     this.productClient.getProductsPaging(
-      1, // page
-      1000, // pageSize - lấy nhiều để hiển thị tất cả
+      page,
+      pageSize,
       undefined, // search
       undefined, // sortBy
       SortDirection.Ascending, // sortDirection
@@ -33,23 +52,57 @@ export class InventoryService {
       false // hasSorting
     ).pipe(
       map(response => {
-        if (response.isSuccess && response.data?.items) {
-          return response.data.items;
+        if (response.isSuccess && response.data) {
+          return response.data;
         }
-        return [];
+        return null;
       }),
       catchError(error => {
         console.error('Error loading products:', error);
-        return of([]);
+        return of(null);
       })
-    ).subscribe(products => {
-      this.productsSubject.next(products);
+    ).subscribe(pagedResult => {
+      if (pagedResult) {
+        this.productsSubject.next(pagedResult.items || []);
+        
+        // Update paging info
+        this.pagingInfoSubject.next({
+          totalCount: pagedResult.totalCount || 0,
+          totalPages: pagedResult.totalPages || 0,
+          currentPage: pagedResult.page || 1,
+          pageSize: pagedResult.pageSize || 10,
+          hasPreviousPage: pagedResult.hasPreviousPage || false,
+          hasNextPage: pagedResult.hasNextPage || false
+        });
+      }
     });
   }
 
   // Refresh products from server
-  refreshProducts(): void {
-    this.loadProducts();
+  refreshProducts(page?: number, pageSize?: number): void {
+    const currentPaging = this.pagingInfoSubject.value;
+    this.loadProducts(
+      page || currentPaging.currentPage,
+      pageSize || currentPaging.pageSize
+    );
+  }
+
+  // Get current paging info
+  getPagingInfo(): Observable<PagingInfo> {
+    return this.pagingInfo$;
+  }
+
+  // Change page
+  changePage(page: number): void {
+    const currentPaging = this.pagingInfoSubject.value;
+    if (page >= 1 && page <= currentPaging.totalPages) {
+      this.loadProducts(page, currentPaging.pageSize);
+    }
+  }
+
+  // Change page size
+  changePageSize(pageSize: number): void {
+    this.loadProducts(1, pageSize); // Reset to page 1 when changing page size
   }
 
   // Lấy danh sách sản phẩm
