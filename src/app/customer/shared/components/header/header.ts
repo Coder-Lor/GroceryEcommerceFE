@@ -1,4 +1,13 @@
-import { Component, inject, OnChanges, OnInit, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnChanges,
+  OnInit,
+  PLATFORM_ID,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UtilityPanel } from './utility-panel/utility-panel';
 import { Router, RouterModule } from '@angular/router';
@@ -18,10 +27,13 @@ export class Header implements OnInit, OnChanges {
   private router: Router = inject(Router);
   private platformId = inject(PLATFORM_ID);
 
+  @ViewChild('userMenu', { static: false }) userMenu!: ElementRef;
+
   isShowSidebar: boolean = false;
   isShowSubMenu: boolean = false;
   isShowSearchBox: boolean = false;
   isShowPanel: boolean = false;
+  isOpen: boolean = false;
 
   username: string = '';
   isLoggedIn$ = this.authService.isAuthenticated$;
@@ -77,6 +89,21 @@ export class Header implements OnInit, OnChanges {
 
   togggleSubmenu() {
     this.isShowSubMenu = !this.isShowSubMenu;
+  }
+  toggleUserMenu(event: Event) {
+    event.stopPropagation();
+    this.isOpen = !this.isOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: MouseEvent) {
+    // Check if userMenu exists and click target is valid
+    if (this.userMenu?.nativeElement && event.target instanceof Node) {
+      const clickedInside = this.userMenu.nativeElement.contains(event.target);
+      if (!clickedInside) {
+        this.isOpen = false;
+      }
+    }
   }
 
   toggleSearchBox() {

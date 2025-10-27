@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '@core/service/auth.service';
-import { AuthClient, RegisterCommand } from '@core/service/system-admin.service';
+import { RegisterCommand, RegisterResponse } from '@core/service/system-admin.service';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -13,17 +14,21 @@ import { MessageService } from 'primeng/api';
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
-export class Register {
-  router: Router = inject(Router);
+export class Register implements OnDestroy {
+  private router = inject(Router);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
+  private messageService = inject(MessageService);
 
   registerForm: FormGroup;
   showPassword = false;
   isSubmitting = false;
   errorMessage = '';
 
-  constructor(private messageService: MessageService) {
+  private destroy$ = new Subject<void>(); // ✅ Cleanup subscription
+  private redirectTimeout: any; // ✅ Giữ ID của setTimeout
+
+  constructor() {
     this.registerForm = this.fb.group(
       {
         email: ['', [Validators.required, Validators.email]],
@@ -31,9 +36,7 @@ export class Register {
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
       },
-      {
-        validators: this.passwordMatchValidator,
-      }
+      { validators: this.passwordMatchValidator }
     );
   }
 
@@ -57,9 +60,7 @@ export class Register {
   }
 
   onSubmit() {
-    console.log(this.registerForm);
     if (this.registerForm.invalid) {
-      // Đánh dấu tất cả các field là đã touched để hiển thị lỗi
       Object.keys(this.registerForm.controls).forEach((key) => {
         this.registerForm.get(key)?.markAsTouched();
       });
@@ -75,74 +76,56 @@ export class Register {
       password: this.registerForm.value.password,
     });
 
-    this.authService.register(registerCommand).subscribe({
-      next: (response: any) => {
-        console.log('in next');
-        this.isSubmitting = false;
-        if (response.isSuccess) {
-          // Lưu token vào localStorage
-          if (response.data?.token) {
-            localStorage.setItem('accessToken', response.data.token);
-          }
+    this.authService
+      .register(registerCommand)
+      .pipe(takeUntil(this.destroy$)) // ✅ Tự động unsubscribe
+      .subscribe({
+        next: (response: RegisterResponse) => {
+          console.log('Đăng ký thành công:', response);
+          this.isSubmitting = false;
 
-          // Lưu refresh token nếu có
-          if (response.data?.refreshToken) {
-            localStorage.setItem('refreshToken', response.data.refreshToken);
-          }
-
-          // Lưu userId nếu có
-          if (response.data?.userId) {
-            localStorage.setItem('userId', response.data.userId);
-          }
-
-          // Lưu thời gian hết hạn nếu có
-          if (response.data?.expiresAt) {
-            localStorage.setItem('tokenExpiresAt', response.data.expiresAt);
-          }
-
-          // Đăng ký thành công, chuyển đến trang đăng nhập
-          // alert('Đăng ký thành công! Vui lòng đăng nhập.');
           this.messageService.add({
             severity: 'success',
             summary: 'Thành công',
-            detail: 'Đăng ký thành công.',
+            detail: 'Đăng ký thành công!',
             life: 1000,
           });
-          this.router.navigate(['/login']);
-        } else {
-          // Hiển thị lỗi từ server
-          // this.errorMessage = response.errorMessage || 'Đăng ký thất bại. Vui lòng thử lại.';
+
+          this.redirectTimeout = setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 800);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error('Register error:', err);
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Đăng ký không thành công.',
+            detail: err.message || 'Đăng ký không thành công.',
             life: 1000,
           });
-        }
-      },
-      error: (error: any) => {
-        this.isSubmitting = false;
-        this.errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại sau.';
-        console.error('Register error:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Lỗi',
-          detail: 'Đăng ký không thành công.',
-          life: 1000,
-        });
-      },
-    });
+        },
+      });
   }
 
-  // Helper methods để kiểm tra lỗi trong template
+  // ✅ Cleanup khi component bị hủy
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    // ✅ Clear timeout nếu còn
+    if (this.redirectTimeout) {
+      clearTimeout(this.redirectTimeout);
+    }
+  }
+
   hasError(fieldName: string, errorType?: string): boolean {
     const field = this.registerForm.get(fieldName);
     if (!field) return false;
 
-    if (errorType) {
-      return field.hasError(errorType) && (field.dirty || field.touched);
-    }
-    return field.invalid && (field.dirty || field.touched);
+    return errorType
+      ? field.hasError(errorType) && (field.dirty || field.touched)
+      : field.invalid && (field.dirty || field.touched);
   }
 
   getErrorMessage(fieldName: string): string {

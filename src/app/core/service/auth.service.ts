@@ -115,19 +115,25 @@ export class AuthService {
   }
 
   /**
-   * API Đăng ký (Giả sử đăng ký xong sẽ tự động đăng nhập)
+   * API Đăng ký (Đăng ký xong sẽ tự động đăng nhập)
    */
-  public register(registerData: RegisterCommand): Observable<ResultOfRegisterResponse> {
+  public register(registerData: RegisterCommand): Observable<RegisterResponse> {
     // Dùng method của AuthClient bạn đã có, hoặc gọi http trực tiếp
     return this.authClient.registerAccount(registerData).pipe(
-      tap((response: RegisterResponse) => {
-        // Khi đăng ký thành công, lưu state
+      map((respone: ResultOfRegisterResponse) => {
+        if (!respone.isSuccess || !respone.data) {
+          throw new Error(respone.errorMessage || 'Đăng ký thất bại');
+        }
+
+        const data = respone.data;
         const user: User = {
-          id: response.userId!,
-          username: response.username!,
-          email: response.email!,
+          id: data.userId ?? '',
+          username: data.username ?? '',
+          email: data.email ?? '',
         };
-        this.setAuthState(response.token!, user);
+        this.setAuthState(data.token ?? '', user);
+        this.saveAuthToLocalStorage(data);
+        return data;
       })
     );
   }

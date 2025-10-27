@@ -52,13 +52,31 @@
 
         <!-- User / Login -->
         @if (isLoggedIn$ | async; as isLoggedIn) {
-        <div class="user-avatar-container d-flex align-items-center" style="cursor: pointer">
-          <div class="user-avatar me-2">
-            <i class="pi pi-user"></i>
-            {{ (user$ | async)?.username }}
+        <div class="user-menu-wrapper" #userMenu>
+          <div
+            class="user-avatar-container d-flex align-items-center"
+            (click)="toggleUserMenu($event)"
+          >
+            <div class="user-avatar me-2">
+              <i class="pi pi-user"></i>
+              <span style="margin-left: 5px">{{ (user$ | async)?.username }}</span>
+            </div>
+            <i class="pi pi-angle-down ms-1"></i>
           </div>
-          <button (click)="onLogout()">Logout</button>
+
+          @if(isOpen) {
+          <div class="user-dropdown">
+            <ul>
+              <li>Quản lý hồ sơ</li>
+              <li>Đơn mua</li>
+              <li style="align-items: center" (click)="onLogout()">
+                <i style="font-size: 14px" class="pi pi-sign-out"></i> Đăng Xuất
+              </li>
+            </ul>
+          </div>
+          }
         </div>
+
         } @else {
         <div class="user-avatar-container d-flex align-items-center" style="cursor: pointer">
           <div class="user-avatar me-2">
