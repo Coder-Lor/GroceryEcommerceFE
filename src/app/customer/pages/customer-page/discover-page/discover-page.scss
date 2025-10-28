@@ -1,0 +1,111 @@
+.product-list {
+  margin-top: 108px;
+}
+
+.product-list,
+.product-list .p-dataview,
+.product-list .p-dataview .p-dataview-content,
+.product-list .p-dataview .p-dataview-header,
+.p-dataview,
+.p-dataview .p-dataview-content,
+.p-dataview .p-dataview-header {
+  background-color: #f1f4f7 !important;
+  color: #111 !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.recomment {
+  font-weight: 550;
+  position: relative;
+
+  h4 {
+    background-color: #fff;
+    padding: 10px 14px;
+    z-index: 10;
+    border-radius: 5px;
+  }
+}
+
+.recomment::before {
+  content: "";
+  height: 1px;
+  width: 520px;
+  background-color: #111;
+  position: absolute;
+  top: 50%;
+  right: 0px;
+  transform: translateY(50%);
+
+}
+
+.recomment::after {
+  content: "";
+  height: 1px;
+  width: 520px;
+  background-color: #111;
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  transform: translateY(50%);
+
+}
+
+.p-button {
+  background-color: #f1f4f7 !important;
+  border: none !important;
+  color: #111 !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 14px !important;
+}
+
+.p-select {
+  background-color: #f1f4f7 !important;
+  border: none !important;
+  height: 36px !important;
+
+  .p-select-label {
+    color: #111 !important;
+  }
+}
+
+.p-select-overlay {
+  border: none !important;
+
+  .p-select-list-container {
+    background-color: #f1f4f7 !important;
+
+    .p-select-list {
+      background-color: #f1f4f7 !important;
+      border: none !important;
+
+      .p-select-option {
+        color: #111 !important;
+      }
+
+      .p-select-option:hover {
+        background-color: #111 !important;
+        color: #f1f4f7 !important;
+      }
+
+      .p-select-option-selected {
+        background-color: #ffb700 !important;
+        color: #111 !important;
+      }
+    }
+  }
+}
+
+.p-paginator {
+  background-color: #f1f4f7 !important;
+  padding: 0 !important;
+  border: none !important;
+
+  button {
+    color: #111;
+  }
+
+  .p-paginator-page-selected {
+    background-color: #ffb700 !important;
+    color: #111 !important;
+  }
+}

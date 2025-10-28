@@ -4,6 +4,7 @@ import {
   provideZoneChangeDetection,
   provideAppInitializer,
   inject,
+  LOCALE_ID,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -17,6 +18,11 @@ import { MessageService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AuthService } from '@core/service/auth.service';
+
+import { registerLocaleData } from '@angular/common';
+import localeVi from '@angular/common/locales/vi';
+
+registerLocaleData(localeVi);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -39,6 +45,7 @@ export const appConfig: ApplicationConfig = {
     }),
     provideCharts(withDefaultRegisterables()),
     provideHttpClient(withFetch()),
+    { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
     // provideAppInitializer(() => {
     //   // Dùng 'inject()' để lấy service

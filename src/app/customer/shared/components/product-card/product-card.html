@@ -75,7 +75,7 @@
       [src]="product.image"
       [alt]="product.name"
       class="img-fluid rounded"
-      style="max-width: 200px"
+      style="max-width: 200px; min-height: 200px"
     />
     <p-tag
       [value]="product.inventoryStatus"
@@ -95,12 +95,12 @@
       </div>
     </div>
     <div class="mt-3">
-      <h5 class="fw-semibold">{{ product.price | currency : 'USD' }}</h5>
+      <h5 class="fw-semibold">{{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}</h5>
       <div class="d-flex gap-2 mt-2">
         <button
           class="btn-checkout"
           pButton
-          label="Checkout"
+          label="Mua ngay"
           [disabled]="product.inventoryStatus === 'OUTOFSTOCK'"
           class="btn btn-dark flex-fill"
         ></button>

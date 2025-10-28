@@ -1,0 +1,35 @@
+<div class="product-list container">
+  <p-dataview #dv [value]="products" [layout]="layout">
+    <!-- Header -->
+    <ng-template #header>
+      <div class="recomment d-flex justify-content-center">
+        <h4>ĐỀ XUẤT CHO BẠN</h4>
+      </div>
+    </ng-template>
+    <!-- GRID layout -->
+    <ng-template #grid let-items>
+      <div class="row g-4">
+        @for (item of products; track $index) {
+        <div class="col-12 col-sm-6 col-lg-3">
+          <product-card
+            [product]="item"
+            [layout]="'grid'"
+            [getSeverity]="getSeverity.bind(this)"
+          ></product-card>
+        </div>
+        }
+      </div>
+    </ng-template>
+  </p-dataview>
+</div>
+
+<div class="row">
+  <div class="d-flex justify-content-center mt-4 mb-3">
+    <p-paginator
+      (onPageChange)="onPageChange($event)"
+      [first]="first"
+      [rows]="rows"
+      [totalRecords]="20"
+    />
+  </div>
+</div>

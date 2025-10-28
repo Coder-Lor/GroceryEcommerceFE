@@ -117,6 +117,21 @@
 
 }
 
+.btn-see-more {
+  font-family: 'poppins', sans-serif;
+  width: 300px;
+  background-color: #fff;
+  border: none;
+  color: #111;
+  padding: 8px 0;
+  font-size: 16px;
+  box-shadow: #1a162e;
+}
+
+.btn-see-more:hover {
+  transform: scale(1.05);
+}
+
 
 /* Extra: đảm bảo card nhỏ trên mobile hiển thị OK */
 @media (max-width: 767.98px) {
