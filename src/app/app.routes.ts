@@ -20,8 +20,7 @@ import { OrdersPageComponent } from './admin/orders/orders-page.component';
 import { CategoriesPageComponent } from './admin/categories/categories-page.component';
 import { authGuard } from './core/service/auth.guard';
 import { NotFoundComponent } from './core/components/not-found/not-found.component';
-
-
+import { Checkout } from './customer/features/checkout/checkout';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -40,6 +39,7 @@ export const routes: Routes = [
       { path: 'register', component: Register },
       { path: 'product-detail', component: ProductDetail },
       { path: 'product-list', component: ProductList },
+      { path: 'checkout', component: Checkout },
     ],
   },
   {

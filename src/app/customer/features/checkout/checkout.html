@@ -1,0 +1,51 @@
+<div class="checkout-page container">
+  <!-- Địa chỉ giao hàng -->
+  <section class="checkout-section address">
+    <h5 class="section-title"><i class="pi pi-map-marker"></i> Địa chỉ nhận hàng</h5>
+    <div class="address-info">
+      <div class="user-info">
+        <span class="user-name">Trần Văn A</span>
+        <span class="user-phone">(+84) 0912 345 678</span>
+      </div>
+      <p class="user-address">123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
+      <button class="btn-change">Thay đổi</button>
+    </div>
+  </section>
+
+  <!-- Danh sách sản phẩm -->
+  <section class="checkout-section product-list">
+    <div class="checkout-header">
+      <div class="col-product">Sản phẩm</div>
+      <div class="col-price">Đơn giá</div>
+      <div class="col-quantity">Số lượng</div>
+      <div class="col-total">Thành tiền</div>
+    </div>
+
+    <div class="product-item" *ngFor="let item of products">
+      <div class="col-product d-flex align-items-center">
+        <img [src]="item.image" alt="Ảnh sản phẩm" class="product-img" />
+        <div class="product-name">{{ item.name }}</div>
+      </div>
+      <div class="col-price">{{ item.price | currency : 'VND' }}</div>
+      <div class="col-quantity">{{ item.quantity }}</div>
+      <div class="col-total">{{ item.price * item.quantity | currency : 'VND' }}</div>
+    </div>
+  </section>
+
+  <!-- Tổng kết đơn hàng -->
+  <section class="checkout-summary">
+    <div class="summary-row">
+      <span>Tổng tiền hàng</span>
+      <span>{{ totalPrice | currency : 'VND' }}</span>
+    </div>
+    <div class="summary-row">
+      <span>Phí vận chuyển</span>
+      <span>{{ totalPrice | currency : 'VND' }}</span>
+    </div>
+    <div class="summary-row total">
+      <span>Tổng thanh toán</span>
+      <span class="total-price">{{ totalPrice | currency : 'VND' }}</span>
+    </div>
+    <button class="btn-checkout">Đặt hàng</button>
+  </section>
+</div>
