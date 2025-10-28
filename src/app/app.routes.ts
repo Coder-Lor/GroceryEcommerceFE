@@ -3,6 +3,8 @@ import {
   provideRouter,
   Routes,
   withInMemoryScrolling,
+  withPreloading,
+  PreloadAllModules,
 } from '@angular/router';
 import { Cart } from './customer/features/cart/cart';
 import { Home } from './customer/features/home/home';
@@ -20,6 +22,7 @@ import { OrdersPageComponent } from './admin/orders/orders-page.component';
 import { CategoriesPageComponent } from './admin/categories/categories-page.component';
 import { authGuard } from './core/service/auth.guard';
 import { NotFoundComponent } from './core/components/not-found/not-found.component';
+import { Profile } from './customer/features/profile/profile';
 
 
 
@@ -40,6 +43,7 @@ export const routes: Routes = [
       { path: 'register', component: Register },
       { path: 'product-detail', component: ProductDetail },
       { path: 'product-list', component: ProductList },
+      { path: 'profile', component: Profile},
     ],
   },
   {
@@ -77,4 +81,8 @@ export const routes: Routes = [
   { path: '**', component: NotFoundComponent }, // Trang 404
 ];
 
-export const appRouter = provideRouter(routes, withInMemoryScrolling(scrollOpts));
+export const appRouter = provideRouter(
+  routes, 
+  withInMemoryScrolling(scrollOpts),
+  withPreloading(PreloadAllModules) // Preload all modules for faster navigation
+);
