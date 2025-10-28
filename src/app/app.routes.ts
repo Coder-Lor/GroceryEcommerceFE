@@ -3,6 +3,8 @@ import {
   provideRouter,
   Routes,
   withInMemoryScrolling,
+  withPreloading,
+  PreloadAllModules,
 } from '@angular/router';
 import { Cart } from './customer/features/cart/cart';
 import { Home } from './customer/features/home/home';
@@ -77,4 +79,8 @@ export const routes: Routes = [
   { path: '**', component: NotFoundComponent }, // Trang 404
 ];
 
-export const appRouter = provideRouter(routes, withInMemoryScrolling(scrollOpts));
+export const appRouter = provideRouter(
+  routes, 
+  withInMemoryScrolling(scrollOpts),
+  withPreloading(PreloadAllModules) // Preload all modules for faster navigation
+);
