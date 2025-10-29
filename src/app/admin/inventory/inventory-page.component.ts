@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -88,24 +88,51 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     private productClient: ProductClient,
     private router: Router,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
   ngOnInit(): void {
+    console.log('[Inventory] ngOnInit - START');
     this.isLoading = true;
+    console.log('[Inventory] Setting isLoading = true');
+    this.cdr.detectChanges(); // Force change detection
     
-    // Subscribe to products
-    this.inventoryService.getProducts().subscribe(products => {
+    // Subscribe to products FIRST - before loading data
+    this.inventoryService.getProducts().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(products => {
+      console.log('[Inventory] Received products:', products.length, 'items');
       this.products = products;
       this.filteredProducts = [...products];
-      this.isLoading = false;
+      
+      // Only turn off loading if we have data or it's not initial load
+      if (products.length > 0 || this.products.length > 0) {
+        this.isLoading = false;
+        console.log('[Inventory] Setting isLoading = false');
+        this.cdr.detectChanges(); // Force change detection
+      }
     });
     
     // Subscribe to paging info
-    this.inventoryService.getPagingInfo().subscribe(pagingInfo => {
+    this.inventoryService.getPagingInfo().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(pagingInfo => {
+      console.log('[Inventory] Paging info updated:', pagingInfo);
       this.pagingInfo = pagingInfo;
+      
+      // Turn off loading when paging info is updated with data
+      if (pagingInfo.totalCount > 0 && this.isLoading) {
+        this.isLoading = false;
+        console.log('[Inventory] Setting isLoading = false (from paging)');
+        this.cdr.detectChanges();
+      }
     });
+    
+    // NOW initialize/load data AFTER subscriptions are set up
+    console.log('[Inventory] Calling initialize()');
+    this.inventoryService.initialize();
     
     this.categoryClient.getCategoryTree().pipe(
       takeUntil(this.destroy$),        
@@ -133,13 +160,17 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
   // Paging methods
   onPageSizeChange(): void {
+    console.log('[Inventory] onPageSizeChange - Setting isLoading = true');
     this.isLoading = true;
+    this.cdr.detectChanges(); // Force change detection
     this.inventoryService.changePageSize(this.pagingInfo.pageSize);
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.pagingInfo.totalPages) {
+      console.log('[Inventory] goToPage', page, '- Setting isLoading = true');
       this.isLoading = true;
+      this.cdr.detectChanges(); // Force change detection
       this.inventoryService.changePage(page);
     }
   }
@@ -352,6 +383,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
             life: 3000
           });
           // Refresh danh sách sản phẩm
+          this.isLoading = true; // Set loading before refresh
           this.inventoryService.refreshProducts();
         } else {
           this.messageService.add({

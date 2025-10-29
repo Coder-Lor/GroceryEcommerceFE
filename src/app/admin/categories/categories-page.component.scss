@@ -1,22 +1,15 @@
-.categories-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  position: relative;
-}
-
-// Loading Overlay
-.loading-overlay {
-  position: absolute;
-  top: 105px;
-  left: 0;
+// Loading Overlay - Full page (covers entire content area)
+.loading-overlay-fullpage {
+  position: fixed;
+  top: 0;
+  left: 240px; // Sidebar width
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 9999;
   backdrop-filter: blur(8px);
   animation: fadeIn 0.3s ease;
 
@@ -67,6 +60,13 @@
   50% {
     opacity: 0.6;
   }
+}
+
+.categories-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .page-header {

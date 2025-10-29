@@ -1,3 +1,13 @@
+<!-- Loading Overlay for entire page -->
+@if (isLoading) {
+<div class="loading-overlay-fullpage">
+  <div class="loading-content">
+    <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
+    <p class="loading-text">Đang tải dữ liệu...</p>
+  </div>
+</div>
+}
+
 <div class="categories-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
@@ -49,14 +59,6 @@
 
   <!-- Bảng danh sách danh mục -->
   <div class="table-container">
-    @if (isLoading) {
-    <!-- Loading Overlay -->
-    <div class="loading-overlay">
-      <div class="loading-content">
-        <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
-      </div>
-    </div>
-    }
     <table class="category-table">
       <thead>
         <tr>

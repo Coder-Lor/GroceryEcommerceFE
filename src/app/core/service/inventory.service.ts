@@ -31,9 +31,19 @@ export class InventoryService {
   public pagingInfo$ = this.pagingInfoSubject.asObservable();
   
   private nextId = 8;
+  private isInitialized = false; // Track if data has been loaded
 
   constructor(private productClient: ProductClient) {
-    this.loadProducts(1, 10);
+    // Don't auto-load in constructor
+    // Let component decide when to load
+  }
+
+  // Initialize data (call from component)
+  initialize(): void {
+    if (!this.isInitialized) {
+      this.isInitialized = true;
+      this.loadProducts(1, 10);
+    }
   }
 
   // Load products from API with paging
@@ -51,6 +61,9 @@ export class InventoryService {
       false, // hasSearch
       false // hasSorting
     ).pipe(
+      tap(() => {
+        // Data is being loaded
+      }),
       map(response => {
         if (response.isSuccess && response.data) {
           return response.data;
@@ -61,19 +74,28 @@ export class InventoryService {
         console.error('Error loading products:', error);
         return of(null);
       })
-    ).subscribe(pagedResult => {
-      if (pagedResult) {
-        this.productsSubject.next(pagedResult.items || []);
-        
-        // Update paging info
-        this.pagingInfoSubject.next({
-          totalCount: pagedResult.totalCount || 0,
-          totalPages: pagedResult.totalPages || 0,
-          currentPage: pagedResult.page || 1,
-          pageSize: pagedResult.pageSize || 10,
-          hasPreviousPage: pagedResult.hasPreviousPage || false,
-          hasNextPage: pagedResult.hasNextPage || false
-        });
+    ).subscribe({
+      next: (pagedResult) => {
+        if (pagedResult) {
+          this.productsSubject.next(pagedResult.items || []);
+          
+          // Update paging info
+          this.pagingInfoSubject.next({
+            totalCount: pagedResult.totalCount || 0,
+            totalPages: pagedResult.totalPages || 0,
+            currentPage: pagedResult.page || 1,
+            pageSize: pagedResult.pageSize || 10,
+            hasPreviousPage: pagedResult.hasPreviousPage || false,
+            hasNextPage: pagedResult.hasNextPage || false
+          });
+        } else {
+          // If no data, emit empty array
+          this.productsSubject.next([]);
+        }
+      },
+      error: (error) => {
+        console.error('Fatal error loading products:', error);
+        this.productsSubject.next([]);
       }
     });
   }
