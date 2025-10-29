@@ -1,0 +1,48 @@
+<p-dialog 
+  [(visible)]="visible" 
+  [modal]="true" 
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  (onHide)="closeDialog()"
+  styleClass="image-cropper-dialog"
+  [style]="{width: '90vw', maxWidth: '600px'}">
+  
+  <ng-template pTemplate="header">
+    <h3>Chỉnh sửa ảnh đại diện</h3>
+  </ng-template>
+
+  <div class="cropper-container">
+    <image-cropper
+      [imageChangedEvent]="imageChangedEvent"
+      [maintainAspectRatio]="true"
+      [aspectRatio]="1/1"
+      [resizeToWidth]="400"
+      [cropperMinWidth]="200"
+      format="png"
+      [roundCropper]="true"
+      (imageCropped)="imageCroppedEvent($event)"
+      (imageLoaded)="imageLoaded($event)"
+      (cropperReady)="cropperReady()"
+      (loadImageFailed)="loadImageFailed()">
+    </image-cropper>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button 
+        label="Hủy" 
+        icon="pi pi-times" 
+        (onClick)="closeDialog()"
+        [text]="true"
+        severity="secondary">
+      </p-button>
+      <p-button 
+        label="Lưu" 
+        icon="pi pi-check" 
+        (onClick)="saveCroppedImage()"
+        severity="success">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

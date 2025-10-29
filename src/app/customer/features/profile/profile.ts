@@ -1,22 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ImageModule } from 'primeng/image';
+import { ImageCropperDialogComponent } from './image-cropper-dialog/image-cropper-dialog.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ImageModule],
+  imports: [CommonModule, ImageModule, ImageCropperDialogComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
 export class Profile {
+  @ViewChild(ImageCropperDialogComponent) imageCropper!: ImageCropperDialogComponent;
+
   // User data - có thể lấy từ service sau
   user = {
     name: 'Imran Khan',
     registeredDate: '17th May 2022',
     email: 'tarok971a@gmail.com',
     phone: '+000 11122 2345 657',
-    address: 'Bangladesh Embassy, Washington, DC 20008'
+    address: 'Bangladesh Embassy, Washington, DC 20008',
+    avatar: 'images/avatar.jpg' // Ảnh đại diện mặc định
   };
 
   cards = [
@@ -50,5 +54,17 @@ export class Profile {
   addToCart(item: any) {
     console.log('Adding to cart:', item);
     // Implement cart logic
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.imageCropper.openDialog(event);
+    }
+  }
+
+  onImageCropped(croppedImage: string) {
+    this.user.avatar = croppedImage;
+    console.log('Image cropped and saved:', croppedImage);
+    // Có thể upload lên server tại đây
   }
 }
