@@ -27,7 +27,12 @@ import {
   CategoryDto,
   CreateCategoryCommand,
   UpdateCategoryCommand,
-  ResultOfListOfCategoryDto
+  ResultOfListOfCategoryDto,
+  ProductClient,
+  ProductBaseResponse,
+  FilterCriteria,
+  FilterOperator,
+  SortDirection
 } from '../../core/service/system-admin.service';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -62,6 +67,11 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
   showSubCategoriesModal: boolean = false;
   selectedCategory: CategoryDto | null = null;
   
+  showProductsModal: boolean = false;
+  selectedCategoryForProducts: CategoryDto | null = null;
+  categoryProducts: ProductBaseResponse[] = [];
+  isLoadingProducts: boolean = false;
+  
   showReport: boolean = false;
   report: CategoryReport | null = null;
   
@@ -88,7 +98,10 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
   faCheckCircle = faCheckCircle;
   faTimesCircle = faTimesCircle;
 
-  constructor(private categoryClient: CategoryClient) {}
+  constructor(
+    private categoryClient: CategoryClient,
+    private productClient: ProductClient
+  ) {}
 
   ngOnInit(): void {
     this.loadCategories();
@@ -291,6 +304,61 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
   closeSubCategoriesModal(): void {
     this.showSubCategoriesModal = false;
     this.selectedCategory = null;
+  }
+
+  viewCategoryProducts(category: CategoryDto): void {
+    if (!category.categoryId) return;
+    
+    this.selectedCategoryForProducts = category;
+    this.showProductsModal = true;
+    this.isLoadingProducts = true;
+    this.categoryProducts = [];
+    
+    // Tạo filter để lọc sản phẩm theo categoryId
+    const categoryFilter = new FilterCriteria();
+    categoryFilter.fieldName = 'CategoryId';
+    categoryFilter.value = category.categoryId;
+    categoryFilter.operator = FilterOperator.Equals;
+    
+    // Gọi API getProductsPaging với filter
+    this.productClient.getProductsPaging(
+      1,                              // page
+      100,                            // pageSize - lấy tối đa 100 sản phẩm
+      undefined,                      // search
+      'Name',                         // sortBy
+      SortDirection.Ascending,        // sortDirection
+      [categoryFilter],               // filters
+      undefined,                      // entityType
+      undefined,                      // availableFields
+      true,                           // hasFilters
+      false,                          // hasSearch
+      true                            // hasSorting
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response) => {
+        this.isLoadingProducts = false;
+        if (response.isSuccess && response.data?.items) {
+          this.categoryProducts = response.data.items;
+        } else {
+          this.categoryProducts = [];
+          if (response.errorMessage) {
+            alert(response.errorMessage);
+          }
+        }
+      },
+      error: (error) => {
+        this.isLoadingProducts = false;
+        console.error('Error loading category products:', error);
+        alert('Lỗi khi tải danh sách sản phẩm');
+      }
+    });
+  }
+
+  closeProductsModal(): void {
+    this.showProductsModal = false;
+    this.selectedCategoryForProducts = null;
+    this.categoryProducts = [];
   }
 
   showCategoryReport(): void {

@@ -66,6 +66,11 @@ export class Header implements OnInit, OnChanges {
     console.log(this.isLoggedIn$);
   }
 
+  redirectToProfile(): void {
+    this.isOpen = !this.isOpen;
+    this.router.navigate(['/profile']);
+  }
+
   onLogout() {
     this.authService.logout(this.refreshtoken).subscribe({
       next: () => {
