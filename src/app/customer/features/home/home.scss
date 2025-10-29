@@ -120,7 +120,7 @@
 .btn-see-more {
   font-family: 'poppins', sans-serif;
   width: 300px;
-  background-color: #fff;
+  background-color: #f1f1f1;
   border: none;
   color: #111;
   padding: 8px 0;
@@ -152,7 +152,7 @@
 :host ::ng-deep .p-dataview,
 :host ::ng-deep .p-dataview .p-dataview-content,
 :host ::ng-deep .p-dataview .p-dataview-header {
-  background-color: #f1f4f7 !important;
+  background-color: #fff !important;
   color: #111 !important;
   font-family: "Poppins", sans-serif !important;
 }

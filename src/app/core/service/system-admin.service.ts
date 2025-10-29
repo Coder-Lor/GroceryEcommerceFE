@@ -17,6 +17,476 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 @Injectable({
   providedIn: 'root',
 })
+export class AbandonedCartClient {
+  private http: HttpClient;
+  private baseUrl: string;
+  protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+  constructor(
+    @Inject(HttpClient) http: HttpClient,
+    @Optional() @Inject(API_BASE_URL) baseUrl?: string
+  ) {
+    this.http = http;
+    this.baseUrl = baseUrl ?? 'https://localhost:44394';
+  }
+
+  getUnnotifiedCarts(
+    page: number | undefined,
+    pageSize: number | undefined,
+    search: string | null | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: SortDirection | undefined,
+    filters: FilterCriteria[] | undefined,
+    entityType: string | null | undefined,
+    availableFields: SearchableField[] | null | undefined,
+    hasFilters: boolean | undefined,
+    hasSearch: boolean | undefined,
+    hasSorting: boolean | undefined
+  ): Observable<ResultOfPagedResultOfAbandonedCartDto> {
+    let url_ = this.baseUrl + '/api/AbandonedCart/unnotified?';
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'Page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'PageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (search !== undefined && search !== null)
+      url_ += 'Search=' + encodeURIComponent('' + search) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'SortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection === null)
+      throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+    else if (sortDirection !== undefined)
+      url_ += 'SortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    if (filters === null) throw new globalThis.Error("The parameter 'filters' cannot be null.");
+    else if (filters !== undefined)
+      filters &&
+        filters.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'Filters[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (entityType !== undefined && entityType !== null)
+      url_ += 'EntityType=' + encodeURIComponent('' + entityType) + '&';
+    if (availableFields !== undefined && availableFields !== null)
+      availableFields &&
+        availableFields.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'AvailableFields[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (hasFilters === null)
+      throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+    else if (hasFilters !== undefined)
+      url_ += 'HasFilters=' + encodeURIComponent('' + hasFilters) + '&';
+    if (hasSearch === null) throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+    else if (hasSearch !== undefined)
+      url_ += 'HasSearch=' + encodeURIComponent('' + hasSearch) + '&';
+    if (hasSorting === null)
+      throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+    else if (hasSorting !== undefined)
+      url_ += 'HasSorting=' + encodeURIComponent('' + hasSorting) + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetUnnotifiedCarts(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetUnnotifiedCarts(response_ as any);
+            } catch (e) {
+              return _observableThrow(
+                e
+              ) as any as Observable<ResultOfPagedResultOfAbandonedCartDto>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfPagedResultOfAbandonedCartDto>;
+        })
+      );
+  }
+
+  protected processGetUnnotifiedCarts(
+    response: HttpResponseBase
+  ): Observable<ResultOfPagedResultOfAbandonedCartDto> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfPagedResultOfAbandonedCartDto.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getByDateRange(
+    page: number | undefined,
+    pageSize: number | undefined,
+    search: string | null | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: SortDirection | undefined,
+    filters: FilterCriteria[] | undefined,
+    entityType: string | null | undefined,
+    availableFields: SearchableField[] | null | undefined,
+    hasFilters: boolean | undefined,
+    hasSearch: boolean | undefined,
+    hasSorting: boolean | undefined,
+    fromDate: Date | undefined,
+    toDate: Date | undefined
+  ): Observable<ResultOfPagedResultOfAbandonedCartDto> {
+    let url_ = this.baseUrl + '/api/AbandonedCart/date-range?';
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'Page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'PageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (search !== undefined && search !== null)
+      url_ += 'Search=' + encodeURIComponent('' + search) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'SortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection === null)
+      throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+    else if (sortDirection !== undefined)
+      url_ += 'SortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    if (filters === null) throw new globalThis.Error("The parameter 'filters' cannot be null.");
+    else if (filters !== undefined)
+      filters &&
+        filters.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'Filters[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (entityType !== undefined && entityType !== null)
+      url_ += 'EntityType=' + encodeURIComponent('' + entityType) + '&';
+    if (availableFields !== undefined && availableFields !== null)
+      availableFields &&
+        availableFields.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'AvailableFields[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (hasFilters === null)
+      throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+    else if (hasFilters !== undefined)
+      url_ += 'HasFilters=' + encodeURIComponent('' + hasFilters) + '&';
+    if (hasSearch === null) throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+    else if (hasSearch !== undefined)
+      url_ += 'HasSearch=' + encodeURIComponent('' + hasSearch) + '&';
+    if (hasSorting === null)
+      throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+    else if (hasSorting !== undefined)
+      url_ += 'HasSorting=' + encodeURIComponent('' + hasSorting) + '&';
+    if (fromDate === null) throw new globalThis.Error("The parameter 'fromDate' cannot be null.");
+    else if (fromDate !== undefined)
+      url_ += 'fromDate=' + encodeURIComponent(fromDate ? '' + fromDate.toISOString() : '') + '&';
+    if (toDate === null) throw new globalThis.Error("The parameter 'toDate' cannot be null.");
+    else if (toDate !== undefined)
+      url_ += 'toDate=' + encodeURIComponent(toDate ? '' + toDate.toISOString() : '') + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetByDateRange(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetByDateRange(response_ as any);
+            } catch (e) {
+              return _observableThrow(
+                e
+              ) as any as Observable<ResultOfPagedResultOfAbandonedCartDto>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfPagedResultOfAbandonedCartDto>;
+        })
+      );
+  }
+
+  protected processGetByDateRange(
+    response: HttpResponseBase
+  ): Observable<ResultOfPagedResultOfAbandonedCartDto> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfPagedResultOfAbandonedCartDto.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  markAsNotified(abandonedCartId: string): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/AbandonedCart/notified/{abandonedCartId}';
+    if (abandonedCartId === undefined || abandonedCartId === null)
+      throw new globalThis.Error("The parameter 'abandonedCartId' must be defined.");
+    url_ = url_.replace('{abandonedCartId}', encodeURIComponent('' + abandonedCartId));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('put', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processMarkAsNotified(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processMarkAsNotified(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processMarkAsNotified(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  markBatchAsNotified(request: MarkCartsNotifiedRequest): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/AbandonedCart/notified/batch';
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = JSON.stringify(request);
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('put', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processMarkBatchAsNotified(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processMarkBatchAsNotified(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processMarkBatchAsNotified(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+}
+
+@Injectable({
+  providedIn: 'root',
+})
 export class AuditLogClient {
   private http: HttpClient;
   private baseUrl: string;
@@ -2467,83 +2937,6 @@ export class CartClient {
     return _observableOf(null as any);
   }
 
-  createShoppingCart(userId: string): Observable<ResultOfShoppingCartDto> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processCreateShoppingCart(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processCreateShoppingCart(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfShoppingCartDto>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfShoppingCartDto>;
-        })
-      );
-  }
-
-  protected processCreateShoppingCart(
-    response: HttpResponseBase
-  ): Observable<ResultOfShoppingCartDto> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfShoppingCartDto.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
   clearShoppingCart(userId: string): Observable<ResultOfBoolean> {
     let url_ = this.baseUrl + '/api/Cart/users/{userId}';
     if (userId === undefined || userId === null)
@@ -2601,156 +2994,6 @@ export class CartClient {
           let resultData200 =
             _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
           result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  getCartTotal(userId: string): Observable<ResultOfDecimal> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/total';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('get', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processGetCartTotal(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processGetCartTotal(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfDecimal>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfDecimal>;
-        })
-      );
-  }
-
-  protected processGetCartTotal(response: HttpResponseBase): Observable<ResultOfDecimal> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfDecimal.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  getCartItemCount(userId: string): Observable<ResultOfInteger> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/count';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('get', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processGetCartItemCount(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processGetCartItemCount(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfInteger>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfInteger>;
-        })
-      );
-  }
-
-  protected processGetCartItemCount(response: HttpResponseBase): Observable<ResultOfInteger> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfInteger.fromJS(resultData200);
           return _observableOf(result200);
         })
       );
@@ -2844,87 +3087,7 @@ export class CartClient {
     return _observableOf(null as any);
   }
 
-  getShoppingCartItems(userId: string): Observable<ResultOfListOfShoppingCartItemDto> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/items';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('get', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processGetShoppingCartItems(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processGetShoppingCartItems(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfListOfShoppingCartItemDto>;
-            }
-          } else
-            return _observableThrow(
-              response_
-            ) as any as Observable<ResultOfListOfShoppingCartItemDto>;
-        })
-      );
-  }
-
-  protected processGetShoppingCartItems(
-    response: HttpResponseBase
-  ): Observable<ResultOfListOfShoppingCartItemDto> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfListOfShoppingCartItemDto.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  addItemToCart(request: AddToCartRequest): Observable<ResultOfShoppingCartItemDto> {
+  addItemToCart(request: AddToCartRequest): Observable<ResultOfBoolean> {
     let url_ = this.baseUrl + '/api/Cart/items';
     url_ = url_.replace(/[?&]$/, '');
 
@@ -2953,17 +3116,14 @@ export class CartClient {
             try {
               return this.processAddItemToCart(response_ as any);
             } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfShoppingCartItemDto>;
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
             }
-          } else
-            return _observableThrow(response_) as any as Observable<ResultOfShoppingCartItemDto>;
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         })
       );
   }
 
-  protected processAddItemToCart(
-    response: HttpResponseBase
-  ): Observable<ResultOfShoppingCartItemDto> {
+  protected processAddItemToCart(response: HttpResponseBase): Observable<ResultOfBoolean> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -2984,7 +3144,7 @@ export class CartClient {
           let result200: any = null;
           let resultData200 =
             _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfShoppingCartItemDto.fromJS(resultData200);
+          result200 = ResultOfBoolean.fromJS(resultData200);
           return _observableOf(result200);
         })
       );
@@ -3085,21 +3245,17 @@ export class CartClient {
     return _observableOf(null as any);
   }
 
-  removeItemFromCart(itemId: string, request: RemoveItemRequest): Observable<ResultOfBoolean> {
+  removeItemFromCart(itemId: string): Observable<ResultOfBoolean> {
     let url_ = this.baseUrl + '/api/Cart/items/{itemId}';
     if (itemId === undefined || itemId === null)
       throw new globalThis.Error("The parameter 'itemId' must be defined.");
     url_ = url_.replace('{itemId}', encodeURIComponent('' + itemId));
     url_ = url_.replace(/[?&]$/, '');
 
-    const content_ = JSON.stringify(request);
-
     let options_: any = {
-      body: content_,
       observe: 'response',
       responseType: 'blob',
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
         Accept: 'application/json',
       }),
     };
@@ -3125,165 +3281,6 @@ export class CartClient {
   }
 
   protected processRemoveItemFromCart(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  removeItemByProduct(
-    userId: string,
-    productId: string,
-    variantId: string | null | undefined
-  ): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/products/{productId}?';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    if (productId === undefined || productId === null)
-      throw new globalThis.Error("The parameter 'productId' must be defined.");
-    url_ = url_.replace('{productId}', encodeURIComponent('' + productId));
-    if (variantId !== undefined && variantId !== null)
-      url_ += 'variantId=' + encodeURIComponent('' + variantId) + '&';
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('delete', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processRemoveItemByProduct(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processRemoveItemByProduct(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processRemoveItemByProduct(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  validateCartItems(userId: string): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/validate';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processValidateCartItems(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processValidateCartItems(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processValidateCartItems(response: HttpResponseBase): Observable<ResultOfBoolean> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -3398,86 +3395,80 @@ export class CartClient {
     return _observableOf(null as any);
   }
 
-  createWishlist(userId: string): Observable<ResultOfWishlistDto> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist';
+  getWishlistItems(
+    userId: string,
+    page: number | undefined,
+    pageSize: number | undefined,
+    search: string | null | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: SortDirection | undefined,
+    filters: FilterCriteria[] | undefined,
+    entityType: string | null | undefined,
+    availableFields: SearchableField[] | null | undefined,
+    hasFilters: boolean | undefined,
+    hasSearch: boolean | undefined,
+    hasSorting: boolean | undefined
+  ): Observable<ResultOfPagedResultOfWishlistItemDto> {
+    let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist/items?';
     if (userId === undefined || userId === null)
       throw new globalThis.Error("The parameter 'userId' must be defined.");
     url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processCreateWishlist(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processCreateWishlist(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfWishlistDto>;
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'Page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'PageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (search !== undefined && search !== null)
+      url_ += 'Search=' + encodeURIComponent('' + search) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'SortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection === null)
+      throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+    else if (sortDirection !== undefined)
+      url_ += 'SortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    if (filters === null) throw new globalThis.Error("The parameter 'filters' cannot be null.");
+    else if (filters !== undefined)
+      filters &&
+        filters.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'Filters[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
             }
-          } else return _observableThrow(response_) as any as Observable<ResultOfWishlistDto>;
-        })
-      );
-  }
-
-  protected processCreateWishlist(response: HttpResponseBase): Observable<ResultOfWishlistDto> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfWishlistDto.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  getWishlistItems(userId: string): Observable<ResultOfListOfWishlistItemDto> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist/items';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
+        });
+    if (entityType !== undefined && entityType !== null)
+      url_ += 'EntityType=' + encodeURIComponent('' + entityType) + '&';
+    if (availableFields !== undefined && availableFields !== null)
+      availableFields &&
+        availableFields.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'AvailableFields[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (hasFilters === null)
+      throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+    else if (hasFilters !== undefined)
+      url_ += 'HasFilters=' + encodeURIComponent('' + hasFilters) + '&';
+    if (hasSearch === null) throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+    else if (hasSearch !== undefined)
+      url_ += 'HasSearch=' + encodeURIComponent('' + hasSearch) + '&';
+    if (hasSorting === null)
+      throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+    else if (hasSorting !== undefined)
+      url_ += 'HasSorting=' + encodeURIComponent('' + hasSorting) + '&';
     url_ = url_.replace(/[?&]$/, '');
 
     let options_: any = {
@@ -3501,17 +3492,19 @@ export class CartClient {
             try {
               return this.processGetWishlistItems(response_ as any);
             } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfListOfWishlistItemDto>;
+              return _observableThrow(e) as any as Observable<ResultOfPagedResultOfWishlistItemDto>;
             }
           } else
-            return _observableThrow(response_) as any as Observable<ResultOfListOfWishlistItemDto>;
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfPagedResultOfWishlistItemDto>;
         })
       );
   }
 
   protected processGetWishlistItems(
     response: HttpResponseBase
-  ): Observable<ResultOfListOfWishlistItemDto> {
+  ): Observable<ResultOfPagedResultOfWishlistItemDto> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -3532,7 +3525,7 @@ export class CartClient {
           let result200: any = null;
           let resultData200 =
             _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfListOfWishlistItemDto.fromJS(resultData200);
+          result200 = ResultOfPagedResultOfWishlistItemDto.fromJS(resultData200);
           return _observableOf(result200);
         })
       );
@@ -3551,10 +3544,7 @@ export class CartClient {
     return _observableOf(null as any);
   }
 
-  addItemToWishlist(
-    userId: string,
-    request: AddToWishlistRequest
-  ): Observable<ResultOfWishlistItemDto> {
+  addItemToWishlist(userId: string, request: AddToWishlistRequest): Observable<ResultOfBoolean> {
     let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist/items';
     if (userId === undefined || userId === null)
       throw new globalThis.Error("The parameter 'userId' must be defined.");
@@ -3586,16 +3576,14 @@ export class CartClient {
             try {
               return this.processAddItemToWishlist(response_ as any);
             } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfWishlistItemDto>;
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
             }
-          } else return _observableThrow(response_) as any as Observable<ResultOfWishlistItemDto>;
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         })
       );
   }
 
-  protected processAddItemToWishlist(
-    response: HttpResponseBase
-  ): Observable<ResultOfWishlistItemDto> {
+  protected processAddItemToWishlist(response: HttpResponseBase): Observable<ResultOfBoolean> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -3616,7 +3604,7 @@ export class CartClient {
           let result200: any = null;
           let resultData200 =
             _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfWishlistItemDto.fromJS(resultData200);
+          result200 = ResultOfBoolean.fromJS(resultData200);
           return _observableOf(result200);
         })
       );
@@ -3674,645 +3662,6 @@ export class CartClient {
   }
 
   protected processRemoveItemFromWishlist(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  removeItemByProductFromWishlist(
-    userId: string,
-    productId: string,
-    variantId: string | null | undefined
-  ): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist/products/{productId}?';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    if (productId === undefined || productId === null)
-      throw new globalThis.Error("The parameter 'productId' must be defined.");
-    url_ = url_.replace('{productId}', encodeURIComponent('' + productId));
-    if (variantId !== undefined && variantId !== null)
-      url_ += 'variantId=' + encodeURIComponent('' + variantId) + '&';
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('delete', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processRemoveItemByProductFromWishlist(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processRemoveItemByProductFromWishlist(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processRemoveItemByProductFromWishlist(
-    response: HttpResponseBase
-  ): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  isProductInWishlist(
-    userId: string,
-    productId: string,
-    variantId: string | null | undefined
-  ): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist/products/{productId}/check?';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    if (productId === undefined || productId === null)
-      throw new globalThis.Error("The parameter 'productId' must be defined.");
-    url_ = url_.replace('{productId}', encodeURIComponent('' + productId));
-    if (variantId !== undefined && variantId !== null)
-      url_ += 'variantId=' + encodeURIComponent('' + variantId) + '&';
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('get', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processIsProductInWishlist(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processIsProductInWishlist(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processIsProductInWishlist(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  moveItemToCart(
-    userId: string,
-    itemId: string,
-    request: MoveToCartRequest
-  ): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/wishlist/items/{itemId}/move-to-cart';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    if (itemId === undefined || itemId === null)
-      throw new globalThis.Error("The parameter 'itemId' must be defined.");
-    url_ = url_.replace('{itemId}', encodeURIComponent('' + itemId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    const content_ = JSON.stringify(request);
-
-    let options_: any = {
-      body: content_,
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processMoveItemToCart(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processMoveItemToCart(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processMoveItemToCart(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  mergeCarts(userId: string, request: MergeCartsRequest): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/merge';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    const content_ = JSON.stringify(request);
-
-    let options_: any = {
-      body: content_,
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processMergeCarts(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processMergeCarts(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processMergeCarts(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  applyCoupon(userId: string, request: ApplyCouponRequest): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/coupon';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    const content_ = JSON.stringify(request);
-
-    let options_: any = {
-      body: content_,
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processApplyCoupon(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processApplyCoupon(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processApplyCoupon(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  removeCoupon(userId: string): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/coupon';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('delete', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processRemoveCoupon(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processRemoveCoupon(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processRemoveCoupon(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  saveCartForLater(userId: string): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/save-for-later';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processSaveCartForLater(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processSaveCartForLater(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processSaveCartForLater(response: HttpResponseBase): Observable<ResultOfBoolean> {
-    const status = response.status;
-    const responseBlob =
-      response instanceof HttpResponse
-        ? response.body
-        : (response as any).error instanceof Blob
-        ? (response as any).error
-        : undefined;
-
-    let _headers: any = {};
-    if (response.headers) {
-      for (let key of response.headers.keys()) {
-        _headers[key] = response.headers.get(key);
-      }
-    }
-    if (status === 200) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          let result200: any = null;
-          let resultData200 =
-            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
-          return _observableOf(result200);
-        })
-      );
-    } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(
-        _observableMergeMap((_responseText: string) => {
-          return throwException(
-            'An unexpected server error occurred.',
-            status,
-            _responseText,
-            _headers
-          );
-        })
-      );
-    }
-    return _observableOf(null as any);
-  }
-
-  restoreSavedCart(userId: string): Observable<ResultOfBoolean> {
-    let url_ = this.baseUrl + '/api/Cart/users/{userId}/restore';
-    if (userId === undefined || userId === null)
-      throw new globalThis.Error("The parameter 'userId' must be defined.");
-    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
-    url_ = url_.replace(/[?&]$/, '');
-
-    let options_: any = {
-      observe: 'response',
-      responseType: 'blob',
-      headers: new HttpHeaders({
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .request('post', url_, options_)
-      .pipe(
-        _observableMergeMap((response_: any) => {
-          return this.processRestoreSavedCart(response_);
-        })
-      )
-      .pipe(
-        _observableCatch((response_: any) => {
-          if (response_ instanceof HttpResponseBase) {
-            try {
-              return this.processRestoreSavedCart(response_ as any);
-            } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
-            }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
-        })
-      );
-  }
-
-  protected processRestoreSavedCart(response: HttpResponseBase): Observable<ResultOfBoolean> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -8972,6 +8321,1017 @@ export class ProductClient {
     }
     return _observableOf(null as any);
   }
+
+  getById(productId: string): Observable<ResultOfGetProductByIdResponse> {
+    let url_ = this.baseUrl + '/api/Product/{productId}';
+    if (productId === undefined || productId === null)
+      throw new globalThis.Error("The parameter 'productId' must be defined.");
+    url_ = url_.replace('{productId}', encodeURIComponent('' + productId));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetById(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetById(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfGetProductByIdResponse>;
+            }
+          } else
+            return _observableThrow(response_) as any as Observable<ResultOfGetProductByIdResponse>;
+        })
+      );
+  }
+
+  protected processGetById(response: HttpResponseBase): Observable<ResultOfGetProductByIdResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfGetProductByIdResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  delete(productId: string): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/Product/{productId}';
+    if (productId === undefined || productId === null)
+      throw new globalThis.Error("The parameter 'productId' must be defined.");
+    url_ = url_.replace('{productId}', encodeURIComponent('' + productId));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('delete', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processDelete(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processDelete(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processDelete(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getBySku(sku: string): Observable<ResultOfGetProductBySkuResponse> {
+    let url_ = this.baseUrl + '/api/Product/sku/{sku}';
+    if (sku === undefined || sku === null)
+      throw new globalThis.Error("The parameter 'sku' must be defined.");
+    url_ = url_.replace('{sku}', encodeURIComponent('' + sku));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetBySku(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetBySku(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfGetProductBySkuResponse>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfGetProductBySkuResponse>;
+        })
+      );
+  }
+
+  protected processGetBySku(
+    response: HttpResponseBase
+  ): Observable<ResultOfGetProductBySkuResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfGetProductBySkuResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getBySlug(slug: string): Observable<ResultOfGetProductBySlugResponse> {
+    let url_ = this.baseUrl + '/api/Product/slug/{slug}';
+    if (slug === undefined || slug === null)
+      throw new globalThis.Error("The parameter 'slug' must be defined.");
+    url_ = url_.replace('{slug}', encodeURIComponent('' + slug));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetBySlug(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetBySlug(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfGetProductBySlugResponse>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfGetProductBySlugResponse>;
+        })
+      );
+  }
+
+  protected processGetBySlug(
+    response: HttpResponseBase
+  ): Observable<ResultOfGetProductBySlugResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfGetProductBySlugResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  updateWithFiles(
+    productId: string | undefined,
+    name: string | undefined,
+    slug: string | null | undefined,
+    sku: string | undefined,
+    description: string | undefined,
+    shortDescription: string | null | undefined,
+    price: number | undefined,
+    discountPrice: number | null | undefined,
+    cost: number | null | undefined,
+    stockQuantity: number | undefined,
+    minStockLevel: number | undefined,
+    weight: number | null | undefined,
+    dimensions: string | null | undefined,
+    categoryId: string | undefined,
+    brandId: string | null | undefined,
+    status: number | undefined,
+    isFeatured: boolean | undefined,
+    isDigital: boolean | undefined,
+    metaTitle: string | null | undefined,
+    metaDescription: string | null | undefined,
+    newImageFiles: FileParameter[] | null | undefined,
+    newImageAltTexts: string[] | null | undefined,
+    newImageDisplayOrders: number[] | null | undefined,
+    newImageIsPrimary: boolean[] | null | undefined,
+    imageIdsToDelete: string[] | null | undefined,
+    variants: CreateProductVariantRequest[] | null | undefined,
+    attributes: CreateProductAttributeValueRequest[] | null | undefined,
+    tagIds: string[] | null | undefined
+  ): Observable<ResultOfUpdateProductResponse> {
+    let url_ = this.baseUrl + '/api/Product/update';
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = new FormData();
+    if (productId === null || productId === undefined)
+      throw new globalThis.Error("The parameter 'productId' cannot be null.");
+    else content_.append('ProductId', productId.toString());
+    if (name === null || name === undefined)
+      throw new globalThis.Error("The parameter 'name' cannot be null.");
+    else content_.append('Name', name.toString());
+    if (slug !== null && slug !== undefined) content_.append('Slug', slug.toString());
+    if (sku === null || sku === undefined)
+      throw new globalThis.Error("The parameter 'sku' cannot be null.");
+    else content_.append('Sku', sku.toString());
+    if (description === null || description === undefined)
+      throw new globalThis.Error("The parameter 'description' cannot be null.");
+    else content_.append('Description', description.toString());
+    if (shortDescription !== null && shortDescription !== undefined)
+      content_.append('ShortDescription', shortDescription.toString());
+    if (price === null || price === undefined)
+      throw new globalThis.Error("The parameter 'price' cannot be null.");
+    else content_.append('Price', price.toString());
+    if (discountPrice !== null && discountPrice !== undefined)
+      content_.append('DiscountPrice', discountPrice.toString());
+    if (cost !== null && cost !== undefined) content_.append('Cost', cost.toString());
+    if (stockQuantity === null || stockQuantity === undefined)
+      throw new globalThis.Error("The parameter 'stockQuantity' cannot be null.");
+    else content_.append('StockQuantity', stockQuantity.toString());
+    if (minStockLevel === null || minStockLevel === undefined)
+      throw new globalThis.Error("The parameter 'minStockLevel' cannot be null.");
+    else content_.append('MinStockLevel', minStockLevel.toString());
+    if (weight !== null && weight !== undefined) content_.append('Weight', weight.toString());
+    if (dimensions !== null && dimensions !== undefined)
+      content_.append('Dimensions', dimensions.toString());
+    if (categoryId === null || categoryId === undefined)
+      throw new globalThis.Error("The parameter 'categoryId' cannot be null.");
+    else content_.append('CategoryId', categoryId.toString());
+    if (brandId !== null && brandId !== undefined) content_.append('BrandId', brandId.toString());
+    if (status === null || status === undefined)
+      throw new globalThis.Error("The parameter 'status' cannot be null.");
+    else content_.append('Status', status.toString());
+    if (isFeatured === null || isFeatured === undefined)
+      throw new globalThis.Error("The parameter 'isFeatured' cannot be null.");
+    else content_.append('IsFeatured', isFeatured.toString());
+    if (isDigital === null || isDigital === undefined)
+      throw new globalThis.Error("The parameter 'isDigital' cannot be null.");
+    else content_.append('IsDigital', isDigital.toString());
+    if (metaTitle !== null && metaTitle !== undefined)
+      content_.append('MetaTitle', metaTitle.toString());
+    if (metaDescription !== null && metaDescription !== undefined)
+      content_.append('MetaDescription', metaDescription.toString());
+    if (newImageFiles !== null && newImageFiles !== undefined)
+      newImageFiles.forEach((item_) =>
+        content_.append(
+          'NewImageFiles',
+          item_.data,
+          item_.fileName ? item_.fileName : 'NewImageFiles'
+        )
+      );
+    if (newImageAltTexts !== null && newImageAltTexts !== undefined)
+      newImageAltTexts.forEach((item_) => content_.append('NewImageAltTexts', item_.toString()));
+    if (newImageDisplayOrders !== null && newImageDisplayOrders !== undefined)
+      newImageDisplayOrders.forEach((item_) =>
+        content_.append('NewImageDisplayOrders', item_.toString())
+      );
+    if (newImageIsPrimary !== null && newImageIsPrimary !== undefined)
+      newImageIsPrimary.forEach((item_) => content_.append('NewImageIsPrimary', item_.toString()));
+    if (imageIdsToDelete !== null && imageIdsToDelete !== undefined)
+      imageIdsToDelete.forEach((item_) => content_.append('ImageIdsToDelete', item_.toString()));
+    if (variants !== null && variants !== undefined)
+      variants.forEach((item_) => content_.append('Variants', item_.toString()));
+    if (attributes !== null && attributes !== undefined)
+      attributes.forEach((item_) => content_.append('Attributes', item_.toString()));
+    if (tagIds !== null && tagIds !== undefined)
+      tagIds.forEach((item_) => content_.append('TagIds', item_.toString()));
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('put', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processUpdateWithFiles(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processUpdateWithFiles(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfUpdateProductResponse>;
+            }
+          } else
+            return _observableThrow(response_) as any as Observable<ResultOfUpdateProductResponse>;
+        })
+      );
+  }
+
+  protected processUpdateWithFiles(
+    response: HttpResponseBase
+  ): Observable<ResultOfUpdateProductResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfUpdateProductResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  update(command: UpdateProductCommand): Observable<ResultOfUpdateProductResponse> {
+    let url_ = this.baseUrl + '/api/Product/update-simple';
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = JSON.stringify(command);
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('put', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processUpdate(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processUpdate(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfUpdateProductResponse>;
+            }
+          } else
+            return _observableThrow(response_) as any as Observable<ResultOfUpdateProductResponse>;
+        })
+      );
+  }
+
+  protected processUpdate(response: HttpResponseBase): Observable<ResultOfUpdateProductResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfUpdateProductResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  updateStatus(command: UpdateProductStatusCommand): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/Product/update-status';
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = JSON.stringify(command);
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('put', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processUpdateStatus(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processUpdateStatus(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processUpdateStatus(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  updateStock(command: UpdateProductStockCommand): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/Product/update-stock';
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = JSON.stringify(command);
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('put', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processUpdateStock(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processUpdateStock(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processUpdateStock(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getFeatured(
+    page: number | undefined,
+    pageSize: number | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: string | null | undefined
+  ): Observable<ResultOfGetFeaturedProductsResponse> {
+    let url_ = this.baseUrl + '/api/Product/featured?';
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'pageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'sortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection !== undefined && sortDirection !== null)
+      url_ += 'sortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetFeatured(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetFeatured(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfGetFeaturedProductsResponse>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfGetFeaturedProductsResponse>;
+        })
+      );
+  }
+
+  protected processGetFeatured(
+    response: HttpResponseBase
+  ): Observable<ResultOfGetFeaturedProductsResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfGetFeaturedProductsResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getActive(
+    page: number | undefined,
+    pageSize: number | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: string | null | undefined
+  ): Observable<ResultOfGetActiveProductsResponse> {
+    let url_ = this.baseUrl + '/api/Product/active?';
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'pageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'sortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection !== undefined && sortDirection !== null)
+      url_ += 'sortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetActive(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetActive(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfGetActiveProductsResponse>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfGetActiveProductsResponse>;
+        })
+      );
+  }
+
+  protected processGetActive(
+    response: HttpResponseBase
+  ): Observable<ResultOfGetActiveProductsResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfGetActiveProductsResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  search(
+    searchTerm: string | null | undefined,
+    categoryId: string | null | undefined,
+    brandId: string | null | undefined,
+    minPrice: number | null | undefined,
+    maxPrice: number | null | undefined,
+    isFeatured: boolean | null | undefined,
+    isActive: boolean | null | undefined,
+    tagIds: string[] | null | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: string | null | undefined,
+    page: number | undefined,
+    pageSize: number | undefined
+  ): Observable<ResultOfSearchProductsResponse> {
+    let url_ = this.baseUrl + '/api/Product/search?';
+    if (searchTerm !== undefined && searchTerm !== null)
+      url_ += 'searchTerm=' + encodeURIComponent('' + searchTerm) + '&';
+    if (categoryId !== undefined && categoryId !== null)
+      url_ += 'categoryId=' + encodeURIComponent('' + categoryId) + '&';
+    if (brandId !== undefined && brandId !== null)
+      url_ += 'brandId=' + encodeURIComponent('' + brandId) + '&';
+    if (minPrice !== undefined && minPrice !== null)
+      url_ += 'minPrice=' + encodeURIComponent('' + minPrice) + '&';
+    if (maxPrice !== undefined && maxPrice !== null)
+      url_ += 'maxPrice=' + encodeURIComponent('' + maxPrice) + '&';
+    if (isFeatured !== undefined && isFeatured !== null)
+      url_ += 'isFeatured=' + encodeURIComponent('' + isFeatured) + '&';
+    if (isActive !== undefined && isActive !== null)
+      url_ += 'isActive=' + encodeURIComponent('' + isActive) + '&';
+    if (tagIds !== undefined && tagIds !== null)
+      tagIds &&
+        tagIds.forEach((item) => {
+          url_ += 'tagIds=' + encodeURIComponent('' + item) + '&';
+        });
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'sortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection !== undefined && sortDirection !== null)
+      url_ += 'sortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'pageSize=' + encodeURIComponent('' + pageSize) + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processSearch(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processSearch(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfSearchProductsResponse>;
+            }
+          } else
+            return _observableThrow(response_) as any as Observable<ResultOfSearchProductsResponse>;
+        })
+      );
+  }
+
+  protected processSearch(response: HttpResponseBase): Observable<ResultOfSearchProductsResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfSearchProductsResponse.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
 }
 
 @Injectable({
@@ -11960,6 +12320,1064 @@ export class ProductVariantClient {
     }
     return _observableOf(null as any);
   }
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class WishlistClient {
+  private http: HttpClient;
+  private baseUrl: string;
+  protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+  constructor(
+    @Inject(HttpClient) http: HttpClient,
+    @Optional() @Inject(API_BASE_URL) baseUrl?: string
+  ) {
+    this.http = http;
+    this.baseUrl = baseUrl ?? 'https://localhost:44394';
+  }
+
+  getWishlist(userId: string): Observable<ResultOfWishlistDto> {
+    let url_ = this.baseUrl + '/api/Wishlist/users/{userId}';
+    if (userId === undefined || userId === null)
+      throw new globalThis.Error("The parameter 'userId' must be defined.");
+    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetWishlist(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetWishlist(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfWishlistDto>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfWishlistDto>;
+        })
+      );
+  }
+
+  protected processGetWishlist(response: HttpResponseBase): Observable<ResultOfWishlistDto> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfWishlistDto.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  addItem(userId: string, request: AddToWishlistRequest): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/Wishlist/users/{userId}/items';
+    if (userId === undefined || userId === null)
+      throw new globalThis.Error("The parameter 'userId' must be defined.");
+    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = JSON.stringify(request);
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('post', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processAddItem(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processAddItem(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processAddItem(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getUserWishlistItems(
+    userId: string,
+    page: number | undefined,
+    pageSize: number | undefined,
+    search: string | null | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: SortDirection | undefined,
+    filters: FilterCriteria[] | undefined,
+    entityType: string | null | undefined,
+    availableFields: SearchableField[] | null | undefined,
+    hasFilters: boolean | undefined,
+    hasSearch: boolean | undefined,
+    hasSorting: boolean | undefined
+  ): Observable<ResultOfPagedResultOfWishlistItemDto> {
+    let url_ = this.baseUrl + '/api/Wishlist/users/{userId}/items?';
+    if (userId === undefined || userId === null)
+      throw new globalThis.Error("The parameter 'userId' must be defined.");
+    url_ = url_.replace('{userId}', encodeURIComponent('' + userId));
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'Page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'PageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (search !== undefined && search !== null)
+      url_ += 'Search=' + encodeURIComponent('' + search) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'SortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection === null)
+      throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+    else if (sortDirection !== undefined)
+      url_ += 'SortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    if (filters === null) throw new globalThis.Error("The parameter 'filters' cannot be null.");
+    else if (filters !== undefined)
+      filters &&
+        filters.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'Filters[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (entityType !== undefined && entityType !== null)
+      url_ += 'EntityType=' + encodeURIComponent('' + entityType) + '&';
+    if (availableFields !== undefined && availableFields !== null)
+      availableFields &&
+        availableFields.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'AvailableFields[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (hasFilters === null)
+      throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+    else if (hasFilters !== undefined)
+      url_ += 'HasFilters=' + encodeURIComponent('' + hasFilters) + '&';
+    if (hasSearch === null) throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+    else if (hasSearch !== undefined)
+      url_ += 'HasSearch=' + encodeURIComponent('' + hasSearch) + '&';
+    if (hasSorting === null)
+      throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+    else if (hasSorting !== undefined)
+      url_ += 'HasSorting=' + encodeURIComponent('' + hasSorting) + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetUserWishlistItems(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetUserWishlistItems(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfPagedResultOfWishlistItemDto>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfPagedResultOfWishlistItemDto>;
+        })
+      );
+  }
+
+  protected processGetUserWishlistItems(
+    response: HttpResponseBase
+  ): Observable<ResultOfPagedResultOfWishlistItemDto> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfPagedResultOfWishlistItemDto.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  removeItem(itemId: string): Observable<ResultOfBoolean> {
+    let url_ = this.baseUrl + '/api/Wishlist/items/{itemId}';
+    if (itemId === undefined || itemId === null)
+      throw new globalThis.Error("The parameter 'itemId' must be defined.");
+    url_ = url_.replace('{itemId}', encodeURIComponent('' + itemId));
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('delete', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processRemoveItem(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processRemoveItem(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+            }
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        })
+      );
+  }
+
+  protected processRemoveItem(response: HttpResponseBase): Observable<ResultOfBoolean> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfBoolean.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+
+  getWishlistItems(
+    wishlistId: string,
+    page: number | undefined,
+    pageSize: number | undefined,
+    search: string | null | undefined,
+    sortBy: string | null | undefined,
+    sortDirection: SortDirection | undefined,
+    filters: FilterCriteria[] | undefined,
+    entityType: string | null | undefined,
+    availableFields: SearchableField[] | null | undefined,
+    hasFilters: boolean | undefined,
+    hasSearch: boolean | undefined,
+    hasSorting: boolean | undefined
+  ): Observable<ResultOfPagedResultOfWishlistItemDto> {
+    let url_ = this.baseUrl + '/api/Wishlist/wishlists/{wishlistId}/items?';
+    if (wishlistId === undefined || wishlistId === null)
+      throw new globalThis.Error("The parameter 'wishlistId' must be defined.");
+    url_ = url_.replace('{wishlistId}', encodeURIComponent('' + wishlistId));
+    if (page === null) throw new globalThis.Error("The parameter 'page' cannot be null.");
+    else if (page !== undefined) url_ += 'Page=' + encodeURIComponent('' + page) + '&';
+    if (pageSize === null) throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+    else if (pageSize !== undefined) url_ += 'PageSize=' + encodeURIComponent('' + pageSize) + '&';
+    if (search !== undefined && search !== null)
+      url_ += 'Search=' + encodeURIComponent('' + search) + '&';
+    if (sortBy !== undefined && sortBy !== null)
+      url_ += 'SortBy=' + encodeURIComponent('' + sortBy) + '&';
+    if (sortDirection === null)
+      throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+    else if (sortDirection !== undefined)
+      url_ += 'SortDirection=' + encodeURIComponent('' + sortDirection) + '&';
+    if (filters === null) throw new globalThis.Error("The parameter 'filters' cannot be null.");
+    else if (filters !== undefined)
+      filters &&
+        filters.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'Filters[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (entityType !== undefined && entityType !== null)
+      url_ += 'EntityType=' + encodeURIComponent('' + entityType) + '&';
+    if (availableFields !== undefined && availableFields !== null)
+      availableFields &&
+        availableFields.forEach((item, index) => {
+          for (const attr in item)
+            if (item.hasOwnProperty(attr)) {
+              url_ +=
+                'AvailableFields[' +
+                index +
+                '].' +
+                attr +
+                '=' +
+                encodeURIComponent('' + (item as any)[attr]) +
+                '&';
+            }
+        });
+    if (hasFilters === null)
+      throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+    else if (hasFilters !== undefined)
+      url_ += 'HasFilters=' + encodeURIComponent('' + hasFilters) + '&';
+    if (hasSearch === null) throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+    else if (hasSearch !== undefined)
+      url_ += 'HasSearch=' + encodeURIComponent('' + hasSearch) + '&';
+    if (hasSorting === null)
+      throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+    else if (hasSorting !== undefined)
+      url_ += 'HasSorting=' + encodeURIComponent('' + hasSorting) + '&';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        Accept: 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetWishlistItems(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetWishlistItems(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<ResultOfPagedResultOfWishlistItemDto>;
+            }
+          } else
+            return _observableThrow(
+              response_
+            ) as any as Observable<ResultOfPagedResultOfWishlistItemDto>;
+        })
+      );
+  }
+
+  protected processGetWishlistItems(
+    response: HttpResponseBase
+  ): Observable<ResultOfPagedResultOfWishlistItemDto> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = ResultOfPagedResultOfWishlistItemDto.fromJS(resultData200);
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
+}
+
+export class ResultOfPagedResultOfAbandonedCartDto
+  implements IResultOfPagedResultOfAbandonedCartDto
+{
+  isSuccess?: boolean;
+  data?: PagedResultOfAbandonedCartDto | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfPagedResultOfAbandonedCartDto) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data']
+        ? PagedResultOfAbandonedCartDto.fromJS(_data['data'])
+        : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfPagedResultOfAbandonedCartDto {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfPagedResultOfAbandonedCartDto();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfPagedResultOfAbandonedCartDto {
+  isSuccess?: boolean;
+  data?: PagedResultOfAbandonedCartDto | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class PagedResultOfAbandonedCartDto implements IPagedResultOfAbandonedCartDto {
+  items?: AbandonedCartDto[];
+  totalCount?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+
+  constructor(data?: IPagedResultOfAbandonedCartDto) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      if (Array.isArray(_data['items'])) {
+        this.items = [] as any;
+        for (let item of _data['items']) this.items!.push(AbandonedCartDto.fromJS(item));
+      }
+      this.totalCount = _data['totalCount'];
+      this.page = _data['page'];
+      this.pageSize = _data['pageSize'];
+      this.totalPages = _data['totalPages'];
+      this.hasPreviousPage = _data['hasPreviousPage'];
+      this.hasNextPage = _data['hasNextPage'];
+    }
+  }
+
+  static fromJS(data: any): PagedResultOfAbandonedCartDto {
+    data = typeof data === 'object' ? data : {};
+    let result = new PagedResultOfAbandonedCartDto();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    if (Array.isArray(this.items)) {
+      data['items'] = [];
+      for (let item of this.items) data['items'].push(item ? item.toJSON() : (undefined as any));
+    }
+    data['totalCount'] = this.totalCount;
+    data['page'] = this.page;
+    data['pageSize'] = this.pageSize;
+    data['totalPages'] = this.totalPages;
+    data['hasPreviousPage'] = this.hasPreviousPage;
+    data['hasNextPage'] = this.hasNextPage;
+    return data;
+  }
+}
+
+export interface IPagedResultOfAbandonedCartDto {
+  items?: AbandonedCartDto[];
+  totalCount?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}
+
+export class AbandonedCartDto implements IAbandonedCartDto {
+  abandonedCartId?: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
+  cartValue?: number;
+  itemCount?: number;
+  lastActivity?: Date;
+  createdAt?: Date;
+  recoveredAt?: Date | undefined;
+  isRecovered?: boolean;
+  items?: ShoppingCartItemDto[];
+
+  constructor(data?: IAbandonedCartDto) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.abandonedCartId = _data['abandonedCartId'];
+      this.userId = _data['userId'];
+      this.userEmail = _data['userEmail'];
+      this.userName = _data['userName'];
+      this.cartValue = _data['cartValue'];
+      this.itemCount = _data['itemCount'];
+      this.lastActivity = _data['lastActivity']
+        ? new Date(_data['lastActivity'].toString())
+        : (undefined as any);
+      this.createdAt = _data['createdAt']
+        ? new Date(_data['createdAt'].toString())
+        : (undefined as any);
+      this.recoveredAt = _data['recoveredAt']
+        ? new Date(_data['recoveredAt'].toString())
+        : (undefined as any);
+      this.isRecovered = _data['isRecovered'];
+      if (Array.isArray(_data['items'])) {
+        this.items = [] as any;
+        for (let item of _data['items']) this.items!.push(ShoppingCartItemDto.fromJS(item));
+      }
+    }
+  }
+
+  static fromJS(data: any): AbandonedCartDto {
+    data = typeof data === 'object' ? data : {};
+    let result = new AbandonedCartDto();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['abandonedCartId'] = this.abandonedCartId;
+    data['userId'] = this.userId;
+    data['userEmail'] = this.userEmail;
+    data['userName'] = this.userName;
+    data['cartValue'] = this.cartValue;
+    data['itemCount'] = this.itemCount;
+    data['lastActivity'] = this.lastActivity ? this.lastActivity.toISOString() : (undefined as any);
+    data['createdAt'] = this.createdAt ? this.createdAt.toISOString() : (undefined as any);
+    data['recoveredAt'] = this.recoveredAt ? this.recoveredAt.toISOString() : (undefined as any);
+    data['isRecovered'] = this.isRecovered;
+    if (Array.isArray(this.items)) {
+      data['items'] = [];
+      for (let item of this.items) data['items'].push(item ? item.toJSON() : (undefined as any));
+    }
+    return data;
+  }
+}
+
+export interface IAbandonedCartDto {
+  abandonedCartId?: string;
+  userId?: string;
+  userEmail?: string;
+  userName?: string;
+  cartValue?: number;
+  itemCount?: number;
+  lastActivity?: Date;
+  createdAt?: Date;
+  recoveredAt?: Date | undefined;
+  isRecovered?: boolean;
+  items?: ShoppingCartItemDto[];
+}
+
+export class ShoppingCartItemDto implements IShoppingCartItemDto {
+  cartItemId?: string;
+  cartId?: string;
+  productId?: string;
+  productName?: string;
+  productSku?: string;
+  productImageUrl?: string | undefined;
+  productVariantId?: string | undefined;
+  variantName?: string | undefined;
+  unitPrice?: number;
+  quantity?: number;
+  totalPrice?: number;
+  createdAt?: Date;
+  updatedAt?: Date | undefined;
+
+  constructor(data?: IShoppingCartItemDto) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.cartItemId = _data['cartItemId'];
+      this.cartId = _data['cartId'];
+      this.productId = _data['productId'];
+      this.productName = _data['productName'];
+      this.productSku = _data['productSku'];
+      this.productImageUrl = _data['productImageUrl'];
+      this.productVariantId = _data['productVariantId'];
+      this.variantName = _data['variantName'];
+      this.unitPrice = _data['unitPrice'];
+      this.quantity = _data['quantity'];
+      this.totalPrice = _data['totalPrice'];
+      this.createdAt = _data['createdAt']
+        ? new Date(_data['createdAt'].toString())
+        : (undefined as any);
+      this.updatedAt = _data['updatedAt']
+        ? new Date(_data['updatedAt'].toString())
+        : (undefined as any);
+    }
+  }
+
+  static fromJS(data: any): ShoppingCartItemDto {
+    data = typeof data === 'object' ? data : {};
+    let result = new ShoppingCartItemDto();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['cartItemId'] = this.cartItemId;
+    data['cartId'] = this.cartId;
+    data['productId'] = this.productId;
+    data['productName'] = this.productName;
+    data['productSku'] = this.productSku;
+    data['productImageUrl'] = this.productImageUrl;
+    data['productVariantId'] = this.productVariantId;
+    data['variantName'] = this.variantName;
+    data['unitPrice'] = this.unitPrice;
+    data['quantity'] = this.quantity;
+    data['totalPrice'] = this.totalPrice;
+    data['createdAt'] = this.createdAt ? this.createdAt.toISOString() : (undefined as any);
+    data['updatedAt'] = this.updatedAt ? this.updatedAt.toISOString() : (undefined as any);
+    return data;
+  }
+}
+
+export interface IShoppingCartItemDto {
+  cartItemId?: string;
+  cartId?: string;
+  productId?: string;
+  productName?: string;
+  productSku?: string;
+  productImageUrl?: string | undefined;
+  productVariantId?: string | undefined;
+  variantName?: string | undefined;
+  unitPrice?: number;
+  quantity?: number;
+  totalPrice?: number;
+  createdAt?: Date;
+  updatedAt?: Date | undefined;
+}
+
+export enum SortDirection {
+  Ascending = 'Ascending',
+  Descending = 'Descending',
+}
+
+export class FilterCriteria implements IFilterCriteria {
+  fieldName?: string;
+  value?: any;
+  operator?: FilterOperator;
+
+  constructor(data?: IFilterCriteria) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.fieldName = _data['fieldName'];
+      this.value = _data['value'];
+      this.operator = _data['operator'];
+    }
+  }
+
+  static fromJS(data: any): FilterCriteria {
+    data = typeof data === 'object' ? data : {};
+    let result = new FilterCriteria();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['fieldName'] = this.fieldName;
+    data['value'] = this.value;
+    data['operator'] = this.operator;
+    return data;
+  }
+}
+
+export interface IFilterCriteria {
+  fieldName?: string;
+  value?: any;
+  operator?: FilterOperator;
+}
+
+export enum FilterOperator {
+  Equals = 0,
+  NotEquals = 1,
+  Contains = 2,
+  NotContains = 3,
+  StartsWith = 4,
+  EndsWith = 5,
+  GreaterThan = 6,
+  GreaterThanOrEqual = 7,
+  LessThan = 8,
+  LessThanOrEqual = 9,
+  In = 10,
+  NotIn = 11,
+  IsNull = 12,
+  IsNotNull = 13,
+}
+
+export class SearchableField implements ISearchableField {
+  fieldName?: string;
+  fieldType?: string;
+  isSearchable?: boolean;
+  isSortable?: boolean;
+  isFilterable?: boolean;
+
+  constructor(data?: ISearchableField) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.fieldName = _data['fieldName'];
+      this.fieldType = _data['fieldType'];
+      this.isSearchable = _data['isSearchable'];
+      this.isSortable = _data['isSortable'];
+      this.isFilterable = _data['isFilterable'];
+    }
+  }
+
+  static fromJS(data: any): SearchableField {
+    data = typeof data === 'object' ? data : {};
+    let result = new SearchableField();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['fieldName'] = this.fieldName;
+    data['fieldType'] = this.fieldType;
+    data['isSearchable'] = this.isSearchable;
+    data['isSortable'] = this.isSortable;
+    data['isFilterable'] = this.isFilterable;
+    return data;
+  }
+}
+
+export interface ISearchableField {
+  fieldName?: string;
+  fieldType?: string;
+  isSearchable?: boolean;
+  isSortable?: boolean;
+  isFilterable?: boolean;
+}
+
+export class ResultOfBoolean implements IResultOfBoolean {
+  isSuccess?: boolean;
+  data?: boolean;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfBoolean) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data'];
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfBoolean {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfBoolean();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data;
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfBoolean {
+  isSuccess?: boolean;
+  data?: boolean;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class MarkCartsNotifiedRequest implements IMarkCartsNotifiedRequest {
+  abandonedCartIds?: string[];
+
+  constructor(data?: IMarkCartsNotifiedRequest) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      if (Array.isArray(_data['abandonedCartIds'])) {
+        this.abandonedCartIds = [] as any;
+        for (let item of _data['abandonedCartIds']) this.abandonedCartIds!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): MarkCartsNotifiedRequest {
+    data = typeof data === 'object' ? data : {};
+    let result = new MarkCartsNotifiedRequest();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    if (Array.isArray(this.abandonedCartIds)) {
+      data['abandonedCartIds'] = [];
+      for (let item of this.abandonedCartIds) data['abandonedCartIds'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IMarkCartsNotifiedRequest {
+  abandonedCartIds?: string[];
 }
 
 export class ResultOfPagedResultOfAuditLog implements IResultOfPagedResultOfAuditLog {
@@ -16128,71 +17546,6 @@ export interface IPagedRequest {
   hasSorting?: boolean;
 }
 
-export enum SortDirection {
-  Ascending = 'Ascending',
-  Descending = 'Descending',
-}
-
-export class FilterCriteria implements IFilterCriteria {
-  fieldName?: string;
-  value?: any;
-  operator?: FilterOperator;
-
-  constructor(data?: IFilterCriteria) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.fieldName = _data['fieldName'];
-      this.value = _data['value'];
-      this.operator = _data['operator'];
-    }
-  }
-
-  static fromJS(data: any): FilterCriteria {
-    data = typeof data === 'object' ? data : {};
-    let result = new FilterCriteria();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['fieldName'] = this.fieldName;
-    data['value'] = this.value;
-    data['operator'] = this.operator;
-    return data;
-  }
-}
-
-export interface IFilterCriteria {
-  fieldName?: string;
-  value?: any;
-  operator?: FilterOperator;
-}
-
-export enum FilterOperator {
-  Equals = 0,
-  NotEquals = 1,
-  Contains = 2,
-  NotContains = 3,
-  StartsWith = 4,
-  EndsWith = 5,
-  GreaterThan = 6,
-  GreaterThanOrEqual = 7,
-  LessThan = 8,
-  LessThanOrEqual = 9,
-  In = 10,
-  NotIn = 11,
-  IsNull = 12,
-  IsNotNull = 13,
-}
-
 export class ResultOfAuditLog implements IResultOfAuditLog {
   isSuccess?: boolean;
   data?: AuditLog;
@@ -16245,63 +17598,6 @@ export class ResultOfAuditLog implements IResultOfAuditLog {
 export interface IResultOfAuditLog {
   isSuccess?: boolean;
   data?: AuditLog;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-}
-
-export class ResultOfBoolean implements IResultOfBoolean {
-  isSuccess?: boolean;
-  data?: boolean;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-
-  constructor(data?: IResultOfBoolean) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.isSuccess = _data['isSuccess'];
-      this.data = _data['data'];
-      this.errorMessage = _data['errorMessage'];
-      this.errorCode = _data['errorCode'];
-      if (Array.isArray(_data['errors'])) {
-        this.errors = [] as any;
-        for (let item of _data['errors']) this.errors!.push(item);
-      }
-    }
-  }
-
-  static fromJS(data: any): ResultOfBoolean {
-    data = typeof data === 'object' ? data : {};
-    let result = new ResultOfBoolean();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['isSuccess'] = this.isSuccess;
-    data['data'] = this.data;
-    data['errorMessage'] = this.errorMessage;
-    data['errorCode'] = this.errorCode;
-    if (Array.isArray(this.errors)) {
-      data['errors'] = [];
-      for (let item of this.errors) data['errors'].push(item);
-    }
-    return data;
-  }
-}
-
-export interface IResultOfBoolean {
-  isSuccess?: boolean;
-  data?: boolean;
   errorMessage?: string | undefined;
   errorCode?: string | undefined;
   errors?: string[];
@@ -17003,57 +18299,6 @@ export interface IRefreshTokenCommand {
   refreshToken?: string;
 }
 
-export class SearchableField implements ISearchableField {
-  fieldName?: string;
-  fieldType?: string;
-  isSearchable?: boolean;
-  isSortable?: boolean;
-  isFilterable?: boolean;
-
-  constructor(data?: ISearchableField) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.fieldName = _data['fieldName'];
-      this.fieldType = _data['fieldType'];
-      this.isSearchable = _data['isSearchable'];
-      this.isSortable = _data['isSortable'];
-      this.isFilterable = _data['isFilterable'];
-    }
-  }
-
-  static fromJS(data: any): SearchableField {
-    data = typeof data === 'object' ? data : {};
-    let result = new SearchableField();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['fieldName'] = this.fieldName;
-    data['fieldType'] = this.fieldType;
-    data['isSearchable'] = this.isSearchable;
-    data['isSortable'] = this.isSortable;
-    data['isFilterable'] = this.isFilterable;
-    return data;
-  }
-}
-
-export interface ISearchableField {
-  fieldName?: string;
-  fieldType?: string;
-  isSearchable?: boolean;
-  isSortable?: boolean;
-  isFilterable?: boolean;
-}
-
 export class CreateBrandCommand implements ICreateBrandCommand {
   description?: string;
   logoUrl?: string;
@@ -17353,150 +18598,6 @@ export interface IShoppingCartDto {
   items?: ShoppingCartItemDto[];
 }
 
-export class ShoppingCartItemDto implements IShoppingCartItemDto {
-  cartItemId?: string;
-  cartId?: string;
-  productId?: string;
-  productName?: string;
-  productSku?: string;
-  productImageUrl?: string | undefined;
-  productVariantId?: string | undefined;
-  variantName?: string | undefined;
-  unitPrice?: number;
-  quantity?: number;
-  totalPrice?: number;
-  createdAt?: Date;
-  updatedAt?: Date | undefined;
-
-  constructor(data?: IShoppingCartItemDto) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.cartItemId = _data['cartItemId'];
-      this.cartId = _data['cartId'];
-      this.productId = _data['productId'];
-      this.productName = _data['productName'];
-      this.productSku = _data['productSku'];
-      this.productImageUrl = _data['productImageUrl'];
-      this.productVariantId = _data['productVariantId'];
-      this.variantName = _data['variantName'];
-      this.unitPrice = _data['unitPrice'];
-      this.quantity = _data['quantity'];
-      this.totalPrice = _data['totalPrice'];
-      this.createdAt = _data['createdAt']
-        ? new Date(_data['createdAt'].toString())
-        : (undefined as any);
-      this.updatedAt = _data['updatedAt']
-        ? new Date(_data['updatedAt'].toString())
-        : (undefined as any);
-    }
-  }
-
-  static fromJS(data: any): ShoppingCartItemDto {
-    data = typeof data === 'object' ? data : {};
-    let result = new ShoppingCartItemDto();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['cartItemId'] = this.cartItemId;
-    data['cartId'] = this.cartId;
-    data['productId'] = this.productId;
-    data['productName'] = this.productName;
-    data['productSku'] = this.productSku;
-    data['productImageUrl'] = this.productImageUrl;
-    data['productVariantId'] = this.productVariantId;
-    data['variantName'] = this.variantName;
-    data['unitPrice'] = this.unitPrice;
-    data['quantity'] = this.quantity;
-    data['totalPrice'] = this.totalPrice;
-    data['createdAt'] = this.createdAt ? this.createdAt.toISOString() : (undefined as any);
-    data['updatedAt'] = this.updatedAt ? this.updatedAt.toISOString() : (undefined as any);
-    return data;
-  }
-}
-
-export interface IShoppingCartItemDto {
-  cartItemId?: string;
-  cartId?: string;
-  productId?: string;
-  productName?: string;
-  productSku?: string;
-  productImageUrl?: string | undefined;
-  productVariantId?: string | undefined;
-  variantName?: string | undefined;
-  unitPrice?: number;
-  quantity?: number;
-  totalPrice?: number;
-  createdAt?: Date;
-  updatedAt?: Date | undefined;
-}
-
-export class ResultOfDecimal implements IResultOfDecimal {
-  isSuccess?: boolean;
-  data?: number;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-
-  constructor(data?: IResultOfDecimal) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.isSuccess = _data['isSuccess'];
-      this.data = _data['data'];
-      this.errorMessage = _data['errorMessage'];
-      this.errorCode = _data['errorCode'];
-      if (Array.isArray(_data['errors'])) {
-        this.errors = [] as any;
-        for (let item of _data['errors']) this.errors!.push(item);
-      }
-    }
-  }
-
-  static fromJS(data: any): ResultOfDecimal {
-    data = typeof data === 'object' ? data : {};
-    let result = new ResultOfDecimal();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['isSuccess'] = this.isSuccess;
-    data['data'] = this.data;
-    data['errorMessage'] = this.errorMessage;
-    data['errorCode'] = this.errorCode;
-    if (Array.isArray(this.errors)) {
-      data['errors'] = [];
-      for (let item of this.errors) data['errors'].push(item);
-    }
-    return data;
-  }
-}
-
-export interface IResultOfDecimal {
-  isSuccess?: boolean;
-  data?: number;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-}
-
 export class ResultOfCartSummaryDto implements IResultOfCartSummaryDto {
   isSuccess?: boolean;
   data?: CartSummaryDto | undefined;
@@ -17627,126 +18728,6 @@ export interface ICartSummaryDto {
   validationErrors?: string[];
 }
 
-export class ResultOfListOfShoppingCartItemDto implements IResultOfListOfShoppingCartItemDto {
-  isSuccess?: boolean;
-  data?: ShoppingCartItemDto[] | undefined;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-
-  constructor(data?: IResultOfListOfShoppingCartItemDto) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.isSuccess = _data['isSuccess'];
-      if (Array.isArray(_data['data'])) {
-        this.data = [] as any;
-        for (let item of _data['data']) this.data!.push(ShoppingCartItemDto.fromJS(item));
-      }
-      this.errorMessage = _data['errorMessage'];
-      this.errorCode = _data['errorCode'];
-      if (Array.isArray(_data['errors'])) {
-        this.errors = [] as any;
-        for (let item of _data['errors']) this.errors!.push(item);
-      }
-    }
-  }
-
-  static fromJS(data: any): ResultOfListOfShoppingCartItemDto {
-    data = typeof data === 'object' ? data : {};
-    let result = new ResultOfListOfShoppingCartItemDto();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['isSuccess'] = this.isSuccess;
-    if (Array.isArray(this.data)) {
-      data['data'] = [];
-      for (let item of this.data) data['data'].push(item ? item.toJSON() : (undefined as any));
-    }
-    data['errorMessage'] = this.errorMessage;
-    data['errorCode'] = this.errorCode;
-    if (Array.isArray(this.errors)) {
-      data['errors'] = [];
-      for (let item of this.errors) data['errors'].push(item);
-    }
-    return data;
-  }
-}
-
-export interface IResultOfListOfShoppingCartItemDto {
-  isSuccess?: boolean;
-  data?: ShoppingCartItemDto[] | undefined;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-}
-
-export class ResultOfShoppingCartItemDto implements IResultOfShoppingCartItemDto {
-  isSuccess?: boolean;
-  data?: ShoppingCartItemDto | undefined;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-
-  constructor(data?: IResultOfShoppingCartItemDto) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.isSuccess = _data['isSuccess'];
-      this.data = _data['data'] ? ShoppingCartItemDto.fromJS(_data['data']) : (undefined as any);
-      this.errorMessage = _data['errorMessage'];
-      this.errorCode = _data['errorCode'];
-      if (Array.isArray(_data['errors'])) {
-        this.errors = [] as any;
-        for (let item of _data['errors']) this.errors!.push(item);
-      }
-    }
-  }
-
-  static fromJS(data: any): ResultOfShoppingCartItemDto {
-    data = typeof data === 'object' ? data : {};
-    let result = new ResultOfShoppingCartItemDto();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['isSuccess'] = this.isSuccess;
-    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
-    data['errorMessage'] = this.errorMessage;
-    data['errorCode'] = this.errorCode;
-    if (Array.isArray(this.errors)) {
-      data['errors'] = [];
-      for (let item of this.errors) data['errors'].push(item);
-    }
-    return data;
-  }
-}
-
-export interface IResultOfShoppingCartItemDto {
-  isSuccess?: boolean;
-  data?: ShoppingCartItemDto | undefined;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-}
-
 export class AddToCartRequest implements IAddToCartRequest {
   userId?: string;
   productId?: string;
@@ -17795,7 +18776,6 @@ export interface IAddToCartRequest {
 }
 
 export class UpdateQuantityRequest implements IUpdateQuantityRequest {
-  userId?: string;
   quantity?: number;
 
   constructor(data?: IUpdateQuantityRequest) {
@@ -17808,7 +18788,6 @@ export class UpdateQuantityRequest implements IUpdateQuantityRequest {
 
   init(_data?: any) {
     if (_data) {
-      this.userId = _data['userId'];
       this.quantity = _data['quantity'];
     }
   }
@@ -17822,50 +18801,13 @@ export class UpdateQuantityRequest implements IUpdateQuantityRequest {
 
   toJSON(data?: any) {
     data = typeof data === 'object' ? data : {};
-    data['userId'] = this.userId;
     data['quantity'] = this.quantity;
     return data;
   }
 }
 
 export interface IUpdateQuantityRequest {
-  userId?: string;
   quantity?: number;
-}
-
-export class RemoveItemRequest implements IRemoveItemRequest {
-  userId?: string;
-
-  constructor(data?: IRemoveItemRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.userId = _data['userId'];
-    }
-  }
-
-  static fromJS(data: any): RemoveItemRequest {
-    data = typeof data === 'object' ? data : {};
-    let result = new RemoveItemRequest();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['userId'] = this.userId;
-    return data;
-  }
-}
-
-export interface IRemoveItemRequest {
-  userId?: string;
 }
 
 export class ResultOfWishlistDto implements IResultOfWishlistDto {
@@ -18075,14 +19017,14 @@ export interface IWishlistItemDto {
   createdAt?: Date;
 }
 
-export class ResultOfListOfWishlistItemDto implements IResultOfListOfWishlistItemDto {
+export class ResultOfPagedResultOfWishlistItemDto implements IResultOfPagedResultOfWishlistItemDto {
   isSuccess?: boolean;
-  data?: WishlistItemDto[] | undefined;
+  data?: PagedResultOfWishlistItemDto | undefined;
   errorMessage?: string | undefined;
   errorCode?: string | undefined;
   errors?: string[];
 
-  constructor(data?: IResultOfListOfWishlistItemDto) {
+  constructor(data?: IResultOfPagedResultOfWishlistItemDto) {
     if (data) {
       for (var property in data) {
         if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
@@ -18093,10 +19035,9 @@ export class ResultOfListOfWishlistItemDto implements IResultOfListOfWishlistIte
   init(_data?: any) {
     if (_data) {
       this.isSuccess = _data['isSuccess'];
-      if (Array.isArray(_data['data'])) {
-        this.data = [] as any;
-        for (let item of _data['data']) this.data!.push(WishlistItemDto.fromJS(item));
-      }
+      this.data = _data['data']
+        ? PagedResultOfWishlistItemDto.fromJS(_data['data'])
+        : (undefined as any);
       this.errorMessage = _data['errorMessage'];
       this.errorCode = _data['errorCode'];
       if (Array.isArray(_data['errors'])) {
@@ -18106,69 +19047,9 @@ export class ResultOfListOfWishlistItemDto implements IResultOfListOfWishlistIte
     }
   }
 
-  static fromJS(data: any): ResultOfListOfWishlistItemDto {
+  static fromJS(data: any): ResultOfPagedResultOfWishlistItemDto {
     data = typeof data === 'object' ? data : {};
-    let result = new ResultOfListOfWishlistItemDto();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['isSuccess'] = this.isSuccess;
-    if (Array.isArray(this.data)) {
-      data['data'] = [];
-      for (let item of this.data) data['data'].push(item ? item.toJSON() : (undefined as any));
-    }
-    data['errorMessage'] = this.errorMessage;
-    data['errorCode'] = this.errorCode;
-    if (Array.isArray(this.errors)) {
-      data['errors'] = [];
-      for (let item of this.errors) data['errors'].push(item);
-    }
-    return data;
-  }
-}
-
-export interface IResultOfListOfWishlistItemDto {
-  isSuccess?: boolean;
-  data?: WishlistItemDto[] | undefined;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-}
-
-export class ResultOfWishlistItemDto implements IResultOfWishlistItemDto {
-  isSuccess?: boolean;
-  data?: WishlistItemDto | undefined;
-  errorMessage?: string | undefined;
-  errorCode?: string | undefined;
-  errors?: string[];
-
-  constructor(data?: IResultOfWishlistItemDto) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.isSuccess = _data['isSuccess'];
-      this.data = _data['data'] ? WishlistItemDto.fromJS(_data['data']) : (undefined as any);
-      this.errorMessage = _data['errorMessage'];
-      this.errorCode = _data['errorCode'];
-      if (Array.isArray(_data['errors'])) {
-        this.errors = [] as any;
-        for (let item of _data['errors']) this.errors!.push(item);
-      }
-    }
-  }
-
-  static fromJS(data: any): ResultOfWishlistItemDto {
-    data = typeof data === 'object' ? data : {};
-    let result = new ResultOfWishlistItemDto();
+    let result = new ResultOfPagedResultOfWishlistItemDto();
     result.init(data);
     return result;
   }
@@ -18187,12 +19068,77 @@ export class ResultOfWishlistItemDto implements IResultOfWishlistItemDto {
   }
 }
 
-export interface IResultOfWishlistItemDto {
+export interface IResultOfPagedResultOfWishlistItemDto {
   isSuccess?: boolean;
-  data?: WishlistItemDto | undefined;
+  data?: PagedResultOfWishlistItemDto | undefined;
   errorMessage?: string | undefined;
   errorCode?: string | undefined;
   errors?: string[];
+}
+
+export class PagedResultOfWishlistItemDto implements IPagedResultOfWishlistItemDto {
+  items?: WishlistItemDto[];
+  totalCount?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+
+  constructor(data?: IPagedResultOfWishlistItemDto) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      if (Array.isArray(_data['items'])) {
+        this.items = [] as any;
+        for (let item of _data['items']) this.items!.push(WishlistItemDto.fromJS(item));
+      }
+      this.totalCount = _data['totalCount'];
+      this.page = _data['page'];
+      this.pageSize = _data['pageSize'];
+      this.totalPages = _data['totalPages'];
+      this.hasPreviousPage = _data['hasPreviousPage'];
+      this.hasNextPage = _data['hasNextPage'];
+    }
+  }
+
+  static fromJS(data: any): PagedResultOfWishlistItemDto {
+    data = typeof data === 'object' ? data : {};
+    let result = new PagedResultOfWishlistItemDto();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    if (Array.isArray(this.items)) {
+      data['items'] = [];
+      for (let item of this.items) data['items'].push(item ? item.toJSON() : (undefined as any));
+    }
+    data['totalCount'] = this.totalCount;
+    data['page'] = this.page;
+    data['pageSize'] = this.pageSize;
+    data['totalPages'] = this.totalPages;
+    data['hasPreviousPage'] = this.hasPreviousPage;
+    data['hasNextPage'] = this.hasNextPage;
+    return data;
+  }
+}
+
+export interface IPagedResultOfWishlistItemDto {
+  items?: WishlistItemDto[];
+  totalCount?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
 }
 
 export class AddToWishlistRequest implements IAddToWishlistRequest {
@@ -18232,111 +19178,6 @@ export class AddToWishlistRequest implements IAddToWishlistRequest {
 export interface IAddToWishlistRequest {
   productId?: string;
   variantId?: string | undefined;
-}
-
-export class MoveToCartRequest implements IMoveToCartRequest {
-  quantity?: number;
-
-  constructor(data?: IMoveToCartRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.quantity = _data['quantity'];
-    }
-  }
-
-  static fromJS(data: any): MoveToCartRequest {
-    data = typeof data === 'object' ? data : {};
-    let result = new MoveToCartRequest();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['quantity'] = this.quantity;
-    return data;
-  }
-}
-
-export interface IMoveToCartRequest {
-  quantity?: number;
-}
-
-export class MergeCartsRequest implements IMergeCartsRequest {
-  guestCartId?: string;
-
-  constructor(data?: IMergeCartsRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.guestCartId = _data['guestCartId'];
-    }
-  }
-
-  static fromJS(data: any): MergeCartsRequest {
-    data = typeof data === 'object' ? data : {};
-    let result = new MergeCartsRequest();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['guestCartId'] = this.guestCartId;
-    return data;
-  }
-}
-
-export interface IMergeCartsRequest {
-  guestCartId?: string;
-}
-
-export class ApplyCouponRequest implements IApplyCouponRequest {
-  couponCode?: string;
-
-  constructor(data?: IApplyCouponRequest) {
-    if (data) {
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
-      }
-    }
-  }
-
-  init(_data?: any) {
-    if (_data) {
-      this.couponCode = _data['couponCode'];
-    }
-  }
-
-  static fromJS(data: any): ApplyCouponRequest {
-    data = typeof data === 'object' ? data : {};
-    let result = new ApplyCouponRequest();
-    result.init(data);
-    return result;
-  }
-
-  toJSON(data?: any) {
-    data = typeof data === 'object' ? data : {};
-    data['couponCode'] = this.couponCode;
-    return data;
-  }
-}
-
-export interface IApplyCouponRequest {
-  couponCode?: string;
 }
 
 export class ResultOfPagedResultOfCategoryDto implements IResultOfPagedResultOfCategoryDto {
@@ -21033,6 +21874,789 @@ export interface IPagedResultOfProductBaseResponse {
   hasPreviousPage?: boolean;
   hasNextPage?: boolean;
 }
+
+export class ResultOfGetProductByIdResponse implements IResultOfGetProductByIdResponse {
+  isSuccess?: boolean;
+  data?: GetProductByIdResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfGetProductByIdResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data'] ? GetProductByIdResponse.fromJS(_data['data']) : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfGetProductByIdResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfGetProductByIdResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfGetProductByIdResponse {
+  isSuccess?: boolean;
+  data?: GetProductByIdResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class GetProductByIdResponse extends ProductBaseResponse implements IGetProductByIdResponse {
+  constructor(data?: IGetProductByIdResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): GetProductByIdResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new GetProductByIdResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface IGetProductByIdResponse extends IProductBaseResponse {}
+
+export class ResultOfGetProductBySkuResponse implements IResultOfGetProductBySkuResponse {
+  isSuccess?: boolean;
+  data?: GetProductBySkuResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfGetProductBySkuResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data']
+        ? GetProductBySkuResponse.fromJS(_data['data'])
+        : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfGetProductBySkuResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfGetProductBySkuResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfGetProductBySkuResponse {
+  isSuccess?: boolean;
+  data?: GetProductBySkuResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class GetProductBySkuResponse
+  extends ProductBaseResponse
+  implements IGetProductBySkuResponse
+{
+  constructor(data?: IGetProductBySkuResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): GetProductBySkuResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new GetProductBySkuResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface IGetProductBySkuResponse extends IProductBaseResponse {}
+
+export class ResultOfGetProductBySlugResponse implements IResultOfGetProductBySlugResponse {
+  isSuccess?: boolean;
+  data?: GetProductBySlugResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfGetProductBySlugResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data']
+        ? GetProductBySlugResponse.fromJS(_data['data'])
+        : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfGetProductBySlugResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfGetProductBySlugResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfGetProductBySlugResponse {
+  isSuccess?: boolean;
+  data?: GetProductBySlugResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class GetProductBySlugResponse
+  extends ProductBaseResponse
+  implements IGetProductBySlugResponse
+{
+  constructor(data?: IGetProductBySlugResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): GetProductBySlugResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new GetProductBySlugResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface IGetProductBySlugResponse extends IProductBaseResponse {}
+
+export class ResultOfUpdateProductResponse implements IResultOfUpdateProductResponse {
+  isSuccess?: boolean;
+  data?: UpdateProductResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfUpdateProductResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data'] ? UpdateProductResponse.fromJS(_data['data']) : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfUpdateProductResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfUpdateProductResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfUpdateProductResponse {
+  isSuccess?: boolean;
+  data?: UpdateProductResponse | undefined;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class UpdateProductResponse extends ProductBaseResponse implements IUpdateProductResponse {
+  constructor(data?: IUpdateProductResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): UpdateProductResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new UpdateProductResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface IUpdateProductResponse extends IProductBaseResponse {}
+
+export class UpdateProductCommand implements IUpdateProductCommand {
+  productId?: string;
+  name?: string;
+  slug?: string | undefined;
+  sku?: string;
+  description?: string;
+  shortDescription?: string | undefined;
+  price?: number;
+  discountPrice?: number | undefined;
+  cost?: number | undefined;
+  stockQuantity?: number;
+  minStockLevel?: number;
+  weight?: number | undefined;
+  dimensions?: string | undefined;
+  categoryId?: string;
+  brandId?: string | undefined;
+  status?: number;
+  isFeatured?: boolean;
+  isDigital?: boolean;
+  metaTitle?: string | undefined;
+  metaDescription?: string | undefined;
+
+  constructor(data?: IUpdateProductCommand) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.productId = _data['productId'];
+      this.name = _data['name'];
+      this.slug = _data['slug'];
+      this.sku = _data['sku'];
+      this.description = _data['description'];
+      this.shortDescription = _data['shortDescription'];
+      this.price = _data['price'];
+      this.discountPrice = _data['discountPrice'];
+      this.cost = _data['cost'];
+      this.stockQuantity = _data['stockQuantity'];
+      this.minStockLevel = _data['minStockLevel'];
+      this.weight = _data['weight'];
+      this.dimensions = _data['dimensions'];
+      this.categoryId = _data['categoryId'];
+      this.brandId = _data['brandId'];
+      this.status = _data['status'];
+      this.isFeatured = _data['isFeatured'];
+      this.isDigital = _data['isDigital'];
+      this.metaTitle = _data['metaTitle'];
+      this.metaDescription = _data['metaDescription'];
+    }
+  }
+
+  static fromJS(data: any): UpdateProductCommand {
+    data = typeof data === 'object' ? data : {};
+    let result = new UpdateProductCommand();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['productId'] = this.productId;
+    data['name'] = this.name;
+    data['slug'] = this.slug;
+    data['sku'] = this.sku;
+    data['description'] = this.description;
+    data['shortDescription'] = this.shortDescription;
+    data['price'] = this.price;
+    data['discountPrice'] = this.discountPrice;
+    data['cost'] = this.cost;
+    data['stockQuantity'] = this.stockQuantity;
+    data['minStockLevel'] = this.minStockLevel;
+    data['weight'] = this.weight;
+    data['dimensions'] = this.dimensions;
+    data['categoryId'] = this.categoryId;
+    data['brandId'] = this.brandId;
+    data['status'] = this.status;
+    data['isFeatured'] = this.isFeatured;
+    data['isDigital'] = this.isDigital;
+    data['metaTitle'] = this.metaTitle;
+    data['metaDescription'] = this.metaDescription;
+    return data;
+  }
+}
+
+export interface IUpdateProductCommand {
+  productId?: string;
+  name?: string;
+  slug?: string | undefined;
+  sku?: string;
+  description?: string;
+  shortDescription?: string | undefined;
+  price?: number;
+  discountPrice?: number | undefined;
+  cost?: number | undefined;
+  stockQuantity?: number;
+  minStockLevel?: number;
+  weight?: number | undefined;
+  dimensions?: string | undefined;
+  categoryId?: string;
+  brandId?: string | undefined;
+  status?: number;
+  isFeatured?: boolean;
+  isDigital?: boolean;
+  metaTitle?: string | undefined;
+  metaDescription?: string | undefined;
+}
+
+export class UpdateProductStatusCommand implements IUpdateProductStatusCommand {
+  productId?: string;
+  status?: number;
+
+  constructor(data?: IUpdateProductStatusCommand) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.productId = _data['productId'];
+      this.status = _data['status'];
+    }
+  }
+
+  static fromJS(data: any): UpdateProductStatusCommand {
+    data = typeof data === 'object' ? data : {};
+    let result = new UpdateProductStatusCommand();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['productId'] = this.productId;
+    data['status'] = this.status;
+    return data;
+  }
+}
+
+export interface IUpdateProductStatusCommand {
+  productId?: string;
+  status?: number;
+}
+
+export class UpdateProductStockCommand implements IUpdateProductStockCommand {
+  productId?: string;
+  stockQuantity?: number;
+
+  constructor(data?: IUpdateProductStockCommand) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.productId = _data['productId'];
+      this.stockQuantity = _data['stockQuantity'];
+    }
+  }
+
+  static fromJS(data: any): UpdateProductStockCommand {
+    data = typeof data === 'object' ? data : {};
+    let result = new UpdateProductStockCommand();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['productId'] = this.productId;
+    data['stockQuantity'] = this.stockQuantity;
+    return data;
+  }
+}
+
+export interface IUpdateProductStockCommand {
+  productId?: string;
+  stockQuantity?: number;
+}
+
+export class ResultOfGetFeaturedProductsResponse implements IResultOfGetFeaturedProductsResponse {
+  isSuccess?: boolean;
+  data?: GetFeaturedProductsResponse;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfGetFeaturedProductsResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data']
+        ? GetFeaturedProductsResponse.fromJS(_data['data'])
+        : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfGetFeaturedProductsResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfGetFeaturedProductsResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfGetFeaturedProductsResponse {
+  isSuccess?: boolean;
+  data?: GetFeaturedProductsResponse;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class GetFeaturedProductsResponse
+  extends ProductBaseResponse
+  implements IGetFeaturedProductsResponse
+{
+  constructor(data?: IGetFeaturedProductsResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): GetFeaturedProductsResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new GetFeaturedProductsResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface IGetFeaturedProductsResponse extends IProductBaseResponse {}
+
+export class ResultOfGetActiveProductsResponse implements IResultOfGetActiveProductsResponse {
+  isSuccess?: boolean;
+  data?: GetActiveProductsResponse;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfGetActiveProductsResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data']
+        ? GetActiveProductsResponse.fromJS(_data['data'])
+        : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfGetActiveProductsResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfGetActiveProductsResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfGetActiveProductsResponse {
+  isSuccess?: boolean;
+  data?: GetActiveProductsResponse;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class GetActiveProductsResponse
+  extends ProductBaseResponse
+  implements IGetActiveProductsResponse
+{
+  constructor(data?: IGetActiveProductsResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): GetActiveProductsResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new GetActiveProductsResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface IGetActiveProductsResponse extends IProductBaseResponse {}
+
+export class ResultOfSearchProductsResponse implements IResultOfSearchProductsResponse {
+  isSuccess?: boolean;
+  data?: SearchProductsResponse;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+
+  constructor(data?: IResultOfSearchProductsResponse) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.isSuccess = _data['isSuccess'];
+      this.data = _data['data'] ? SearchProductsResponse.fromJS(_data['data']) : (undefined as any);
+      this.errorMessage = _data['errorMessage'];
+      this.errorCode = _data['errorCode'];
+      if (Array.isArray(_data['errors'])) {
+        this.errors = [] as any;
+        for (let item of _data['errors']) this.errors!.push(item);
+      }
+    }
+  }
+
+  static fromJS(data: any): ResultOfSearchProductsResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new ResultOfSearchProductsResponse();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['isSuccess'] = this.isSuccess;
+    data['data'] = this.data ? this.data.toJSON() : (undefined as any);
+    data['errorMessage'] = this.errorMessage;
+    data['errorCode'] = this.errorCode;
+    if (Array.isArray(this.errors)) {
+      data['errors'] = [];
+      for (let item of this.errors) data['errors'].push(item);
+    }
+    return data;
+  }
+}
+
+export interface IResultOfSearchProductsResponse {
+  isSuccess?: boolean;
+  data?: SearchProductsResponse;
+  errorMessage?: string | undefined;
+  errorCode?: string | undefined;
+  errors?: string[];
+}
+
+export class SearchProductsResponse extends ProductBaseResponse implements ISearchProductsResponse {
+  constructor(data?: ISearchProductsResponse) {
+    super(data);
+  }
+
+  override init(_data?: any) {
+    super.init(_data);
+  }
+
+  static override fromJS(data: any): SearchProductsResponse {
+    data = typeof data === 'object' ? data : {};
+    let result = new SearchProductsResponse();
+    result.init(data);
+    return result;
+  }
+
+  override toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    super.toJSON(data);
+    return data;
+  }
+}
+
+export interface ISearchProductsResponse extends IProductBaseResponse {}
 
 export class ResultOfProductImageDto implements IResultOfProductImageDto {
   isSuccess?: boolean;
