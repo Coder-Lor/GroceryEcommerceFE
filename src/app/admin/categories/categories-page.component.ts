@@ -315,11 +315,15 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
     this.categoryProducts = [];
     
     // Tạo filter để lọc sản phẩm theo categoryId
-    const categoryFilter = new FilterCriteria();
-    categoryFilter.fieldName = 'CategoryId';
-    categoryFilter.value = category.categoryId;
-    categoryFilter.operator = FilterOperator.Equals;
-    
+    const categoryFilter = new FilterCriteria({
+      fieldName: 'CategoryId',
+      operator: FilterOperator.Equals,
+      value: "38737d23-2a6f-49a9-9171-77fbf361e64f"
+    });
+    // categoryFilter.fieldName = 'CategoryId';
+    // categoryFilter.value = category.categoryId;
+    // categoryFilter.operator = FilterOperator.Equals;
+    // categoryFilter.toJSON();
     // Gọi API getProductsPaging với filter
     this.productClient.getProductsPaging(
       1,                              // page

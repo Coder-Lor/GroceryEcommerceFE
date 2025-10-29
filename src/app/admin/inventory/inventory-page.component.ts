@@ -271,9 +271,7 @@ export class InventoryPageComponent implements OnInit {
   // Xác nhận xóa sản phẩm
   confirmDelete(product: CreateProductCommand): void {
     if (confirm(`Bạn có chắc muốn xóa sản phẩm "${product.name}"?`)) {
-      // Note: DeleteProduct requires proper product ID mapping
-      // this.inventoryService.deleteProduct(product.productId!);
-      alert('Chức năng xóa sẽ được hoàn thiện sau');
+      // this.inventoryService.deleteProduct
     }
   }
 
