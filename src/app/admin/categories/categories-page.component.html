@@ -106,6 +106,9 @@
             <button class="btn-icon btn-view" (click)="viewSubCategories(category)" title="Xem danh mục con">
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
+            <button class="btn-icon btn-products" (click)="viewCategoryProducts(category)" title="Xem sản phẩm">
+              <fa-icon [icon]="faBox"></fa-icon>
+            </button>
             <button class="btn-icon btn-edit" (click)="openEditModal(category)" title="Sửa">
               <fa-icon [icon]="faPenToSquare"></fa-icon>
             </button>
@@ -364,6 +367,91 @@
         <fa-icon [icon]="faFileExport"></fa-icon>
         Xuất CSV
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal xem sản phẩm theo danh mục -->
+<div class="modal-overlay" *ngIf="showProductsModal" (click)="closeProductsModal()">
+  <div class="modal-content products-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faBox"></fa-icon>
+        Sản phẩm trong danh mục "{{ selectedCategoryForProducts?.name }}"
+      </h3>
+      <button class="btn-close" (click)="closeProductsModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      @if (isLoadingProducts) {
+      <div class="loading-content">
+        <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
+        <p>Đang tải danh sách sản phẩm...</p>
+      </div>
+      } @else {
+        @if (categoryProducts.length > 0) {
+          <div class="products-table-container">
+            <table class="products-table">
+              <thead>
+                <tr>
+                  <th>Tên sản phẩm</th>
+                  <th>SKU</th>
+                  <th class="text-right">Giá</th>
+                  <th class="text-center">Số lượng</th>
+                  <th class="text-center">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let product of categoryProducts">
+                  <td>
+                    <div class="product-name">{{ product.name }}</div>
+                    @if (product.shortDescription) {
+                      <div class="product-desc">{{ product.shortDescription }}</div>
+                    }
+                  </td>
+                  <td>
+                    <span class="sku-badge">{{ product.sku }}</span>
+                  </td>
+                  <td class="text-right">
+                    @if (product.discountPrice && product.discountPrice < product.price!) {
+                      <div class="price-container">
+                        <span class="original-price">{{ product.price | number:'1.0-0' }}đ</span>
+                        <span class="discount-price">{{ product.discountPrice | number:'1.0-0' }}đ</span>
+                      </div>
+                    } @else {
+                      <span class="product-price">{{ product.price | number:'1.0-0' }}đ</span>
+                    }
+                  </td>
+                  <td class="text-center">
+                    <span class="stock-badge" [class.low-stock]="product.stockQuantity! < product.minStockLevel!">
+                      {{ product.stockQuantity }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="status-badge" [class.status-active]="product.status === 1" [class.status-inactive]="product.status !== 1">
+                      {{ product.status === 1 ? 'Hoạt động' : 'Ngừng bán' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="products-summary">
+            Tổng cộng: <strong>{{ categoryProducts.length }}</strong> sản phẩm
+          </div>
+        } @else {
+          <div class="no-products">
+            <fa-icon [icon]="faBox" size="3x"></fa-icon>
+            <p>Danh mục này chưa có sản phẩm nào</p>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeProductsModal()">Đóng</button>
     </div>
   </div>
 </div>
