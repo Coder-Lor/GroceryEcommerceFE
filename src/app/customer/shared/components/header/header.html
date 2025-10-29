@@ -37,11 +37,11 @@
           <i class="pi pi-search"></i>
         </div>
         <!-- Cart & wishlist -->
-        <div class="cart-wishlist me-3" (click)="toggleUtilPanel()">
+        <div class="cart-wishlist me-3" (click)="toggleUtilPanel()" style="cursor: pointer">
           <div class="cart-wishlist-content d-flex align-items-center">
             <div class="cart-section">
               <div class="cart-icon-wrapper">
-                <span class="cart-icon" style="cursor: pointer">
+                <span class="cart-icon">
                   <i class="pi pi-shopping-cart"></i>
                 </span>
                 <span class="cart-badge">5</span>
@@ -67,8 +67,8 @@
           @if(isOpen) {
           <div class="user-dropdown">
             <ul>
-              <li><a href="/profile">Quản lý hồ sơ</a></li>
-              <li><a href="#">Đơn mua</a></li>
+              <li (click)="redirectToProfile()">Quản lý hồ sơ</li>
+              <li>Đơn mua</li>
               <li style="align-items: center" (click)="onLogout()">
                 <i style="font-size: 14px" class="pi pi-sign-out"></i> Đăng Xuất
               </li>
