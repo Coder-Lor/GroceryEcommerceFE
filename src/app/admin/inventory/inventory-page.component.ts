@@ -115,7 +115,12 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
           this.categories = response.data;
           console.log(this.categories);
         } else {
-          alert(response.errorMessage);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: response.errorMessage || 'Không thể tải danh mục',
+            life: 3000
+          });
         }
       }
     })
@@ -271,11 +276,21 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     if (this.validateProduct()) {
       if (this.modalMode === 'add') {
         // this.inventoryService.addProduct(this.currentProduct);
-        alert('Chức năng này đã được chuyển sang trang thêm sản phẩm mới');
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Thông báo',
+          detail: 'Chức năng này đã được chuyển sang trang thêm sản phẩm mới',
+          life: 3000
+        });
       } else {
         // Note: UpdateProduct requires proper product ID mapping
         // this.inventoryService.updateProduct(this.currentProduct.productId!, this.currentProduct);
-        alert('Chức năng cập nhật sẽ được hoàn thiện sau');
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Thông báo',
+          detail: 'Chức năng cập nhật sẽ được hoàn thiện sau',
+          life: 3000
+        });
       }
       this.closeModal();
     }
@@ -420,23 +435,48 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   // Validate sản phẩm
   private validateProduct(): boolean {
     if (!this.currentProduct.sku?.trim()) {
-      alert('Vui lòng nhập mã SKU');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập mã SKU',
+        life: 3000
+      });
       return false;
     }
     if (!this.currentProduct.name?.trim()) {
-      alert('Vui lòng nhập tên sản phẩm');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập tên sản phẩm',
+        life: 3000
+      });
       return false;
     }
     if ((this.currentProduct.price || 0) <= 0) {
-      alert('Giá bán phải lớn hơn 0');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Giá bán phải lớn hơn 0',
+        life: 3000
+      });
       return false;
     }
     if ((this.currentProduct.cost || 0) < 0) {
-      alert('Giá vốn không được âm');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Giá vốn không được âm',
+        life: 3000
+      });
       return false;
     }
     if ((this.currentProduct.stockQuantity || 0) < 0) {
-      alert('Số lượng tồn kho không được âm');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Số lượng tồn kho không được âm',
+        life: 3000
+      });
       return false;
     }
     return true;

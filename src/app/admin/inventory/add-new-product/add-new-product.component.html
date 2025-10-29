@@ -1,4 +1,17 @@
 <div class="add-product-container">
+  <!-- Toast messages -->
+  <p-toast></p-toast>
+  
+  <!-- Confirm Dialog -->
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    [closable]="true"
+    [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger"
+    rejectButtonStyleClass="p-button-secondary p-button-text">
+  </p-confirmDialog>
+  
   <div class="page-header">
     <button class="btn-back" (click)="goBack()">
       <fa-icon [icon]="faArrowLeft"></fa-icon>

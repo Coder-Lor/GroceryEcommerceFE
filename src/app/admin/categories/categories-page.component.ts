@@ -35,6 +35,9 @@ import {
   SortDirection
 } from '../../core/service/system-admin.service';
 import { Subject, takeUntil } from 'rxjs';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface CategoryReport {
   totalCategories: number;
@@ -47,7 +50,8 @@ interface CategoryReport {
 @Component({
   selector: 'app-categories-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, FaIconComponent],
+  imports: [CommonModule, FormsModule, FaIconComponent, ToastModule, ConfirmDialogModule],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './categories-page.component.html',
   styleUrls: ['./categories-page.component.scss']
 })
@@ -100,7 +104,9 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private categoryClient: CategoryClient,
-    private productClient: ProductClient
+    private productClient: ProductClient,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -123,14 +129,11 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
             this.categories = this.flattenCategories(response.data);
             this.allCategories = [...this.categories];
             this.filterCategories();
-          } else {
-            alert(response.errorMessage || 'Không thể tải danh sách danh mục');
           }
         },
         error: (error) => {
           this.isLoading = false;
           console.error('Error loading categories:', error);
-          alert('Lỗi khi tải danh sách danh mục');
         }
       });
   }
@@ -233,17 +236,32 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
           next: (response) => {
             this.isLoading = false;
             if (response.isSuccess) {
-              alert('Thêm danh mục thành công!');
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: 'Thêm danh mục thành công!',
+                life: 3000
+              });
               this.closeModal();
               this.loadCategories();
             } else {
-              alert(response.errorMessage || 'Không thể thêm danh mục');
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: response.errorMessage || 'Không thể thêm danh mục',
+                life: 3000
+              });
             }
           },
           error: (error) => {
             this.isLoading = false;
             console.error('Error creating category:', error);
-            alert('Lỗi khi thêm danh mục');
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Lỗi khi thêm danh mục',
+              life: 3000
+            });
           }
         });
     } else {
@@ -254,17 +272,32 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
           next: (response) => {
             this.isLoading = false;
             if (response.isSuccess) {
-              alert('Cập nhật danh mục thành công!');
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: 'Cập nhật danh mục thành công!',
+                life: 3000
+              });
               this.closeModal();
               this.loadCategories();
             } else {
-              alert(response.errorMessage || 'Không thể cập nhật danh mục');
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: response.errorMessage || 'Không thể cập nhật danh mục',
+                life: 3000
+              });
             }
           },
           error: (error) => {
             this.isLoading = false;
             console.error('Error updating category:', error);
-            alert('Lỗi khi cập nhật danh mục');
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Lỗi khi cập nhật danh mục',
+              life: 3000
+            });
           }
         });
     }
@@ -273,27 +306,52 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
   confirmDelete(category: CategoryDto): void {
     if (!category.categoryId) return;
     
-    if (confirm(`Bạn có chắc muốn xóa danh mục "${category.name}"?`)) {
-      this.isLoading = true;
-      this.categoryClient.deleteCategory(category.categoryId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            if (response.isSuccess) {
-              alert('Xóa danh mục thành công!');
-              this.loadCategories();
-            } else {
-              alert(response.errorMessage || 'Không thể xóa danh mục');
+    this.confirmationService.confirm({
+      message: `Bạn có chắc muốn xóa danh mục "${category.name}"?<br/>Hành động này không thể hoàn tác.`,
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      defaultFocus: 'reject',
+      accept: () => {
+        this.isLoading = true;
+        this.categoryClient.deleteCategory(category.categoryId!)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.isLoading = false;
+              if (response.isSuccess) {
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Thành công',
+                  detail: 'Xóa danh mục thành công!',
+                  life: 3000
+                });
+                this.loadCategories();
+              } else {
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Lỗi',
+                  detail: response.errorMessage || 'Không thể xóa danh mục',
+                  life: 3000
+                });
+              }
+            },
+            error: (error) => {
+              this.isLoading = false;
+              console.error('Error deleting category:', error);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Lỗi khi xóa danh mục',
+                life: 3000
+              });
             }
-          },
-          error: (error) => {
-            this.isLoading = false;
-            console.error('Error deleting category:', error);
-            alert('Lỗi khi xóa danh mục');
-          }
-        });
-    }
+          });
+      }
+    });
   }
 
   viewSubCategories(category: CategoryDto): void {
@@ -347,14 +405,24 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
         } else {
           this.categoryProducts = [];
           if (response.errorMessage) {
-            alert(response.errorMessage);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage,
+              life: 3000
+            });
           }
         }
       },
       error: (error) => {
         this.isLoadingProducts = false;
         console.error('Error loading category products:', error);
-        alert('Lỗi khi tải danh sách sản phẩm');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Lỗi khi tải danh sách sản phẩm',
+          life: 3000
+        });
       }
     });
   }
@@ -439,15 +507,30 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
 
   private validateCategory(): boolean {
     if (!this.currentCategory.name?.trim()) {
-      alert('Vui lòng nhập tên danh mục');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập tên danh mục',
+        life: 3000
+      });
       return false;
     }
     if (!this.currentCategory.slug?.trim()) {
-      alert('Vui lòng nhập slug');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập slug',
+        life: 3000
+      });
       return false;
     }
     if (this.currentCategory.displayOrder === undefined || this.currentCategory.displayOrder < 0) {
-      alert('Thứ tự hiển thị phải >= 0');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Thứ tự hiển thị phải >= 0',
+        life: 3000
+      });
       return false;
     }
     return true;

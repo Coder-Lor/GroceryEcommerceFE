@@ -14,7 +14,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AuthService } from '@core/service/auth.service';
@@ -47,6 +47,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
+    ConfirmationService,
     // provideAppInitializer(() => {
     //   // Dùng 'inject()' để lấy service
     //   const authService = inject(AuthService);

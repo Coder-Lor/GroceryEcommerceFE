@@ -25,11 +25,15 @@ import {
   FileParameter
 } from '@services/system-admin.service';
 import { InventoryService } from '../../../core/service/inventory.service';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-add-new-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FaIconComponent],
+  imports: [CommonModule, ReactiveFormsModule, FaIconComponent, ToastModule, ConfirmDialogModule],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './add-new-product.component.html',
   styleUrls: ['./add-new-product.component.scss']
 })
@@ -68,7 +72,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     private router: Router,
     private categoryClient: CategoryClient,
     private inventoryService: InventoryService,
-    private productClient: ProductClient
+    private productClient: ProductClient,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -137,12 +143,22 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
           if (response.isSuccess && response.data) {
             this.categories = response.data;
           } else {
-            alert(response.errorMessage || 'Không thể tải danh mục');
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể tải danh mục',
+              life: 3000
+            });
           }
         },
         error: (error) => {
           console.error('Error loading categories:', error);
-          alert('Có lỗi xảy ra khi tải danh mục');
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Có lỗi xảy ra khi tải danh mục',
+            life: 3000
+          });
         }
       });
   }
@@ -164,7 +180,12 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.productForm.invalid) {
       this.markFormGroupTouched(this.productForm);
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng điền đầy đủ thông tin bắt buộc',
+        life: 3000
+      });
       return;
     }
 
@@ -224,18 +245,36 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.isSuccess) {
-            alert('Thêm sản phẩm thành công!');
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Thêm sản phẩm thành công!',
+              life: 3000
+            });
             // Refresh danh sách sản phẩm để cập nhật danh sách mới nhất
             this.inventoryService.refreshProducts();
-            this.router.navigate(['/admin/inventory']);
+            // Navigate sau khi toast hiển thị
+            setTimeout(() => {
+              this.router.navigate(['/admin/inventory']);
+            }, 500);
           } else {
-            alert(response.errorMessage || 'Không thể thêm sản phẩm');
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể thêm sản phẩm',
+              life: 3000
+            });
             this.isSubmitting = false;
           }
         },
         error: (error: any) => {
           console.error('Error creating product:', error);
-          alert('Có lỗi xảy ra khi thêm sản phẩm'); 
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Có lỗi xảy ra khi thêm sản phẩm',
+            life: 3000
+          });
           this.isSubmitting = false;
         }
       });
@@ -243,9 +282,19 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     if (this.productForm.dirty) {
-      if (confirm('Bạn có thay đổi chưa lưu. Bạn có chắc muốn quay lại?')) {
-        this.router.navigate(['/admin/inventory']);
-      }
+      this.confirmationService.confirm({
+        message: 'Bạn có thay đổi chưa lưu. Bạn có chắc muốn quay lại?',
+        header: 'Xác nhận',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Có',
+        rejectLabel: 'Không',
+        acceptButtonStyleClass: 'p-button-danger',
+        rejectButtonStyleClass: 'p-button-secondary p-button-text',
+        defaultFocus: 'reject',
+        accept: () => {
+          this.router.navigate(['/admin/inventory']);
+        }
+      });
     } else {
       this.router.navigate(['/admin/inventory']);
     }
@@ -498,12 +547,22 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     const validFiles = files.filter(file => {
       // Check if file is an image
       if (!file.type.startsWith('image/')) {
-        alert(`${file.name} không phải là file ảnh`);
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `${file.name} không phải là file ảnh`,
+          life: 3000
+        });
         return false;
       }
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert(`${file.name} vượt quá kích thước cho phép (5MB)`);
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `${file.name} vượt quá kích thước cho phép (5MB)`,
+          life: 3000
+        });
         return false;
       }
       return true;
