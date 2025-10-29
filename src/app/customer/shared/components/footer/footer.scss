@@ -1,84 +1,84 @@
 .footer {
-    background: #fff;
-    color: #444;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    font-family: 'Poppins', sans-serif;
+  background: #f1f1f1;
+  color: #444;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-family: 'Poppins', sans-serif;
 }
 
 .footer h4 {
-    color: #222;
-    border-bottom: 1px dashed #bbb;
+  color: #222;
+  border-bottom: 1px dashed #bbb;
 }
 
 .footer .logo img {
-    width: 25px;
-    height: 25px;
+  width: 25px;
+  height: 25px;
 }
 
 .footer .app-buttons img {
-    width: 140px;
-    margin: 5px 0;
-    display: block;
+  width: 140px;
+  margin: 5px 0;
+  display: block;
 }
 
 .footer p,
 .footer li {
-    color: #555;
-    font-size: 14px;
-    line-height: 1.6;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .item-link:hover {
-    color: #000 !important;
+  color: #000 !important;
 }
 
 .social-links a {
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    background: #ddd;
-    color: #333;
-    margin-right: 8px;
-    text-align: center;
-    line-height: 32px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    vertical-align: middle;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background: #ddd;
+  color: #333;
+  margin-right: 8px;
+  text-align: center;
+  line-height: 32px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  vertical-align: middle;
 }
 
 /* Hover colors */
 .social-links a.facebook:hover {
-    background: #1877f2;
-    color: #fff;
+  background: #1877f2;
+  color: #fff;
 }
 
 .social-links a.twitter:hover {
-    background: #000;
-    color: #fff;
+  background: #000;
+  color: #fff;
 }
 
 .social-links a.linkedin:hover {
-    background: #0a66c2;
-    color: #fff;
+  background: #0a66c2;
+  color: #fff;
 }
 
 .social-links a.instagram:hover {
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%,
-            #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-    color: #fff;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%,
+      #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  color: #fff;
 }
 
 .payment-icon {
-    background-color: #fff;
-    padding: 2px 8px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .payment-icon img {
-    width: 40px;
-    height: 24px;
-    object-fit: contain;
+  width: 40px;
+  height: 24px;
+  object-fit: contain;
 }
