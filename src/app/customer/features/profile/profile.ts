@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImageModule } from 'primeng/image';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ImageModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
