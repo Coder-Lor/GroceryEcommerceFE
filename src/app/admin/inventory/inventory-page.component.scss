@@ -740,3 +740,108 @@
     }
   }
 }
+
+// PrimeNG Custom Styles
+::ng-deep {
+  .p-toast {
+    z-index: 9999 !important;
+    
+    .p-toast-message {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      
+      // Solid backgrounds with proper text colors
+      &.p-toast-message-success {
+        background: #22c55e !important;
+        border: none !important;
+        
+        .p-toast-message-icon,
+        .p-toast-message-text,
+        .p-toast-summary,
+        .p-toast-detail {
+          color: white !important;
+        }
+      }
+      
+      &.p-toast-message-info {
+        background: #3b82f6 !important;
+        border: none !important;
+        
+        .p-toast-message-icon,
+        .p-toast-message-text,
+        .p-toast-summary,
+        .p-toast-detail {
+          color: white !important;
+        }
+      }
+      
+      &.p-toast-message-warn {
+        background: #f97316 !important;
+        border: none !important;
+        
+        .p-toast-message-icon,
+        .p-toast-message-text,
+        .p-toast-summary,
+        .p-toast-detail {
+          color: white !important;
+        }
+      }
+      
+      &.p-toast-message-error {
+        background: #ef4444 !important;
+        border: none !important;
+        
+        .p-toast-message-icon,
+        .p-toast-message-text,
+        .p-toast-summary,
+        .p-toast-detail {
+          color: white !important;
+        }
+      }
+      
+      .p-toast-icon-close {
+        color: white !important;
+        opacity: 0.8;
+        
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  
+  .p-confirm-dialog {
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+    
+    .p-dialog-footer {
+      padding: 1rem 1.5rem;
+      
+      button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        
+        &.p-button-danger {
+          background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+          border: none;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+          }
+        }
+        
+        &.p-button-text {
+          color: #666;
+          
+          &:hover {
+            background: #f0f0f0;
+          }
+        }
+      }
+    }
+  }
+}

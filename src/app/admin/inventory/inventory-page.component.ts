@@ -1,21 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InventoryService, PagingInfo } from '../../core/service/inventory.service';
 import { faPlus, faChartSimple, faFile, faFileArrowDown, faDownload, faMagnifyingGlass, faPenToSquare, faTrashCan, faXmark, faBox, faMoneyBill, faTriangleExclamation, faCircleXmark, faFileExport, faHurricane, faCoins, faSort, faSortUp, faSortDown, faFilter, faChevronLeft, faChevronRight, faAnglesLeft, faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { CategoryClient, CategoryDto, ResultOfListOfCategoryDto, CreateProductCommand, ProductBaseResponse } from "@services/system-admin.service"
+import { CategoryClient, CategoryDto, ResultOfListOfCategoryDto, CreateProductCommand, ProductBaseResponse, ProductClient } from "@services/system-admin.service"
 import { Subject, take, takeUntil } from 'rxjs';
 import { Product } from './models/product.model';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
 @Component({
   selector: 'app-inventory-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, FaIconComponent],
+  imports: [CommonModule, FormsModule, FaIconComponent, ConfirmDialogModule, ToastModule],
+  providers: [ConfirmationService, MessageService],
   templateUrl: 'inventory-page.component.html',
   styleUrls: ['inventory-page.component.scss']
 })
-export class InventoryPageComponent implements OnInit {
+export class InventoryPageComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   categories: CategoryDto[] | undefined = [];
@@ -80,7 +85,10 @@ export class InventoryPageComponent implements OnInit {
   constructor(
     private inventoryService: InventoryService, 
     private categoryClient: CategoryClient,
-    private router: Router
+    private productClient: ProductClient,
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) {}
 
 
@@ -111,6 +119,11 @@ export class InventoryPageComponent implements OnInit {
         }
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Paging methods
@@ -269,10 +282,83 @@ export class InventoryPageComponent implements OnInit {
   }
 
   // Xác nhận xóa sản phẩm
-  confirmDelete(product: CreateProductCommand): void {
-    if (confirm(`Bạn có chắc muốn xóa sản phẩm "${product.name}"?`)) {
-      // this.inventoryService.deleteProduct
+  confirmDelete(product: Product): void {
+    console.log('confirmDelete called with product:', product);
+    
+    this.confirmationService.confirm({
+      message: `Bạn có chắc muốn xóa sản phẩm "${product.name}"?<br/>Hành động này không thể hoàn tác.`,
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      defaultFocus: 'reject',
+      accept: () => {
+        console.log('User accepted delete');
+        this.deleteProduct(product);
+      },
+      reject: () => {
+        console.log('User rejected delete');
+      }
+    });
+  }
+
+  // Xóa sản phẩm
+  private deleteProduct(product: Product): void {
+    console.log('deleteProduct called with product:', product);
+    
+    if (!product.productId) {
+      console.error('Product ID is missing:', product);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Không tìm thấy ID sản phẩm',
+        life: 3000
+      });
+      return;
     }
+
+    console.log('Calling API to delete product with ID:', product.productId);
+    this.isLoading = true;
+    
+    this.productClient.delete(product.productId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        console.log('Delete API response:', response);
+        this.isLoading = false;
+        
+        if (response.isSuccess) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Thành công',
+            detail: `Đã xóa sản phẩm "${product.name}"`,
+            life: 3000
+          });
+          // Refresh danh sách sản phẩm
+          this.inventoryService.refreshProducts();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: response.errorMessage || 'Không thể xóa sản phẩm',
+            life: 3000
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting product:', error);
+        this.isLoading = false;
+        
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Đã có lỗi xảy ra khi xóa sản phẩm',
+          life: 3000
+        });
+      }
+    });
   }
 
   // Hiển thị báo cáo
