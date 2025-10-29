@@ -1,6 +1,6 @@
 <div class="homepage">
   <!-- Hero banner -->
-  <section class="hero container position-relative mb-5">
+  <!-- <section class="hero container position-relative mb-5">
     <div class="hero-bg bg-info rounded-4 position-absolute w-100 h-100 top-0 start-0"></div>
     <img class="hero-vector hero-vector-1 position-absolute" src="vector-40.svg" alt="" />
     <img class="hero-vector hero-vector-2 position-absolute" src="vector-50.svg" alt="" />
@@ -30,111 +30,114 @@
       <div class="dot active bg-white rounded-circle" style="width: 10px; height: 10px"></div>
       <div class="dot bg-white rounded-circle opacity-50" style="width: 10px; height: 10px"></div>
     </div>
+  </section> -->
+  <section class="hero-slider container position-relative mb-4">
+    <swiper-container autoplay-delay="4000" loop="true" pagination="true" navigation="true">
+      <swiper-slide *ngFor="let slide of heroSlides">
+        <div class="hero-slide position-relative rounded-4 overflow-hidden">
+          <img [src]="slide.image" class="w-100 h-100 object-fit-cover" />
+          <!-- <div class="hero-overlay"></div>
+          <div class="hero-content position-absolute text-white">
+            <h1 class="fw-bold mb-3">{{ slide.title }}</h1>
+            <p class="mb-4">{{ slide.subtitle }}</p>
+            <button class="btn btn-light rounded-pill px-4 py-2">Mua ngay</button>
+          </div> -->
+        </div>
+      </swiper-slide>
+    </swiper-container>
   </section>
-
   <!-- Categories -->
-  <section class="categories container mb-5">
+  <section class="categories container py-2 mb-3">
     <h3 class="section-title fw-bold mb-4">DANH MỤC SẢN PHẨM</h3>
-    <div class="categories-list row g-4">
-      <div class="category-card col-md-4" (click)="navigationToProductList()">
-        <div
-          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
-        >
-          <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
-          </div>
-          <div class="category-info">
-            <p class="category-price fw-bold fs-5">$24 - $150</p>
-            <p class="category-name text-secondary">New sumatra mandeling coffe blend</p>
-          </div>
-        </div>
-      </div>
 
-      <div class="category-card col-md-4" (click)="navigationToProductList()">
-        <div
-          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
-        >
-          <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
-          </div>
-          <div class="category-info">
-            <p class="category-price fw-bold fs-5">$37 - $160</p>
-            <p class="category-name text-secondary">Espresso arabica and robusta beans</p>
-          </div>
+    <swiper-container
+      slides-per-view="6"
+      space-between="20"
+      navigation="true"
+      loop="false"
+      class="category-swiper"
+    >
+      <swiper-slide
+        *ngFor="let category of categories"
+        (click)="navigationToCategory()"
+        class="category-slide"
+      >
+        <div class="category-card text-center">
+          <img src="/images/product-image-1.png" [alt]="category.name" class="category-img" />
+          <p class="category-name mt-2">{{ category.name }}</p>
         </div>
-      </div>
-
-      <div class="category-card col-md-4" (click)="navigationToProductList()">
-        <div
-          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
-        >
-          <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
-          </div>
-          <div class="category-info">
-            <p class="category-price fw-bold fs-5">$32 - $160</p>
-            <p class="category-name text-secondary">Lavazza top class whole bean coffee blend</p>
-          </div>
-        </div>
-      </div>
-    </div>
+      </swiper-slide>
+    </swiper-container>
   </section>
 
-  <!-- brands -->
-  <section class="categories container mb-5">
-    <h3 class="section-title fw-bold mb-4">THƯƠNG HIỆU NỔI BẬT</h3>
-    <div class="categories-list row g-4">
-      <div class="category-card col-md-4" (click)="navigationToProductList()">
-        <div
-          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
-        >
-          <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
-          </div>
-          <div class="category-info">
-            <p class="category-price fw-bold fs-5">$24 - $150</p>
-            <p class="category-name text-secondary">New sumatra mandeling coffe blend</p>
-          </div>
-        </div>
+  <!-- Flash sale -->
+  <section class="flash-sale container py-5">
+    <div class="flash-sale-header d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <h3 class="section-title fw-bold mb-0">Flash Sale</h3>
+        <countdown
+          class="flash-timer"
+          [config]="countdownConfig"
+          (event)="onCountdownEvent($event)"
+        ></countdown>
       </div>
-
-      <div class="category-card col-md-4" (click)="navigationToProductList()">
-        <div
-          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
-        >
-          <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
-          </div>
-          <div class="category-info">
-            <p class="category-price fw-bold fs-5">$37 - $160</p>
-            <p class="category-name text-secondary">Espresso arabica and robusta beans</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="category-card col-md-4" (click)="navigationToProductList()">
-        <div
-          class="card border-0 shadow-sm h-100 rounded-4 p-3 d-flex flex-row align-items-center gap-3"
-        >
-          <div class="category-img flex-shrink-0">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded" />
-          </div>
-          <div class="category-info">
-            <p class="category-price fw-bold fs-5">$32 - $160</p>
-            <p class="category-name text-secondary">Lavazza top class whole bean coffee blend</p>
-          </div>
-        </div>
-      </div>
+      <a class="see-all" href="#">Xem tất cả</a>
     </div>
+
+    <swiper-container
+      slides-per-view="6"
+      space-between="20"
+      navigation="true"
+      loop="true"
+      autoplay-delay="3000"
+      autoplay-disable-on-interaction="false"
+      class="flash-sale-swiper"
+    >
+      <swiper-slide *ngFor="let product of flashSaleProducts" class="flash-sale-slide">
+        <div class="product-card">
+          <div class="discount-badge">-{{ product.discount }}%</div>
+          <div class="product-image">
+            <img src="/images/product-image-1.png" [alt]="product.name" />
+          </div>
+          <div class="product-price text-danger fw-bold">{{ product.price | number }}đ</div>
+          <div class="sale-status">
+            <div class="progress-bar">
+              <div class="progress" [style.width.%]="product.progress"></div>
+            </div>
+            <p class="status-text">Vừa mở bán</p>
+          </div>
+        </div>
+      </swiper-slide>
+    </swiper-container>
+  </section>
+
+  <!-- BRANDS -->
+  <section class="brands container py-5" style="margin-top: 30px">
+    <h3 class="section-title fw-bold mb-4">THƯƠNG HIỆU NỔI BẬT</h3>
+
+    <swiper-container
+      slides-per-view="6"
+      space-between="20"
+      navigation="true"
+      loop="true"
+      class="brands-swiper"
+    >
+      <swiper-slide *ngFor="let brand of brands" class="brand-slide">
+        <div class="brand-card">
+          <img [src]="brand.logo" [alt]="brand.name" class="brand-logo" />
+        </div>
+      </swiper-slide>
+    </swiper-container>
   </section>
 
   <!-- Product list -->
-  <div class="product-list container">
+  <div class="product-list container mt-4">
     <p-dataview #dv [value]="products" [layout]="layout">
       <!-- Header -->
       <ng-template #header>
-        <div class="recomment d-flex justify-content-center">
-          <h4>ĐỀ XUẤT CHO BẠN</h4>
+        <div class="section-header text-center mb-5">
+          <h3 class="fw-bold title">Sản Phẩm Nổi Bật</h3>
+          <p class="subtitle">Khám phá những sản phẩm được yêu thích nhất</p>
         </div>
       </ng-template>
       <!-- GRID layout -->
@@ -159,4 +162,39 @@
       <button class="btn-see-more" (click)="navigationToDiscoverPage()">XEM THÊM</button>
     </div>
   </div>
+
+  <section class="policy-section container my-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <h3 class="fw-bold mb-2">Chính sách & cam kết của chúng tôi</h3>
+      <p class="text-muted">
+        Mang đến trải nghiệm mua sắm an toàn, nhanh chóng và tiện lợi cho bạn
+      </p>
+    </div>
+
+    <!-- Chính sách -->
+    <div class="row g-4 justify-content-center">
+      <!-- Hàng đầu: 3 chính sách -->
+      <div class="col-12 col-md-4" *ngFor="let policy of policies.slice(0, 3)">
+        <div class="policy-card text-center p-4">
+          <div class="icon mb-3">
+            <i [class]="policy.icon"></i>
+          </div>
+          <h6 class="fw-bold mb-2">{{ policy.title }}</h6>
+          <p class="text-muted small mb-0">{{ policy.desc }}</p>
+        </div>
+      </div>
+
+      <!-- Hàng thứ 2: 2 chính sách -->
+      <div class="col-12 col-md-4 col-lg-3" *ngFor="let policy of policies.slice(3)">
+        <div class="policy-card text-center p-4 h-100">
+          <div class="icon mb-3">
+            <i [class]="policy.icon"></i>
+          </div>
+          <h6 class="fw-bold mb-2">{{ policy.title }}</h6>
+          <p class="text-muted small mb-0">{{ policy.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>

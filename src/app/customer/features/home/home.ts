@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
@@ -9,6 +9,8 @@ import { ProductBaseResponse } from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
 import { ProductService } from '@core/service/product.service';
 import { Subject, takeUntil } from 'rxjs';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CountdownEvent, CountdownModule } from 'ngx-countdown';
 
 type Product = ProductBaseResponse;
 
@@ -22,9 +24,13 @@ type Product = ProductBaseResponse;
     ProductCard,
     DataViewModule,
     SelectButtonModule,
+    CountdownModule,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './home.html',
   styleUrl: './home.scss',
+  encapsulation: ViewEncapsulation.None,
+  host: { ngSkipHydration: 'true' },
 })
 export class Home implements OnInit {
   private route: Router = inject(Router);
@@ -36,6 +42,132 @@ export class Home implements OnInit {
 
   layout: 'list' | 'grid' = 'grid';
   options = ['list', 'grid'];
+  countdownConfig = {
+    leftTime: 3600,
+    format: 'HH:mm:ss',
+    demand: false,
+  };
+
+  categories = [
+    { name: 'Thời Trang Nam', image: 'assets/images/categories/men-fashion.jpg' },
+    { name: 'Thời Trang Nữ', image: 'assets/images/categories/women-fashion.jpg' },
+    { name: 'Điện Thoại & Phụ Kiện', image: 'assets/images/categories/phones.jpg' },
+    { name: 'Máy Tính & Laptop', image: 'assets/images/categories/laptop.jpg' },
+    { name: 'Nhà Cửa & Đời Sống', image: 'assets/images/categories/home.jpg' },
+    { name: 'Sắc Đẹp', image: 'assets/images/categories/beauty.jpg' },
+    { name: 'Đồ Chơi & Sở Thích', image: 'assets/images/categories/toys.jpg' },
+    { name: 'Thực phẩm', image: 'assets/images/categories/toys.jpg' },
+    { name: 'Đồ gia dụng', image: 'assets/images/categories/toys.jpg' },
+    { name: 'abc', image: 'assets/images/categories/toys.jpg' },
+  ];
+
+  brands = [
+    { name: 'Nestlé', logo: '/images/brands/nestle.png' },
+    { name: 'Starbucks', logo: '/images/brands/starbucks.png' },
+    { name: 'Highlands Coffee', logo: '/images/brands/highlands.png' },
+    { name: 'Vinacafé', logo: '/images/brands/vinacafe.png' },
+    { name: 'Trung Nguyên', logo: '/images/brands/trungnguyen.png' },
+    { name: 'G7', logo: '/images/brands/g7.png' },
+    { name: 'Tchibo', logo: '/images/brands/tchibo.png' },
+  ];
+
+  flashSaleProducts = [
+    {
+      name: 'Cafe Legend 500g',
+      image: '/images/product1.png',
+      price: 182000,
+      discount: 10,
+      progress: 40,
+    },
+    {
+      name: 'Bình Lock&Lock',
+      image: '/images/product2.png',
+      price: 418000,
+      discount: 43,
+      progress: 50,
+    },
+    {
+      name: 'Chảo chống dính',
+      image: '/images/product3.png',
+      price: 201000,
+      discount: 37,
+      progress: 70,
+    },
+    {
+      name: 'Sách Toàn tâm toàn ý',
+      image: '/images/product4.png',
+      price: 101200,
+      discount: 32,
+      progress: 20,
+    },
+    { name: 'Pinocchio', image: '/images/product5.png', price: 681500, discount: 9, progress: 80 },
+    {
+      name: 'Inferno - Dan Brown',
+      image: '/images/product6.png',
+      price: 212500,
+      discount: 7,
+      progress: 35,
+    },
+    {
+      name: 'Inferno - Dan Brown',
+      image: '/images/product6.png',
+      price: 212500,
+      discount: 7,
+      progress: 35,
+    },
+    {
+      name: 'Inferno - Dan Brown',
+      image: '/images/product6.png',
+      price: 212500,
+      discount: 7,
+      progress: 35,
+    },
+    {
+      name: 'Inferno - Dan Brown',
+      image: '/images/product6.png',
+      price: 212500,
+      discount: 7,
+      progress: 35,
+    },
+  ];
+
+  hours = '01';
+  minutes = '13';
+  seconds = '38';
+
+  heroSlides: any[] = [
+    { title: 'banner 1', image: '/images/banner-1.jpg' },
+    { title: 'banner 2', image: '/images/banner-2.jpg' },
+    { title: 'banner 3', image: '/images/banner-3.jpg' },
+  ];
+
+  policies = [
+    {
+      icon: 'pi pi-truck',
+      title: 'Miễn phí vận chuyển',
+      desc: 'Áp dụng cho đơn hàng từ 200.000đ',
+    },
+    {
+      icon: 'pi pi-refresh',
+      title: 'Đổi trả dễ dàng',
+      desc: 'Trong vòng 7 ngày nếu có lỗi từ NSX',
+    },
+    {
+      icon: 'pi pi-shield',
+      title: 'Hàng chính hãng 100%',
+      desc: 'Cam kết chất lượng và nguồn gốc rõ ràng',
+    },
+    {
+      icon: 'pi pi-headphones',
+      title: 'Hỗ trợ 24/7',
+      desc: 'Đội ngũ CSKH sẵn sàng phục vụ bạn',
+    },
+    {
+      icon: 'pi pi-credit-card',
+      title: 'Thanh toán an toàn',
+      desc: 'Mọi giao dịch được mã hóa và bảo mật tuyệt đối',
+    },
+  ];
 
   ngOnInit(): void {
     // this.inventoryService.loadProducts(1, 12);
@@ -43,18 +175,22 @@ export class Home implements OnInit {
     //   this.products = data;
     // });
     this.productService
-      .getProductByPaging(1, 12)
+      .getProductByPaging(1, 8)
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.products = data?.items || [];
         console.log(data?.items);
         console.log(this.products);
       });
+
+    // this.startCountdown(1 * 60 * 60 + 13 * 60 + 38);
   }
 
   navigationToDetailPage() {
     this.route.navigate(['/product-detail']);
   }
+
+  navigationToCategory() {}
 
   navigationToDiscoverPage() {
     this.route.navigate(['/discover-page'], {
@@ -83,5 +219,11 @@ export class Home implements OnInit {
 
   navigationToProductList() {
     this.route.navigate(['/product-list']);
+  }
+
+  onCountdownEvent(event: CountdownEvent) {
+    if (event.action === 'done') {
+      console.log('Flash sale kết thúc!');
+    }
   }
 }
