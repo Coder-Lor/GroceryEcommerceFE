@@ -42,6 +42,14 @@ export class Home implements OnInit {
 
   layout: 'list' | 'grid' = 'grid';
   options = ['list', 'grid'];
+
+  //biến phân trang
+  page: number = 1;
+  pageSize: number = 4;
+  totalCount = 0;
+  isLoading: boolean = false;
+
+  // setup countdown flash sale
   countdownConfig = {
     leftTime: 3600,
     format: 'HH:mm:ss',
@@ -174,16 +182,38 @@ export class Home implements OnInit {
     // this.inventoryService.getProducts().subscribe((data) => {
     //   this.products = data;
     // });
-    this.productService
-      .getProductByPaging(1, 8)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data) => {
-        this.products = data?.items || [];
-        console.log(data?.items);
-        console.log(this.products);
-      });
+    this.loadProducts();
 
     // this.startCountdown(1 * 60 * 60 + 13 * 60 + 38);
+  }
+
+  loadProducts(): void {
+    if (this.isLoading) return;
+    this.isLoading = true;
+
+    this.productService
+      .getProductByPaging(this.page, this.pageSize)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          const newItems = data?.items || [];
+          this.totalCount = data?.totalCount || 0;
+
+          // ✅ Ghép thêm sản phẩm mới vào danh sách cũ
+          this.products = [...this.products, ...newItems];
+        },
+        error: (err) => console.error('Lỗi khi tải sản phẩm', err),
+        complete: () => (this.isLoading = false),
+      });
+  }
+
+  loadMore(): void {
+    if (this.products.length >= this.totalCount) {
+      console.log('Đã tải hết sản phẩm!');
+      return;
+    }
+    this.page++;
+    this.loadProducts();
   }
 
   navigationToDetailPage() {

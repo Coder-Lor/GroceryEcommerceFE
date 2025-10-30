@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { ProductBaseResponse } from '@core/service/system-admin.service';
+import { TruncatePipe } from '@shared/pipes/truncate-pipe.pipe';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Ripple } from 'primeng/ripple';
@@ -12,7 +13,7 @@ type Product = ProductBaseResponse;
 @Component({
   selector: 'product-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule, Ripple, Tag],
+  imports: [CommonModule, RouterModule, ButtonModule, Ripple, Tag, TruncatePipe],
   templateUrl: './product-card.html',
   styleUrl: './product-card.scss',
 })
