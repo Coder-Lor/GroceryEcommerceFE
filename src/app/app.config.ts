@@ -16,8 +16,9 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { MessageService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthService } from '@core/service/auth.service';
+import { CredentialInterceptor } from './core/service/credential.interceptor';
 
 import { registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
@@ -45,6 +46,7 @@ export const appConfig: ApplicationConfig = {
     }),
     provideCharts(withDefaultRegisterables()),
     provideHttpClient(withFetch()),
+    { provide: HTTP_INTERCEPTORS, useClass: CredentialInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
     // provideAppInitializer(() => {
