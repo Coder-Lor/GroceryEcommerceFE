@@ -1,24 +1,26 @@
 <div class="homepage">
   <!-- Hero banner -->
   <section class="hero container position-relative mb-5">
-    <div class="hero-bg bg-info rounded-4 position-absolute w-100 h-100 top-0 start-0"></div>
-    <img class="hero-vector hero-vector-1 position-absolute" src="vector-40.svg" alt="" />
-    <img class="hero-vector hero-vector-2 position-absolute" src="vector-50.svg" alt="" />
-    <div class="hero-shadow hero-shadow-1 position-absolute"></div>
-    <div class="hero-shadow hero-shadow-2 position-absolute"></div>
-
-    <h1 class="hero-title position-absolute fw-bold text-white">
-      ORDER YOUR <br />
-      FAVORITE COFFEE
-    </h1>
-
-    <div class="hero-pagination position-absolute d-flex align-items-center gap-2 text-white">
-      <span class="current fw-bold">1</span>
-      <span class="total">5</span>
-      <div class="line bg-white opacity-50" style="width: 40px; height: 2px"></div>
-      <div class="dot active bg-white rounded-circle" style="width: 10px; height: 10px"></div>
-      <div class="dot bg-white rounded-circle opacity-50" style="width: 10px; height: 10px"></div>
-    </div>
+    <p-carousel 
+      [value]="carouselImages" 
+      [numVisible]="2" 
+      [numScroll]="2" 
+      [circular]="true" 
+      [autoplayInterval]="8000" 
+      [responsiveOptions]="responsiveOptions"
+      class="custom-carousel">
+      <ng-template let-image #item>
+        <div class="carousel-item-wrapper">
+          <div class="image-container">
+            <img 
+              [src]="image.url" 
+              [alt]="'Banner image'" 
+              class="carousel-image"
+              loading="lazy" />
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
   </section>
 
   <!-- Categories -->

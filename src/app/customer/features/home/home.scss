@@ -4,26 +4,108 @@
 }
 
 .hero {
-  height: 455px;
   border-radius: 20px;
   overflow: hidden;
 }
 
-.hero-title {
-  left: 5%;
-  top: 15%;
-  font-size: 42px;
-  line-height: 60px;
-  z-index: 2;
+// Custom Carousel Styles
+.custom-carousel {
+  ::ng-deep {
+    .p-carousel {
+      .p-carousel-content {
+        display: flex;
+        width: 100%;
+        // align-items: stretch;
+      }
+
+      .p-carousel-items-container {
+        width: 100%;
+      }
+
+      .p-carousel-item {
+        display: flex;
+        // align-items: stretch;
+        width: 50% !important; // Ensure exactly 2 items per slide
+        padding: 0 12px; // Gap between images
+      }
+    }
+  }
 }
 
-.hero-img-main {
-  right: 10%;
-  top: 9%;
-  width: 18.6%;
-  height: 70%;
-  object-fit: cover;
+.carousel-item-wrapper {
+  width: 100%;
+  height: 200px; // Fixed height for carousel
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px; // Add horizontal gap between items
 }
+
+.image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #f5f5f5; // Fallback color while loading
+  margin: 0 4px; // Additional margin for gap
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; // Cover: fills container, crops overflow
+  // Alternative: object-fit: contain; // Contain: shows full image, may have letterboxing
+  object-position: center;
+  display: block;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+
+  // &:hover {
+  //   transform: scale(1.02);
+  // }
+}
+
+// Responsive adjustments
+@media (max-width: 767px) {
+  .carousel-item-wrapper {
+    height: 200px;
+    padding: 0 4px; // Smaller gap on mobile
+  }
+
+  .image-container {
+    margin: 0 2px; // Smaller margin on mobile
+  }
+
+  .custom-carousel ::ng-deep .p-carousel .p-carousel-item {
+    width: 100% !important; // Single image on mobile
+    padding: 0 8px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .carousel-item-wrapper {
+    height: 280px;
+  }
+}
+
+// .hero-title {
+//   left: 5%;
+//   top: 15%;
+//   font-size: 42px;
+//   line-height: 60px;
+//   z-index: 2;
+// }
+
+// .hero-img-main {
+//   right: 10%;
+//   top: 9%;
+//   width: 18.6%;
+//   height: 70%;
+//   object-fit: cover;
+// }
 
 /* Bảo đảm column chứa card dùng flex để chiều cao bằng nhau */
 .categories-list .col-md-4 {
