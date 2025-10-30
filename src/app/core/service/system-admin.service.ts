@@ -105,6 +105,7 @@ export class AbandonedCartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -260,6 +261,7 @@ export class AbandonedCartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -342,6 +344,7 @@ export class AbandonedCartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -417,6 +420,7 @@ export class AbandonedCartClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -510,6 +514,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -587,6 +592,7 @@ export class AuditLogClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -662,6 +668,7 @@ export class AuditLogClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -737,6 +744,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -816,6 +824,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -903,6 +912,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -987,6 +997,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1076,6 +1087,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1160,6 +1172,7 @@ export class AuditLogClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1239,6 +1252,7 @@ export class AuditLogClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -1313,6 +1327,7 @@ export class AuditLogClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -1394,6 +1409,7 @@ export class AuditLogClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -1491,6 +1507,7 @@ export class AuthClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1569,6 +1586,7 @@ export class AuthClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1645,6 +1663,7 @@ export class AuthClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1721,6 +1740,7 @@ export class AuthClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1797,6 +1817,7 @@ export class AuthClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -1873,6 +1894,7 @@ export class AuthClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -2034,6 +2056,7 @@ export class BrandClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -2124,6 +2147,7 @@ export class BrandClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -2214,6 +2238,7 @@ export class BrandClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -2307,6 +2332,7 @@ export class BrandClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/octet-stream',
@@ -2398,6 +2424,7 @@ export class BrandClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -2488,6 +2515,7 @@ export class BrandClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -2578,6 +2606,7 @@ export class BrandClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -2668,6 +2697,7 @@ export class BrandClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/octet-stream',
@@ -2762,6 +2792,7 @@ export class BrandClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/octet-stream',
@@ -2870,6 +2901,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -2947,6 +2979,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3022,6 +3055,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3097,6 +3131,7 @@ export class CartClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -3179,6 +3214,7 @@ export class CartClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -3255,6 +3291,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3330,6 +3367,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3474,6 +3512,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3557,6 +3596,7 @@ export class CartClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -3636,6 +3676,7 @@ export class CartClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3793,6 +3834,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3873,6 +3915,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -3950,6 +3993,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4027,6 +4071,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4101,6 +4146,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4175,6 +4221,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4249,6 +4296,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4326,6 +4374,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4407,6 +4456,7 @@ export class CategoryClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -4483,6 +4533,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4558,6 +4609,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4633,6 +4685,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4708,6 +4761,7 @@ export class CategoryClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -4784,6 +4838,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -4867,6 +4922,7 @@ export class CategoryClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -4945,6 +5001,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5022,6 +5079,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5099,6 +5157,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5174,6 +5233,7 @@ export class CategoryClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5268,6 +5328,7 @@ export class FileUploadClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -5362,6 +5423,7 @@ export class FileUploadClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -5451,6 +5513,7 @@ export class FileUploadClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -5560,6 +5623,7 @@ export class ImageClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5639,6 +5703,7 @@ export class ImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5715,6 +5780,7 @@ export class ImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5798,6 +5864,7 @@ export class ImageClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5873,6 +5940,7 @@ export class ImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -5948,6 +6016,7 @@ export class ImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6023,6 +6092,7 @@ export class ImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6097,6 +6167,7 @@ export class ImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6178,6 +6249,7 @@ export class ImageClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6272,6 +6344,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6349,6 +6422,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6426,6 +6500,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6498,6 +6573,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6580,6 +6656,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6658,6 +6735,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6806,6 +6884,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -6953,6 +7032,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -7037,6 +7117,7 @@ export class ProductAttributeClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -7122,6 +7203,7 @@ export class ProductAttributeClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -7205,6 +7287,7 @@ export class ProductAttributeClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -7297,6 +7380,7 @@ export class ProductAttributeValueClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -7446,6 +7530,7 @@ export class ProductAttributeValueClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -7597,6 +7682,7 @@ export class ProductAttributeValueClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -7681,6 +7767,7 @@ export class ProductAttributeValueClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -7766,6 +7853,7 @@ export class ProductAttributeValueClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -7849,6 +7937,7 @@ export class ProductAttributeValueClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8030,6 +8119,7 @@ export class ProductClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8106,6 +8196,7 @@ export class ProductClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -8250,6 +8341,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8332,6 +8424,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8408,6 +8501,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8483,6 +8577,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8563,6 +8658,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8743,6 +8839,7 @@ export class ProductClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -8821,6 +8918,7 @@ export class ProductClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -8898,6 +8996,7 @@ export class ProductClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -8974,6 +9073,7 @@ export class ProductClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -9060,6 +9160,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9150,6 +9251,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9267,6 +9369,7 @@ export class ProductClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9360,6 +9463,7 @@ export class ProductImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9504,6 +9608,7 @@ export class ProductImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9584,6 +9689,7 @@ export class ProductImageClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -9665,6 +9771,7 @@ export class ProductImageClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -9746,6 +9853,7 @@ export class ProductImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9821,6 +9929,7 @@ export class ProductImageClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -9913,6 +10022,7 @@ export class ProductQuestionClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -10058,6 +10168,7 @@ export class ProductQuestionClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -10205,6 +10316,7 @@ export class ProductQuestionClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -10287,6 +10399,7 @@ export class ProductQuestionClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -10370,6 +10483,7 @@ export class ProductQuestionClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -10453,6 +10567,7 @@ export class ProductQuestionClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -10529,6 +10644,7 @@ export class ProductQuestionClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -10621,6 +10737,7 @@ export class ProductTagAssignmentClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/octet-stream',
@@ -10715,6 +10832,7 @@ export class ProductTagAssignmentClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -10805,6 +10923,7 @@ export class ProductTagAssignmentClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -10909,6 +11028,7 @@ export class ProductTagAssignmentClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -11013,6 +11133,7 @@ export class ProductTagAssignmentClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -11185,6 +11306,7 @@ export class ProductTagClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -11275,6 +11397,7 @@ export class ProductTagClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -11368,6 +11491,7 @@ export class ProductTagClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/octet-stream',
@@ -11459,6 +11583,7 @@ export class ProductTagClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -11549,6 +11674,7 @@ export class ProductTagClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/octet-stream',
       }),
@@ -11639,6 +11765,7 @@ export class ProductTagClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/octet-stream',
@@ -11749,6 +11876,7 @@ export class ProductVariantClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -11832,6 +11960,7 @@ export class ProductVariantClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -11913,6 +12042,7 @@ export class ProductVariantClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -11988,6 +12118,7 @@ export class ProductVariantClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -12064,6 +12195,7 @@ export class ProductVariantClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12153,6 +12285,7 @@ export class ProductVariantClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12249,6 +12382,7 @@ export class ProductVariantClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12348,6 +12482,7 @@ export class RefreshTokenClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12424,6 +12559,7 @@ export class RefreshTokenClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12499,6 +12635,7 @@ export class RefreshTokenClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12571,6 +12708,7 @@ export class RefreshTokenClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12666,6 +12804,7 @@ export class UserAddressClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -12747,6 +12886,7 @@ export class UserAddressClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -12822,6 +12962,7 @@ export class UserAddressClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -12898,6 +13039,7 @@ export class UserAddressClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -12977,6 +13119,7 @@ export class UserAddressClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13052,6 +13195,7 @@ export class UserAddressClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13144,6 +13288,7 @@ export class UserClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13219,6 +13364,7 @@ export class UserClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13293,6 +13439,7 @@ export class UserClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13367,6 +13514,7 @@ export class UserClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13442,6 +13590,7 @@ export class UserClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -13518,6 +13667,7 @@ export class UserClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -13611,6 +13761,7 @@ export class UserRoleAssignmentClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -13687,6 +13838,7 @@ export class UserRoleAssignmentClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -13763,6 +13915,7 @@ export class UserRoleAssignmentClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -13844,6 +13997,7 @@ export class UserRoleAssignmentClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -13944,6 +14098,7 @@ export class UserRoleClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -14021,6 +14176,7 @@ export class UserRoleClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -14096,6 +14252,7 @@ export class UserRoleClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -14168,6 +14325,7 @@ export class UserRoleClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -14243,6 +14401,7 @@ export class UserRoleClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -14319,6 +14478,7 @@ export class UserRoleClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -14415,6 +14575,7 @@ export class UserSessionClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -14502,6 +14663,7 @@ export class UserSessionClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -14583,6 +14745,7 @@ export class UserSessionClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -14658,6 +14821,7 @@ export class UserSessionClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -14750,6 +14914,7 @@ export class WishlistClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -14828,6 +14993,7 @@ export class WishlistClient {
       body: content_,
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -14973,6 +15139,7 @@ export class WishlistClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -15053,6 +15220,7 @@ export class WishlistClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
@@ -15197,6 +15365,7 @@ export class WishlistClient {
     let options_: any = {
       observe: 'response',
       responseType: 'blob',
+      withCredentials: true,
       headers: new HttpHeaders({
         Accept: 'application/json',
       }),
