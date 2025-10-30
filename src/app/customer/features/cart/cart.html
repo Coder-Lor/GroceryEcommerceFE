@@ -8,20 +8,18 @@
             <div class="col-lg-8">
                 <div class="card shadow-lg border-0 rounded-4 p-4">
                     <!-- Product Item -->
-                    @for (item of Cart; track $index) {
+                    @for (item of (Cart$ | async); track item.cartItemId) {
                     <div class="cart-item d-flex gap-4 align-items-center border-bottom pb-4 mb-2">
-                        <img [src]="item.image" class="rounded img-fluid"
+                        <img [src]="item.imageUrl" class="rounded img-fluid"
                             style="width:175px; height:172px; object-fit:cover;" alt="Coffee Beans">
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h6 class="fw-semibold fs-7 text-dark mb-0">
-                                    {{item.name}}
+                                    {{item.productName}}
                                 </h6>
-                                <span class="fw-bold fs-8 text-dark">${{item.price * item.quantity}}</span>
+                                <span class="fw-bold fs-8 text-dark">{{item.unitPrice * item.quantity | number:'1.0-0'}}₫</span>
                             </div>
-                            <p class="mb-2 text-muted">${{item.price}} | <span class="fw-medium"
-                                    [ngClass]="{'text-success': item.inventory, 'text-warning': !item.inventory}">
-                                    {{ item.inventory ? 'In stock' : 'Out of stock'}}</span></p>
+                            <p class="mb-2 text-muted">{{item.unitPrice | number:'1.0-0'}}₫</p>
 
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                                 <div class="d-flex gap-2">
@@ -33,7 +31,7 @@
                                     <!-- Quantity Selector -->
                                     <div class="d-flex align-items-center px-2">
                                         <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [step]="1"
-                                            [showButtons]="true" buttonLayout="horizontal" inputId="{{item.id}}">
+                                            [showButtons]="true" buttonLayout="horizontal" inputId="{{item.cartItemId}}" (onInput)="onUpdateQuantity(item.cartItemId, item.quantity)">
                                             <ng-template pTemplate="incrementbuttonicon">
                                                 <span class="pi pi-plus"></span>
                                             </ng-template>
@@ -46,8 +44,8 @@
 
                                 <!-- Save & Delete -->
                                 <div class="d-flex gap-4">
-                                    <button class="btn text-muted d-flex align-items-center gap-2 p-0">
-                                        <i class="pi pi-trash"></i> Delete
+                                    <button class="btn text-muted d-flex align-items-center gap-2 p-0" (click)="onRemove(item.cartItemId)">
+                                        <i class="pi pi-trash"></i> Xóa
                                     </button>
                                 </div>
                             </div>
@@ -66,7 +64,7 @@
                         <div>
                             <div class="d-flex justify-content-between gap-5">
                                 <span class="fw-medium">Subtotal:</span>
-                                <span class="fw-medium">$191.65</span>
+                                <span class="fw-medium">{{ (totalPrice$ | async) | number:'1.0-0' }}₫</span>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <span class="fw-medium">Shipping:</span>

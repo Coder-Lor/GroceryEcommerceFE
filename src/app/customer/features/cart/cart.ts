@@ -4,6 +4,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CartService } from '../../../core/service/cart.service';
+import { inject } from '@angular/core';
 
 
 @Component({
@@ -21,16 +23,20 @@ import { RouterModule } from '@angular/router';
   styleUrl: './cart.scss'
 })
 export class Cart implements OnInit {
+  private cartService: CartService = inject(CartService);
 
-  Cart: any[] = [
-    { id: 1, name: "product 1", price: 25.5, quantity: 1, image: '/images/product-image-1.png', inventory: true },
-    { id: 2, name: "product 2", price: 15.5, quantity: 1, image: '/images/product-image-1.png', inventory: false },
-    { id: 3, name: "product 3", price: 45.5, quantity: 1, image: '/images/product-image-1.png', inventory: true },
-    { id: 4, name: "product 4", price: 35.5, quantity: 1, image: '/images/product-image-1.png', inventory: false },
-  ]
-  totalPrice: number = 0;
+  Cart$ = this.cartService.cartItems$;
+  totalPrice$ = this.cartService.cartSubtotal$;
 
   ngOnInit(): void {
+    this.cartService.loadCartSummary();
+  }
 
+  onUpdateQuantity(id: string, qty: number) {
+    this.cartService.updateQuantity(id, qty).subscribe();
+  }
+
+  onRemove(id: string) {
+    this.cartService.removeItem(id).subscribe();
   }
 }
