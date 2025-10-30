@@ -13,29 +13,26 @@
           <img class="logo-icon" src="/icons/Icon.svg" />
           <div class="brand-name">grocerymart</div>
         </div>
+      </div>
 
-        <!-- nav (hidden on small screens) -->
-        <div class="navigation-menu d-none d-md-flex align-items-center">
-          <div class="nav-item d-flex align-items-center me-3">
-            <span>Departments</span>
-            <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
-          </div>
-          <div class="nav-item d-flex align-items-center me-3">
-            <span>Grocery</span>
-            <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
-          </div>
-          <div class="nav-item d-flex align-items-center">
-            <span>Beauty</span>
-            <img class="dropdown-arrow ms-1" src="/icons/arrow-down.svg" />
-          </div>
+      <!-- Center Section: Search -->
+      <div class="search-center d-none d-md-flex">
+        <div class="search-box d-flex align-items-center text-body">
+          <input
+            #queryInput
+            class="search-input"
+            type="text"
+            placeholder="Tìm sản phẩm..."
+            (keyup.enter)="onSearch(queryInput.value)"
+          />
+          <button class="search-btn" (click)="onSearch(queryInput.value)">
+            <i class="pi pi-search"></i>
+          </button>
         </div>
       </div>
 
       <!-- Right Section -->
       <div class="header-right d-flex align-items-center">
-        <div class="search-button me-2" style="cursor: pointer" (click)="toggleSearchBox()">
-          <i class="pi pi-search"></i>
-        </div>
         <!-- Cart & wishlist -->
         <div class="cart-wishlist me-3" (click)="toggleUtilPanel()" style="cursor: pointer">
           <div class="cart-wishlist-content d-flex align-items-center">

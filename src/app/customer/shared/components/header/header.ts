@@ -116,11 +116,20 @@ export class Header implements OnInit, OnChanges {
     this.isShowSearchBox = !this.isShowSearchBox;
   }
 
-  toggleUtilPanel() {
+  toggleUtilPanel() { 
     this.isShowPanel = !this.isShowPanel;
   }
 
   backToHomePage() {
     this.router.navigate(['']);
+  }
+
+  onSearch(rawQuery: string) {
+    const query = (rawQuery ?? '').trim();
+    if (!query) {
+      this.router.navigate(['/product-list'], { queryParams: {} });
+      return;
+    }
+    this.router.navigate(['/product-list'], { queryParams: { search: query } });
   }
 }
