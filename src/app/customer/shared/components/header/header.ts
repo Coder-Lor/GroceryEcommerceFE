@@ -14,6 +14,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/service/auth.service';
 import { log } from 'console';
 import { LogoutCommand } from '@core/service/system-admin.service';
+import { CartService } from '../../../../core/service/cart.service';
 import { Ripple } from "primeng/ripple";
 
 @Component({
@@ -27,6 +28,7 @@ export class Header implements OnInit, OnChanges {
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private cartService: CartService = inject(CartService);
 
   @ViewChild('userMenu', { static: false }) userMenu!: ElementRef;
 
@@ -35,11 +37,15 @@ export class Header implements OnInit, OnChanges {
   isShowSearchBox: boolean = false;
   isShowPanel: boolean = false;
   isOpen: boolean = false;
+  isShowMiniCart: boolean = false;
 
   username: string = '';
   isLoggedIn$ = this.authService.isAuthenticated$;
   user$ = this.authService.currentUser;
   private refreshtoken: any;
+
+  cartCount$ = this.cartService.cartCount$;
+  miniItems$ = this.cartService.cartItems$;
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -116,11 +122,33 @@ export class Header implements OnInit, OnChanges {
     this.isShowSearchBox = !this.isShowSearchBox;
   }
 
-  toggleUtilPanel() {
+  toggleUtilPanel() { 
     this.isShowPanel = !this.isShowPanel;
+  }
+
+  // Hover mini cart
+  onCartMouseEnter() {
+    this.isShowMiniCart = true;
+  }
+  onCartMouseLeave() {
+    this.isShowMiniCart = false;
+  }
+
+  goToCart(event: MouseEvent) {
+    event.stopPropagation();
+    this.router.navigate(['/cart']);
   }
 
   backToHomePage() {
     this.router.navigate(['']);
+  }
+
+  onSearch(rawQuery: string) {
+    const query = (rawQuery ?? '').trim();
+    if (!query) {
+      this.router.navigate(['/product-list'], { queryParams: {} });
+      return;
+    }
+    this.router.navigate(['/product-list'], { queryParams: { search: query } });
   }
 }

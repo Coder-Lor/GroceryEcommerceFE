@@ -3335,7 +3335,7 @@ ngx-countdown@^20.0.0:
 
 ngx-image-cropper@^9.1.5:
   version "9.1.5"
-  resolved "https://registry.npmjs.org/ngx-image-cropper/-/ngx-image-cropper-9.1.5.tgz"
+  resolved "https://registry.yarnpkg.com/ngx-image-cropper/-/ngx-image-cropper-9.1.5.tgz#9b56e5eda4efa481c3b56d9ad019795a139bf8cb"
   integrity sha512-I8MAjMREtXDALgYyeMIvcqE+WpXA4IA9Z59JsujDuqOnjFY/Mpb+8JUyVVuOa0Irp20ukDPQJZmECR4v96hTrg==
   dependencies:
     tslib "^2.3.0"

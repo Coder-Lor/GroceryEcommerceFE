@@ -36,19 +36,19 @@ export class InventoryService {
     this.loadProducts(1, 10);
   }
 
-  // Load products from API with paging
-  loadProducts(page: number = 1, pageSize: number = 10): void {
+  // Load products from API with paging and optional search keyword
+  loadProducts(page: number = 1, pageSize: number = 10, search?: string): void {
     this.productClient.getProductsPaging(
       page,
       pageSize,
-      undefined, // search
+      search, // search
       undefined, // sortBy
       SortDirection.Ascending, // sortDirection
       [], // filters
       undefined, // entityType
       undefined, // availableFields
       false, // hasFilters
-      false, // hasSearch
+      !!search, // hasSearch
       false // hasSorting
     ).pipe(
       map(response => {
