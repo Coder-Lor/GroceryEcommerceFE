@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { InventoryService, PagingInfo } from '../../core/service/inventory.service';
+import { InventoryService } from '../../core/service/inventory.service';
 import {
   faPlus,
   faChartSimple,
@@ -28,7 +28,11 @@ import {
   faChevronRight,
   faAnglesLeft,
   faAnglesRight,
+  faEye,
+  faImages,
+  faStar,
 } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   CategoryClient,
@@ -43,7 +47,6 @@ import { Product } from './models/product.model';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { ProductCard } from 'app/customer/shared/components/product-card/product-card';
 
 @Component({
   selector: 'app-inventory-page',
@@ -53,9 +56,8 @@ import { ProductCard } from 'app/customer/shared/components/product-card/product
     FormsModule,
     FaIconComponent,
     ConfirmDialogModule,
-    ToastModule,
-    ProductCard,
-  ],
+    ToastModule
+],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'inventory-page.component.html',
   styleUrls: ['inventory-page.component.scss'],
@@ -63,24 +65,25 @@ import { ProductCard } from 'app/customer/shared/components/product-card/product
 export class InventoryPageComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   filteredProducts: Product[] = [];
+  currentPageProducts: Product[] = [];
   categories: CategoryDto[] | undefined = [];
   private destroy$ = new Subject<void>();
   searchTerm: string = '';
+  layout: 'list' | 'grid' = 'grid';
 
-  // Paging properties
-  pagingInfo: PagingInfo = {
-    totalCount: 0,
-    totalPages: 0,
-    currentPage: 1,
-    pageSize: 10,
-    hasPreviousPage: false,
-    hasNextPage: false,
-  };
-  pageSizeOptions: number[] = [5, 10, 20, 50, 100];
+  // Pagination properties
+  currentPage: number = 1;
+  pageSize: number = 10;
+  pageSizeOptions: number[] = [10, 20, 50, 100];
+  totalPages: number = 0;
 
   showModal: boolean = false;
   modalMode: 'add' | 'edit' = 'add';
   currentProduct: CreateProductCommand = this.getEmptyProduct();
+
+  showDetailModal: boolean = false;
+  detailProduct: Product | null = null;
+  isDetailEditMode: boolean = false;
 
   showReport: boolean = false;
   report: any = null;
@@ -121,6 +124,10 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   faChevronRight = faChevronRight;
   faAnglesLeft = faAnglesLeft;
   faAnglesRight = faAnglesRight;
+  faEye = faEye;
+  faImages = faImages;
+  faStar = faStar;
+  faStarRegular = faStarRegular;
 
   constructor(
     private inventoryService: InventoryService,
@@ -133,46 +140,39 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('[Inventory] ngOnInit - START');
     this.isLoading = true;
-    console.log('[Inventory] Setting isLoading = true');
-    this.cdr.detectChanges(); // Force change detection
+    this.cdr.detectChanges();
 
-    // Subscribe to products FIRST - before loading data
+    // Subscribe to loading state from service
+    this.inventoryService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((loading) => {
+        this.isLoading = loading;
+        console.log('[Inventory] Loading state changed:', loading);
+        this.cdr.detectChanges();
+      });
+
     this.inventoryService
       .getProducts()
       .pipe(takeUntil(this.destroy$))
       .subscribe((products) => {
         console.log('[Inventory] Received products:', products.length, 'items');
         this.products = products;
-        this.filteredProducts = [...products];
-
-        // Only turn off loading if we have data or it's not initial load
-        if (products.length > 0 || this.products.length > 0) {
-          this.isLoading = false;
-          console.log('[Inventory] Setting isLoading = false');
-          this.cdr.detectChanges(); // Force change detection
-        }
+        this.currentPageProducts = products;
+        this.cdr.detectChanges();
       });
 
-    // Subscribe to paging info
     this.inventoryService
       .getPagingInfo()
       .pipe(takeUntil(this.destroy$))
       .subscribe((pagingInfo) => {
         console.log('[Inventory] Paging info updated:', pagingInfo);
-        this.pagingInfo = pagingInfo;
-
-        // Turn off loading when paging info is updated with data
-        if (pagingInfo.totalCount > 0 && this.isLoading) {
-          this.isLoading = false;
-          console.log('[Inventory] Setting isLoading = false (from paging)');
-          this.cdr.detectChanges();
-        }
+        this.currentPage = pagingInfo.currentPage;
+        this.pageSize = pagingInfo.pageSize;
+        this.totalPages = pagingInfo.totalPages;
+        this.cdr.detectChanges();
       });
-
-    // NOW initialize/load data AFTER subscriptions are set up
-    console.log('[Inventory] Calling initialize()');
+    
     this.inventoryService.initialize();
 
     this.categoryClient
@@ -182,7 +182,6 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         next: (response: ResultOfListOfCategoryDto) => {
           if (response.isSuccess) {
             this.categories = response.data;
-            console.log(this.categories);
           } else {
             this.messageService.add({
               severity: 'error',
@@ -200,20 +199,25 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Paging methods
+  // Search handler - call API with search keyword
+  onSearch(): void {
+    this.currentPage = 1; // Reset to first page on search
+    const keyword = this.searchTerm.trim() || undefined;
+    this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+  }
+
+  // Pagination methods
   onPageSizeChange(): void {
-    console.log('[Inventory] onPageSizeChange - Setting isLoading = true');
-    this.isLoading = true;
-    this.cdr.detectChanges(); // Force change detection
-    this.inventoryService.changePageSize(this.pagingInfo.pageSize);
+    this.currentPage = 1;
+    const keyword = this.searchTerm.trim() || undefined;
+    this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
   }
 
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.pagingInfo.totalPages) {
-      console.log('[Inventory] goToPage', page, '- Setting isLoading = true');
-      this.isLoading = true;
-      this.cdr.detectChanges(); // Force change detection
-      this.inventoryService.changePage(page);
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      const keyword = this.searchTerm.trim() || undefined;
+      this.inventoryService.loadProducts(page, this.pageSize, keyword);
     }
   }
 
@@ -222,76 +226,73 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   }
 
   goToLastPage(): void {
-    this.goToPage(this.pagingInfo.totalPages);
+    this.goToPage(this.totalPages);
   }
 
   goToPreviousPage(): void {
-    if (this.pagingInfo.hasPreviousPage) {
-      this.goToPage(this.pagingInfo.currentPage - 1);
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
     }
   }
 
   goToNextPage(): void {
-    if (this.pagingInfo.hasNextPage) {
-      this.goToPage(this.pagingInfo.currentPage + 1);
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
     }
   }
 
   getPageNumbers(): number[] {
     const pages: number[] = [];
-    const totalPages = this.pagingInfo.totalPages;
-    const currentPage = this.pagingInfo.currentPage;
+    const totalPages = this.totalPages;
+    const currentPage = this.currentPage;
 
     if (totalPages <= 7) {
-      // Show all pages if total is 7 or less
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show first page
       pages.push(1);
 
       if (currentPage <= 3) {
-        // Near the start
         pages.push(2, 3, 4, 5);
-        pages.push(-1); // Ellipsis
+        pages.push(-1);
       } else if (currentPage >= totalPages - 2) {
-        // Near the end
-        pages.push(-1); // Ellipsis
+        pages.push(-1);
         pages.push(totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1);
       } else {
-        // In the middle
-        pages.push(-1); // Ellipsis
+        pages.push(-1);
         pages.push(currentPage - 1, currentPage, currentPage + 1);
-        pages.push(-1); // Ellipsis
+        pages.push(-1);
       }
 
-      // Always show last page
       pages.push(totalPages);
     }
 
     return pages;
   }
 
-  // Lọc sản phẩm theo từ khóa - Note: Filtering is now done on server side via API
-  // This method is kept for client-side filtering of status only
-  filterProducts(): void {
-    let productsToFilter = [...this.products];
-
-    // Lọc theo trạng thái (client-side)
-    const activeStatusFilters = this.statusOptions.filter((status) => this.statusFilters[status]);
-    // Only filter if not all options are selected
-    if (activeStatusFilters.length > 0 && activeStatusFilters.length < this.statusOptions.length) {
-      productsToFilter = productsToFilter.filter((p) =>
-        activeStatusFilters.includes(this.getStockStatus(p))
-      );
-    }
-
-    this.filteredProducts = productsToFilter;
+  get hasPreviousPage(): boolean {
+    return this.currentPage > 1;
   }
 
-  // Sắp xếp sản phẩm - Note: Sorting is now done on server side via API
-  // This method is kept for client-side sorting only if needed
+  get hasNextPage(): boolean {
+    return this.currentPage < this.totalPages;
+  }
+
+  get paginationInfo(): string {
+    const start = (this.currentPage - 1) * this.pageSize + 1;
+    const end = Math.min(this.currentPage * this.pageSize, this.filteredProducts.length);
+    return `Hiển thị ${start} - ${end} trong tổng số ${this.filteredProducts.length} sản phẩm`;
+  }
+
+  // Filter products
+  filterProducts(): void {
+    this.currentPage = 1;
+    const keyword = this.searchTerm.trim() || undefined;
+    this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+  }
+
+  // Sort products - Note: For full server-side sorting, modify API call
   sortProducts(): void {
     this.filteredProducts.sort((a, b) => {
       let aValue: any = (a as any)[this.sortColumn];
@@ -306,9 +307,14 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
+    
+    // Update display after sorting
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.currentPageProducts = this.filteredProducts.slice(startIndex, endIndex);
   }
 
-  // Thay đổi cột sắp xếp - Note: In future, this should trigger server-side sorting
+  // Change sort column
   changeSortColumn(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -331,6 +337,214 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   // Mở modal thêm sản phẩm - Giờ chuyển sang navigate
   openAddModal(): void {
     this.router.navigate(['/admin/inventory/add-new-product']);
+  }
+
+  // Xem chi tiết sản phẩm
+  viewProductDetail(product: Product): void {
+    console.log('viewProductDetail called with product:', product);
+    console.log('Product ID:', product.productId);
+    
+    if (!product.productId) {
+      console.error('Product ID is missing!');
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Không tìm thấy ID sản phẩm',
+        life: 3000,
+      });
+      return;
+    }
+
+    console.log('Calling API getById with productId:', product.productId);
+    this.isLoading = true;
+    
+    // Call API to get full product details
+    this.productClient
+      .getById(product.productId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('API Response received:', response);
+          this.isLoading = false;
+          
+          if (response.isSuccess && response.data) {
+            console.log('Response data:', response.data);
+            // Map API response to Product type
+            this.detailProduct = ProductBaseResponse.fromJS({
+              productId: response.data.productId,
+              name: response.data.name,
+              slug: response.data.slug,
+              sku: response.data.sku,
+              description: response.data.description,
+              shortDescription: response.data.shortDescription,
+              price: response.data.price,
+              discountPrice: response.data.discountPrice,
+              cost: response.data.cost,
+              stockQuantity: response.data.stockQuantity,
+              minStockLevel: response.data.minStockLevel,
+              weight: response.data.weight,
+              dimensions: response.data.dimensions,
+              categoryId: response.data.categoryId,
+              categoryName: response.data.categoryName,
+              brandId: response.data.brandId,
+              brandName: response.data.brandName,
+              status: response.data.status,
+              isFeatured: response.data.isFeatured,
+              isDigital: response.data.isDigital,
+              metaTitle: response.data.metaTitle,
+              metaDescription: response.data.metaDescription,
+              createdAt: response.data.createdAt,
+              updatedAt: response.data.updatedAt,
+              primaryImageUrl: response.data.primaryImageUrl,
+              images: response.data.images,
+              variants: response.data.variants,
+              tags: response.data.tags,
+              averageRating: response.data.averageRating,
+              reviewCount: response.data.reviewCount
+            });
+            
+            this.showDetailModal = true;
+            this.isDetailEditMode = false;
+            this.cdr.detectChanges();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể tải thông tin sản phẩm',
+              life: 3000,
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error loading product details:', error);
+          this.isLoading = false;
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Đã có lỗi xảy ra khi tải thông tin sản phẩm',
+            life: 3000,
+          });
+        }
+      });
+  }
+
+  // Đóng modal chi tiết
+  closeDetailModal(): void {
+    this.showDetailModal = false;
+    this.detailProduct = null;
+    this.isDetailEditMode = false;
+  }
+
+  // Bật chế độ chỉnh sửa trong modal chi tiết
+  enableEditMode(): void {
+    if (this.detailProduct) {
+      this.isDetailEditMode = true;
+      this.currentProduct = CreateProductCommand.fromJS(this.detailProduct.toJSON());
+    }
+  }
+
+  // Lưu thay đổi từ modal chi tiết
+  saveDetailChanges(): void {
+    if (this.validateProduct() && this.detailProduct) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Thông báo',
+        detail: 'Chức năng cập nhật sẽ được hoàn thiện sau',
+        life: 3000,
+      });
+      this.closeDetailModal();
+    }
+  }
+
+  // Handle image selection
+  onImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      Array.from(input.files).forEach(file => {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Cảnh báo',
+            detail: `File ${file.name} vượt quá 5MB`,
+            life: 3000,
+          });
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Cảnh báo',
+            detail: `File ${file.name} không phải là ảnh`,
+            life: 3000,
+          });
+          return;
+        }
+
+        // Read and create preview
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const imageUrl = e.target?.result as string;
+          
+          // Add to currentProduct images
+          if (!this.currentProduct.images) {
+            this.currentProduct.images = [];
+          }
+
+          // Create new image object
+          const newImage = {
+            productImageId: `temp-${Date.now()}-${Math.random()}`,
+            imageUrl: imageUrl,
+            altText: file.name,
+            displayOrder: this.currentProduct.images.length,
+            isPrimary: this.currentProduct.images.length === 0, // First image is primary
+            createdAt: new Date()
+          };
+
+          this.currentProduct.images.push(newImage as any);
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    // Reset input
+    input.value = '';
+  }
+
+  // Set image as primary
+  setPrimaryImage(index: number): void {
+    if (this.currentProduct.images && this.currentProduct.images.length > 0) {
+      // Remove primary from all images
+      this.currentProduct.images.forEach(img => img.isPrimary = false);
+      // Set selected as primary
+      this.currentProduct.images[index].isPrimary = true;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Remove image
+  removeImage(index: number): void {
+    if (this.currentProduct.images && this.currentProduct.images.length > 0) {
+      const removedImage = this.currentProduct.images[index];
+      this.currentProduct.images.splice(index, 1);
+
+      // If removed image was primary and there are remaining images, set first as primary
+      if (removedImage.isPrimary && this.currentProduct.images.length > 0) {
+        this.currentProduct.images[0].isPrimary = true;
+      }
+
+      this.cdr.detectChanges();
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Thành công',
+        detail: 'Đã xóa ảnh',
+        life: 2000,
+      });
+    }
   }
 
   // Mở modal sửa sản phẩm
@@ -373,8 +587,6 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
   // Xác nhận xóa sản phẩm
   confirmDelete(product: Product): void {
-    console.log('confirmDelete called with product:', product);
-
     this.confirmationService.confirm({
       message: `Bạn có chắc muốn xóa sản phẩm "${product.name}"?<br/>Hành động này không thể hoàn tác.`,
       header: 'Xác nhận xóa',

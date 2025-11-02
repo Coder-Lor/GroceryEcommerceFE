@@ -30,6 +30,9 @@ export class InventoryService {
   });
   public pagingInfo$ = this.pagingInfoSubject.asObservable();
   
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
+  
   private nextId = 8;
   private isInitialized = false; // Track if data has been loaded
 
@@ -48,6 +51,8 @@ export class InventoryService {
 
   // Load products from API with paging and optional search keyword
   loadProducts(page: number = 1, pageSize: number = 10, search?: string): void {
+    this.loadingSubject.next(true); // Start loading
+    
     this.productClient.getProductsPaging(
       page,
       pageSize,
@@ -72,6 +77,7 @@ export class InventoryService {
       }),
       catchError(error => {
         console.error('Error loading products:', error);
+        this.loadingSubject.next(false); // Stop loading on error
         return of(null);
       })
     ).subscribe({
@@ -92,10 +98,13 @@ export class InventoryService {
           // If no data, emit empty array
           this.productsSubject.next([]);
         }
+        
+        this.loadingSubject.next(false); // Stop loading when done
       },
       error: (error) => {
         console.error('Fatal error loading products:', error);
         this.productsSubject.next([]);
+        this.loadingSubject.next(false); // Stop loading on error
       }
     });
   }

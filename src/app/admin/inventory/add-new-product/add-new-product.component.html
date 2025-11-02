@@ -266,6 +266,96 @@
         </div>
       </div>
 
+      <!-- Variants Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faCubes"></fa-icon>
+            Biến thể sản phẩm
+          </h3>
+          <button 
+            type="button" 
+            class="btn btn-sm btn-success"
+            (click)="openAddVariantModal()"
+          >
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Thêm biến thể
+          </button>
+        </div>
+
+        @if (variants.length === 0) {
+        <div class="empty-state">
+          <fa-icon [icon]="faCubes" size="3x" class="text-muted"></fa-icon>
+          <p class="text-muted mt-3">Chưa có biến thể nào. Click "Thêm biến thể" để tạo biến thể mới.</p>
+        </div>
+        } @else {
+        <div class="variants-list">
+          @for (variant of variants; track $index) {
+          <div class="variant-item">
+            <div class="variant-content">
+              <div class="variant-image">
+                @if (variant.imageUrl) {
+                <img [src]="variant.imageUrl" [alt]="variant.name || 'Variant image'" />
+                } @else {
+                <div class="no-image">
+                  <fa-icon [icon]="faImage" size="2x"></fa-icon>
+                </div>
+                }
+              </div>
+              
+              <div class="variant-info">
+                <div class="variant-name">
+                  <strong>{{ variant.name || 'Biến thể ' + ($index + 1) }}</strong>
+                  <span class="variant-status" [ngClass]="getVariantStatusClass(variant.status)">
+                    {{ getVariantStatusText(variant.status) }}
+                  </span>
+                </div>
+                <div class="variant-details">
+                  <span class="detail-item">
+                    <strong>SKU:</strong> {{ variant.sku }}
+                  </span>
+                  <span class="detail-item">
+                    <strong>Giá:</strong> {{ formatCurrency(variant.price) }}
+                  </span>
+                  @if (variant.discountPrice) {
+                  <span class="detail-item">
+                    <strong>Giá giảm:</strong> {{ formatCurrency(variant.discountPrice) }}
+                  </span>
+                  }
+                  <span class="detail-item">
+                    <strong>Tồn kho:</strong> {{ variant.stockQuantity }}
+                  </span>
+                  <span class="detail-item">
+                    <strong>Tối thiểu:</strong> {{ variant.minStockLevel }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="variant-actions">
+              <button 
+                type="button" 
+                class="btn-icon btn-edit"
+                (click)="openEditVariantModal(variant, $index)"
+                title="Chỉnh sửa"
+              >
+                <fa-icon [icon]="faPenToSquare"></fa-icon>
+              </button>
+              <button 
+                type="button" 
+                class="btn-icon btn-delete"
+                (click)="deleteVariant($index)"
+                title="Xóa"
+              >
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+        }
+      </div>
+
       <!-- SEO Section -->
       <div class="form-section">
         <h3 class="section-title">SEO</h3>
@@ -421,3 +511,163 @@
     </div>
   </div>
 </div>
+
+<!-- Variant Modal -->
+@if (showVariantModal) {
+<div class="modal-overlay" (click)="closeVariantModal()">
+  <div class="modal-content variant-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faCubes"></fa-icon>
+        {{ variantMode === 'add' ? 'Thêm biến thể' : 'Chỉnh sửa biến thể' }}
+      </h3>
+      <button class="btn-close" (click)="closeVariantModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-section">
+        <h4 class="subsection-title">Thông tin cơ bản</h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>SKU biến thể <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.sku"
+              class="form-control"
+              placeholder="Nhập SKU biến thể (vd: SKU-001-RED)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Tên biến thể</label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.name"
+              class="form-control"
+              placeholder="Nhập tên biến thể (vd: Màu đỏ - Size M)"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>URL hình ảnh</label>
+          <input
+            type="text"
+            [(ngModel)]="currentVariant.imageUrl"
+            class="form-control"
+            placeholder="Nhập URL hình ảnh biến thể"
+          />
+          <small class="form-hint">Để trống nếu sử dụng ảnh sản phẩm chính</small>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="subsection-title">Giá & Tồn kho</h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Giá bán <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentVariant.price"
+              class="form-control"
+              min="0"
+              step="1000"
+              placeholder="0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Giá giảm</label>
+            <input
+              type="number"
+              [(ngModel)]="currentVariant.discountPrice"
+              class="form-control"
+              min="0"
+              step="1000"
+              placeholder="0"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Số lượng tồn kho <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentVariant.stockQuantity"
+              class="form-control"
+              min="0"
+              placeholder="0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Mức tồn tối thiểu <span class="required">*</span></label>
+            <input
+              type="number"
+              [(ngModel)]="currentVariant.minStockLevel"
+              class="form-control"
+              min="0"
+              placeholder="10"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="subsection-title">Thông tin vật lý</h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Trọng lượng (kg)</label>
+            <input
+              type="number"
+              [(ngModel)]="currentVariant.weight"
+              class="form-control"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Kích thước</label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.dimensions"
+              class="form-control"
+              placeholder="DxRxC (mm)"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Trạng thái <span class="required">*</span></label>
+          <select
+            [(ngModel)]="currentVariant.status"
+            class="form-control"
+          >
+            <option [value]="1">Hoạt động</option>
+            <option [value]="2">Nháp</option>
+            <option [value]="3">Đã lưu trữ</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeVariantModal()">
+        Hủy
+      </button>
+      <button type="button" class="btn btn-primary" (click)="saveVariant()">
+        <fa-icon [icon]="faSave"></fa-icon>
+        {{ variantMode === 'add' ? 'Thêm' : 'Cập nhật' }}
+      </button>
+    </div>
+  </div>
+</div>
+}

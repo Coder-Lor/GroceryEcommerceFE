@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -14,7 +14,10 @@ import {
   faImage,
   faTrash,
   faStar,
-  faCloudUpload
+  faCloudUpload,
+  faPlus,
+  faPenToSquare,
+  faCubes
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   CategoryClient, 
@@ -22,7 +25,8 @@ import {
   ResultOfListOfCategoryDto,
   CreateProductCommand,
   ProductClient,
-  FileParameter
+  FileParameter,
+  CreateProductVariantRequest
 } from '@services/system-admin.service';
 import { InventoryService } from '../../../core/service/inventory.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -32,7 +36,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 @Component({
   selector: 'app-add-new-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FaIconComponent, ToastModule, ConfirmDialogModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, FaIconComponent, ToastModule, ConfirmDialogModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './add-new-product.component.html',
   styleUrls: ['./add-new-product.component.scss']
@@ -55,6 +59,13 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }> = [];
   isDragging: boolean = false;
 
+  // Variants management
+  variants: CreateProductVariantRequest[] = [];
+  showVariantModal: boolean = false;
+  variantMode: 'add' | 'edit' = 'add';
+  currentVariant: CreateProductVariantRequest = new CreateProductVariantRequest();
+  editingVariantIndex: number = -1;
+
   // Font Awesome icons
   faArrowLeft = faArrowLeft;
   faXmark = faXmark;
@@ -66,6 +77,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   faTrash = faTrash;
   faStar = faStar;
   faCloudUpload = faCloudUpload;
+  faPlus = faPlus;
+  faPenToSquare = faPenToSquare;
+  faCubes = faCubes;
 
   constructor(
     private fb: FormBuilder,
@@ -237,7 +251,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       imageAltTexts,
       imageDisplayOrders,
       imageIsPrimary,
-      formValue.variants && formValue.variants.length > 0 ? formValue.variants : null,
+      this.variants.length > 0 ? this.variants : null,
       formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null,
       formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null
     )
@@ -615,5 +629,151 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     if (fileInput) {
       fileInput.click();
     }
+  }
+
+  // ===== Variants Management Methods =====
+  
+  openAddVariantModal(): void {
+    console.log('openAddVariantModal called');
+    this.variantMode = 'add';
+    this.currentVariant = new CreateProductVariantRequest();
+    this.currentVariant.status = 1; // Active by default
+    this.currentVariant.stockQuantity = 0;
+    this.currentVariant.minStockLevel = 10;
+    this.currentVariant.price = 0;
+    this.editingVariantIndex = -1;
+    this.showVariantModal = true;
+    console.log('showVariantModal set to:', this.showVariantModal);
+    console.log('currentVariant:', this.currentVariant);
+  }
+
+  openEditVariantModal(variant: CreateProductVariantRequest, index: number): void {
+    this.variantMode = 'edit';
+    this.currentVariant = CreateProductVariantRequest.fromJS(variant.toJSON());
+    this.editingVariantIndex = index;
+    this.showVariantModal = true;
+  }
+
+  closeVariantModal(): void {
+    this.showVariantModal = false;
+    this.currentVariant = new CreateProductVariantRequest();
+    this.editingVariantIndex = -1;
+  }
+
+  saveVariant(): void {
+    // Validate required fields
+    if (!this.currentVariant.sku || !this.currentVariant.sku.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập SKU cho biến thể',
+        life: 3000
+      });
+      return;
+    }
+
+    if (!this.currentVariant.price || this.currentVariant.price < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập giá hợp lệ cho biến thể',
+        life: 3000
+      });
+      return;
+    }
+
+    if (this.currentVariant.stockQuantity === undefined || this.currentVariant.stockQuantity < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập số lượng tồn kho hợp lệ',
+        life: 3000
+      });
+      return;
+    }
+
+    // Check duplicate SKU
+    const isDuplicateSku = this.variants.some((v, idx) => 
+      v.sku === this.currentVariant.sku && 
+      (this.variantMode === 'add' || idx !== this.editingVariantIndex)
+    );
+
+    if (isDuplicateSku) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'SKU biến thể đã tồn tại',
+        life: 3000
+      });
+      return;
+    }
+
+    if (this.variantMode === 'add') {
+      this.variants.push(CreateProductVariantRequest.fromJS(this.currentVariant.toJSON()));
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Thành công',
+        detail: 'Đã thêm biến thể mới',
+        life: 2000
+      });
+    } else {
+      this.variants[this.editingVariantIndex] = CreateProductVariantRequest.fromJS(this.currentVariant.toJSON());
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Thành công',
+        detail: 'Đã cập nhật biến thể',
+        life: 2000
+      });
+    }
+
+    this.closeVariantModal();
+  }
+
+  deleteVariant(index: number): void {
+    this.confirmationService.confirm({
+      message: 'Bạn có chắc muốn xóa biến thể này?',
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      defaultFocus: 'reject',
+      accept: () => {
+        this.variants.splice(index, 1);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Thành công',
+          detail: 'Đã xóa biến thể',
+          life: 2000
+        });
+      }
+    });
+  }
+
+  getVariantStatusText(status: number | undefined): string {
+    switch (status) {
+      case 1: return 'Hoạt động';
+      case 2: return 'Nháp';
+      case 3: return 'Đã lưu trữ';
+      default: return 'Không xác định';
+    }
+  }
+
+  getVariantStatusClass(status: number | undefined): string {
+    switch (status) {
+      case 1: return 'status-active';
+      case 2: return 'status-draft';
+      case 3: return 'status-archived';
+      default: return 'status-unknown';
+    }
+  }
+
+  formatCurrency(value: number | undefined): string {
+    if (!value) return '0 ₫';
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(value);
   }
 }
