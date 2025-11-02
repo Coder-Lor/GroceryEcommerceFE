@@ -25,7 +25,7 @@ export class ProductCard {
   @Input() product: Product;
   @Input() first: any;
   @Input() layout: string = '';
-  @Input() getSeverity: any;
+  @Input() getSeverity: any; 
 
   constructor(private messageService: MessageService) {}
 

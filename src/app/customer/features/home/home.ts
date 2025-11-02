@@ -14,6 +14,10 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
 
 type Product = ProductBaseResponse;
+type UrlObject = {
+  url: string;
+}
+type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
 
 @Component({
   selector: 'app-home',
@@ -178,6 +182,8 @@ export class Home implements OnInit {
     },
   ];
 
+
+  private carouselImages: UrlObject[];
   ngOnInit(): void {
     // Initialize carousel images
     this.carouselImages = [
@@ -191,8 +197,7 @@ export class Home implements OnInit {
       { url: '/images/banner-honor-x6c.png' },      
     ];
 
-    // Responsive options for carousel (2 images per slide)
-    this.responsiveOptions = [
+    var responsiveOptions: ResponsiveOp[] = [
       {
         breakpoint: '1400px',
         numVisible: 2,
@@ -214,6 +219,8 @@ export class Home implements OnInit {
         numScroll: 1
       }
     ];
+    // Responsive options for carousel (2 images per slide)
+    // this.responsiveOptions = 
 
     // this.inventoryService.loadProducts(1, 12);
     // this.inventoryService.getProducts().subscribe((data) => {

@@ -11,17 +11,18 @@
 <div class="inventory-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
-  
+
   <!-- Confirm Dialog -->
   <p-confirmDialog
-    [style]="{width: '450px'}"
+    [style]="{ width: '450px' }"
     [baseZIndex]="10000"
     [closable]="true"
     [closeOnEscape]="true"
     acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text">
+    rejectButtonStyleClass="p-button-secondary p-button-text"
+  >
   </p-confirmDialog>
-  
+
   <div class="page-header">
     <h2>Quản lý kho hàng</h2>
     <div class="header-actions">
@@ -53,97 +54,25 @@
       />
     </div>
     <span class="search-result"
-      >Hiển thị {{ filteredProducts.length }} sản phẩm / Tổng {{ pagingInfo.totalCount }} sản phẩm</span
+      >Hiển thị {{ filteredProducts.length }} sản phẩm / Tổng {{ pagingInfo.totalCount }} sản
+      phẩm</span
     >
   </div>
 
   <!-- Bảng danh sách sản phẩm -->
-  <div class="table-container">
-    <table class="product-table">
-      <thead>
-        <tr>
-          <th (click)="changeSortColumn('sku')" class="sortable">
-            SKU
-            <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'sku' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
-            </span>
-          </th>
-          <th (click)="changeSortColumn('name')" class="sortable">
-            Tên sản phẩm
-            <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'name' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
-            </span>
-          </th>
-          <th (click)="changeSortColumn('cost')" class="sortable text-right">
-            Giá vốn
-            <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'cost' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
-            </span>
-          </th>
-          <th (click)="changeSortColumn('price')" class="sortable text-right">
-            Giá bán
-            <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'price' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
-            </span>
-          </th>
-          <th (click)="changeSortColumn('stockQuantity')" class="sortable text-center">
-            Tồn kho
-            <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'stockQuantity' ? ( sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
-            </span>
-          </th>
-          <th class="text-center status-header">
-            Trạng thái
-            <button class="btn-icon filter-btn" (click)="openStatusFilterModal($event)">
-              <fa-icon [icon]="faFilter"></fa-icon>
-            </button>
-          </th>
-          <th class="text-right">Giá trị tồn</th>
-          <th class="text-center">Thao tác</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let product of filteredProducts"
-          [class.low-stock]="(product.stockQuantity || 0) <= (product.minStockLevel || 0)"
-        >
-          <td class="sku">{{ product.sku || '' }}</td>
-          <td>
-            <div class="product-name">{{ product.name || '' }}</div>
-            <div class="product-desc">{{ product.shortDescription || '' }}</div>
-          </td>
-          <td class="text-right">{{ formatCurrency(product.cost || 0) }}</td>
-          <td class="text-right">
-            <div class="price">{{ formatCurrency(product.price || 0) }}</div>
-            <div class="discount" *ngIf="(product.discountPrice || 0) > 0">
-              {{ formatCurrency(product.discountPrice || 0) }}
-            </div>
-          </td>
-          <td class="text-center">
-            <span class="stock-badge">{{ product.stockQuantity || 0 }}</span>
-            <div class="min-stock">Min: {{ product.minStockLevel || 0 }}</div>
-          </td>
-          <td class="text-center">
-            <span [class]="'status-badge ' + getStockStatusClass(product)">
-              {{ getStockStatus(product) }}
-            </span>
-          </td>
-          <td class="text-right stock-value">{{ formatCurrency(calculateStockValue(product)) }}</td>
-          <td class="text-center actions">
-            <button class="btn-icon btn-edit" (click)="openEditModal(product)" title="Sửa">
-              <fa-icon [icon]="faPenToSquare"></fa-icon>
-            </button>
-            <button class="btn-icon btn-delete" (click)="confirmDelete(product)" title="Xóa">
-              <fa-icon [icon]="faTrashCan"></fa-icon>
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="filteredProducts.length === 0">
-          <td colspan="8" class="no-data">Không tìm thấy sản phẩm nào</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <ng-template #grid let-items>
+    <div class="row g-4">
+      @for (item of products; track $index) {
+      <div class="col-12 col-sm-6 col-lg-3">
+        <product-card
+          [product]="item"
+          [layout]="'grid'"
+          [getSeverity]="getSeverity.bind(this)"
+        ></product-card>
+      </div>
+      }
+    </div>
+  </ng-template>
 
   <!-- Pagination Controls -->
   <div class="pagination-container">
@@ -151,9 +80,9 @@
       <span>Hiển thị trang {{ pagingInfo.currentPage }} / {{ pagingInfo.totalPages }}</span>
       <div class="page-size-selector">
         <label for="pageSize">Số dòng mỗi trang:</label>
-        <select 
-          id="pageSize" 
-          [(ngModel)]="pagingInfo.pageSize" 
+        <select
+          id="pageSize"
+          [(ngModel)]="pagingInfo.pageSize"
           (change)="onPageSizeChange()"
           class="page-size-select"
         >
@@ -161,29 +90,29 @@
         </select>
       </div>
     </div>
-    
+
     <div class="pagination-controls">
-      <button 
-        class="btn-pagination" 
-        (click)="goToFirstPage()" 
+      <button
+        class="btn-pagination"
+        (click)="goToFirstPage()"
         [disabled]="!pagingInfo.hasPreviousPage"
         title="Trang đầu"
       >
         <fa-icon [icon]="faAnglesLeft"></fa-icon>
       </button>
-      
-      <button 
-        class="btn-pagination" 
-        (click)="goToPreviousPage()" 
+
+      <button
+        class="btn-pagination"
+        (click)="goToPreviousPage()"
         [disabled]="!pagingInfo.hasPreviousPage"
         title="Trang trước"
       >
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
-      
+
       <div class="page-numbers">
-        <button 
-          *ngFor="let page of getPageNumbers()" 
+        <button
+          *ngFor="let page of getPageNumbers()"
           class="btn-page"
           [class.active]="page === pagingInfo.currentPage"
           [disabled]="page === -1"
@@ -193,19 +122,19 @@
           <span *ngIf="page !== -1">{{ page }}</span>
         </button>
       </div>
-      
-      <button 
-        class="btn-pagination" 
-        (click)="goToNextPage()" 
+
+      <button
+        class="btn-pagination"
+        (click)="goToNextPage()"
         [disabled]="!pagingInfo.hasNextPage"
         title="Trang sau"
       >
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>
-      
-      <button 
-        class="btn-pagination" 
-        (click)="goToLastPage()" 
+
+      <button
+        class="btn-pagination"
+        (click)="goToLastPage()"
         [disabled]="!pagingInfo.hasNextPage"
         title="Trang cuối"
       >
@@ -467,7 +396,12 @@
     <div class="modal-body">
       <div class="filter-options-container">
         <div *ngFor="let status of statusOptions" class="filter-option">
-          <input type="checkbox" [id]="'status-modal-' + status" [(ngModel)]="statusFilters[status]" (ngModelChange)="filterProducts()">
+          <input
+            type="checkbox"
+            [id]="'status-modal-' + status"
+            [(ngModel)]="statusFilters[status]"
+            (ngModelChange)="filterProducts()"
+          />
           <label [for]="'status-modal-' + status">{{ status }}</label>
         </div>
       </div>
