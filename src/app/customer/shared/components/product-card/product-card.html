@@ -67,9 +67,9 @@
 </div>
 }  -->
 @if(layout === 'grid') {
-<div class="card h-100 border-0 shadow-sm bg-white">
+<div class="card h-100 border-1 shadow-sm bg-white">
   <div
-    class="bg-light rounded-top d-flex justify-content-center p-3 position-relative"
+    class="rounded-top d-flex justify-content-center p-3 position-relative"
     (click)="navigationToDetailPage()"
   >
     <img
@@ -88,7 +88,9 @@
     <div class="d-flex justify-content-between">
       <div>
         <small class="text-muted">{{ product.categoryName }}</small>
-        <h6 class="mt-2 product-name" (click)="navigationToDetailPage()">{{ product.name }}</h6>
+        <h6 class="mt-2 product-name" (click)="navigationToDetailPage()" [title]="product.name">
+          {{ product.name | truncate : 24 }}
+        </h6>
       </div>
       <div class="bg-light rounded-pill px-2 py-1 d-inline-flex align-items-center gap-1 shadow-sm">
         <span class="fw-medium small">4</span>

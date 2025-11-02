@@ -45,6 +45,9 @@
     <!-- RIGHT PRODUCT LIST -->
     <section class="col-lg-9 col-md-8">
       <div class="product-list container-fluid">
+        <div class="mb-3" *ngIf="keyword">
+          Kết quả cho: "<strong>{{ keyword }}</strong>"
+        </div>
         <p-dataview #dv [value]="products" [layout]="layout">
           <!-- Header -->
           <ng-template #header>
@@ -90,7 +93,7 @@
         (onPageChange)="onPageChange($event)"
         [first]="first"
         [rows]="rows"
-        [totalRecords]="120"
+        [totalRecords]="totalRecords"
       />
     </div>
   </div>

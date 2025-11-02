@@ -3,178 +3,185 @@
 
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
 }
 
 body {
-    background-color: #f1f4f7 !important;
+  background-color: #f1f4f7 !important;
 }
 
 :root {
-    /* Colors */
-    --dark-1: #171c28;
-    --dark-2: #292e39;
-    --dark-3: #b9babe;
-    --background-2: #f6f6f6;
-    --background-3: #eeeeee;
-    --secondary-color: #77dae6;
-    --secondary-color-secondary-1: #1a162e;
-    --secondary-color-secondary-2: #9e9da8;
-    --secondary-color-secondary-3: #d2d1d6;
-    --secondary-color-secondary-4: #ededf6;
-    --secondary-color-secondary-5: #f8f8fb;
-    --secondary-color-secondary-6: #fafafd;
-    --secondary-color-background: #ffffff;
+  /* Colors */
+  --dark-1: #171c28;
+  --dark-2: #292e39;
+  --dark-3: #b9babe;
+  --background-2: #f6f6f6;
+  --background-3: #eeeeee;
+  --secondary-color: #77dae6;
+  --secondary-color-secondary-1: #1a162e;
+  --secondary-color-secondary-2: #9e9da8;
+  --secondary-color-secondary-3: #d2d1d6;
+  --secondary-color-secondary-4: #ededf6;
+  --secondary-color-secondary-5: #f8f8fb;
+  --secondary-color-secondary-6: #fafafd;
+  --secondary-color-background: #ffffff;
 
-    /* Fonts */
-    --regular-14-font-family: Poppins, sans-serif;
-    --regular-14-font-size: 14px;
-    --regular-14-line-height: 20px;
-    --regular-14-font-weight: 400;
-    --regular-14-font-style: normal;
-    --medium-14-font-family: Poppins, sans-serif;
-    --medium-14-font-size: 14px;
-    --medium-14-line-height: 20px;
-    --medium-14-font-weight: 500;
-    --medium-14-font-style: normal;
-    --bold-14-font-family: Poppins, sans-serif;
-    --bold-14-font-size: 14px;
-    --bold-14-line-height: 20px;
-    --bold-14-font-weight: 700;
-    --bold-14-font-style: normal;
-    --regular-15-font-family: Poppins, sans-serif;
-    --regular-15-font-size: 15px;
-    --regular-15-line-height: 22px;
-    --regular-15-font-weight: 400;
-    --regular-15-font-style: normal;
-    --medium-15-font-family: Poppins, sans-serif;
-    --medium-15-font-size: 15px;
-    --medium-15-line-height: 22px;
-    --medium-15-font-weight: 500;
-    --medium-15-font-style: normal;
-    --bold-15-font-family: Poppins, sans-serif;
-    --bold-15-font-size: 15px;
-    --bold-15-line-height: 22px;
-    --bold-15-font-weight: 700;
-    --bold-15-font-style: normal;
-    --regular-16-font-family: Poppins, sans-serif;
-    --regular-16-font-size: 16px;
-    --regular-16-line-height: 24px;
-    --regular-16-font-weight: 400;
-    --regular-16-font-style: normal;
-    --medium-16-font-family: Poppins, sans-serif;
-    --medium-16-font-size: 16px;
-    --medium-16-line-height: 24px;
-    --medium-16-font-weight: 500;
-    --medium-16-font-style: normal;
-    --bold-16-font-family: Poppins, sans-serif;
-    --bold-16-font-size: 16px;
-    --bold-16-line-height: 24px;
-    --bold-16-font-weight: 700;
-    --bold-16-font-style: normal;
-    --regular-18-font-family: Poppins, sans-serif;
-    --regular-18-font-size: 18px;
-    --regular-18-line-height: 26px;
-    --regular-18-font-weight: 400;
-    --regular-18-font-style: normal;
-    --medium-18-font-family: Poppins, sans-serif;
-    --medium-18-font-size: 18px;
-    --medium-18-line-height: 26px;
-    --medium-18-font-weight: 500;
-    --medium-18-font-style: normal;
-    --bold-18-font-family: Poppins, sans-serif;
-    --bold-18-font-size: 18px;
-    --bold-18-line-height: 26px;
-    --bold-18-font-weight: 700;
-    --bold-18-font-style: normal;
-    --regular-22-font-family: Poppins, sans-serif;
-    --regular-22-font-size: 22px;
-    --regular-22-line-height: 32px;
-    --regular-22-font-weight: 400;
-    --regular-22-font-style: normal;
-    --medium-22-font-family: Poppins, sans-serif;
-    --medium-22-font-size: 22px;
-    --medium-22-line-height: 32px;
-    --medium-22-font-weight: 500;
-    --medium-22-font-style: normal;
-    --bold-22-font-family: Poppins, sans-serif;
-    --bold-22-font-size: 22px;
-    --bold-22-line-height: 32px;
-    --bold-22-font-weight: 700;
-    --bold-22-font-style: normal;
-    --medium-30-font-family: Poppins, sans-serif;
-    --medium-30-font-size: 30px;
-    --medium-30-line-height: 44px;
-    --medium-30-font-weight: 500;
-    --medium-30-font-style: normal;
-    --bold-30-font-family: Poppins, sans-serif;
-    --bold-30-font-size: 30px;
-    --bold-30-line-height: 44px;
-    --bold-30-font-weight: 700;
-    --bold-30-font-style: normal;
-    --bold-36-font-family: Poppins, sans-serif;
-    --bold-36-font-size: 36px;
-    --bold-36-line-height: 50px;
-    --bold-36-font-weight: 700;
-    --bold-36-font-style: normal;
-    --medium-42-font-family: Poppins, sans-serif;
-    --medium-42-font-size: 42px;
-    --medium-42-line-height: 60px;
-    --medium-42-font-weight: 500;
-    --medium-42-font-style: normal;
-    --bold-42-font-family: Poppins, sans-serif;
-    --bold-42-font-size: 42px;
-    --bold-42-line-height: 60px;
-    --bold-42-font-weight: 700;
-    --bold-42-font-style: normal;
-    --medium-36-font-family: Poppins, sans-serif;
-    --medium-36-font-size: 36px;
-    --medium-36-line-height: 54px;
-    --medium-36-font-weight: 500;
-    --medium-36-font-style: normal;
-    --medium-26-font-family: Poppins, sans-serif;
-    --medium-26-font-size: 26px;
-    --medium-26-line-height: 36px;
-    --medium-26-font-weight: 500;
-    --medium-26-font-style: normal;
-    --bold-26-font-family: Poppins, sans-serif;
-    --bold-26-font-size: 26px;
-    --bold-26-line-height: 36px;
-    --bold-26-font-weight: 700;
-    --bold-26-font-style: normal;
-    --bold-24-font-family: Poppins, sans-serif;
-    --bold-24-font-size: 24px;
-    --bold-24-line-height: 34px;
-    --bold-24-font-weight: 700;
-    --bold-24-font-style: normal;
+  /* Fonts */
+  --regular-14-font-family: Poppins, sans-serif;
+  --regular-14-font-size: 14px;
+  --regular-14-line-height: 20px;
+  --regular-14-font-weight: 400;
+  --regular-14-font-style: normal;
+  --medium-14-font-family: Poppins, sans-serif;
+  --medium-14-font-size: 14px;
+  --medium-14-line-height: 20px;
+  --medium-14-font-weight: 500;
+  --medium-14-font-style: normal;
+  --bold-14-font-family: Poppins, sans-serif;
+  --bold-14-font-size: 14px;
+  --bold-14-line-height: 20px;
+  --bold-14-font-weight: 700;
+  --bold-14-font-style: normal;
+  --regular-15-font-family: Poppins, sans-serif;
+  --regular-15-font-size: 15px;
+  --regular-15-line-height: 22px;
+  --regular-15-font-weight: 400;
+  --regular-15-font-style: normal;
+  --medium-15-font-family: Poppins, sans-serif;
+  --medium-15-font-size: 15px;
+  --medium-15-line-height: 22px;
+  --medium-15-font-weight: 500;
+  --medium-15-font-style: normal;
+  --bold-15-font-family: Poppins, sans-serif;
+  --bold-15-font-size: 15px;
+  --bold-15-line-height: 22px;
+  --bold-15-font-weight: 700;
+  --bold-15-font-style: normal;
+  --regular-16-font-family: Poppins, sans-serif;
+  --regular-16-font-size: 16px;
+  --regular-16-line-height: 24px;
+  --regular-16-font-weight: 400;
+  --regular-16-font-style: normal;
+  --medium-16-font-family: Poppins, sans-serif;
+  --medium-16-font-size: 16px;
+  --medium-16-line-height: 24px;
+  --medium-16-font-weight: 500;
+  --medium-16-font-style: normal;
+  --bold-16-font-family: Poppins, sans-serif;
+  --bold-16-font-size: 16px;
+  --bold-16-line-height: 24px;
+  --bold-16-font-weight: 700;
+  --bold-16-font-style: normal;
+  --regular-18-font-family: Poppins, sans-serif;
+  --regular-18-font-size: 18px;
+  --regular-18-line-height: 26px;
+  --regular-18-font-weight: 400;
+  --regular-18-font-style: normal;
+  --medium-18-font-family: Poppins, sans-serif;
+  --medium-18-font-size: 18px;
+  --medium-18-line-height: 26px;
+  --medium-18-font-weight: 500;
+  --medium-18-font-style: normal;
+  --bold-18-font-family: Poppins, sans-serif;
+  --bold-18-font-size: 18px;
+  --bold-18-line-height: 26px;
+  --bold-18-font-weight: 700;
+  --bold-18-font-style: normal;
+  --regular-22-font-family: Poppins, sans-serif;
+  --regular-22-font-size: 22px;
+  --regular-22-line-height: 32px;
+  --regular-22-font-weight: 400;
+  --regular-22-font-style: normal;
+  --medium-22-font-family: Poppins, sans-serif;
+  --medium-22-font-size: 22px;
+  --medium-22-line-height: 32px;
+  --medium-22-font-weight: 500;
+  --medium-22-font-style: normal;
+  --bold-22-font-family: Poppins, sans-serif;
+  --bold-22-font-size: 22px;
+  --bold-22-line-height: 32px;
+  --bold-22-font-weight: 700;
+  --bold-22-font-style: normal;
+  --medium-30-font-family: Poppins, sans-serif;
+  --medium-30-font-size: 30px;
+  --medium-30-line-height: 44px;
+  --medium-30-font-weight: 500;
+  --medium-30-font-style: normal;
+  --bold-30-font-family: Poppins, sans-serif;
+  --bold-30-font-size: 30px;
+  --bold-30-line-height: 44px;
+  --bold-30-font-weight: 700;
+  --bold-30-font-style: normal;
+  --bold-36-font-family: Poppins, sans-serif;
+  --bold-36-font-size: 36px;
+  --bold-36-line-height: 50px;
+  --bold-36-font-weight: 700;
+  --bold-36-font-style: normal;
+  --medium-42-font-family: Poppins, sans-serif;
+  --medium-42-font-size: 42px;
+  --medium-42-line-height: 60px;
+  --medium-42-font-weight: 500;
+  --medium-42-font-style: normal;
+  --bold-42-font-family: Poppins, sans-serif;
+  --bold-42-font-size: 42px;
+  --bold-42-line-height: 60px;
+  --bold-42-font-weight: 700;
+  --bold-42-font-style: normal;
+  --medium-36-font-family: Poppins, sans-serif;
+  --medium-36-font-size: 36px;
+  --medium-36-line-height: 54px;
+  --medium-36-font-weight: 500;
+  --medium-36-font-style: normal;
+  --medium-26-font-family: Poppins, sans-serif;
+  --medium-26-font-size: 26px;
+  --medium-26-line-height: 36px;
+  --medium-26-font-weight: 500;
+  --medium-26-font-style: normal;
+  --bold-26-font-family: Poppins, sans-serif;
+  --bold-26-font-size: 26px;
+  --bold-26-line-height: 36px;
+  --bold-26-font-weight: 700;
+  --bold-26-font-style: normal;
+  --bold-24-font-family: Poppins, sans-serif;
+  --bold-24-font-size: 24px;
+  --bold-24-line-height: 34px;
+  --bold-24-font-weight: 700;
+  --bold-24-font-style: normal;
 
-    /* primeNg colors - Solid backgrounds */
-      --p-toast-success-background: #22c55e !important;
-      --p-toast-info-background: #3b82f6 !important;
-      --p-toast-warn-background: #f97316 !important;
-      --p-toast-error-background: #ef4444 !important;
+  /* primeNg colors */
+  --p-toast-success-background: color-mix(in srgb, var(--p-green-500), transparent 45%) !important;
+  --p-toast-info-background: color-mix(in srgb, var(--p-blue-500), transparent 45%) !important;
+  --p-toast-warn-background: color-mix(in srgb, var(--p-orange-500), transparent 45%) !important;
+  --p-toast-error-background: color-mix(in srgb, var(--p-red-500), transparent 55%) !important;
 
-    /* Effects */
+  /* Effects */
 }
 
 html.dark {
-    /* Colors */
-    --dark-1: #171c28;
-    --dark-2: #292e39;
-    --dark-3: #b9babe;
-    --background-2: #f6f6f6;
-    --background-3: #171c28;
-    --secondary-color: #77dae6;
-    --secondary-color-secondary-1: #1a162e;
-    --secondary-color-secondary-2: #9e9da8;
-    --secondary-color-secondary-3: #d2d1d6;
-    --secondary-color-secondary-4: #ededf6;
-    --secondary-color-secondary-5: #f8f8fb;
-    --secondary-color-secondary-6: #fafafd;
-    --secondary-color-background: #292E39;
+  /* Colors */
+  --dark-1: #171c28;
+  --dark-2: #292e39;
+  --dark-3: #b9babe;
+  --background-2: #f6f6f6;
+  --background-3: #171c28;
+  --secondary-color: #77dae6;
+  --secondary-color-secondary-1: #1a162e;
+  --secondary-color-secondary-2: #9e9da8;
+  --secondary-color-secondary-3: #d2d1d6;
+  --secondary-color-secondary-4: #ededf6;
+  --secondary-color-secondary-5: #f8f8fb;
+  --secondary-color-secondary-6: #fafafd;
+  --secondary-color-background: #292E39;
 }
 
-/* Figma Color Variables of your File */
+// swiper custom styles
+swiper-container::part(button-next).swiper-button-disabled {
+  display: none !important;
+}
+
+swiper-container::part(button-prev).swiper-button-disabled {
+  display: none !important;
+}

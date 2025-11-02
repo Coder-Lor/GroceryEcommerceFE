@@ -3,93 +3,11 @@
   background-color: var(--secondary-color-background);
 }
 
-.hero {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-// Custom Carousel Styles
-.custom-carousel {
-  ::ng-deep {
-    .p-carousel {
-      .p-carousel-content {
-        display: flex;
-        width: 100%;
-        // align-items: stretch;
-      }
-
-      .p-carousel-items-container {
-        width: 100%;
-      }
-
-      .p-carousel-item {
-        display: flex;
-        // align-items: stretch;
-        width: 50% !important; // Ensure exactly 2 items per slide
-        padding: 0 12px; // Gap between images
-      }
-    }
-  }
-}
-
-.carousel-item-wrapper {
-  width: 100%;
-  height: 200px; // Fixed height for carousel
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8px; // Add horizontal gap between items
-}
-
-.image-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 12px;
-  background-color: #f5f5f5; // Fallback color while loading
-  margin: 0 4px; // Additional margin for gap
-}
-
-.carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; // Cover: fills container, crops overflow
-  // Alternative: object-fit: contain; // Contain: shows full image, may have letterboxing
-  object-position: center;
-  display: block;
-  border-radius: 12px;
-  transition: transform 0.3s ease;
-
-  // &:hover {
-  //   transform: scale(1.02);
-  // }
-}
-
-// Responsive adjustments
-@media (max-width: 767px) {
-  .carousel-item-wrapper {
-    height: 200px;
-    padding: 0 4px; // Smaller gap on mobile
-  }
-
-  .image-container {
-    margin: 0 2px; // Smaller margin on mobile
-  }
-
-  .custom-carousel ::ng-deep .p-carousel .p-carousel-item {
-    width: 100% !important; // Single image on mobile
-    padding: 0 8px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  .carousel-item-wrapper {
-    height: 280px;
-  }
-}
+// .hero {
+//   height: 455px;
+//   border-radius: 20px;
+//   overflow: hidden;
+// }
 
 // .hero-title {
 //   left: 5%;
@@ -106,61 +24,328 @@
 //   height: 70%;
 //   object-fit: cover;
 // }
+.hero-slide {
+  height: 540px;
 
-/* Bảo đảm column chứa card dùng flex để chiều cao bằng nhau */
-.categories-list .col-md-4 {
-  display: flex;
-  /* cho card có thể occupy full column */
-  align-items: stretch;
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.6), transparent 70%);
+  }
+
+  .hero-content {
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    max-width: 400px;
+  }
 }
 
-/* Card bây giờ chiếm full width cột và là flex row */
-.categories-list .col-md-4>.card {
-  width: 100%;
-  /* ghi đè các width cũ như width:420px */
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  align-items: center;
-  padding: 1rem;
-  overflow: hidden;
-  /* tránh nội dung tràn ra ngoài */
-  border-radius: 0.75rem;
+
+.categories {
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a162e;
+  }
+
+  .category-swiper {
+    width: 100%;
+  }
+
+  .category-slide {
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover .category-card {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .category-card {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #eee;
+    // border-radius: 12px;
+    padding: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .category-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .category-name {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
-/* Giữ kích thước ảnh cố định như thiết kế ban đầu */
-.category-img img {
-  width: 116px;
-  height: 116px;
-  object-fit: cover;
-  display: block;
-  border-radius: 8px;
+// .category-swiper {
+//   --swiper-navigation-color: #333;
+
+//   .swiper-slide {
+//     // padding: 0 !important;
+//     /* bỏ padding nội bộ nếu có */
+//     // margin: 0 !important;
+//     /* xóa khoảng cách */
+//   }
+
+//   .category-card {
+//     border: 1px solid #eee;
+//     border-radius: 0 !important;
+//     /* bỏ bo góc */
+//     box-shadow: none;
+//     /* nếu có shadow thì bỏ luôn */
+//   }
+
+//   .category-img {
+//     width: 100%;
+//     height: auto;
+//     border-radius: 0 !important;
+//     /* bỏ bo góc hình */
+//   }
+
+//   swiper-slide {
+//     margin-right: 0 !important;
+//   }
+
+//   .swiper-button-next,
+//   .swiper-button-prev {
+//     background-color: #ccc !important;
+//   }
+// }
+
+.brands {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 40px 20px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+
+  .section-title {
+    font-size: 20px;
+    color: #1a162e;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .brands-swiper {
+    width: 100%;
+  }
+
+  .brand-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      border-color: #ddd;
+    }
+  }
+
+  .brand-logo {
+    max-width: 100px;
+    max-height: 80px;
+    object-fit: contain;
+    filter: grayscale(100%);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+
+    &:hover {
+      filter: grayscale(0%);
+      opacity: 1;
+    }
+  }
 }
 
-/* Cho container chứa text có thể co lại (rất quan trọng) */
-.category-info {
-  flex: 1 1 auto;
-  min-width: 0;
-  /* key fix: cho phép nội dung xuống dòng */
+.flash-sale {
+  background-color: #f9f9fc;
+  border-radius: 16px;
+  padding: 10px 20px;
+
+  .flash-sale-header {
+    .section-title {
+      font-size: 22px;
+      color: #1a162e;
+    }
+
+    .flash-timer {
+      background: #ff424e;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+
+    .see-all {
+      font-size: 14px;
+      color: #007aff;
+      text-decoration: none;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .flash-sale-swiper {
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.25s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      }
+
+      .discount-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #ffebee;
+        color: #ff424e;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 3px 6px;
+        border-radius: 6px;
+      }
+
+      .product-image img {
+        width: 100%;
+        height: 160px;
+        object-fit: contain;
+      }
+
+      .product-price {
+        margin-top: 8px;
+        font-size: 18px;
+      }
+
+      .sale-status {
+        margin-top: 6px;
+
+        .progress-bar {
+          height: 6px;
+          border-radius: 6px;
+          background: #ffe0e3;
+          overflow: hidden;
+
+          .progress {
+            height: 100%;
+            background: #ff424e;
+            transition: width 0.3s ease;
+          }
+        }
+
+        .status-text {
+          font-size: 13px;
+          margin-top: 4px;
+          color: #555;
+        }
+      }
+    }
+  }
 }
 
-/* Kiểu cho giá & tên */
-.category-price {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 4px 0;
+.product-card {
+  animation: fadeInUp 0.5s ease both;
 }
 
-.category-name {
-  font-size: 16px;
-  color: #1a162e;
-  margin: 0;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.category-card {
-  width: auto !important;
+.policy-section {
+  background-color: #f8fafc;
+  padding: 60px 120px;
+  border-radius: 20px;
+
+  h3 {
+    color: #222;
+    font-size: 1.75rem;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+
+  .policy-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+    &:hover {
+      transform: translateY(-6px);
+      border-color: #007bff;
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.15);
+
+      .icon i {
+        color: #007bff;
+      }
+    }
+
+    .icon i {
+      font-size: 2.2rem;
+      color: #3f51b5;
+      transition: color 0.3s ease;
+    }
+
+    h6 {
+      color: #212529;
+      font-size: 1rem;
+    }
+
+    p {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Tuỳ chỉnh mũi tên Swiper */
+/* Swiper Navigation Arrows */
+swiper-container {
+  --swiper-navigation-size: 20px;
+  --swiper-navigation-color: #000;
+  --swiper-navigation-sides-offset: 10px;
+  --swiper-navigation-top-offset: 45%;
+  --swiper-space-between: 0px !important;
 }
 
 .recomment {
@@ -199,11 +384,34 @@
 
 }
 
+.section-header {
+  .title {
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .divider {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #00c9a7);
+    border-radius: 2px;
+  }
+}
+
 .btn-see-more {
   font-family: 'poppins', sans-serif;
   width: 300px;
-  background-color: #f1f1f1;
-  border: none;
+  background-color: #fff;
+  border: 2px solid #111;
+  border-radius: 8px;
   color: #111;
   padding: 8px 0;
   font-size: 16px;
@@ -231,10 +439,12 @@
 .product-list .p-dataview,
 .product-list .p-dataview .p-dataview-content,
 .product-list .p-dataview .p-dataview-header,
-:host ::ng-deep .p-dataview,
-:host ::ng-deep .p-dataview .p-dataview-content,
-:host ::ng-deep .p-dataview .p-dataview-header {
+.p-dataview,
+.p-dataview .p-dataview-content,
+.p-dataview .p-dataview-header {
   background-color: #fff !important;
   color: #111 !important;
   font-family: "Poppins", sans-serif !important;
 }
+
+.product-card {}
