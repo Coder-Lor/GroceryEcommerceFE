@@ -1,12 +1,5 @@
 <!-- Loading Overlay for entire page -->
-@if (isLoading) {
-<div class="loading-overlay-fullpage">
-  <div class="loading-content">
-    <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
-    <p class="loading-text">Đang xử lý...</p>
-  </div>
-</div>
-}
+<app-loading-overlay [show]="isLoading" message="Đang xử lý..."></app-loading-overlay>
 
 <div class="inventory-container">
   <!-- Toast messages -->

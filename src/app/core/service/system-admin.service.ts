@@ -2966,63 +2966,7 @@ export class CategoryClient {
         return _observableOf(null as any);
     }
 
-    updateCategory(categoryId: string, request: UpdateCategoryCommand): Observable<ResultOfCategoryDto> {
-        let url_ = this.baseUrl + "/api/Category/{categoryId}";
-        if (categoryId === undefined || categoryId === null)
-            throw new globalThis.Error("The parameter 'categoryId' must be defined.");
-        url_ = url_.replace("{categoryId}", encodeURIComponent("" + categoryId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateCategory(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateCategory(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCategoryDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<ResultOfCategoryDto>;
-        }));
-    }
-
-    protected processUpdateCategory(response: HttpResponseBase): Observable<ResultOfCategoryDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCategoryDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    deleteCategory(categoryId: string): Observable<ResultOfCategoryDto> {
+    deleteCategory(categoryId: string): Observable<ResultOfBoolean> {
         let url_ = this.baseUrl + "/api/Category/{categoryId}";
         if (categoryId === undefined || categoryId === null)
             throw new globalThis.Error("The parameter 'categoryId' must be defined.");
@@ -3045,14 +2989,14 @@ export class CategoryClient {
                 try {
                     return this.processDeleteCategory(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCategoryDto>;
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ResultOfCategoryDto>;
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         }));
     }
 
-    protected processDeleteCategory(response: HttpResponseBase): Observable<ResultOfCategoryDto> {
+    protected processDeleteCategory(response: HttpResponseBase): Observable<ResultOfBoolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3063,7 +3007,7 @@ export class CategoryClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCategoryDto.fromJS(resultData200);
+            result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3178,7 +3122,7 @@ export class CategoryClient {
         return _observableOf(null as any);
     }
 
-    createCategory(request: CreateCategoryCommand): Observable<ResultOfCategoryDto> {
+    createCategory(request: CreateCategoryCommand): Observable<ResultOfCreateCategoryResponse> {
         let url_ = this.baseUrl + "/api/Category";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3202,14 +3146,14 @@ export class CategoryClient {
                 try {
                     return this.processCreateCategory(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCategoryDto>;
+                    return _observableThrow(e) as any as Observable<ResultOfCreateCategoryResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ResultOfCategoryDto>;
+                return _observableThrow(response_) as any as Observable<ResultOfCreateCategoryResponse>;
         }));
     }
 
-    protected processCreateCategory(response: HttpResponseBase): Observable<ResultOfCategoryDto> {
+    protected processCreateCategory(response: HttpResponseBase): Observable<ResultOfCreateCategoryResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3220,7 +3164,272 @@ export class CategoryClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCategoryDto.fromJS(resultData200);
+            result200 = ResultOfCreateCategoryResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    createCategoryWithFile(name: string | undefined, slug: string | null | undefined, description: string | null | undefined, image: FileParameter | null | undefined, metaTitle: string | null | undefined, metaDescription: string | null | undefined, parentCategoryId: string | null | undefined, status: number | undefined, displayOrder: number | undefined): Observable<ResultOfCreateCategoryResponse> {
+        let url_ = this.baseUrl + "/api/Category/create-with-file";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (name === null || name === undefined)
+            throw new globalThis.Error("The parameter 'name' cannot be null.");
+        else
+            content_.append("Name", name.toString());
+        if (slug !== null && slug !== undefined)
+            content_.append("Slug", slug.toString());
+        if (description !== null && description !== undefined)
+            content_.append("Description", description.toString());
+        if (image !== null && image !== undefined)
+            content_.append("Image", image.data, image.fileName ? image.fileName : "Image");
+        if (metaTitle !== null && metaTitle !== undefined)
+            content_.append("MetaTitle", metaTitle.toString());
+        if (metaDescription !== null && metaDescription !== undefined)
+            content_.append("MetaDescription", metaDescription.toString());
+        if (parentCategoryId !== null && parentCategoryId !== undefined)
+            content_.append("ParentCategoryId", parentCategoryId.toString());
+        if (status === null || status === undefined)
+            throw new globalThis.Error("The parameter 'status' cannot be null.");
+        else
+            content_.append("Status", status.toString());
+        if (displayOrder === null || displayOrder === undefined)
+            throw new globalThis.Error("The parameter 'displayOrder' cannot be null.");
+        else
+            content_.append("DisplayOrder", displayOrder.toString());
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateCategoryWithFile(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateCategoryWithFile(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfCreateCategoryResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfCreateCategoryResponse>;
+        }));
+    }
+
+    protected processCreateCategoryWithFile(response: HttpResponseBase): Observable<ResultOfCreateCategoryResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfCreateCategoryResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    updateCategory(request: UpdateCategoryCommand): Observable<ResultOfUpdateCategoryResponse> {
+        let url_ = this.baseUrl + "/api/Category/update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCategory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCategory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfUpdateCategoryResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfUpdateCategoryResponse>;
+        }));
+    }
+
+    protected processUpdateCategory(response: HttpResponseBase): Observable<ResultOfUpdateCategoryResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfUpdateCategoryResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    updateCategoryWithFile(categoryId: string | undefined, name: string | undefined, slug: string | null | undefined, description: string | null | undefined, image: FileParameter | null | undefined, metaTitle: string | null | undefined, metaDescription: string | null | undefined, parentCategoryId: string | null | undefined, status: number | undefined, displayOrder: number | undefined): Observable<ResultOfBoolean> {
+        let url_ = this.baseUrl + "/api/Category/update-with-file";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (categoryId === null || categoryId === undefined)
+            throw new globalThis.Error("The parameter 'categoryId' cannot be null.");
+        else
+            content_.append("CategoryId", categoryId.toString());
+        if (name === null || name === undefined)
+            throw new globalThis.Error("The parameter 'name' cannot be null.");
+        else
+            content_.append("Name", name.toString());
+        if (slug !== null && slug !== undefined)
+            content_.append("Slug", slug.toString());
+        if (description !== null && description !== undefined)
+            content_.append("Description", description.toString());
+        if (image !== null && image !== undefined)
+            content_.append("Image", image.data, image.fileName ? image.fileName : "Image");
+        if (metaTitle !== null && metaTitle !== undefined)
+            content_.append("MetaTitle", metaTitle.toString());
+        if (metaDescription !== null && metaDescription !== undefined)
+            content_.append("MetaDescription", metaDescription.toString());
+        if (parentCategoryId !== null && parentCategoryId !== undefined)
+            content_.append("ParentCategoryId", parentCategoryId.toString());
+        if (status === null || status === undefined)
+            throw new globalThis.Error("The parameter 'status' cannot be null.");
+        else
+            content_.append("Status", status.toString());
+        if (displayOrder === null || displayOrder === undefined)
+            throw new globalThis.Error("The parameter 'displayOrder' cannot be null.");
+        else
+            content_.append("DisplayOrder", displayOrder.toString());
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCategoryWithFile(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCategoryWithFile(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        }));
+    }
+
+    protected processUpdateCategoryWithFile(response: HttpResponseBase): Observable<ResultOfBoolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfBoolean.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    updateCategoryStatus(categoryId: string, request: UpdateCategoryStatusCommand): Observable<ResultOfBoolean> {
+        let url_ = this.baseUrl + "/api/Category/status/{categoryId}";
+        if (categoryId === undefined || categoryId === null)
+            throw new globalThis.Error("The parameter 'categoryId' must be defined.");
+        url_ = url_.replace("{categoryId}", encodeURIComponent("" + categoryId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCategoryStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCategoryStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+        }));
+    }
+
+    protected processUpdateCategoryStatus(response: HttpResponseBase): Observable<ResultOfBoolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3232,7 +3441,7 @@ export class CategoryClient {
     }
 
     checkCategoryExistsById(categoryId: string): Observable<ResultOfBoolean> {
-        let url_ = this.baseUrl + "/api/Category";
+        let url_ = this.baseUrl + "/api/Category/exists/{categoryId}";
         if (categoryId === undefined || categoryId === null)
             throw new globalThis.Error("The parameter 'categoryId' must be defined.");
         url_ = url_.replace("{categoryId}", encodeURIComponent("" + categoryId));
@@ -3273,219 +3482,6 @@ export class CategoryClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = ResultOfBoolean.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    createCategoryWithFile(categoryName: string | undefined, slug: string | null | undefined, description: string | null | undefined, metaTitle: string | null | undefined, metaDescription: string | null | undefined, parentCategoryId: string | null | undefined, status: number | undefined, displayOrder: number | undefined, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined): Observable<ResultOfCategoryDto> {
-        let url_ = this.baseUrl + "/api/Category/create-with-file";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = new FormData();
-        if (categoryName === null || categoryName === undefined)
-            throw new globalThis.Error("The parameter 'categoryName' cannot be null.");
-        else
-            content_.append("categoryName", categoryName.toString());
-        if (slug !== null && slug !== undefined)
-            content_.append("slug", slug.toString());
-        if (description !== null && description !== undefined)
-            content_.append("description", description.toString());
-        if (metaTitle !== null && metaTitle !== undefined)
-            content_.append("metaTitle", metaTitle.toString());
-        if (metaDescription !== null && metaDescription !== undefined)
-            content_.append("metaDescription", metaDescription.toString());
-        if (parentCategoryId !== null && parentCategoryId !== undefined)
-            content_.append("parentCategoryId", parentCategoryId.toString());
-        if (status === null || status === undefined)
-            throw new globalThis.Error("The parameter 'status' cannot be null.");
-        else
-            content_.append("status", status.toString());
-        if (displayOrder === null || displayOrder === undefined)
-            throw new globalThis.Error("The parameter 'displayOrder' cannot be null.");
-        else
-            content_.append("displayOrder", displayOrder.toString());
-        if (contentType !== null && contentType !== undefined)
-            content_.append("ContentType", contentType.toString());
-        if (contentDisposition !== null && contentDisposition !== undefined)
-            content_.append("ContentDisposition", contentDisposition.toString());
-        if (headers !== null && headers !== undefined)
-            headers.forEach(item_ => content_.append("Headers", item_.toString()));
-        if (length === null || length === undefined)
-            throw new globalThis.Error("The parameter 'length' cannot be null.");
-        else
-            content_.append("Length", length.toString());
-        if (name !== null && name !== undefined)
-            content_.append("Name", name.toString());
-        if (fileName !== null && fileName !== undefined)
-            content_.append("FileName", fileName.toString());
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateCategoryWithFile(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateCategoryWithFile(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCategoryDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<ResultOfCategoryDto>;
-        }));
-    }
-
-    protected processCreateCategoryWithFile(response: HttpResponseBase): Observable<ResultOfCategoryDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCategoryDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    uploadCategoryImage(categoryId: string, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined): Observable<ResultOfString> {
-        let url_ = this.baseUrl + "/api/Category/{categoryId}/upload-image";
-        if (categoryId === undefined || categoryId === null)
-            throw new globalThis.Error("The parameter 'categoryId' must be defined.");
-        url_ = url_.replace("{categoryId}", encodeURIComponent("" + categoryId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = new FormData();
-        if (contentType !== null && contentType !== undefined)
-            content_.append("ContentType", contentType.toString());
-        if (contentDisposition !== null && contentDisposition !== undefined)
-            content_.append("ContentDisposition", contentDisposition.toString());
-        if (headers !== null && headers !== undefined)
-            headers.forEach(item_ => content_.append("Headers", item_.toString()));
-        if (length === null || length === undefined)
-            throw new globalThis.Error("The parameter 'length' cannot be null.");
-        else
-            content_.append("Length", length.toString());
-        if (name !== null && name !== undefined)
-            content_.append("Name", name.toString());
-        if (fileName !== null && fileName !== undefined)
-            content_.append("FileName", fileName.toString());
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUploadCategoryImage(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUploadCategoryImage(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfString>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<ResultOfString>;
-        }));
-    }
-
-    protected processUploadCategoryImage(response: HttpResponseBase): Observable<ResultOfString> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfString.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    updateCategoryStatus(categoryId: string, request: UpdateCategoryStatusCommand): Observable<ResultOfCategoryDto> {
-        let url_ = this.baseUrl + "/api/Category/status/{categoryId}";
-        if (categoryId === undefined || categoryId === null)
-            throw new globalThis.Error("The parameter 'categoryId' must be defined.");
-        url_ = url_.replace("{categoryId}", encodeURIComponent("" + categoryId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateCategoryStatus(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateCategoryStatus(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCategoryDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<ResultOfCategoryDto>;
-        }));
-    }
-
-    protected processUpdateCategoryStatus(response: HttpResponseBase): Observable<ResultOfCategoryDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCategoryDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -19098,11 +19094,98 @@ export interface IResultOfCategoryDto {
     errors?: string[];
 }
 
+export class ResultOfCreateCategoryResponse implements IResultOfCreateCategoryResponse {
+    isSuccess?: boolean;
+    data?: CreateCategoryResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfCreateCategoryResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"] ? CreateCategoryResponse.fromJS(_data["data"]) : undefined as any;
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfCreateCategoryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfCreateCategoryResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfCreateCategoryResponse {
+    isSuccess?: boolean;
+    data?: CreateCategoryResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class CreateCategoryResponse extends CategoryDto implements ICreateCategoryResponse {
+
+    constructor(data?: ICreateCategoryResponse) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+    }
+
+    static override fromJS(data: any): CreateCategoryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateCategoryResponse();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface ICreateCategoryResponse extends ICategoryDto {
+}
+
 export class CreateCategoryCommand implements ICreateCategoryCommand {
     name?: string;
     slug?: string | undefined;
     description?: string | undefined;
-    imageUrl?: string | undefined;
+    image?: string | undefined;
     metaTitle?: string | undefined;
     metaDescription?: string | undefined;
     parentCategoryId?: string | undefined;
@@ -19123,7 +19206,7 @@ export class CreateCategoryCommand implements ICreateCategoryCommand {
             this.name = _data["name"];
             this.slug = _data["slug"];
             this.description = _data["description"];
-            this.imageUrl = _data["imageUrl"];
+            this.image = _data["image"];
             this.metaTitle = _data["metaTitle"];
             this.metaDescription = _data["metaDescription"];
             this.parentCategoryId = _data["parentCategoryId"];
@@ -19144,7 +19227,7 @@ export class CreateCategoryCommand implements ICreateCategoryCommand {
         data["name"] = this.name;
         data["slug"] = this.slug;
         data["description"] = this.description;
-        data["imageUrl"] = this.imageUrl;
+        data["image"] = this.image;
         data["metaTitle"] = this.metaTitle;
         data["metaDescription"] = this.metaDescription;
         data["parentCategoryId"] = this.parentCategoryId;
@@ -19158,12 +19241,99 @@ export interface ICreateCategoryCommand {
     name?: string;
     slug?: string | undefined;
     description?: string | undefined;
-    imageUrl?: string | undefined;
+    image?: string | undefined;
     metaTitle?: string | undefined;
     metaDescription?: string | undefined;
     parentCategoryId?: string | undefined;
     status?: number;
     displayOrder?: number;
+}
+
+export class ResultOfUpdateCategoryResponse implements IResultOfUpdateCategoryResponse {
+    isSuccess?: boolean;
+    data?: UpdateCategoryResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+
+    constructor(data?: IResultOfUpdateCategoryResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isSuccess = _data["isSuccess"];
+            this.data = _data["data"] ? UpdateCategoryResponse.fromJS(_data["data"]) : undefined as any;
+            this.errorMessage = _data["errorMessage"];
+            this.errorCode = _data["errorCode"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): ResultOfUpdateCategoryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultOfUpdateCategoryResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isSuccess"] = this.isSuccess;
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        data["errorMessage"] = this.errorMessage;
+        data["errorCode"] = this.errorCode;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IResultOfUpdateCategoryResponse {
+    isSuccess?: boolean;
+    data?: UpdateCategoryResponse | undefined;
+    errorMessage?: string | undefined;
+    errorCode?: string | undefined;
+    errors?: string[];
+}
+
+export class UpdateCategoryResponse extends CategoryDto implements IUpdateCategoryResponse {
+
+    constructor(data?: IUpdateCategoryResponse) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+    }
+
+    static override fromJS(data: any): UpdateCategoryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateCategoryResponse();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IUpdateCategoryResponse extends ICategoryDto {
 }
 
 export class UpdateCategoryCommand implements IUpdateCategoryCommand {
@@ -19238,6 +19408,46 @@ export interface IUpdateCategoryCommand {
     displayOrder?: number;
 }
 
+export class UpdateCategoryStatusCommand implements IUpdateCategoryStatusCommand {
+    categoryId?: string;
+    status?: number;
+
+    constructor(data?: IUpdateCategoryStatusCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.categoryId = _data["categoryId"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): UpdateCategoryStatusCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateCategoryStatusCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["categoryId"] = this.categoryId;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IUpdateCategoryStatusCommand {
+    categoryId?: string;
+    status?: number;
+}
+
 export class ResultOfString implements IResultOfString {
     isSuccess?: boolean;
     data?: string | undefined;
@@ -19296,46 +19506,6 @@ export interface IResultOfString {
     errorMessage?: string | undefined;
     errorCode?: string | undefined;
     errors?: string[];
-}
-
-export class UpdateCategoryStatusCommand implements IUpdateCategoryStatusCommand {
-    categoryId?: string;
-    status?: number;
-
-    constructor(data?: IUpdateCategoryStatusCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.categoryId = _data["categoryId"];
-            this.status = _data["status"];
-        }
-    }
-
-    static fromJS(data: any): UpdateCategoryStatusCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateCategoryStatusCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["categoryId"] = this.categoryId;
-        data["status"] = this.status;
-        return data;
-    }
-}
-
-export interface IUpdateCategoryStatusCommand {
-    categoryId?: string;
-    status?: number;
 }
 
 export class ResultOfObject implements IResultOfObject {

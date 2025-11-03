@@ -34,6 +34,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { LoadingOverlayComponent } from '../layout/loading-overlay/loading-overlay.component';
 import {
   CategoryClient,
   CategoryDto,
@@ -56,6 +57,7 @@ import { ToastModule } from 'primeng/toast';
     CommonModule,
     FormsModule,
     FaIconComponent,
+    LoadingOverlayComponent,
     ConfirmDialogModule,
     ToastModule
 ],

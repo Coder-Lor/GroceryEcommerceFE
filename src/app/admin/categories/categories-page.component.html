@@ -1,12 +1,5 @@
 <!-- Loading Overlay for entire page -->
-@if (isLoading) {
-<div class="loading-overlay-fullpage">
-  <div class="loading-content">
-    <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
-    <p class="loading-text">Đang tải dữ liệu...</p>
-  </div>
-</div>
-}
+<app-loading-overlay [show]="isLoading" message="Đang xử lý..."></app-loading-overlay>
 
 <div class="categories-container">
   <!-- Toast messages -->
@@ -25,17 +18,14 @@
   <div class="page-header">
     <h2>Quản lý danh mục</h2>
     <div class="header-actions">
-      <button class="btn btn-success" (click)="openAddModal()">
+      <button class="btn btn-success" (click)="openAddModal()" title="Thêm danh mục">
         <fa-icon [icon]="faPlus" size="1x"></fa-icon>
-        Thêm danh mục
       </button>
-      <button class="btn btn-info" (click)="showCategoryReport()">
+      <button class="btn btn-info" (click)="showCategoryReport()" title="Báo cáo tổng quan">
         <fa-icon [icon]="faChartSimple"></fa-icon>
-        Báo cáo
       </button>
-      <button class="btn btn-secondary" (click)="exportReport()">
+      <button class="btn btn-secondary" (click)="exportReport()" title="Xuất CSV">
         <fa-icon [icon]="faDownload"></fa-icon>
-        Xuất CSV
       </button>
     </div>
   </div>
@@ -141,122 +131,14 @@
 </div>
 
 <!-- Modal thêm/sửa danh mục -->
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>{{ modalMode === 'add' ? 'Thêm danh mục mới' : 'Sửa danh mục' }}</h3>
-      <button class="btn-close" (click)="closeModal()">
-        <fa-icon [icon]="faXmark"></fa-icon>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <form #categoryForm="ngForm">
-        <div class="form-group">
-          <label>Tên danh mục <span class="required">*</span></label>
-          <input
-            type="text"
-            [(ngModel)]="currentCategory.name"
-            name="name"
-            class="form-control"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Slug <span class="required">*</span></label>
-          <input
-            type="text"
-            [(ngModel)]="currentCategory.slug"
-            name="slug"
-            class="form-control"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Mô tả</label>
-          <textarea
-            [(ngModel)]="currentCategory.description"
-            name="description"
-            class="form-control"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Danh mục cha</label>
-            <select
-              [(ngModel)]="currentCategory.parentCategoryId"
-              name="parentCategoryId"
-              class="form-control"
-            >
-              <option [ngValue]="undefined">-- Danh mục gốc --</option>
-              <option *ngFor="let cat of allCategories" [ngValue]="cat.categoryId">
-                {{ cat.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Thứ tự hiển thị <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentCategory.displayOrder"
-              name="displayOrder"
-              class="form-control"
-              min="0"
-              required
-            />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Meta Title</label>
-            <input
-              type="text"
-              [(ngModel)]="currentCategory.metaTitle"
-              name="metaTitle"
-              class="form-control"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Meta Description</label>
-            <input
-              type="text"
-              [(ngModel)]="currentCategory.metaDescription"
-              name="metaDescription"
-              class="form-control"
-            />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Trạng thái <span class="required">*</span></label>
-          <select
-            [(ngModel)]="currentCategory.status"
-            name="status"
-            class="form-control"
-            required
-          >
-            <option [ngValue]="1">Hoạt động</option>
-            <option [ngValue]="0">Tạm ẩn</option>
-          </select>
-        </div>
-      </form>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
-      <button class="btn btn-primary" (click)="saveCategory()">
-        {{ modalMode === 'add' ? 'Thêm' : 'Cập nhật' }}
-      </button>
-    </div>
-  </div>
-</div>
+<app-category-form-modal
+  [show]="showModal"
+  [mode]="modalMode"
+  [category]="currentCategory"
+  [allCategories]="allCategories"
+  (close)="closeModal()"
+  (save)="saveCategory($event)"
+></app-category-form-modal>
 
 <!-- Modal xem danh mục con -->
 <div class="modal-overlay" *ngIf="showSubCategoriesModal" (click)="closeSubCategoriesModal()">
@@ -400,13 +282,8 @@
     </div>
 
     <div class="modal-body">
-      @if (isLoadingProducts) {
-      <div class="loading-content">
-        <fa-icon [icon]="faHurricane" size="3x" animation="spin" class="loading-icon"></fa-icon>
-        <p>Đang tải danh sách sản phẩm...</p>
-      </div>
-      } @else {
-        @if (categoryProducts.length > 0) {
+      <app-loading-overlay [show]="isLoadingProducts" message="Đang tải danh sách sản phẩm..."></app-loading-overlay>
+        
           <div class="products-table-container">
             <table class="products-table">
               <thead>
@@ -456,13 +333,10 @@
           <div class="products-summary">
             Tổng cộng: <strong>{{ categoryProducts.length }}</strong> sản phẩm
           </div>
-        } @else {
-          <div class="no-products">
+          <div class="no-products" *ngIf="categoryProducts.length === 0">
             <fa-icon [icon]="faBox" size="3x"></fa-icon>
             <p>Danh mục này chưa có sản phẩm nào</p>
           </div>
-        }
-      }
     </div>
 
     <div class="modal-footer">

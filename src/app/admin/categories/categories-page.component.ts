@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+import { LoadingOverlayComponent } from '../layout/loading-overlay/loading-overlay.component';
+import { CategoryFormModalComponent } from './category-form-modal/category-form-modal.component';
 import {
   faPlus,
   faChartSimple,
@@ -32,12 +34,14 @@ import {
   ProductBaseResponse,
   FilterCriteria,
   FilterOperator,
-  SortDirection
+  SortDirection,
+  FileParameter
 } from '../../core/service/system-admin.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ImageUploadService } from '../../core/service/image-upload.service';
 
 interface CategoryReport {
   totalCategories: number;
@@ -50,7 +54,7 @@ interface CategoryReport {
 @Component({
   selector: 'app-categories-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, FaIconComponent, ToastModule, ConfirmDialogModule],
+  imports: [CommonModule, FormsModule, FaIconComponent, ToastModule, ConfirmDialogModule, LoadingOverlayComponent, CategoryFormModalComponent],
   providers: [MessageService, ConfirmationService],
   templateUrl: './categories-page.component.html',
   styleUrls: ['./categories-page.component.scss']
@@ -106,7 +110,8 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
     private categoryClient: CategoryClient,
     private productClient: ProductClient,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private imageUploadService: ImageUploadService
   ) {}
 
   ngOnInit(): void {
@@ -205,6 +210,7 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
     updateCmd.name = category.name;
     updateCmd.slug = category.slug;
     updateCmd.description = category.description;
+    updateCmd.imageUrl = category.imageUrl;  // Copy imageUrl from existing category
     updateCmd.parentCategoryId = category.parentCategoryId;
     updateCmd.displayOrder = category.displayOrder;
     updateCmd.status = category.status;
@@ -221,7 +227,9 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
     this.currentCategory = this.getEmptyCategory();
   }
 
-  saveCategory(): void {
+  saveCategory(data: {category: CreateCategoryCommand | UpdateCategoryCommand, imageFile: File | null}): void {
+    this.currentCategory = data.category;
+    
     if (!this.validateCategory()) {
       return;
     }
@@ -229,77 +237,159 @@ export class CategoriesPageComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     if (this.modalMode === 'add') {
+      // Mode thêm mới - sử dụng createCategoryWithFile
       const createCmd = this.currentCategory as CreateCategoryCommand;
-      this.categoryClient.createCategory(createCmd)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            if (response.isSuccess) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Thành công',
-                detail: 'Thêm danh mục thành công!',
-                life: 3000
-              });
-              this.closeModal();
-              this.loadCategories();
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Lỗi',
-                detail: response.errorMessage || 'Không thể thêm danh mục',
-                life: 3000
-              });
-            }
-          },
-          error: (error) => {
-            this.isLoading = false;
-            console.error('Error creating category:', error);
+      
+      // Chuẩn bị FileParameter nếu có ảnh
+      let imageParam: FileParameter | null = null;
+      if (data.imageFile) {
+        imageParam = {
+          data: data.imageFile,
+          fileName: data.imageFile.name
+        };
+      }
+
+      // Gọi API createCategoryWithFile
+      this.categoryClient.createCategoryWithFile(
+        createCmd.name,                    // name (required)
+        createCmd.slug,                    // slug
+        createCmd.description,             // description
+        imageParam,                        // image file
+        createCmd.metaTitle,               // metaTitle
+        createCmd.metaDescription,         // metaDescription
+        createCmd.parentCategoryId,        // parentCategoryId
+        createCmd.status,                  // status (required)
+        createCmd.displayOrder             // displayOrder (required)
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Thêm danh mục thành công!',
+              life: 3000
+            });
+            this.closeModal();
+            this.loadCategories();
+          } else {
             this.messageService.add({
               severity: 'error',
               summary: 'Lỗi',
-              detail: 'Lỗi khi thêm danh mục',
+              detail: response.errorMessage || 'Không thể thêm danh mục',
               life: 3000
             });
           }
-        });
+        },
+        error: (error) => {
+          this.isLoading = false;
+          console.error('Error creating category:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Lỗi khi thêm danh mục',
+            life: 3000
+          });
+        }
+      });
     } else {
+      // Mode chỉnh sửa - sử dụng updateCategory hoặc updateCategoryWithFile
       const updateCmd = this.currentCategory as UpdateCategoryCommand;
-      this.categoryClient.updateCategory(updateCmd.categoryId!, updateCmd)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            if (response.isSuccess) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Thành công',
-                detail: 'Cập nhật danh mục thành công!',
-                life: 3000
-              });
-              this.closeModal();
-              this.loadCategories();
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Lỗi',
-                detail: response.errorMessage || 'Không thể cập nhật danh mục',
-                life: 3000
-              });
-            }
-          },
-          error: (error) => {
-            this.isLoading = false;
-            console.error('Error updating category:', error);
+      this.submitUpdateCategory(updateCmd, data.imageFile);
+    }
+  }
+
+  private submitUpdateCategory(updateCmd: UpdateCategoryCommand, imageFile: File | null): void {
+    // Nếu có file ảnh mới, sử dụng updateCategoryWithFile
+    if (imageFile) {
+      const imageParam: FileParameter = {
+        data: imageFile,
+        fileName: imageFile.name
+      };
+
+      this.categoryClient.updateCategoryWithFile(
+        updateCmd.categoryId,              // categoryId (required)
+        updateCmd.name,                    // name (required)
+        updateCmd.slug,                    // slug
+        updateCmd.description,             // description
+        imageParam,                        // image file (có ảnh mới)
+        updateCmd.metaTitle,               // metaTitle
+        updateCmd.metaDescription,         // metaDescription
+        updateCmd.parentCategoryId,        // parentCategoryId
+        updateCmd.status,                  // status (required)
+        updateCmd.displayOrder             // displayOrder (required)
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Cập nhật danh mục thành công!',
+              life: 3000
+            });
+            this.closeModal();
+            this.loadCategories();
+          } else {
             this.messageService.add({
               severity: 'error',
               summary: 'Lỗi',
-              detail: 'Lỗi khi cập nhật danh mục',
+              detail: response.errorMessage || 'Không thể cập nhật danh mục',
               life: 3000
             });
           }
-        });
+        },
+        error: (error) => {
+          this.isLoading = false;
+          console.error('Error updating category with file:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Lỗi khi cập nhật danh mục',
+            life: 3000
+          });
+        }
+      });
+    } else {
+      // Không có ảnh mới, sử dụng updateCategory thông thường
+      this.categoryClient.updateCategory(updateCmd)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Cập nhật danh mục thành công!',
+              life: 3000
+            });
+            this.closeModal();
+            this.loadCategories();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể cập nhật danh mục',
+              life: 3000
+            });
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          console.error('Error updating category:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Lỗi khi cập nhật danh mục',
+            life: 3000
+          });
+        }
+      });
     }
   }
 

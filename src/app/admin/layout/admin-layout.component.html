@@ -1,11 +1,30 @@
-<div class="admin-layout">
+<div class="admin-layout" [class.sidebar-collapsed]="isSidebarCollapsed">
+  <button class="toggle-btn" (click)="toggleSidebar()" [attr.aria-label]="isSidebarCollapsed ? 'Mở sidebar' : 'Đóng sidebar'">
+    <span class="toggle-icon">
+      @if (isSidebarCollapsed) {
+        <i class="pi pi-angle-right"></i>
+      } @else {
+        <i class="pi pi-angle-left"></i>
+      }
+    </span>
+  </button>
   <aside class="sidebar">
     <nav>
-      <a routerLink="home" routerLinkActive="active">Trang Chủ</a>
-      <a routerLink="users" routerLinkActive="active">Quản lý người dùng</a>
-      <a routerLink="inventory" routerLinkActive="active">Quản lý kho hàng</a>
-      <a routerLink="orders" routerLinkActive="active">Quản lý đơn hàng</a>
-      <a routerLink="categories" routerLinkActive="active">Quản lý danh mục</a>
+      <a routerLink="home" routerLinkActive="active">
+        <span class="nav-text">Trang Chủ</span>
+      </a>
+      <a routerLink="users" routerLinkActive="active">
+        <span class="nav-text">Quản lý người dùng</span>
+      </a>
+      <a routerLink="inventory" routerLinkActive="active">
+        <span class="nav-text">Quản lý kho hàng</span>
+      </a>
+      <a routerLink="orders" routerLinkActive="active">
+        <span class="nav-text">Quản lý đơn hàng</span>
+      </a>
+      <a routerLink="categories" routerLinkActive="active">
+        <span class="nav-text">Quản lý danh mục</span>
+      </a>
     </nav>
   </aside>
   <main class="content">
