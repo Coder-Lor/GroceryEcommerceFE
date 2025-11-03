@@ -32,10 +32,10 @@
     </div>
   </section> -->
   <section class="hero-slider container position-relative mb-4">
-    <swiper-container autoplay-delay="4000" loop="true" pagination="true" navigation="true">
+    <swiper-container autoplay-delay="20000" loop="true" pagination="true" navigation="true">
       <swiper-slide *ngFor="let slide of heroSlides">
         <div class="hero-slide position-relative rounded-4 overflow-hidden">
-          <img [src]="slide.image" class="w-100 h-100 object-fit-cover" />
+          <img [src]="slide.image" class="w-100 h-100 overflow-hidden object-fit-cover" />
           <!-- <div class="hero-overlay"></div>
           <div class="hero-content position-absolute text-white">
             <h1 class="fw-bold mb-3">{{ slide.title }}</h1>

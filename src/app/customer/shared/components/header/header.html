@@ -34,10 +34,10 @@
       <!-- Right Section -->
       <div class="header-right d-flex align-items-center">
         <!-- Cart & wishlist -->
-        <div class="cart-wishlist me-3" (click)="toggleUtilPanel()" style="cursor: pointer">
+        <div class="cart-wishlist me-3">
           <div class="cart-wishlist-content d-flex align-items-center">
             <div class="cart-section" (mouseenter)="onCartMouseEnter()" (mouseleave)="onCartMouseLeave()">
-              <div class="cart-icon-wrapper">
+              <div class="cart-icon-wrapper" (click)="toggleUtilPanel()" style="cursor: pointer">
                 <span class="cart-icon">
                   <i class="pi pi-shopping-cart"></i>
                 </span>
@@ -136,58 +136,6 @@
       </div>
       <span class="menu-count">3</span>
     </div>
-
-    <!-- Departments -->
-    <div class="menu-item has-arrow">
-      <span class="menu-label">Departments</span>
-      <img class="arrow" src="icons/arrow-right.svg" alt="Next" />
-    </div>
-
-    <!-- Grocery -->
-    <div class="menu-item has-arrow open" (click)="togggleSubmenu()">
-      <span class="menu-label">Grocery</span>
-      <img class="arrow" src="icons/arrow-down.svg" alt="Expand" />
-    </div>
-
-    <div class="submenu" [ngClass]="{ open: isShowSubMenu }">
-      <div class="submenu-header">
-        <div class="icon-box purple">
-          <img class="icon" src="buy1.svg" alt="Grocery Icon" />
-        </div>
-        <span class="submenu-label">Grocery</span>
-      </div>
-      <ul class="submenu-list">
-        <li class="submenu-item">Shop All</li>
-        <li class="submenu-item">Grilling Foods</li>
-        <li class="submenu-item">Spring Flavors</li>
-      </ul>
-
-      <div class="submenu-header">
-        <div class="icon-box green">
-          <img class="icon" src="group0.svg" alt="Fresh Produce Icon" />
-        </div>
-        <span class="submenu-label">Fresh Produce</span>
-      </div>
-      <ul class="submenu-list">
-        <li class="submenu-item">Shop All</li>
-        <li class="submenu-item">Celebrate Salad Month</li>
-        <li class="submenu-item">Healthy Living</li>
-        <li class="submenu-item">Fresh Flowers</li>
-        <li class="submenu-item">Chilled Dressing</li>
-        <li class="submenu-item">Fresh Fruit</li>
-        <li class="submenu-item">Salad Kits &amp; Bowls</li>
-        <li class="submenu-item">Organic Produce</li>
-        <li class="submenu-item">Fresh Vegetables</li>
-      </ul>
-    </div>
-
-    <!-- Beauty -->
-    <div class="menu-item has-arrow">
-      <span class="menu-label">Beauty</span>
-      <img class="arrow" src="icons/arrow-right.svg" alt="Next" />
-    </div>
-  </div>
-</div>
 
 <!-- utility panel component stays the same -->
 <app-utility-panel
