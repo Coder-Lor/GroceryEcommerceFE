@@ -41,6 +41,7 @@ import {
   CreateProductCommand,
   ProductBaseResponse,
   ProductClient,
+  UpdateProductCommand,
 } from '@services/system-admin.service';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Product } from './models/product.model';
@@ -73,8 +74,8 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
   // Pagination properties
   currentPage: number = 1;
-  pageSize: number = 10;
-  pageSizeOptions: number[] = [10, 20, 50, 100];
+  pageSize: number = 8;
+  pageSizeOptions: number[] = [8, 16, 24, 40, 100];
   totalPages: number = 0;
 
   showModal: boolean = false;
@@ -84,6 +85,12 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   showDetailModal: boolean = false;
   detailProduct: Product | null = null;
   isDetailEditMode: boolean = false;
+  editingProduct: UpdateProductCommand | null = null;
+  
+  // Image management for editing
+  newImageFiles: File[] = [];
+  imageIdsToDelete: string[] = [];
+  existingImages: any[] = [];
 
   showReport: boolean = false;
   report: any = null;
@@ -168,12 +175,13 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       .subscribe((pagingInfo) => {
         console.log('[Inventory] Paging info updated:', pagingInfo);
         this.currentPage = pagingInfo.currentPage;
-        this.pageSize = pagingInfo.pageSize;
         this.totalPages = pagingInfo.totalPages;
+        // Don't update pageSize from service to keep component's initial value
         this.cdr.detectChanges();
       });
     
-    this.inventoryService.initialize();
+    // Load products with component's pageSize instead of using initialize()
+    this.inventoryService.loadProducts(this.currentPage, this.pageSize);
 
     this.categoryClient
       .getCategoryTree()
@@ -434,27 +442,367 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.showDetailModal = false;
     this.detailProduct = null;
     this.isDetailEditMode = false;
+    this.editingProduct = null;
+    // Reset image management
+    this.newImageFiles = [];
+    this.imageIdsToDelete = [];
+    this.existingImages = [];
   }
 
   // Bật chế độ chỉnh sửa trong modal chi tiết
   enableEditMode(): void {
     if (this.detailProduct) {
       this.isDetailEditMode = true;
-      this.currentProduct = CreateProductCommand.fromJS(this.detailProduct.toJSON());
+      
+      // Tạo UpdateProductCommand từ detailProduct
+      this.editingProduct = UpdateProductCommand.fromJS({
+        productId: this.detailProduct.productId,
+        name: this.detailProduct.name,
+        slug: this.detailProduct.slug,
+        sku: this.detailProduct.sku,
+        description: this.detailProduct.description,
+        shortDescription: this.detailProduct.shortDescription,
+        price: this.detailProduct.price,
+        discountPrice: this.detailProduct.discountPrice,
+        cost: this.detailProduct.cost,
+        stockQuantity: this.detailProduct.stockQuantity,
+        minStockLevel: this.detailProduct.minStockLevel,
+        weight: this.detailProduct.weight,
+        dimensions: this.detailProduct.dimensions,
+        categoryId: this.detailProduct.categoryId,
+        brandId: this.detailProduct.brandId,
+        status: this.detailProduct.status,
+        isFeatured: this.detailProduct.isFeatured,
+        isDigital: this.detailProduct.isDigital,
+        metaTitle: this.detailProduct.metaTitle,
+        metaDescription: this.detailProduct.metaDescription,
+      });
+
+      // Copy existing images
+      this.existingImages = this.detailProduct.images ? 
+        JSON.parse(JSON.stringify(this.detailProduct.images)) : [];
+      this.newImageFiles = [];
+      this.imageIdsToDelete = [];
+    }
+  }
+
+  // Handle image selection for editing
+  onEditImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      Array.from(input.files).forEach(file => {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Cảnh báo',
+            detail: `File ${file.name} vượt quá 5MB`,
+            life: 3000,
+          });
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Cảnh báo',
+            detail: `File ${file.name} không phải là ảnh`,
+            life: 3000,
+          });
+          return;
+        }
+
+        // Add to new images array
+        this.newImageFiles.push(file);
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const imageUrl = e.target?.result as string;
+          
+          // Add to existing images for preview
+          const newImage = {
+            productImageId: `new-${Date.now()}-${Math.random()}`,
+            imageUrl: imageUrl,
+            altText: file.name,
+            displayOrder: this.existingImages.length + this.newImageFiles.length - 1,
+            isPrimary: this.existingImages.length === 0 && this.newImageFiles.length === 1,
+            isNew: true
+          };
+
+          this.existingImages.push(newImage);
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    // Reset input
+    input.value = '';
+  }
+
+  // Set image as primary in edit mode
+  setEditPrimaryImage(index: number): void {
+    if (this.existingImages && this.existingImages.length > 0) {
+      // Remove primary from all images
+      this.existingImages.forEach(img => img.isPrimary = false);
+      // Set selected as primary
+      this.existingImages[index].isPrimary = true;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Remove image in edit mode
+  removeEditImage(index: number): void {
+    if (this.existingImages && this.existingImages.length > 0) {
+      const removedImage = this.existingImages[index];
+      
+      // If it's an existing image (has productImageId without 'new-' prefix), mark for deletion
+      if (removedImage.productImageId && !removedImage.productImageId.startsWith('new-')) {
+        this.imageIdsToDelete.push(removedImage.productImageId);
+      } else {
+        // If it's a new image, remove from newImageFiles
+        const newImageIndex = this.existingImages
+          .slice(0, index)
+          .filter(img => img.isNew).length;
+        if (newImageIndex >= 0 && newImageIndex < this.newImageFiles.length) {
+          this.newImageFiles.splice(newImageIndex, 1);
+        }
+      }
+
+      this.existingImages.splice(index, 1);
+
+      // If removed image was primary and there are remaining images, set first as primary
+      if (removedImage.isPrimary && this.existingImages.length > 0) {
+        this.existingImages[0].isPrimary = true;
+      }
+
+      this.cdr.detectChanges();
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Thành công',
+        detail: 'Đã xóa ảnh',
+        life: 2000,
+      });
     }
   }
 
   // Lưu thay đổi từ modal chi tiết
   saveDetailChanges(): void {
-    if (this.validateProduct() && this.detailProduct) {
+    if (!this.editingProduct || !this.editingProduct.productId) {
       this.messageService.add({
-        severity: 'info',
-        summary: 'Thông báo',
-        detail: 'Chức năng cập nhật sẽ được hoàn thiện sau',
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Không tìm thấy thông tin sản phẩm để cập nhật',
         life: 3000,
       });
-      this.closeDetailModal();
+      return;
     }
+
+    // Validate dữ liệu
+    if (!this.validateUpdateProduct(this.editingProduct)) {
+      return;
+    }
+
+    console.log('Updating product with data:', this.editingProduct);
+    console.log('New images:', this.newImageFiles.length);
+    console.log('Images to delete:', this.imageIdsToDelete.length);
+    
+    this.isLoading = true;
+
+    // Nếu có ảnh mới hoặc ảnh cần xóa, sử dụng updateWithFiles
+    if (this.newImageFiles.length > 0 || this.imageIdsToDelete.length > 0) {
+      // Prepare image data
+      const newImageAltTexts: string[] = [];
+      const newImageDisplayOrders: number[] = [];
+      const newImageIsPrimary: boolean[] = [];
+      
+      // Get info for new images
+      let displayOrder = 0;
+      this.existingImages.forEach((img, index) => {
+        if (img.isNew) {
+          newImageAltTexts.push(img.altText || this.editingProduct!.name || '');
+          newImageDisplayOrders.push(displayOrder++);
+          newImageIsPrimary.push(img.isPrimary || false);
+        }
+      });
+
+      // Convert File[] to FileParameter[]
+      const fileParameters = this.newImageFiles.map(file => ({
+        data: file,
+        fileName: file.name
+      }));
+
+      // Call updateWithFiles API
+      this.productClient
+        .updateWithFiles(
+          this.editingProduct.productId,
+          this.editingProduct.name,
+          this.editingProduct.slug,
+          this.editingProduct.sku,
+          this.editingProduct.description,
+          this.editingProduct.shortDescription,
+          this.editingProduct.price,
+          this.editingProduct.discountPrice,
+          this.editingProduct.cost,
+          this.editingProduct.stockQuantity,
+          this.editingProduct.minStockLevel,
+          this.editingProduct.weight,
+          this.editingProduct.dimensions,
+          this.editingProduct.categoryId,
+          this.editingProduct.brandId,
+          this.editingProduct.status,
+          this.editingProduct.isFeatured,
+          this.editingProduct.isDigital,
+          this.editingProduct.metaTitle,
+          this.editingProduct.metaDescription,
+          fileParameters.length > 0 ? fileParameters : null,
+          newImageAltTexts.length > 0 ? newImageAltTexts : null,
+          newImageDisplayOrders.length > 0 ? newImageDisplayOrders : null,
+          newImageIsPrimary.length > 0 ? newImageIsPrimary : null,
+          this.imageIdsToDelete.length > 0 ? this.imageIdsToDelete : null,
+          null, // variants
+          null, // attributes
+          null  // tagIds
+        )
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            console.log('Update response:', response);
+            this.isLoading = false;
+
+            if (response.isSuccess) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: 'Cập nhật sản phẩm thành công',
+                life: 3000,
+              });
+              this.closeDetailModal();
+              // Refresh danh sách sản phẩm
+              this.inventoryService.refreshProducts();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: response.errorMessage || 'Không thể cập nhật sản phẩm',
+                life: 3000,
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error updating product:', error);
+            this.isLoading = false;
+
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Đã có lỗi xảy ra khi cập nhật sản phẩm',
+              life: 3000,
+            });
+          },
+        });
+    } else {
+      // Không có thay đổi về ảnh, sử dụng update thông thường
+      this.inventoryService
+        .updateProductToServer(this.editingProduct)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            console.log('Update response:', response);
+            this.isLoading = false;
+
+            if (response.isSuccess) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: 'Cập nhật sản phẩm thành công',
+                life: 3000,
+              });
+              this.closeDetailModal();
+              // Service sẽ tự động refresh danh sách
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: response.errorMessage || 'Không thể cập nhật sản phẩm',
+                life: 3000,
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error updating product:', error);
+            this.isLoading = false;
+
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Đã có lỗi xảy ra khi cập nhật sản phẩm',
+              life: 3000,
+            });
+          },
+        });
+    }
+  }
+
+  // Validate sản phẩm khi cập nhật
+  private validateUpdateProduct(product: UpdateProductCommand): boolean {
+    if (!product.sku?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập mã SKU',
+        life: 3000,
+      });
+      return false;
+    }
+    if (!product.name?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập tên sản phẩm',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((product.price || 0) <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Giá bán phải lớn hơn 0',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((product.cost || 0) < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Giá vốn không được âm',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((product.stockQuantity || 0) < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Số lượng tồn kho không được âm',
+        life: 3000,
+      });
+      return false;
+    }
+    if (!product.categoryId?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng chọn danh mục',
+        life: 3000,
+      });
+      return false;
+    }
+    return true;
   }
 
   // Handle image selection

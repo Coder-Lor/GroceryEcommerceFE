@@ -2,7 +2,15 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { Product, InventoryReport } from '../../admin/inventory/models/product.model';
-import { ProductBaseResponse, ProductClient, SortDirection, PagedResultOfProductBaseResponse } from '@services/system-admin.service';
+import { 
+  ProductBaseResponse, 
+  ProductClient, 
+  SortDirection, 
+  PagedResultOfProductBaseResponse,
+  UpdateProductCommand,
+  ResultOfUpdateProductResponse,
+  FileParameter
+} from '@services/system-admin.service';
 
 export interface PagingInfo {
   totalCount: number;
@@ -41,13 +49,13 @@ export class InventoryService {
     // Let component decide when to load
   }
 
-  // Initialize data (call from component)
-  initialize(): void {
-    if (!this.isInitialized) {
-      this.isInitialized = true;
-      this.loadProducts(1, 10);
-    }
-  }
+  // // Initialize data (call from component)
+  // initialize(): void {
+  //   if (!this.isInitialized) {
+  //     this.isInitialized = true;
+  //     this.loadProducts(1, 10);
+  //   }
+  // }
 
   // Load products from API with paging and optional search keyword
   loadProducts(page: number = 1, pageSize: number = 10, search?: string): void {
@@ -159,7 +167,30 @@ export class InventoryService {
     // TODO: Call API to persist the new product
   }
 
-  // Cập nhật sản phẩm
+  // Cập nhật sản phẩm (gọi API)
+  updateProductToServer(command: UpdateProductCommand): Observable<ResultOfUpdateProductResponse> {
+    this.loadingSubject.next(true);
+    
+    return this.productClient.update(command).pipe(
+      tap((response) => {
+        this.loadingSubject.next(false);
+        if (response.isSuccess) {
+          // Refresh danh sách sản phẩm sau khi cập nhật thành công
+          this.refreshProducts();
+        }
+      }),
+      catchError((error) => {
+        console.error('Error updating product:', error);
+        this.loadingSubject.next(false);
+        return of({
+          isSuccess: false,
+          errorMessage: 'Đã có lỗi xảy ra khi cập nhật sản phẩm'
+        } as ResultOfUpdateProductResponse);
+      })
+    );
+  }
+
+  // Cập nhật sản phẩm (local - legacy)
   updateProduct(id: number, product: Partial<Product>): void {
     const products = this.productsSubject.value;
     const index = products.findIndex(p => p.productId === id.toString());
