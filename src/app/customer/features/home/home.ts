@@ -1,23 +1,27 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Component, inject, OnInit, OnDestroy, ViewEncapsulation, PLATFORM_ID } from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { CarouselModule } from 'primeng/carousel';
 import { ProductCard } from '../../shared/components/product-card/product-card';
-import { ProductBaseResponse } from '@core/service/system-admin.service';
+import { ProductBaseResponse, CategoryClient, CategoryDto } from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
 import { ProductService } from '@core/service/product.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
+import { TransferState, makeStateKey } from '@angular/core';
 
 type Product = ProductBaseResponse;
 type UrlObject = {
   url: string;
 }
 type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
+
+// State key for TransferState
+const CATEGORIES_KEY = makeStateKey<CategoryDto[]>('categories');
 
 @Component({
   selector: 'app-home',
@@ -37,10 +41,13 @@ type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
   encapsulation: ViewEncapsulation.None,
   host: { ngSkipHydration: 'true' },
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
+  private categoryService = inject(CategoryClient);
+  private transferState = inject(TransferState);
+  private platformId = inject(PLATFORM_ID);
   private destroy$ = new Subject<void>();
 
   products: Product[] = [];
@@ -61,18 +68,7 @@ export class Home implements OnInit {
     demand: false,
   };
 
-  categories = [
-    { name: 'Thời Trang Nam', image: 'assets/images/categories/men-fashion.jpg' },
-    { name: 'Thời Trang Nữ', image: 'assets/images/categories/women-fashion.jpg' },
-    { name: 'Điện Thoại & Phụ Kiện', image: 'assets/images/categories/phones.jpg' },
-    { name: 'Máy Tính & Laptop', image: 'assets/images/categories/laptop.jpg' },
-    { name: 'Nhà Cửa & Đời Sống', image: 'assets/images/categories/home.jpg' },
-    { name: 'Sắc Đẹp', image: 'assets/images/categories/beauty.jpg' },
-    { name: 'Đồ Chơi & Sở Thích', image: 'assets/images/categories/toys.jpg' },
-    { name: 'Thực phẩm', image: 'assets/images/categories/toys.jpg' },
-    { name: 'Đồ gia dụng', image: 'assets/images/categories/toys.jpg' },
-    { name: 'abc', image: 'assets/images/categories/toys.jpg' },
-  ];
+  categories: CategoryDto[] = [];
 
   brands = [
     { name: 'Nestlé', logo: '/images/brands/nestle.png' },
@@ -185,6 +181,7 @@ export class Home implements OnInit {
 
   private carouselImages: UrlObject[];
   ngOnInit(): void {
+    this.loadCategories();
     // Initialize carousel images
     this.carouselImages = [
       { url: '/images/banner-s25-ultra.png' },
@@ -229,6 +226,45 @@ export class Home implements OnInit {
     this.loadProducts();
 
     // this.startCountdown(1 * 60 * 60 + 13 * 60 + 38);
+  }
+
+  loadCategories(): void {
+    // Kiểm tra xem có dữ liệu trong TransferState không
+    const cachedCategories = this.transferState.get(CATEGORIES_KEY, null);
+
+    if (cachedCategories) {
+      // Sử dụng dữ liệu từ cache
+      this.categories = cachedCategories;
+      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
+      if (isPlatformBrowser(this.platformId)) {
+        this.transferState.remove(CATEGORIES_KEY);
+      }
+    } else {
+      // Gọi API để lấy danh sách danh mục
+      this.categoryService
+        .getCategoryTree()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response?.isSuccess && response?.data) {
+              this.categories = response.data;
+              
+              // Lưu vào TransferState (chỉ trên server)
+              if (isPlatformServer(this.platformId)) {
+                this.transferState.set(CATEGORIES_KEY, this.categories);
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Lỗi khi tải danh mục', err);
+            this.categories = [];
+          },
+        });
+    }
+  }
+
+  getCategoryImage(category: CategoryDto): string {
+    return category.imageUrl || '/images/no-image.png';
   }
 
   loadProducts(): void {
@@ -299,5 +335,10 @@ export class Home implements OnInit {
     if (event.action === 'done') {
       console.log('Flash sale kết thúc!');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
