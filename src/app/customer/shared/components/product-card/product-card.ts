@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { ProductBaseResponse } from '@core/service/system-admin.service';
+import { AddToCartRequest, ProductBaseResponse } from '@core/service/system-admin.service';
 import { TruncatePipe } from '@shared/pipes/truncate-pipe.pipe';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Ripple } from 'primeng/ripple';
 import { Tag } from 'primeng/tag';
 import { CartService } from '@services/cart.service';
+import { CartClient } from '@core/service/system-admin.service';
+import { tap } from 'rxjs';
 
 type Product = ProductBaseResponse;
 
@@ -21,6 +23,7 @@ type Product = ProductBaseResponse;
 export class ProductCard {
   router: Router = inject(Router);
   private cartService: CartService = inject(CartService);
+  private cartClient: CartClient = inject(CartClient);
 
   @Input() product: Product;
   @Input() first: any;
@@ -37,19 +40,36 @@ export class ProductCard {
     return (price - discountPrice) / price;
   }
 
-  ShowSuccess() {
+  addToCart() {
     if (!this.product?.productId) return;
-    this.cartService
-      .addItem({ productId: this.product.productId, quantity: 1 })
-      .subscribe({
-        next: () => {
+    console.log(this.product.productId);
+    const request = new AddToCartRequest();
+    request.productId = this.product.productId;
+    request.quantity = 1;
+    this.cartClient.addItemToCart(request).pipe(
+      tap(x => console.log("Add to card success"))
+    ).subscribe({
+      next: (res) => {
+        if (res.isSuccess){
           this.messageService.add({
             severity: 'success',
-            summary: 'Success',
-            detail: 'Đã thêm sản phẩm vào giỏ!',
-            life: 1000,
+            summary: 'Thành công',
+            detail: 'Thêm vào giỏ hàng thành công',
+            life: 2000,
+            closable: true
           });
-        },
-      });
+        }
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Thành công',
+          detail: 'Thêm vào giỏ hàng thất bại',
+          life: 2000,
+          closable: true
+        })
+      },
+    })
   }
 }
+

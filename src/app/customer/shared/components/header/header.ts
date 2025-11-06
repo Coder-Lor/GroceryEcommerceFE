@@ -16,6 +16,7 @@ import { log } from 'console';
 import { LogoutCommand } from '@core/service/system-admin.service';
 import { CartService } from '../../../../core/service/cart.service';
 import { Ripple } from "primeng/ripple";
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -48,18 +49,27 @@ export class Header implements OnInit, OnChanges {
   miniItems$ = this.cartService.cartItems$;
 
   constructor() {
-    if (isPlatformBrowser(this.platformId)) {
-      const stored = localStorage.getItem('currentUser');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        this.refreshtoken = new LogoutCommand({
-          refreshToken: parsed.refreshToken ?? undefined,
-        });
-      }
-    }
+    // if (isPlatformBrowser(this.platformId)) {
+    //   const stored = localStorage.getItem('currentUser');
+
+    //   if (stored) {
+    //     const parsed = JSON.parse(stored);
+    //     this.refreshtoken = new LogoutCommand({
+    //       refreshToken: parsed.refreshToken ?? undefined,
+    //     });
+    //   }
+    // }
   }
 
   ngOnInit(): void {
+    // Chỉ load giỏ hàng khi ở browser
+    if (isPlatformBrowser(this.platformId)) {
+      console.log('🛒 Header ngOnInit - Loading cart...');
+      this.cartService.loadCartSummary();
+    } else {
+      console.log('⚠️ Header ngOnInit - Server side, skipping cart load');
+    }
+    
     // this.authService.isAuthenticated$.subscribe((res) => {
     //   this.isLoggedIn = res;
     //   console.log(res);

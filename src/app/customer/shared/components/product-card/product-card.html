@@ -1,71 +1,3 @@
-<!-- <div class="product-card">
-    <div class="card border-0 shadow-lg rounded-4 p-3 h-100">
-        <div class="product-img position-relative mb-3">
-            <img src="images/product-image-1.png" alt="" class="img-fluid rounded-4">
-            <p-toast />
-            <button (click)="ShowSuccess()" pRipple severity="success"
-                class="wishlist btn btn-light rounded-circle shadow position-absolute bottom-0 end-0 m-3">
-                <i class="pi pi-cart-plus"></i>
-            </button>
-        </div>
-        <div class="product-info">
-            <p class="product-name fw-semibold" (click)="navigationToDetailPage()">
-                {{product.name}}
-            </p>
-            <p class="product-brand text-muted">Lavazza</p>
-            <div class="product-bottom d-flex justify-content-between align-items-center">
-                <span class="price fw-bold">${{product.price}}</span>
-                <span class="rating d-flex align-items-center gap-1 text-muted">
-                    <img src="star0.svg" alt="" width="18"> 4.3
-                </span>
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- @if(layout === 'list') {
-<div
-  class="card d-flex flex-column flex-sm-row align-items-start align-items-sm-center p-3 gap-4 bg-white rounded shadow-sm"
->
-  <div class="position-relative" style="width: 160px; flex-shrink: 0">
-    <img class="img-fluid rounded" [src]="product.image" [alt]="product.name" />
-    <p-tag
-      [value]="product.inventoryStatus"
-      [severity]="getSeverity(product)"
-      class="position-absolute top-0 start-0 m-2"
-    ></p-tag>
-  </div>
-
-  <div class="d-flex flex-column flex-md-row justify-content-between w-100 gap-4">
-    <div>
-      <small class="text-muted">{{ product.category }}</small>
-      <h5 class="mt-2 mb-1" (click)="navigationToDetailPage()">{{ product.name }}</h5>
-      <div class="bg-light rounded-pill px-2 py-1 d-inline-flex align-items-center gap-1 shadow-sm">
-        <span class="text-dark fw-medium small">{{ product.rating }}</span>
-        <i class="pi pi-star-fill text-warning"></i>
-      </div>
-    </div>
-
-    <div class="d-flex flex-column align-items-md-end gap-3">
-      <span class="fs-5 fw-semibold">{{ product.price | currency : 'USD' }}</span>
-      <div class="d-flex flex-row-reverse flex-md-row gap-2">
-        <button
-          pButton
-          icon="pi pi-heart"
-          [outlined]="true"
-          class="btn btn-outline-secondary"
-        ></button>
-        <button
-          pButton
-          icon="pi pi-shopping-cart"
-          label="Buy Now"
-          [disabled]="product.inventoryStatus === 'OUTOFSTOCK'"
-          class="btn btn-dark"
-        ></button>
-      </div>
-    </div>
-  </div>
-</div>
-}  -->
 @if(layout === 'grid') {
 <div class="card h-100 border-1 shadow-sm bg-white">
   <div
@@ -112,9 +44,8 @@
           class="btn btn-dark flex-fill"
         ></button>
         <button
-          (click)="ShowSuccess()"
+          (click)="addToCart()"
           pRipple
-          severity="success"
           pButton
           icon="pi pi-cart-plus"
           outlined

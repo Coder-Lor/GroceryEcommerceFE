@@ -1924,7 +1924,7 @@ export class CartClient {
         this.baseUrl = baseUrl ?? "https://localhost:44394";
     }
 
-    getShoppingCart(userId: string): Observable<ResultOfShoppingCartDto> {
+    getShoppingCart(userId: string | null): Observable<ResultOfShoppingCartDto> {
         let url_ = this.baseUrl + "/api/Cart/users/{userId}";
         if (userId === undefined || userId === null)
             throw new globalThis.Error("The parameter 'userId' must be defined.");
@@ -8039,11 +8039,11 @@ export class ProductVariantClient {
         this.baseUrl = baseUrl ?? "https://localhost:44394";
     }
 
-    createVariant(command: CreateProductVariantCommand): Observable<ResultOfCreateProductVariantResponse> {
+    createVariant(request: CreateProductVariantRequest): Observable<ResultOfBoolean> {
         let url_ = this.baseUrl + "/api/ProductVariant/create";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(command);
+        const content_ = JSON.stringify(request);
 
         let options_ : any = {
             body: content_,
@@ -8063,14 +8063,14 @@ export class ProductVariantClient {
                 try {
                     return this.processCreateVariant(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCreateProductVariantResponse>;
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ResultOfCreateProductVariantResponse>;
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         }));
     }
 
-    protected processCreateVariant(response: HttpResponseBase): Observable<ResultOfCreateProductVariantResponse> {
+    protected processCreateVariant(response: HttpResponseBase): Observable<ResultOfBoolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -8081,7 +8081,7 @@ export class ProductVariantClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCreateProductVariantResponse.fromJS(resultData200);
+            result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -8092,11 +8092,15 @@ export class ProductVariantClient {
         return _observableOf(null as any);
     }
 
-    updateVariant(command: UpdateProductVariantCommand): Observable<ResultOfUpdateProductVariantResponse> {
-        let url_ = this.baseUrl + "/api/ProductVariant/update";
+    updateVariant(variantId: string | undefined, request: UpdateProductVariantRequest): Observable<ResultOfBoolean> {
+        let url_ = this.baseUrl + "/api/ProductVariant/update?";
+        if (variantId === null)
+            throw new globalThis.Error("The parameter 'variantId' cannot be null.");
+        else if (variantId !== undefined)
+            url_ += "variantId=" + encodeURIComponent("" + variantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(command);
+        const content_ = JSON.stringify(request);
 
         let options_ : any = {
             body: content_,
@@ -8116,14 +8120,14 @@ export class ProductVariantClient {
                 try {
                     return this.processUpdateVariant(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfUpdateProductVariantResponse>;
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ResultOfUpdateProductVariantResponse>;
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         }));
     }
 
-    protected processUpdateVariant(response: HttpResponseBase): Observable<ResultOfUpdateProductVariantResponse> {
+    protected processUpdateVariant(response: HttpResponseBase): Observable<ResultOfBoolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -8134,7 +8138,7 @@ export class ProductVariantClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfUpdateProductVariantResponse.fromJS(resultData200);
+            result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -8145,7 +8149,7 @@ export class ProductVariantClient {
         return _observableOf(null as any);
     }
 
-    createVariantWithFile(productId: string | undefined, sku: string | null | undefined, variantName: string | null | undefined, price: number | undefined, stockQuantity: number | undefined, minStockLevel: number | undefined, status: number | undefined, discountPrice: number | null | undefined, weight: number | null | undefined, dimensions: string | null | undefined, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined): Observable<ResultOfCreateProductVariantResponse> {
+    createVariantWithFile(productId: string | undefined, sku: string | null | undefined, variantName: string | null | undefined, price: number | undefined, stockQuantity: number | undefined, minStockLevel: number | undefined, status: number | undefined, discountPrice: number | null | undefined, weight: number | null | undefined, dimensions: string | null | undefined, imageFile: FileParameter | null | undefined): Observable<ResultOfBoolean> {
         let url_ = this.baseUrl + "/api/ProductVariant/create-with-file";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -8153,47 +8157,35 @@ export class ProductVariantClient {
         if (productId === null || productId === undefined)
             throw new globalThis.Error("The parameter 'productId' cannot be null.");
         else
-            content_.append("productId", productId.toString());
+            content_.append("ProductId", productId.toString());
         if (sku !== null && sku !== undefined)
-            content_.append("sku", sku.toString());
+            content_.append("Sku", sku.toString());
         if (variantName !== null && variantName !== undefined)
-            content_.append("variantName", variantName.toString());
+            content_.append("VariantName", variantName.toString());
         if (price === null || price === undefined)
             throw new globalThis.Error("The parameter 'price' cannot be null.");
         else
-            content_.append("price", price.toString());
+            content_.append("Price", price.toString());
         if (stockQuantity === null || stockQuantity === undefined)
             throw new globalThis.Error("The parameter 'stockQuantity' cannot be null.");
         else
-            content_.append("stockQuantity", stockQuantity.toString());
+            content_.append("StockQuantity", stockQuantity.toString());
         if (minStockLevel === null || minStockLevel === undefined)
             throw new globalThis.Error("The parameter 'minStockLevel' cannot be null.");
         else
-            content_.append("minStockLevel", minStockLevel.toString());
+            content_.append("MinStockLevel", minStockLevel.toString());
         if (status === null || status === undefined)
             throw new globalThis.Error("The parameter 'status' cannot be null.");
         else
-            content_.append("status", status.toString());
+            content_.append("Status", status.toString());
         if (discountPrice !== null && discountPrice !== undefined)
-            content_.append("discountPrice", discountPrice.toString());
+            content_.append("DiscountPrice", discountPrice.toString());
         if (weight !== null && weight !== undefined)
-            content_.append("weight", weight.toString());
+            content_.append("Weight", weight.toString());
         if (dimensions !== null && dimensions !== undefined)
-            content_.append("dimensions", dimensions.toString());
-        if (contentType !== null && contentType !== undefined)
-            content_.append("ContentType", contentType.toString());
-        if (contentDisposition !== null && contentDisposition !== undefined)
-            content_.append("ContentDisposition", contentDisposition.toString());
-        if (headers !== null && headers !== undefined)
-            headers.forEach(item_ => content_.append("Headers", item_.toString()));
-        if (length === null || length === undefined)
-            throw new globalThis.Error("The parameter 'length' cannot be null.");
-        else
-            content_.append("Length", length.toString());
-        if (name !== null && name !== undefined)
-            content_.append("Name", name.toString());
-        if (fileName !== null && fileName !== undefined)
-            content_.append("FileName", fileName.toString());
+            content_.append("Dimensions", dimensions.toString());
+        if (imageFile !== null && imageFile !== undefined)
+            content_.append("ImageFile", imageFile.data, imageFile.fileName ? imageFile.fileName : "ImageFile");
 
         let options_ : any = {
             body: content_,
@@ -8212,14 +8204,14 @@ export class ProductVariantClient {
                 try {
                     return this.processCreateVariantWithFile(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfCreateProductVariantResponse>;
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ResultOfCreateProductVariantResponse>;
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         }));
     }
 
-    protected processCreateVariantWithFile(response: HttpResponseBase): Observable<ResultOfCreateProductVariantResponse> {
+    protected processCreateVariantWithFile(response: HttpResponseBase): Observable<ResultOfBoolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -8230,7 +8222,7 @@ export class ProductVariantClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfCreateProductVariantResponse.fromJS(resultData200);
+            result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -8241,7 +8233,7 @@ export class ProductVariantClient {
         return _observableOf(null as any);
     }
 
-    uploadVariantImage(variantId: string, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined): Observable<ResultOfString> {
+    uploadVariantImage(variantId: string, contentType: string | null | undefined, contentDisposition: string | null | undefined, headers: any[] | null | undefined, length: number | undefined, name: string | null | undefined, fileName: string | null | undefined): Observable<ResultOfBoolean> {
         let url_ = this.baseUrl + "/api/ProductVariant/{variantId}/upload-image";
         if (variantId === undefined || variantId === null)
             throw new globalThis.Error("The parameter 'variantId' must be defined.");
@@ -8281,14 +8273,14 @@ export class ProductVariantClient {
                 try {
                     return this.processUploadVariantImage(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ResultOfString>;
+                    return _observableThrow(e) as any as Observable<ResultOfBoolean>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ResultOfString>;
+                return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         }));
     }
 
-    protected processUploadVariantImage(response: HttpResponseBase): Observable<ResultOfString> {
+    protected processUploadVariantImage(response: HttpResponseBase): Observable<ResultOfBoolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -8299,7 +8291,7 @@ export class ProductVariantClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ResultOfString.fromJS(resultData200);
+            result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -21191,6 +21183,7 @@ export class CreateProductVariantRequest implements ICreateProductVariantRequest
     dimensions?: string | undefined;
     status?: number;
     imageUrl?: string | undefined;
+    imageFile?: FileUploadDto | undefined;
     attributes?: CreateProductAttributeValueRequest[];
 
     constructor(data?: ICreateProductVariantRequest) {
@@ -21215,6 +21208,7 @@ export class CreateProductVariantRequest implements ICreateProductVariantRequest
             this.dimensions = _data["dimensions"];
             this.status = _data["status"];
             this.imageUrl = _data["imageUrl"];
+            this.imageFile = _data["imageFile"] ? FileUploadDto.fromJS(_data["imageFile"]) : undefined as any;
             if (Array.isArray(_data["attributes"])) {
                 this.attributes = [] as any;
                 for (let item of _data["attributes"])
@@ -21243,6 +21237,7 @@ export class CreateProductVariantRequest implements ICreateProductVariantRequest
         data["dimensions"] = this.dimensions;
         data["status"] = this.status;
         data["imageUrl"] = this.imageUrl;
+        data["imageFile"] = this.imageFile ? this.imageFile.toJSON() : undefined as any;
         if (Array.isArray(this.attributes)) {
             data["attributes"] = [];
             for (let item of this.attributes)
@@ -21264,7 +21259,52 @@ export interface ICreateProductVariantRequest {
     dimensions?: string | undefined;
     status?: number;
     imageUrl?: string | undefined;
+    imageFile?: FileUploadDto | undefined;
     attributes?: CreateProductAttributeValueRequest[];
+}
+
+export class FileUploadDto implements IFileUploadDto {
+    content?: string;
+    fileName?: string;
+    contentType?: string;
+
+    constructor(data?: IFileUploadDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.content = _data["content"];
+            this.fileName = _data["fileName"];
+            this.contentType = _data["contentType"];
+        }
+    }
+
+    static fromJS(data: any): FileUploadDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FileUploadDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["content"] = this.content;
+        data["fileName"] = this.fileName;
+        data["contentType"] = this.contentType;
+        return data;
+    }
+}
+
+export interface IFileUploadDto {
+    content?: string;
+    fileName?: string;
+    contentType?: string;
 }
 
 export class CreateProductAttributeValueRequest implements ICreateProductAttributeValueRequest {
@@ -23636,97 +23676,9 @@ export interface IUpdateProductTagCommand {
     description?: string | undefined;
 }
 
-export class ResultOfCreateProductVariantResponse implements IResultOfCreateProductVariantResponse {
-    isSuccess?: boolean;
-    data?: CreateProductVariantResponse | undefined;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-
-    constructor(data?: IResultOfCreateProductVariantResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.data = _data["data"] ? CreateProductVariantResponse.fromJS(_data["data"]) : undefined as any;
-            this.errorMessage = _data["errorMessage"];
-            this.errorCode = _data["errorCode"];
-            if (Array.isArray(_data["errors"])) {
-                this.errors = [] as any;
-                for (let item of _data["errors"])
-                    this.errors!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): ResultOfCreateProductVariantResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResultOfCreateProductVariantResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["data"] = this.data ? this.data.toJSON() : undefined as any;
-        data["errorMessage"] = this.errorMessage;
-        data["errorCode"] = this.errorCode;
-        if (Array.isArray(this.errors)) {
-            data["errors"] = [];
-            for (let item of this.errors)
-                data["errors"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface IResultOfCreateProductVariantResponse {
-    isSuccess?: boolean;
-    data?: CreateProductVariantResponse | undefined;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-}
-
-export class CreateProductVariantResponse extends ProductVariantDto implements ICreateProductVariantResponse {
-
-    constructor(data?: ICreateProductVariantResponse) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-    }
-
-    static override fromJS(data: any): CreateProductVariantResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateProductVariantResponse();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        super.toJSON(data);
-        return data;
-    }
-}
-
-export interface ICreateProductVariantResponse extends IProductVariantDto {
-}
-
-export class CreateProductVariantCommand implements ICreateProductVariantCommand {
-    productId?: string;
+export class UpdateProductVariantRequest implements IUpdateProductVariantRequest {
     sku?: string;
-    name?: string;
+    name?: string | undefined;
     price?: number;
     discountPrice?: number | undefined;
     stockQuantity?: number;
@@ -23734,9 +23686,10 @@ export class CreateProductVariantCommand implements ICreateProductVariantCommand
     weight?: number | undefined;
     dimensions?: string | undefined;
     imageUrl?: string | undefined;
+    imageFile?: FileUploadDto | undefined;
     status?: number;
 
-    constructor(data?: ICreateProductVariantCommand) {
+    constructor(data?: IUpdateProductVariantRequest) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -23747,7 +23700,6 @@ export class CreateProductVariantCommand implements ICreateProductVariantCommand
 
     init(_data?: any) {
         if (_data) {
-            this.productId = _data["productId"];
             this.sku = _data["sku"];
             this.name = _data["name"];
             this.price = _data["price"];
@@ -23757,20 +23709,20 @@ export class CreateProductVariantCommand implements ICreateProductVariantCommand
             this.weight = _data["weight"];
             this.dimensions = _data["dimensions"];
             this.imageUrl = _data["imageUrl"];
+            this.imageFile = _data["imageFile"] ? FileUploadDto.fromJS(_data["imageFile"]) : undefined as any;
             this.status = _data["status"];
         }
     }
 
-    static fromJS(data: any): CreateProductVariantCommand {
+    static fromJS(data: any): UpdateProductVariantRequest {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateProductVariantCommand();
+        let result = new UpdateProductVariantRequest();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["productId"] = this.productId;
         data["sku"] = this.sku;
         data["name"] = this.name;
         data["price"] = this.price;
@@ -23780,15 +23732,15 @@ export class CreateProductVariantCommand implements ICreateProductVariantCommand
         data["weight"] = this.weight;
         data["dimensions"] = this.dimensions;
         data["imageUrl"] = this.imageUrl;
+        data["imageFile"] = this.imageFile ? this.imageFile.toJSON() : undefined as any;
         data["status"] = this.status;
         return data;
     }
 }
 
-export interface ICreateProductVariantCommand {
-    productId?: string;
+export interface IUpdateProductVariantRequest {
     sku?: string;
-    name?: string;
+    name?: string | undefined;
     price?: number;
     discountPrice?: number | undefined;
     stockQuantity?: number;
@@ -23796,169 +23748,7 @@ export interface ICreateProductVariantCommand {
     weight?: number | undefined;
     dimensions?: string | undefined;
     imageUrl?: string | undefined;
-    status?: number;
-}
-
-export class ResultOfUpdateProductVariantResponse implements IResultOfUpdateProductVariantResponse {
-    isSuccess?: boolean;
-    data?: UpdateProductVariantResponse | undefined;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-
-    constructor(data?: IResultOfUpdateProductVariantResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.isSuccess = _data["isSuccess"];
-            this.data = _data["data"] ? UpdateProductVariantResponse.fromJS(_data["data"]) : undefined as any;
-            this.errorMessage = _data["errorMessage"];
-            this.errorCode = _data["errorCode"];
-            if (Array.isArray(_data["errors"])) {
-                this.errors = [] as any;
-                for (let item of _data["errors"])
-                    this.errors!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): ResultOfUpdateProductVariantResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResultOfUpdateProductVariantResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["isSuccess"] = this.isSuccess;
-        data["data"] = this.data ? this.data.toJSON() : undefined as any;
-        data["errorMessage"] = this.errorMessage;
-        data["errorCode"] = this.errorCode;
-        if (Array.isArray(this.errors)) {
-            data["errors"] = [];
-            for (let item of this.errors)
-                data["errors"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface IResultOfUpdateProductVariantResponse {
-    isSuccess?: boolean;
-    data?: UpdateProductVariantResponse | undefined;
-    errorMessage?: string | undefined;
-    errorCode?: string | undefined;
-    errors?: string[];
-}
-
-export class UpdateProductVariantResponse extends ProductVariantDto implements IUpdateProductVariantResponse {
-
-    constructor(data?: IUpdateProductVariantResponse) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-    }
-
-    static override fromJS(data: any): UpdateProductVariantResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateProductVariantResponse();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        super.toJSON(data);
-        return data;
-    }
-}
-
-export interface IUpdateProductVariantResponse extends IProductVariantDto {
-}
-
-export class UpdateProductVariantCommand implements IUpdateProductVariantCommand {
-    variantId?: string;
-    sku?: string;
-    name?: string;
-    price?: number;
-    discountPrice?: number | undefined;
-    stockQuantity?: number;
-    minStockLevel?: number;
-    weight?: number | undefined;
-    dimensions?: string | undefined;
-    imageUrl?: string | undefined;
-    status?: number;
-
-    constructor(data?: IUpdateProductVariantCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.variantId = _data["variantId"];
-            this.sku = _data["sku"];
-            this.name = _data["name"];
-            this.price = _data["price"];
-            this.discountPrice = _data["discountPrice"];
-            this.stockQuantity = _data["stockQuantity"];
-            this.minStockLevel = _data["minStockLevel"];
-            this.weight = _data["weight"];
-            this.dimensions = _data["dimensions"];
-            this.imageUrl = _data["imageUrl"];
-            this.status = _data["status"];
-        }
-    }
-
-    static fromJS(data: any): UpdateProductVariantCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateProductVariantCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["variantId"] = this.variantId;
-        data["sku"] = this.sku;
-        data["name"] = this.name;
-        data["price"] = this.price;
-        data["discountPrice"] = this.discountPrice;
-        data["stockQuantity"] = this.stockQuantity;
-        data["minStockLevel"] = this.minStockLevel;
-        data["weight"] = this.weight;
-        data["dimensions"] = this.dimensions;
-        data["imageUrl"] = this.imageUrl;
-        data["status"] = this.status;
-        return data;
-    }
-}
-
-export interface IUpdateProductVariantCommand {
-    variantId?: string;
-    sku?: string;
-    name?: string;
-    price?: number;
-    discountPrice?: number | undefined;
-    stockQuantity?: number;
-    minStockLevel?: number;
-    weight?: number | undefined;
-    dimensions?: string | undefined;
-    imageUrl?: string | undefined;
+    imageFile?: FileUploadDto | undefined;
     status?: number;
 }
 
@@ -25051,6 +24841,10 @@ export class UpdateUserCommand implements IUpdateUserCommand {
     email?: string | undefined;
     username?: string | undefined;
     passwordHash?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    phoneNumber?: string | undefined;
+    dateOfBirth?: Date | undefined;
 
     constructor(data?: IUpdateUserCommand) {
         if (data) {
@@ -25067,6 +24861,10 @@ export class UpdateUserCommand implements IUpdateUserCommand {
             this.email = _data["email"];
             this.username = _data["username"];
             this.passwordHash = _data["passwordHash"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.dateOfBirth = _data["dateOfBirth"] ? new Date(_data["dateOfBirth"].toString()) : undefined as any;
         }
     }
 
@@ -25083,6 +24881,10 @@ export class UpdateUserCommand implements IUpdateUserCommand {
         data["email"] = this.email;
         data["username"] = this.username;
         data["passwordHash"] = this.passwordHash;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["phoneNumber"] = this.phoneNumber;
+        data["dateOfBirth"] = this.dateOfBirth ? this.dateOfBirth.toISOString() : undefined as any;
         return data;
     }
 }
@@ -25092,6 +24894,10 @@ export interface IUpdateUserCommand {
     email?: string | undefined;
     username?: string | undefined;
     passwordHash?: string | undefined;
+    firstName?: string | undefined;
+    lastName?: string | undefined;
+    phoneNumber?: string | undefined;
+    dateOfBirth?: Date | undefined;
 }
 
 export class AssignUserRoleCommand implements IAssignUserRoleCommand {

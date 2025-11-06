@@ -46,20 +46,26 @@
 
               @if (isShowMiniCart) {
               <div class="mini-cart-popover">
-                <div class="mini-cart-items">
-                  @for (item of (miniItems$ | async) | slice:0:3; track item.cartItemId) {
-                  <div class="mini-item">
-                    <img [src]="item.imageUrl" alt="thumb" />
-                    <div class="mini-item-info">
-                      <div class="mini-item-name">{{ item.productName }}</div>
-                      <div class="mini-item-meta">{{ item.quantity }} x {{ item.unitPrice | number:'1.0-0' }}₫</div>
+                @if ((miniItems$ | async)?.length ?? 0; as hasItems) {
+                  <div class="mini-cart-items">
+                    @for (item of (miniItems$ | async) | slice:0:3; track item.cartItemId) {
+                    <div class="mini-item">
+                      <img [src]="item.imageUrl" [alt]="item.productName" />
+                      <div class="mini-item-info">
+                        <div class="mini-item-name">{{ item.productName }}</div>
+                        <div class="mini-item-meta">{{ item.quantity }} x {{ item.unitPrice | number:'1.0-0' }}₫</div>
+                      </div>
                     </div>
+                    }
                   </div>
-                  }
-                </div>
-                <div class="mini-cart-footer">
-                  <button class="view-cart-btn" (click)="goToCart($event)">Xem giỏ hàng</button>
-                </div>
+                  <div class="mini-cart-footer">
+                    <button class="view-cart-btn" (click)="goToCart($event)">Xem giỏ hàng</button>
+                  </div>
+                } @else {
+                  <div class="mini-cart-empty">
+                    <p>Giỏ hàng trống</p>
+                  </div>
+                }
               </div>
               }
             </div>
