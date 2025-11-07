@@ -42,7 +42,7 @@ export const routes: Routes = [
       { path: 'login', component: Login },
       { path: 'register', component: Register },
       { path: 'product-detail', component: ProductDetail },
-      { path: 'product-list', component: ProductList },
+      { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
       { path: 'profile', component: Profile },
       { path: 'discover-page', component: DiscoverPage },

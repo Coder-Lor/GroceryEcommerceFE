@@ -1,23 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { CarouselModule } from 'primeng/carousel';
 import { ProductCard } from '../../shared/components/product-card/product-card';
-import { ProductBaseResponse } from '@core/service/system-admin.service';
+import { CategoryDto, ProductBaseResponse } from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
 import { ProductService } from '@core/service/product.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
+import { CategoryService } from '@core/service/category.service';
 
 type Product = ProductBaseResponse;
 type UrlObject = {
   url: string;
-}
-type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
+};
+type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number };
 
 @Component({
   selector: 'app-home',
@@ -37,10 +38,11 @@ type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
   encapsulation: ViewEncapsulation.None,
   host: { ngSkipHydration: 'true' },
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
+  private categoryService: CategoryService = inject(CategoryService);
   private destroy$ = new Subject<void>();
 
   products: Product[] = [];
@@ -61,18 +63,7 @@ export class Home implements OnInit {
     demand: false,
   };
 
-  categories = [
-    { name: 'Thời Trang Nam', image: 'assets/images/categories/men-fashion.jpg' },
-    { name: 'Thời Trang Nữ', image: 'assets/images/categories/women-fashion.jpg' },
-    { name: 'Điện Thoại & Phụ Kiện', image: 'assets/images/categories/phones.jpg' },
-    { name: 'Máy Tính & Laptop', image: 'assets/images/categories/laptop.jpg' },
-    { name: 'Nhà Cửa & Đời Sống', image: 'assets/images/categories/home.jpg' },
-    { name: 'Sắc Đẹp', image: 'assets/images/categories/beauty.jpg' },
-    { name: 'Đồ Chơi & Sở Thích', image: 'assets/images/categories/toys.jpg' },
-    { name: 'Thực phẩm', image: 'assets/images/categories/toys.jpg' },
-    { name: 'Đồ gia dụng', image: 'assets/images/categories/toys.jpg' },
-    { name: 'abc', image: 'assets/images/categories/toys.jpg' },
-  ];
+  categories: CategoryDto[] = [];
 
   brands = [
     { name: 'Nestlé', logo: '/images/brands/nestle.png' },
@@ -182,7 +173,6 @@ export class Home implements OnInit {
     },
   ];
 
-
   private carouselImages: UrlObject[];
   ngOnInit(): void {
     // Initialize carousel images
@@ -192,43 +182,50 @@ export class Home implements OnInit {
       { url: '/images/banner-watch-series-11.png' },
       { url: '/images/banner-nhacua-doisong.png' },
       { url: '/images/banner-chamsoc.png' },
-      { url: '/images/banner-smartphone.png' },      
-      { url: '/images/banner-maylocnuoc.png' },      
-      { url: '/images/banner-honor-x6c.png' },      
+      { url: '/images/banner-smartphone.png' },
+      { url: '/images/banner-maylocnuoc.png' },
+      { url: '/images/banner-honor-x6c.png' },
     ];
 
     var responsiveOptions: ResponsiveOp[] = [
       {
         breakpoint: '1400px',
         numVisible: 2,
-        numScroll: 2
+        numScroll: 2,
       },
       {
         breakpoint: '1199px',
         numVisible: 2,
-        numScroll: 2
+        numScroll: 2,
       },
       {
         breakpoint: '767px',
         numVisible: 1,
-        numScroll: 1
+        numScroll: 1,
       },
       {
         breakpoint: '575px',
         numVisible: 1,
-        numScroll: 1
-      }
+        numScroll: 1,
+      },
     ];
-    // Responsive options for carousel (2 images per slide)
-    // this.responsiveOptions = 
 
-    // this.inventoryService.loadProducts(1, 12);
-    // this.inventoryService.getProducts().subscribe((data) => {
-    //   this.products = data;
-    // });
+    this.loadCategories();
+
     this.loadProducts();
+  }
 
-    // this.startCountdown(1 * 60 * 60 + 13 * 60 + 38);
+  loadCategories(): void {
+    this.categoryService
+      .getCategoryTree()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.categories = data;
+          console.log(this.categories);
+        },
+        error: (err) => console.error('Có lỗi xảy ra: ', err),
+      });
   }
 
   loadProducts(): void {
@@ -264,7 +261,9 @@ export class Home implements OnInit {
     this.route.navigate(['/product-detail']);
   }
 
-  navigationToCategory() {}
+  navigationToCategory() {
+    this.route.navigate(['/category']);
+  }
 
   navigationToDiscoverPage() {
     this.route.navigate(['/discover-page'], {
@@ -299,5 +298,10 @@ export class Home implements OnInit {
     if (event.action === 'done') {
       console.log('Flash sale kết thúc!');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

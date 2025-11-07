@@ -1,36 +1,4 @@
 <div class="homepage">
-  <!-- Hero banner -->
-  <!-- <section class="hero container position-relative mb-5">
-    <div class="hero-bg bg-info rounded-4 position-absolute w-100 h-100 top-0 start-0"></div>
-    <img class="hero-vector hero-vector-1 position-absolute" src="vector-40.svg" alt="" />
-    <img class="hero-vector hero-vector-2 position-absolute" src="vector-50.svg" alt="" />
-    <div class="hero-shadow hero-shadow-1 position-absolute"></div>
-    <div class="hero-shadow hero-shadow-2 position-absolute"></div>
-
-    <img
-      class="hero-img hero-img-main position-absolute end-0 top-0 img-fluid"
-      src="mk-2-q-g-0-z-wwd-53-jk-unsplash-10.png"
-      alt="coffee"
-    />
-    <img
-      class="hero-img hero-img-side position-absolute"
-      src="mk-2-q-g-0-z-wwd-53-jk-unsplash-02-10.png"
-      alt="coffee cup"
-    />
-
-    <h1 class="hero-title position-absolute fw-bold text-white">
-      ORDER YOUR <br />
-      FAVORITE COFFEE
-    </h1>
-
-    <div class="hero-pagination position-absolute d-flex align-items-center gap-2 text-white">
-      <span class="current fw-bold">1</span>
-      <span class="total">5</span>
-      <div class="line bg-white opacity-50" style="width: 40px; height: 2px"></div>
-      <div class="dot active bg-white rounded-circle" style="width: 10px; height: 10px"></div>
-      <div class="dot bg-white rounded-circle opacity-50" style="width: 10px; height: 10px"></div>
-    </div>
-  </section> -->
   <section class="hero-slider container position-relative mb-4">
     <swiper-container autoplay-delay="20000" loop="true" pagination="true" navigation="true">
       <swiper-slide *ngFor="let slide of heroSlides">
@@ -57,7 +25,15 @@
       loop="false"
       class="category-swiper"
     >
-      <swiper-slide
+      @for (item of categories; track $index) {
+      <swiper-slide (click)="navigationToCategory()" class="category-slide">
+        <div class="category-card text-center">
+          <img [src]="item.imageUrl" [alt]="item.name" class="category-img" />
+          <p class="category-name mt-2">{{ item.name }}</p>
+        </div>
+      </swiper-slide>
+      }
+      <!-- <swiper-slide
         *ngFor="let category of categories"
         (click)="navigationToCategory()"
         class="category-slide"
@@ -66,7 +42,7 @@
           <img src="/images/product-image-1.png" [alt]="category.name" class="category-img" />
           <p class="category-name mt-2">{{ category.name }}</p>
         </div>
-      </swiper-slide>
+      </swiper-slide> -->
     </swiper-container>
   </section>
 
