@@ -15,7 +15,7 @@ import { AuthService } from '../../../../core/service/auth.service';
 import { log } from 'console';
 import { LogoutCommand } from '@core/service/system-admin.service';
 import { CartService } from '../../../../core/service/cart.service';
-import { Ripple } from "primeng/ripple";
+import { Ripple } from 'primeng/ripple';
 import { tap } from 'rxjs';
 
 @Component({
@@ -51,7 +51,6 @@ export class Header implements OnInit, OnChanges {
   constructor() {
     // if (isPlatformBrowser(this.platformId)) {
     //   const stored = localStorage.getItem('currentUser');
-
     //   if (stored) {
     //     const parsed = JSON.parse(stored);
     //     this.refreshtoken = new LogoutCommand({
@@ -69,7 +68,7 @@ export class Header implements OnInit, OnChanges {
     } else {
       console.log('⚠️ Header ngOnInit - Server side, skipping cart load');
     }
-    
+
     // this.authService.isAuthenticated$.subscribe((res) => {
     //   this.isLoggedIn = res;
     //   console.log(res);
@@ -132,7 +131,7 @@ export class Header implements OnInit, OnChanges {
     this.isShowSearchBox = !this.isShowSearchBox;
   }
 
-  toggleUtilPanel() { 
+  toggleUtilPanel() {
     this.isShowPanel = !this.isShowPanel;
   }
 
@@ -156,9 +155,9 @@ export class Header implements OnInit, OnChanges {
   onSearch(rawQuery: string) {
     const query = (rawQuery ?? '').trim();
     if (!query) {
-      this.router.navigate(['/product-list'], { queryParams: {} });
+      this.router.navigate(['/category'], { queryParams: {} });
       return;
     }
-    this.router.navigate(['/product-list'], { queryParams: { search: query } });
+    this.router.navigate(['/category'], { queryParams: { search: query } });
   }
 }
