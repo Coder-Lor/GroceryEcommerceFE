@@ -1,7 +1,5 @@
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Component, inject, OnInit, OnDestroy, ViewEncapsulation, PLATFORM_ID } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
@@ -21,11 +19,9 @@ type Product = ProductBaseResponse;
 type UrlObject = {
   url: string;
 }
-type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
-
 // State key for TransferState
 const CATEGORIES_KEY = makeStateKey<CategoryDto[]>('categories');
-};
+
 type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number };
 
 @Component({
@@ -46,7 +42,7 @@ type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number 
   encapsulation: ViewEncapsulation.None,
   host: { ngSkipHydration: 'true' },
 })
-export class Home implements OnInit, OnDestroy {
+
 export class Home implements OnInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
@@ -54,7 +50,6 @@ export class Home implements OnInit, OnDestroy {
   private categoryService = inject(CategoryClient);
   private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
-  private categoryService: CategoryService = inject(CategoryService);
   private destroy$ = new Subject<void>();
 
   products: Product[] = [];
@@ -75,7 +70,6 @@ export class Home implements OnInit, OnDestroy {
     demand: false,
   };
 
-  categories: CategoryDto[] = [];
   categories: CategoryDto[] = [];
 
   brands = [
@@ -230,19 +224,6 @@ export class Home implements OnInit, OnDestroy {
   }
 
   loadCategories(): void {
-    this.categoryService
-      .getCategoryTree()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.categories = data;
-          console.log(this.categories);
-        },
-        error: (err) => console.error('Có lỗi xảy ra: ', err),
-      });
-  }
-
-  loadCategories(): void {
     // Kiểm tra xem có dữ liệu trong TransferState không
     const cachedCategories = this.transferState.get(CATEGORIES_KEY, null);
 
@@ -351,11 +332,6 @@ export class Home implements OnInit, OnDestroy {
     if (event.action === 'done') {
       console.log('Flash sale kết thúc!');
     }
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   ngOnDestroy(): void {
