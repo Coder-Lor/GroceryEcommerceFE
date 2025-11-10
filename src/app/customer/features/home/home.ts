@@ -53,6 +53,7 @@ export class Home implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   products: Product[] = [];
+  flashSaleProducts: Product[] = [];
 
   layout: 'list' | 'grid' = 'grid';
   options = ['list', 'grid'];
@@ -80,66 +81,6 @@ export class Home implements OnInit, OnDestroy {
     { name: 'Trung Nguyên', logo: '/images/brands/trungnguyen.png' },
     { name: 'G7', logo: '/images/brands/g7.png' },
     { name: 'Tchibo', logo: '/images/brands/tchibo.png' },
-  ];
-
-  flashSaleProducts = [
-    {
-      name: 'Cafe Legend 500g',
-      image: '/images/product1.png',
-      price: 182000,
-      discount: 10,
-      progress: 40,
-    },
-    {
-      name: 'Bình Lock&Lock',
-      image: '/images/product2.png',
-      price: 418000,
-      discount: 43,
-      progress: 50,
-    },
-    {
-      name: 'Chảo chống dính',
-      image: '/images/product3.png',
-      price: 201000,
-      discount: 37,
-      progress: 70,
-    },
-    {
-      name: 'Sách Toàn tâm toàn ý',
-      image: '/images/product4.png',
-      price: 101200,
-      discount: 32,
-      progress: 20,
-    },
-    { name: 'Pinocchio', image: '/images/product5.png', price: 681500, discount: 9, progress: 80 },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
-    },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
-    },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
-    },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
-    },
   ];
 
   hours = '01';
@@ -221,6 +162,8 @@ export class Home implements OnInit, OnDestroy {
     this.loadCategories();
 
     this.loadProducts();
+
+    this.loadFlashSaleProducts();
   }
 
   loadCategories(): void {
@@ -289,6 +232,45 @@ export class Home implements OnInit, OnDestroy {
     }
     this.page++;
     this.loadProducts();
+  }
+
+  loadFlashSaleProducts(): void {
+    // Lấy tất cả sản phẩm có giảm giá > 50%
+    this.productService
+      .getProductByPaging(1, 100) // Lấy nhiều sản phẩm để filter
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          const allProducts = data?.items || [];
+          
+          // Lọc các sản phẩm có giảm giá > 50%
+          this.flashSaleProducts = allProducts.filter((product) => {
+            if (product.price && product.discountPrice) {
+              const discountPercent = ((product.price - product.discountPrice) / product.price) * 100;
+              return discountPercent > 50;
+            }
+            return false;
+          });
+        },
+        error: (err) => console.error('Lỗi khi tải flash sale products', err),
+      });
+  }
+
+  getDiscountPercent(product: Product): number {
+    if (product.price && product.discountPrice) {
+      return Math.round(((product.price - product.discountPrice) / product.price) * 100);
+    }
+    return 0;
+  }
+
+  getProductProgress(product: Product): number {
+    // Tính % đã bán dựa trên stockQuantity (giả sử stock ban đầu là 100)
+    if (product.stockQuantity !== undefined) {
+      const initialStock = 100;
+      const sold = initialStock - product.stockQuantity;
+      return Math.min(Math.max((sold / initialStock) * 100, 0), 100);
+    }
+    return 0;
   }
 
   navigationToDetailPage() {
