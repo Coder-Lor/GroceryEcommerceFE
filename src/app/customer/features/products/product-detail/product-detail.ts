@@ -81,10 +81,26 @@ export class ProductDetail implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // toggleFavorite() {
+  // toggleFavorate() {
   //   this.isFavorite = !this.isFavorite;
   // }
   navigationToCheckout() {
-    this.router.navigate(['/checkout']);
+    if (!this.product) return;
+    
+    // Truyền thông tin sản phẩm qua navigation state
+    this.router.navigate(['/checkout'], {
+      state: {
+        checkoutMode: 'single',
+        product: {
+          productId: this.product.productId,
+          productName: this.product.name,
+          imageUrl: this.product.primaryImageUrl || '/images/product-image-1.png',
+          unitPrice: this.product.discountPrice && this.product.discountPrice < this.product.price 
+            ? this.product.discountPrice 
+            : this.product.price,
+          quantity: this.quantity // Sử dụng quantity từ component
+        }
+      }
+    });
   }
 }
