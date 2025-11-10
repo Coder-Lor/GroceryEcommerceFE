@@ -24,8 +24,14 @@
 //   height: 70%;
 //   object-fit: cover;
 // }
+.hero-slider{
+  margin-top: 20px;
+}
+
 .hero-slide {
-  height: 540px;
+  display: flex;
+  height: 300px;
+  gap: 20px;
   .hero-overlay {
     position: absolute;
     inset: 0;
