@@ -33,7 +33,12 @@ export class ProductCard {
   constructor(private messageService: MessageService) {}
 
   navigationToDetailPage() {
-    this.router.navigate(['/product-detail']);
+    // Navigate sử dụng slug của product
+    if (this.product?.slug) {
+      this.router.navigate(['/product-detail', this.product.slug]);
+    } else {
+      console.warn('⚠️ Product không có slug, không thể navigate');
+    }
   }
 
   getDiscountPercent(price: number, discountPrice: number): number {

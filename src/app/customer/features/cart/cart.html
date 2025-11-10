@@ -23,11 +23,6 @@
 
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                                 <div class="d-flex gap-2">
-                                    <!-- Brand Dropdown -->
-                                    <button class="btn btn-outline-secondary rounded-3 d-flex align-items-center gap-1">
-                                        LavAzza <i class="pi pi-chevron-down"></i>
-                                    </button>
-
                                     <!-- Quantity Selector -->
                                     <div class="d-flex align-items-center px-2">
                                         <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [step]="1"
@@ -58,22 +53,22 @@
                     <div class="d-flex justify-content-between flex-wrap align-items-end mt-1">
                         <a routerLink="/home"
                             class="text-decoration-none d-flex align-items-center gap-2 fw-medium text-dark">
-                            <i class="pi pi-chevron-left"></i> Continue Shopping
+                            <i class="pi pi-chevron-left"></i> Tiếp tục mua sắm
                         </a>
 
                         <div>
                             <div class="d-flex justify-content-between gap-5">
-                                <span class="fw-medium">Subtotal:</span>
+                                <span class="fw-medium">Tạm tính:</span>
                                 <span class="fw-medium">{{ (totalPrice$ | async) | number:'1.0-0' }}₫</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="fw-medium">Shipping:</span>
-                                <span class="fw-medium">$10.00</span>
+                                <span class="fw-medium">Phí vận chuyển:</span>
+                                <span class="fw-medium">{{ (shippingFee$ | async) | number:'1.0-0' }}₫</span>
                             </div>
                             <hr class="my-2">
                             <div class="d-flex justify-content-between fw-bold fs-5">
-                                <span>Total:</span>
-                                <span>$201.65</span>
+                                <span>Tổng cộng:</span>
+                                <span>{{ (finalTotal$ | async) | number:'1.0-0' }}₫</span>
                             </div>
                         </div>
                     </div>
@@ -83,25 +78,39 @@
             <!-- 💳 Sidebar Checkout -->
             <div class="col-lg-4">
                 <div class="card shadow-lg border-0 rounded-4 p-4 mb-4">
-                    <h6 class="fw-semibold mb-3">Order Summary</h6>
+                    <!-- <h6 class="fw-semibold mb-3">Tóm tắt đơn hàng</h6> -->
+                    
+                    <!-- Thông báo miễn phí vận chuyển -->
+                    @if ((amountToFreeShipping$ | async) ?? 0 > 0) {
+                    <div class="alert alert-info py-2 px-3 mb-3 small">
+                        <i class="pi pi-info-circle me-2"></i>
+                        Đơn hàng trên {{ (amountToFreeShipping$ | async) | number:'1.0-0' }}₫ sẽ được miễn phí vận chuyển
+                    </div>
+                    } @else {
+                    <div class="alert alert-success py-2 px-3 mb-3 small">
+                        <i class="pi pi-check-circle me-2"></i>
+                        Bạn được miễn phí vận chuyển!
+                    </div>
+                    }
+                    
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal (items)</span>
-                        <span class="fw-semibold">3</span>
+                        <span>Tổng số sản phẩm</span>
+                        <span class="fw-semibold">{{ (itemCount$ | async) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Price (Total)</span>
-                        <span class="fw-semibold">$191.65</span>
+                        <span>Tạm tính</span>
+                        <span class="fw-semibold">{{ (totalPrice$ | async) | number:'1.0-0' }}₫</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping</span>
-                        <span class="fw-semibold">$10.00</span>
+                        <span>Phí vận chuyển</span>
+                        <span class="fw-semibold">{{ (shippingFee$ | async) | number:'1.0-0' }}₫</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
-                        <span>Estimated Total</span>
-                        <span>$201.65</span>
+                        <span>Tổng cộng</span>
+                        <span>{{ (finalTotal$ | async) | number:'1.0-0' }}₫</span>
                     </div>
-                    <button class="btn btn-warning w-100 rounded-pill fw-medium py-3">Continue to checkout</button>
+                    <button class="btn btn-warning w-100 rounded-pill fw-medium py-3" routerLink="/checkout">Tiến hành thanh toán</button>
                 </div>
 
                 <!-- 🎁 Gift Card -->
@@ -111,8 +120,8 @@
                         <i class="pi pi-gift"></i>
                     </div>
                     <div>
-                        <h6 class="fw-semibold mb-1">Send this order as a gift.</h6>
-                        <p class="text-muted small mb-0">Available items will be shipped to your gift recipient.</p>
+                        <h6 class="fw-semibold mb-1">Gửi đơn hàng này làm quà tặng</h6>
+                        <p class="text-muted small mb-0">Các sản phẩm có sẵn sẽ được gửi đến người nhận quà của bạn.</p>
                     </div>
                 </div>
             </div>

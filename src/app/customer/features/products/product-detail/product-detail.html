@@ -4,16 +4,38 @@
     <!-- <app-breadcrumb></app-breadcrumb> -->
   </div>
 
+  <!-- Loading State -->
+  @if (isLoading) {
+  <div class="container text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Đang tải...</span>
+    </div>
+    <p class="mt-3">Đang tải thông tin sản phẩm...</p>
+  </div>
+  }
+
+  <!-- Product Not Found -->
+  @else if (!product) {
+  <div class="container text-center py-5">
+    <i class="pi pi-exclamation-triangle" style="font-size: 3rem; color: #dc3545;"></i>
+    <h3 class="mt-3">Không tìm thấy sản phẩm</h3>
+    <p class="text-muted">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+    <button class="btn btn-primary mt-3" routerLink="/home">Về trang chủ</button>
+  </div>
+  }
+
   <!-- Product Details -->
+  @else {
   <div class="container product-details rounded-3 p-4">
     <div class="row g-4 align-items-start">
       <!-- Left: Image -->
       <div class="col-lg-5 col-md-6">
         <div class="product-image">
           <img
-            src="/images/product-image-1.png"
-            alt="Product"
+            [src]="product.primaryImageUrl || '/images/product-image-1.png'"
+            [alt]="product.name"
             class="img-fluid rounded product-img"
+            onerror="this.src='/images/product-image-1.png'"
           />
         </div>
       </div>
@@ -21,7 +43,7 @@
       <!-- Right: Info -->
       <div class="col-lg-7 col-md-6">
         <div class="product-info">
-          <h2 class="product-name mb-3">Coffee Beans - Espresso Arabica and Robusta Beans</h2>
+          <h2 class="product-name mb-3">{{ product.name }}</h2>
 
           <div class="row g-4 product-content">
             <!-- Left info -->
@@ -82,14 +104,22 @@
                 <div class="purchase-section mt-3">
                   <div class="price-container mb-3">
                     <div class="price-row d-flex align-items-center gap-2">
-                      <span class="current-price fs-5 fw-semibold">$500.00</span>
-                      <span class="discount-badge px-2 py-1 rounded">
-                        <span class="discount-text">10%</span>
+                      <span class="current-price fs-5 fw-semibold">
+                        {{ product.discountPrice ? (product.discountPrice | currency: 'VND':'symbol':'1.0-0') : (product.price | currency: 'VND':'symbol':'1.0-0') }}
                       </span>
+                      @if (product.discountPrice && product.price > product.discountPrice) {
+                      <span class="discount-badge px-2 py-1 rounded">
+                        <span class="discount-text">
+                          {{ ((product.price - product.discountPrice) / product.price * 100) | number:'1.0-0' }}%
+                        </span>
+                      </span>
+                      }
                     </div>
+                    @if (product.discountPrice && product.price > product.discountPrice) {
                     <div class="original-price text-muted text-decoration-line-through">
-                      $540.00
+                      {{ product.price | currency: 'VND':'symbol':'1.0-0' }}
                     </div>
+                    }
                   </div>
 
                   <div class="action-buttons d-flex gap-3">
@@ -97,10 +127,10 @@
                       class="btn btn-warning text-dark fw-semibold px-4 rounded btn-checkout"
                       (click)="navigationToCheckout()"
                     >
-                      Checkout
+                      Thanh toán
                     </button>
                     <button class="btn border rounded add-to-cart-button">
-                      <!-- <fa-icon [icon]="faCartPlus"></fa-icon> -->
+                      Thêm vào giỏ
                     </button>
                   </div>
                 </div>
@@ -123,14 +153,32 @@
       </p-tablist>
       <p-tabpanels>
         <p-tabpanel value="0">
-          <p class="m-0">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-            dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-            mollit anim id est laborum.
-          </p>
+          <div class="product-description">
+            <h5 class="mb-3">Mô tả sản phẩm</h5>
+            <div [innerHTML]="product.description || 'Chưa có mô tả cho sản phẩm này.'"></div>
+            
+            @if (product.shortDescription) {
+            <div class="mt-3">
+              <h6>Tóm tắt:</h6>
+              <p class="text-muted">{{ product.shortDescription }}</p>
+            </div>
+            }
+            
+            <div class="product-meta mt-4">
+              <p><strong>Danh mục:</strong> {{ product.categoryName || 'Chưa phân loại' }}</p>
+              @if (product.brandName) {
+              <p><strong>Thương hiệu:</strong> {{ product.brandName }}</p>
+              }
+              <p><strong>SKU:</strong> {{ product.sku }}</p>
+              <p><strong>Trạng thái:</strong> 
+                @if (product.stockQuantity > 0) {
+                  <span class="badge bg-success">Còn hàng ({{ product.stockQuantity }} sản phẩm)</span>
+                } @else {
+                  <span class="badge bg-danger">Hết hàng</span>
+                }
+              </p>
+            </div>
+          </div>
         </p-tabpanel>
         <p-tabpanel value="1">
           <p class="m-0">
@@ -222,4 +270,5 @@
       </p-tabpanels>
     </p-tabs>
   </div>
+  }
 </div>
