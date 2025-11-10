@@ -1,155 +1,152 @@
-<div class="users-page">
-  <!-- Page Header -->
+<!-- Loading Overlay for entire page -->
+<app-loading-overlay [show]="isLoading" message="Đang xử lý..."></app-loading-overlay>
+
+<div class="users-container">
+  <!-- Toast messages -->
+  <p-toast></p-toast>
+  
+  <!-- Confirm Dialog -->
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    [closable]="true"
+    [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger"
+    rejectButtonStyleClass="p-button-secondary p-button-text">
+  </p-confirmDialog>
+  
   <div class="page-header">
-    <h1>Quản lý người dùng</h1>
-    <p>Quản lý thông tin người dùng trong hệ thống</p>
-  </div>
-
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <div class="search-bar">
-      <div class="search-input">
-        <input 
-          type="text" 
-          [(ngModel)]="searchKeyword" 
-          placeholder="Tìm kiếm theo email, username, số điện thoại..."
-          (keyup.enter)="onSearch()"
-        />
-      </div>
-      <button class="btn btn-primary" (click)="onSearch()">
-        🔍 Tìm kiếm
-      </button>
-      <button class="btn btn-secondary" (click)="searchKeyword = ''; onSearch()">
-        ✖ Xóa
+    <h2>Quản lý người dùng</h2>
+    <div class="header-actions">
+      <button class="btn btn-info" (click)="loadUsers()" title="Tải lại">
+        <fa-icon [icon]="faUser" size="1x"></fa-icon>
       </button>
     </div>
-
-    <div class="filters">
-      <label>Hiển thị:</label>
-      <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-        <option [value]="10">10 mục</option>
-        <option [value]="20">20 mục</option>
-        <option [value]="50">50 mục</option>
-        <option [value]="100">100 mục</option>
-      </select>
-    </div>
   </div>
 
-  <!-- Users Table -->
-  <div class="users-table-container">
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th (click)="onSort('username')">
-              Username
-              <span class="sort-icon">{{ sortBy === 'username' ? (sortDirection === SortDirection.Ascending ? '▲' : '▼') : '⬍' }}</span>
-            </th>
-            <th (click)="onSort('email')">
-              Email
-              <span class="sort-icon">{{ sortBy === 'email' ? (sortDirection === SortDirection.Ascending ? '▲' : '▼') : '⬍' }}</span>
-            </th>
-            <th>Họ tên</th>
-            <th>Số điện thoại</th>
-            <th (click)="onSort('status')">
-              Trạng thái
-              <span class="sort-icon">{{ sortBy === 'status' ? (sortDirection === SortDirection.Ascending ? '▲' : '▼') : '⬍' }}</span>
-            </th>
-            <th>Email xác thực</th>
-            <th (click)="onSort('createdAt')">
-              Ngày tạo
-              <span class="sort-icon">{{ sortBy === 'createdAt' ? (sortDirection === SortDirection.Ascending ? '▲' : '▼') : '⬍' }}</span>
-            </th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of users">
-            <td>{{ user.username }}</td>
-            <td class="email">{{ user.email }}</td>
-            <td>{{ (user.firstName || '') + ' ' + (user.lastName || '') || 'N/A' }}</td>
-            <td>{{ user.phoneNumber || 'N/A' }}</td>
-            <td>
-              <span class="status-badge" [ngClass]="getStatusClass(user.status)">
-                {{ getStatusLabel(user.status) }}
-              </span>
-            </td>
-            <td>
-              <span class="verified-badge" [ngClass]="user.emailVerified ? 'verified' : 'unverified'">
-                {{ user.emailVerified ? '✓ Đã xác thực' : '✗ Chưa xác thực' }}
-              </span>
-            </td>
-            <td>{{ formatDate(user.createdAt) }}</td>
-            <td>
-              <div class="actions">
-                <button class="btn-view" (click)="viewUserDetail(user.userId!)" title="Xem chi tiết">
-                  👁️
-                </button>
-                <button class="btn-edit" (click)="openEditModal(user)" title="Chỉnh sửa">
-                  ✏️
-                </button>
-                <button class="btn-delete" (click)="openDeleteModal(user)" title="Xóa">
-                  🗑️
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Empty State -->
-          <tr *ngIf="!isLoading && users.length === 0">
-            <td colspan="8">
-              <div class="empty-state">
-                <div class="empty-icon">📭</div>
-                <h3>Không có dữ liệu</h3>
-                <p>Không tìm thấy người dùng nào phù hợp với tìm kiếm của bạn.</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Tìm kiếm -->
+  <div class="search-box">
+    <div class="search-wrapper">
+      <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="filterUsers()"
+        placeholder="Tìm kiếm theo username, email, họ tên, số điện thoại..."
+        class="search-input"
+      />
     </div>
-
-    <!-- Pagination -->
-    <div class="pagination" *ngIf="users.length > 0">
-      <div class="pagination-info">
-        Hiển thị {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalRecords) }} 
-        trong tổng số {{ totalRecords }} bản ghi
-      </div>
-      <div class="pagination-controls">
-        <button (click)="onPageChange(1)" [disabled]="currentPage === 1">
-          ⟪
-        </button>
-        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
-          ‹
-        </button>
-        <button 
-          *ngFor="let page of getPageNumbers()" 
-          [class.active]="page === currentPage"
-          (click)="onPageChange(page)"
-        >
-          {{ page }}
-        </button>
-        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">
-          ›
-        </button>
-        <button (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages">
-          ⟫
-        </button>
-      </div>
-    </div>
+    <span class="search-result"
+      >Hiển thị {{ filteredUsers.length }} / {{ users.length }} người dùng</span
+    >
   </div>
 
-  <!-- Loading Overlay -->
-  <app-loading-overlay [show]="isLoading" message="Đang xử lý..."></app-loading-overlay>
+  <!-- Bảng danh sách người dùng -->
+  <div class="table-container">
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th (click)="changeSortColumn('username')" class="sortable">
+            Username
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'username' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th (click)="changeSortColumn('email')" class="sortable">
+            Email
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'email' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th>Họ tên</th>
+          <th>Số điện thoại</th>
+          <th (click)="changeSortColumn('status')" class="sortable text-center">
+            Trạng thái
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'status' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th class="text-center">Email xác thực</th>
+          <th (click)="changeSortColumn('createdAt')" class="sortable text-center">
+            Ngày tạo
+            <span class="sort-icon">
+              <fa-icon [icon]="sortColumn === 'createdAt' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+            </span>
+          </th>
+          <th class="text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>
+            <div class="user-name">
+              <fa-icon [icon]="faUser" class="user-icon"></fa-icon>
+              {{ user.username || '' }}
+            </div>
+          </td>
+          <td class="email">
+            <fa-icon [icon]="faEnvelope" class="icon-small"></fa-icon>
+            {{ user.email || '' }}
+          </td>
+          <td>{{ (user.firstName || '') + ' ' + (user.lastName || '') || 'N/A' }}</td>
+          <td>
+            <span *ngIf="user.phoneNumber">
+              <fa-icon [icon]="faPhone" class="icon-small"></fa-icon>
+              {{ user.phoneNumber }}
+            </span>
+            <span *ngIf="!user.phoneNumber">N/A</span>
+          </td>
+          <td class="text-center">
+            <span [class]="'status-badge ' + getStatusClass(user.status)">
+              {{ getStatusLabel(user.status) }}
+            </span>
+          </td>
+          <td class="text-center">
+            <span class="verified-badge" [ngClass]="user.emailVerified ? 'verified' : 'unverified'">
+              <fa-icon [icon]="user.emailVerified ? faUserCheck : faUserSlash"></fa-icon>
+              {{ user.emailVerified ? 'Đã xác thực' : 'Chưa xác thực' }}
+            </span>
+          </td>
+          <td class="text-center">
+            <fa-icon [icon]="faCalendar" class="icon-small"></fa-icon>
+            {{ formatDate(user.createdAt) }}
+          </td>
+          <td class="text-center actions">
+            <button class="btn-icon btn-view" (click)="viewUserDetail(user.userId!)" title="Xem chi tiết">
+              <fa-icon [icon]="faEye"></fa-icon>
+            </button>
+            <button class="btn-icon btn-role" (click)="openRoleModal(user)" title="Quản lý vai trò">
+              <fa-icon [icon]="faUserShield"></fa-icon>
+            </button>
+            <button class="btn-icon btn-edit" (click)="openEditModal(user)" title="Sửa">
+              <fa-icon [icon]="faPenToSquare"></fa-icon>
+            </button>
+            <button class="btn-icon btn-delete" (click)="confirmDelete(user)" title="Xóa">
+              <fa-icon [icon]="faTrashCan"></fa-icon>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="8" class="no-data">Không tìm thấy người dùng nào</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
-<!-- Detail Modal -->
+<!-- Modal xem chi tiết -->
 <div class="modal-overlay" *ngIf="isDetailModalOpen" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal-content detail-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Chi tiết người dùng</h2>
-      <button class="close-btn" (click)="closeModal()">×</button>
+      <h3>
+        <fa-icon [icon]="faUser"></fa-icon>
+        Chi tiết người dùng
+      </h3>
+      <button class="btn-close" (click)="closeModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
     </div>
+
     <div class="modal-body" *ngIf="selectedUser">
       <div class="detail-row">
         <div class="label">User ID:</div>
@@ -185,7 +182,12 @@
       </div>
       <div class="detail-row">
         <div class="label">Email xác thực:</div>
-        <div class="value">{{ selectedUser.emailVerified ? 'Đã xác thực' : 'Chưa xác thực' }}</div>
+        <div class="value">
+          <span class="verified-badge" [ngClass]="selectedUser.emailVerified ? 'verified' : 'unverified'">
+            <fa-icon [icon]="selectedUser.emailVerified ? faUserCheck : faUserSlash"></fa-icon>
+            {{ selectedUser.emailVerified ? 'Đã xác thực' : 'Chưa xác thực' }}
+          </span>
+        </div>
       </div>
       <div class="detail-row">
         <div class="label">SĐT xác thực:</div>
@@ -200,57 +202,115 @@
         <div class="value">{{ formatDate(selectedUser.lastLoginAt) }}</div>
       </div>
     </div>
+
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModal()">Đóng</button>
+      <button class="btn btn-secondary" (click)="closeModal()">Đóng</button>
     </div>
   </div>
 </div>
 
-<!-- Edit Modal -->
+<!-- Modal chỉnh sửa -->
 <div class="modal-overlay" *ngIf="isEditModalOpen" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal-content edit-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Chỉnh sửa người dùng</h2>
-      <button class="close-btn" (click)="closeModal()">×</button>
+      <h3>
+        <fa-icon [icon]="faPenToSquare"></fa-icon>
+        Chỉnh sửa người dùng
+      </h3>
+      <button class="btn-close" (click)="closeModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
     </div>
+
     <div class="modal-body">
       <div class="form-group">
-        <label>Username:</label>
-        <input type="text" [(ngModel)]="editForm.username" placeholder="Nhập username" />
+        <label>
+          Username <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-control" 
+          [(ngModel)]="editForm.username" 
+          placeholder="Nhập username" 
+        />
       </div>
       <div class="form-group">
-        <label>Email:</label>
-        <input type="email" [(ngModel)]="editForm.email" placeholder="Nhập email" />
+        <label>
+          Email <span class="required">*</span>
+        </label>
+        <input 
+          type="email" 
+          class="form-control" 
+          [(ngModel)]="editForm.email" 
+          placeholder="Nhập email" 
+        />
       </div>
       <div class="form-group">
-        <label>Mật khẩu mới (để trống nếu không đổi):</label>
-        <input type="password" [(ngModel)]="editForm.passwordHash" placeholder="Nhập mật khẩu mới" />
+        <label>Mật khẩu mới (để trống nếu không đổi)</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          [(ngModel)]="editForm.passwordHash" 
+          placeholder="Nhập mật khẩu mới" 
+        />
       </div>
     </div>
+
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModal()">Hủy</button>
-      <button class="btn-primary" (click)="saveUser()">Lưu thay đổi</button>
+      <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveUser()">Lưu thay đổi</button>
     </div>
   </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal-overlay" *ngIf="isDeleteModalOpen" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+<!-- Modal quản lý vai trò -->
+<div class="modal-overlay" *ngIf="isRoleModalOpen" (click)="closeModal()">
+  <div class="modal-content role-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Xác nhận xóa</h2>
-      <button class="close-btn" (click)="closeModal()">×</button>
+      <h3>
+        <fa-icon [icon]="faUserShield"></fa-icon>
+        Quản lý vai trò - {{ selectedUser?.username }}
+      </h3>
+      <button class="btn-close" (click)="closeModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
     </div>
+
     <div class="modal-body">
-      <div class="delete-confirmation">
-        <div class="warning-icon">⚠️</div>
-        <p>Bạn có chắc chắn muốn xóa người dùng <strong>{{ selectedUser?.username }}</strong>?</p>
-        <p class="warning-text">Hành động này không thể hoàn tác!</p>
+      <div class="current-roles" *ngIf="userRoles.length > 0">
+        <h4>
+          <fa-icon [icon]="faUserTag"></fa-icon>
+          Vai trò hiện tại:
+        </h4>
+        <div class="role-badges">
+          <span class="role-badge current" *ngFor="let role of userRoles">
+            {{ role }}
+          </span>
+        </div>
+      </div>
+
+      <div class="available-roles">
+        <h4>Chọn vai trò:</h4>
+        <div class="roles-grid">
+          <label class="role-checkbox" *ngFor="let role of availableRoles">
+            <input 
+              type="checkbox" 
+              [checked]="isRoleSelected(role.roleId!)"
+              (change)="toggleRole(role.roleId!)"
+            />
+            <span class="role-name">{{ role.roleName }}</span>
+            <span class="role-description" *ngIf="role.description">{{ role.description }}</span>
+          </label>
+        </div>
       </div>
     </div>
+
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="closeModal()">Hủy</button>
-      <button class="btn-danger" (click)="deleteUser()">Xóa người dùng</button>
+      <button class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveRoles()">
+        <fa-icon [icon]="faUserShield"></fa-icon>
+        Lưu vai trò
+      </button>
     </div>
   </div>
 </div>

@@ -1,0 +1,93 @@
+<div class="order-result-page">
+  <div class="container">
+    <div class="result-card">
+      <!-- Success State -->
+      @if (isSuccess) {
+      <div class="success-content text-center">
+        <div class="icon-wrapper mb-4">
+          <i class="pi pi-check-circle text-success" style="font-size: 5rem;"></i>
+        </div>
+        
+        <h2 class="mb-3 fw-bold">Đặt hàng thành công!</h2>
+        <p class="text-muted mb-4">
+          Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đang được xử lý và sẽ sớm được giao đến bạn.
+        </p>
+
+        @if (orderInfo) {
+        <div class="order-info mb-4">
+          <div class="info-row">
+            <span class="label">Mã đơn hàng:</span>
+            <span class="value fw-semibold">{{ orderInfo.orderId || 'Đang cập nhật' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Ngày đặt hàng:</span>
+            <span class="value">{{ orderInfo.orderDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Dự kiến giao hàng:</span>
+            <span class="value">{{ orderInfo.expectedDate || 'Trong 2-3 ngày' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Tổng tiền:</span>
+            <span class="value fw-bold text-primary">{{ orderInfo.total || 0 | currency : 'VND' }}</span>
+          </div>
+        </div>
+        }
+
+        <div class="alert alert-info mb-4">
+          <i class="pi pi-info-circle me-2"></i>
+          Chúng tôi sẽ gửi thông tin chi tiết đơn hàng qua email/SMS của bạn.
+        </div>
+
+        <div class="action-buttons d-flex gap-3 justify-content-center flex-wrap">
+          <button class="btn btn-primary px-4 py-2" (click)="goToOrders()">
+            <i class="pi pi-list me-2"></i>
+            Xem đơn hàng của tôi
+          </button>
+          <button class="btn btn-outline-primary px-4 py-2" (click)="goToHome()">
+            <i class="pi pi-home me-2"></i>
+            Về trang chủ
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- Error State -->
+      @else {
+      <div class="error-content text-center">
+        <div class="icon-wrapper mb-4">
+          <i class="pi pi-times-circle text-danger" style="font-size: 5rem;"></i>
+        </div>
+        
+        <h2 class="mb-3 fw-bold text-danger">Đặt hàng thất bại!</h2>
+        <p class="text-muted mb-4">
+          Rất tiếc, đã có lỗi xảy ra trong quá trình đặt hàng.
+        </p>
+
+        @if (errorMessage) {
+        <div class="alert alert-danger mb-4">
+          <i class="pi pi-exclamation-triangle me-2"></i>
+          {{ errorMessage }}
+        </div>
+        }
+
+        <div class="alert alert-warning mb-4">
+          <i class="pi pi-info-circle me-2"></i>
+          Vui lòng thử lại sau hoặc liên hệ với chúng tôi nếu vấn đề vẫn tiếp diễn.
+        </div>
+
+        <div class="action-buttons d-flex gap-3 justify-content-center flex-wrap">
+          <button class="btn btn-primary px-4 py-2" (click)="goToHome()">
+            <i class="pi pi-home me-2"></i>
+            Về trang chủ
+          </button>
+          <button class="btn btn-outline-primary px-4 py-2" routerLink="/cart">
+            <i class="pi pi-shopping-cart me-2"></i>
+            Quay lại giỏ hàng
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>

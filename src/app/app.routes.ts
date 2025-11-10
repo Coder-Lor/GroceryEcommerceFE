@@ -25,6 +25,7 @@ import { NotFoundComponent } from './core/components/not-found/not-found.compone
 import { Checkout } from './customer/features/checkout/checkout';
 import { Profile } from './customer/features/profile/profile';
 import { DiscoverPage } from './customer/pages/customer-page/discover-page/discover-page';
+import { OrderResult } from './customer/features/order-result/order-result';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -44,6 +45,7 @@ export const routes: Routes = [
       { path: 'product-detail/:slug', component: ProductDetail },      
       { path: 'categories', component: ProductList },
       { path: 'checkout', component: Checkout },
+      { path: 'order-result', component: OrderResult },
       { path: 'profile', component: Profile },
       { path: 'discover-page', component: DiscoverPage },
     ],

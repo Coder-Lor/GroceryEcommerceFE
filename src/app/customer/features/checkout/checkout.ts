@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CartService, CartItemViewModel } from '@core/service/cart.service';
+import { OrderService } from '@core/service/order.service';
 import { Observable, of } from 'rxjs';
 
 interface CheckoutProduct {
@@ -24,11 +25,13 @@ export class Checkout implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private cartService = inject(CartService);
+  private orderService = inject(OrderService);
 
   checkoutForm: FormGroup;
   products: CheckoutProduct[] = [];
   checkoutMode: 'cart' | 'single' = 'cart';
   shippingFee = 30000;
+  isProcessing = false;
 
   constructor() {
     this.checkoutForm = this.fb.group({
@@ -82,25 +85,73 @@ export class Checkout implements OnInit {
       return;
     }
 
-    // Chuẩn bị dữ liệu để post lên backend (tạm thời chưa triển khai)
-    const orderData = {
-      ...this.checkoutForm.value,
+    if (this.isProcessing) return;
+
+    const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
+
+    // Chỉ xử lý thanh toán COD
+    if (paymentMethod === 'cod') {
+      this.processOrder();
+    } else {
+      // TODO: Xử lý thanh toán online khác
+      alert('Phương thức thanh toán này chưa được hỗ trợ. Vui lòng chọn COD.');
+    }
+  }
+
+  private processOrder() {
+    this.isProcessing = true;
+
+    // Chuẩn bị dữ liệu đơn hàng
+    const orderRequest = {
       items: this.products.map(p => ({
         productId: p.productId,
         quantity: p.quantity,
         unitPrice: p.unitPrice
-      })),
-      subtotal: this.subtotal,
-      shippingFee: this.shippingFee,
-      total: this.totalPrice,
-      checkoutMode: this.checkoutMode
+      }))
     };
 
-    console.log('📦 Order data ready to post:', orderData);
-    
-    // TODO: Gọi API để tạo đơn hàng
-    // this.orderService.createOrder(orderData).subscribe(...)
-    
-    alert('Đặt hàng thành công 🎉');
+    console.log('📦 Submitting order...', orderRequest);
+
+    this.orderService.createOrder(orderRequest).subscribe({
+      next: (response) => {
+        console.log('✅ Order created successfully:', response);
+        this.isProcessing = false;
+
+        // Tính ngày dự kiến giao hàng
+        const expectedDate = new Date();
+        expectedDate.setDate(expectedDate.getDate() + 2);
+
+        // Navigate đến trang kết quả thành công
+        this.router.navigate(['/order-result'], {
+          state: {
+            success: true,
+            orderInfo: {
+              orderId: response.fileName || 'Đang cập nhật',
+              orderDate: new Date(),
+              expectedDate: expectedDate.toLocaleDateString('vi-VN'),
+              total: this.totalPrice,
+              items: this.products
+            }
+          }
+        });
+
+        // Nếu checkout từ cart, có thể xóa giỏ hàng (tùy chọn)
+        // if (this.checkoutMode === 'cart') {
+        //   this.cartService.clearCart();
+        // }
+      },
+      error: (err) => {
+        console.error('❌ Order creation failed:', err);
+        this.isProcessing = false;
+
+        // Navigate đến trang kết quả thất bại
+        this.router.navigate(['/order-result'], {
+          state: {
+            success: false,
+            errorMessage: err?.message || 'Đã có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau.'
+          }
+        });
+      }
+    });
   }
 }

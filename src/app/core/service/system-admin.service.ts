@@ -8813,108 +8813,6 @@ export class PurchaseOrderClient {
         return _observableOf(null as any);
     }
 
-    getPurchaseOrdersBySupplier(supplierId: string, page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/PurchaseOrder/supplier/{supplierId}/paging?";
-        if (supplierId === undefined || supplierId === null)
-            throw new globalThis.Error("The parameter 'supplierId' must be defined.");
-        url_ = url_.replace("{supplierId}", encodeURIComponent("" + supplierId));
-        if (page === null)
-            throw new globalThis.Error("The parameter 'page' cannot be null.");
-        else if (page !== undefined)
-            url_ += "Page=" + encodeURIComponent("" + page) + "&";
-        if (pageSize === null)
-            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        if (search !== undefined && search !== null)
-            url_ += "Search=" + encodeURIComponent("" + search) + "&";
-        if (sortBy !== undefined && sortBy !== null)
-            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
-        if (sortDirection === null)
-            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
-        else if (sortDirection !== undefined)
-            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
-        if (filters === null)
-            throw new globalThis.Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            filters && filters.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (entityType !== undefined && entityType !== null)
-            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
-        if (availableFields !== undefined && availableFields !== null)
-            availableFields && availableFields.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (hasFilters === null)
-            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
-        else if (hasFilters !== undefined)
-            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
-        if (hasSearch === null)
-            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
-        else if (hasSearch !== undefined)
-            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
-        if (hasSorting === null)
-            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
-        else if (hasSorting !== undefined)
-            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetPurchaseOrdersBySupplier(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetPurchaseOrdersBySupplier(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetPurchaseOrdersBySupplier(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
     getPurchaseOrdersByStatus(status: number, page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
         let url_ = this.baseUrl + "/api/PurchaseOrder/status/{status}/paging?";
         if (status === undefined || status === null)
@@ -9624,14 +9522,12 @@ export class StockMovementClient {
         return _observableOf(null as any);
     }
 
-    getCurrentStock(productId: string | undefined, warehouseId: string | null | undefined): Observable<FileResponse> {
+    getCurrentStock(productId: string | undefined): Observable<FileResponse> {
         let url_ = this.baseUrl + "/api/StockMovement/current-stock?";
         if (productId === null)
             throw new globalThis.Error("The parameter 'productId' cannot be null.");
         else if (productId !== undefined)
             url_ += "productId=" + encodeURIComponent("" + productId) + "&";
-        if (warehouseId !== undefined && warehouseId !== null)
-            url_ += "warehouseId=" + encodeURIComponent("" + warehouseId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -9772,405 +9668,6 @@ export class StockMovementClient {
     }
 
     protected processAdjustStock(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable({
-    providedIn: 'root'
-})
-export class SupplierClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ?? "https://localhost:44394";
-    }
-
-    getSuppliersPaging(page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Supplier/paging?";
-        if (page === null)
-            throw new globalThis.Error("The parameter 'page' cannot be null.");
-        else if (page !== undefined)
-            url_ += "Page=" + encodeURIComponent("" + page) + "&";
-        if (pageSize === null)
-            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        if (search !== undefined && search !== null)
-            url_ += "Search=" + encodeURIComponent("" + search) + "&";
-        if (sortBy !== undefined && sortBy !== null)
-            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
-        if (sortDirection === null)
-            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
-        else if (sortDirection !== undefined)
-            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
-        if (filters === null)
-            throw new globalThis.Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            filters && filters.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (entityType !== undefined && entityType !== null)
-            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
-        if (availableFields !== undefined && availableFields !== null)
-            availableFields && availableFields.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (hasFilters === null)
-            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
-        else if (hasFilters !== undefined)
-            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
-        if (hasSearch === null)
-            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
-        else if (hasSearch !== undefined)
-            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
-        if (hasSorting === null)
-            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
-        else if (hasSorting !== undefined)
-            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetSuppliersPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetSuppliersPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetSuppliersPaging(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getSupplierById(supplierId: string): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Supplier/{supplierId}";
-        if (supplierId === undefined || supplierId === null)
-            throw new globalThis.Error("The parameter 'supplierId' must be defined.");
-        url_ = url_.replace("{supplierId}", encodeURIComponent("" + supplierId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetSupplierById(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetSupplierById(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetSupplierById(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    updateSupplier(supplierId: string, command: UpdateSupplierCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Supplier/{supplierId}";
-        if (supplierId === undefined || supplierId === null)
-            throw new globalThis.Error("The parameter 'supplierId' must be defined.");
-        url_ = url_.replace("{supplierId}", encodeURIComponent("" + supplierId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateSupplier(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateSupplier(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processUpdateSupplier(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    deleteSupplier(supplierId: string): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Supplier/{supplierId}";
-        if (supplierId === undefined || supplierId === null)
-            throw new globalThis.Error("The parameter 'supplierId' must be defined.");
-        url_ = url_.replace("{supplierId}", encodeURIComponent("" + supplierId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDeleteSupplier(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDeleteSupplier(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processDeleteSupplier(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    searchSuppliersByName(searchTerm: string | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Supplier/search?";
-        if (searchTerm === null)
-            throw new globalThis.Error("The parameter 'searchTerm' cannot be null.");
-        else if (searchTerm !== undefined)
-            url_ += "searchTerm=" + encodeURIComponent("" + searchTerm) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSearchSuppliersByName(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSearchSuppliersByName(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processSearchSuppliersByName(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    createSupplier(command: CreateSupplierCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Supplier";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateSupplier(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateSupplier(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processCreateSupplier(response: HttpResponseBase): Observable<FileResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -11202,29 +10699,71 @@ export class UserRoleClient {
         this.baseUrl = baseUrl ?? "https://localhost:44394";
     }
 
-    getPaged(request: PagedRequest): Observable<ResultOfPagedResultOfUserRole> {
-        let url_ = this.baseUrl + "/api/UserRole/paged";
+    getPaging(page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<ResultOfPagedResultOfUserRole> {
+        let url_ = this.baseUrl + "/api/UserRole/paging?";
+        if (page === null)
+            throw new globalThis.Error("The parameter 'page' cannot be null.");
+        else if (page !== undefined)
+            url_ += "Page=" + encodeURIComponent("" + page) + "&";
+        if (pageSize === null)
+            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        if (search !== undefined && search !== null)
+            url_ += "Search=" + encodeURIComponent("" + search) + "&";
+        if (sortBy !== undefined && sortBy !== null)
+            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
+        if (sortDirection === null)
+            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
+        else if (sortDirection !== undefined)
+            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
+        if (filters === null)
+            throw new globalThis.Error("The parameter 'filters' cannot be null.");
+        else if (filters !== undefined)
+            filters && filters.forEach((item, index) => {
+                for (const attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (entityType !== undefined && entityType !== null)
+            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
+        if (availableFields !== undefined && availableFields !== null)
+            availableFields && availableFields.forEach((item, index) => {
+                for (const attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (hasFilters === null)
+            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
+        else if (hasFilters !== undefined)
+            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
+        if (hasSearch === null)
+            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
+        else if (hasSearch !== undefined)
+            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
+        if (hasSorting === null)
+            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
+        else if (hasSorting !== undefined)
+            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(request);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             withCredentials: true,
             headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetPaged(response_);
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPaging(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetPaged(response_ as any);
+                    return this.processGetPaging(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<ResultOfPagedResultOfUserRole>;
                 }
@@ -11233,7 +10772,7 @@ export class UserRoleClient {
         }));
     }
 
-    protected processGetPaged(response: HttpResponseBase): Observable<ResultOfPagedResultOfUserRole> {
+    protected processGetPaging(response: HttpResponseBase): Observable<ResultOfPagedResultOfUserRole> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -11736,447 +11275,6 @@ export class UserSessionClient {
             result200 = ResultOfBoolean.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable({
-    providedIn: 'root'
-})
-export class WarehouseClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ?? "https://localhost:44394";
-    }
-
-    getWarehousesPaging(page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Warehouse/paging?";
-        if (page === null)
-            throw new globalThis.Error("The parameter 'page' cannot be null.");
-        else if (page !== undefined)
-            url_ += "Page=" + encodeURIComponent("" + page) + "&";
-        if (pageSize === null)
-            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        if (search !== undefined && search !== null)
-            url_ += "Search=" + encodeURIComponent("" + search) + "&";
-        if (sortBy !== undefined && sortBy !== null)
-            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
-        if (sortDirection === null)
-            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
-        else if (sortDirection !== undefined)
-            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
-        if (filters === null)
-            throw new globalThis.Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            filters && filters.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (entityType !== undefined && entityType !== null)
-            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
-        if (availableFields !== undefined && availableFields !== null)
-            availableFields && availableFields.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (hasFilters === null)
-            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
-        else if (hasFilters !== undefined)
-            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
-        if (hasSearch === null)
-            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
-        else if (hasSearch !== undefined)
-            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
-        if (hasSorting === null)
-            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
-        else if (hasSorting !== undefined)
-            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetWarehousesPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetWarehousesPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetWarehousesPaging(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getActiveWarehousesPaging(page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Warehouse/active/paging?";
-        if (page === null)
-            throw new globalThis.Error("The parameter 'page' cannot be null.");
-        else if (page !== undefined)
-            url_ += "Page=" + encodeURIComponent("" + page) + "&";
-        if (pageSize === null)
-            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        if (search !== undefined && search !== null)
-            url_ += "Search=" + encodeURIComponent("" + search) + "&";
-        if (sortBy !== undefined && sortBy !== null)
-            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
-        if (sortDirection === null)
-            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
-        else if (sortDirection !== undefined)
-            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
-        if (filters === null)
-            throw new globalThis.Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            filters && filters.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (entityType !== undefined && entityType !== null)
-            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
-        if (availableFields !== undefined && availableFields !== null)
-            availableFields && availableFields.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (hasFilters === null)
-            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
-        else if (hasFilters !== undefined)
-            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
-        if (hasSearch === null)
-            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
-        else if (hasSearch !== undefined)
-            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
-        if (hasSorting === null)
-            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
-        else if (hasSorting !== undefined)
-            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetActiveWarehousesPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetActiveWarehousesPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetActiveWarehousesPaging(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getWarehouseById(warehouseId: string): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Warehouse/{warehouseId}";
-        if (warehouseId === undefined || warehouseId === null)
-            throw new globalThis.Error("The parameter 'warehouseId' must be defined.");
-        url_ = url_.replace("{warehouseId}", encodeURIComponent("" + warehouseId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetWarehouseById(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetWarehouseById(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetWarehouseById(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    updateWarehouse(warehouseId: string, command: UpdateWarehouseCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Warehouse/{warehouseId}";
-        if (warehouseId === undefined || warehouseId === null)
-            throw new globalThis.Error("The parameter 'warehouseId' must be defined.");
-        url_ = url_.replace("{warehouseId}", encodeURIComponent("" + warehouseId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateWarehouse(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateWarehouse(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processUpdateWarehouse(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    deleteWarehouse(warehouseId: string): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Warehouse/{warehouseId}";
-        if (warehouseId === undefined || warehouseId === null)
-            throw new globalThis.Error("The parameter 'warehouseId' must be defined.");
-        url_ = url_.replace("{warehouseId}", encodeURIComponent("" + warehouseId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDeleteWarehouse(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDeleteWarehouse(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processDeleteWarehouse(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    createWarehouse(command: CreateWarehouseCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Warehouse";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateWarehouse(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateWarehouse(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processCreateWarehouse(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -15724,8 +14822,6 @@ export interface IWarehouse {
 
 export class PurchaseOrder implements IPurchaseOrder {
     purchaseOrderId?: string;
-    supplierId?: string;
-    warehouseId?: string | undefined;
     orderNumber!: string;
     orderDate?: Date;
     expectedDate?: Date | undefined;
@@ -15734,9 +14830,7 @@ export class PurchaseOrder implements IPurchaseOrder {
     createdBy?: string | undefined;
     createdAt?: Date;
     updatedAt?: Date | undefined;
-    supplier?: Supplier;
     createdByUser?: User | undefined;
-    warehouse?: Warehouse | undefined;
     purchaseOrderItems?: PurchaseOrderItem[];
 
     constructor(data?: IPurchaseOrder) {
@@ -15751,8 +14845,6 @@ export class PurchaseOrder implements IPurchaseOrder {
     init(_data?: any) {
         if (_data) {
             this.purchaseOrderId = _data["purchaseOrderId"];
-            this.supplierId = _data["supplierId"];
-            this.warehouseId = _data["warehouseId"];
             this.orderNumber = _data["orderNumber"];
             this.orderDate = _data["orderDate"] ? new Date(_data["orderDate"].toString()) : undefined as any;
             this.expectedDate = _data["expectedDate"] ? new Date(_data["expectedDate"].toString()) : undefined as any;
@@ -15761,9 +14853,7 @@ export class PurchaseOrder implements IPurchaseOrder {
             this.createdBy = _data["createdBy"];
             this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
-            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
             this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
-            this.warehouse = _data["warehouse"] ? Warehouse.fromJS(_data["warehouse"]) : undefined as any;
             if (Array.isArray(_data["purchaseOrderItems"])) {
                 this.purchaseOrderItems = [] as any;
                 for (let item of _data["purchaseOrderItems"])
@@ -15782,8 +14872,6 @@ export class PurchaseOrder implements IPurchaseOrder {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["purchaseOrderId"] = this.purchaseOrderId;
-        data["supplierId"] = this.supplierId;
-        data["warehouseId"] = this.warehouseId;
         data["orderNumber"] = this.orderNumber;
         data["orderDate"] = this.orderDate ? this.orderDate.toISOString() : undefined as any;
         data["expectedDate"] = this.expectedDate ? this.expectedDate.toISOString() : undefined as any;
@@ -15792,9 +14880,7 @@ export class PurchaseOrder implements IPurchaseOrder {
         data["createdBy"] = this.createdBy;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
-        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
         data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
-        data["warehouse"] = this.warehouse ? this.warehouse.toJSON() : undefined as any;
         if (Array.isArray(this.purchaseOrderItems)) {
             data["purchaseOrderItems"] = [];
             for (let item of this.purchaseOrderItems)
@@ -15806,8 +14892,6 @@ export class PurchaseOrder implements IPurchaseOrder {
 
 export interface IPurchaseOrder {
     purchaseOrderId?: string;
-    supplierId?: string;
-    warehouseId?: string | undefined;
     orderNumber: string;
     orderDate?: Date;
     expectedDate?: Date | undefined;
@@ -15816,86 +14900,8 @@ export interface IPurchaseOrder {
     createdBy?: string | undefined;
     createdAt?: Date;
     updatedAt?: Date | undefined;
-    supplier?: Supplier;
     createdByUser?: User | undefined;
-    warehouse?: Warehouse | undefined;
     purchaseOrderItems?: PurchaseOrderItem[];
-}
-
-export class Supplier implements ISupplier {
-    supplierId?: string;
-    name!: string;
-    contactName?: string | undefined;
-    contactEmail?: string | undefined;
-    contactPhone?: string | undefined;
-    address?: string | undefined;
-    note?: string | undefined;
-    createdAt?: Date;
-    purchaseOrders?: PurchaseOrder[];
-
-    constructor(data?: ISupplier) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.supplierId = _data["supplierId"];
-            this.name = _data["name"];
-            this.contactName = _data["contactName"];
-            this.contactEmail = _data["contactEmail"];
-            this.contactPhone = _data["contactPhone"];
-            this.address = _data["address"];
-            this.note = _data["note"];
-            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
-            if (Array.isArray(_data["purchaseOrders"])) {
-                this.purchaseOrders = [] as any;
-                for (let item of _data["purchaseOrders"])
-                    this.purchaseOrders!.push(PurchaseOrder.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): Supplier {
-        data = typeof data === 'object' ? data : {};
-        let result = new Supplier();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["supplierId"] = this.supplierId;
-        data["name"] = this.name;
-        data["contactName"] = this.contactName;
-        data["contactEmail"] = this.contactEmail;
-        data["contactPhone"] = this.contactPhone;
-        data["address"] = this.address;
-        data["note"] = this.note;
-        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
-        if (Array.isArray(this.purchaseOrders)) {
-            data["purchaseOrders"] = [];
-            for (let item of this.purchaseOrders)
-                data["purchaseOrders"].push(item ? item.toJSON() : undefined as any);
-        }
-        return data;
-    }
-}
-
-export interface ISupplier {
-    supplierId?: string;
-    name: string;
-    contactName?: string | undefined;
-    contactEmail?: string | undefined;
-    contactPhone?: string | undefined;
-    address?: string | undefined;
-    note?: string | undefined;
-    createdAt?: Date;
-    purchaseOrders?: PurchaseOrder[];
 }
 
 export class PurchaseOrderItem implements IPurchaseOrderItem {
@@ -15974,7 +14980,6 @@ export class StockMovement implements IStockMovement {
     movementId?: string;
     productId?: string;
     productVariantId?: string | undefined;
-    warehouseId?: string | undefined;
     movementType?: number;
     quantity?: number;
     previousStock?: number;
@@ -15986,7 +14991,6 @@ export class StockMovement implements IStockMovement {
     createdBy?: string;
     product?: Product;
     productVariant?: ProductVariant | undefined;
-    warehouse?: Warehouse | undefined;
     createdByUser?: User;
 
     constructor(data?: IStockMovement) {
@@ -16003,7 +15007,6 @@ export class StockMovement implements IStockMovement {
             this.movementId = _data["movementId"];
             this.productId = _data["productId"];
             this.productVariantId = _data["productVariantId"];
-            this.warehouseId = _data["warehouseId"];
             this.movementType = _data["movementType"];
             this.quantity = _data["quantity"];
             this.previousStock = _data["previousStock"];
@@ -16015,7 +15018,6 @@ export class StockMovement implements IStockMovement {
             this.createdBy = _data["createdBy"];
             this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
             this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
-            this.warehouse = _data["warehouse"] ? Warehouse.fromJS(_data["warehouse"]) : undefined as any;
             this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
         }
     }
@@ -16032,7 +15034,6 @@ export class StockMovement implements IStockMovement {
         data["movementId"] = this.movementId;
         data["productId"] = this.productId;
         data["productVariantId"] = this.productVariantId;
-        data["warehouseId"] = this.warehouseId;
         data["movementType"] = this.movementType;
         data["quantity"] = this.quantity;
         data["previousStock"] = this.previousStock;
@@ -16044,7 +15045,6 @@ export class StockMovement implements IStockMovement {
         data["createdBy"] = this.createdBy;
         data["product"] = this.product ? this.product.toJSON() : undefined as any;
         data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
-        data["warehouse"] = this.warehouse ? this.warehouse.toJSON() : undefined as any;
         data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
         return data;
     }
@@ -16054,7 +15054,6 @@ export interface IStockMovement {
     movementId?: string;
     productId?: string;
     productVariantId?: string | undefined;
-    warehouseId?: string | undefined;
     movementType?: number;
     quantity?: number;
     previousStock?: number;
@@ -16066,7 +15065,6 @@ export interface IStockMovement {
     createdBy?: string;
     product?: Product;
     productVariant?: ProductVariant | undefined;
-    warehouse?: Warehouse | undefined;
     createdByUser?: User;
 }
 
@@ -23981,8 +22979,6 @@ export interface IPagedResultOfProductVariantDto {
 }
 
 export class CreatePurchaseOrderCommand implements ICreatePurchaseOrderCommand {
-    supplierId?: string;
-    warehouseId?: string | undefined;
     expectedDate?: Date | undefined;
     items?: CreatePurchaseOrderItemRequest[];
 
@@ -23997,8 +22993,6 @@ export class CreatePurchaseOrderCommand implements ICreatePurchaseOrderCommand {
 
     init(_data?: any) {
         if (_data) {
-            this.supplierId = _data["supplierId"];
-            this.warehouseId = _data["warehouseId"];
             this.expectedDate = _data["expectedDate"] ? new Date(_data["expectedDate"].toString()) : undefined as any;
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
@@ -24017,8 +23011,6 @@ export class CreatePurchaseOrderCommand implements ICreatePurchaseOrderCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["supplierId"] = this.supplierId;
-        data["warehouseId"] = this.warehouseId;
         data["expectedDate"] = this.expectedDate ? this.expectedDate.toISOString() : undefined as any;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -24030,8 +23022,6 @@ export class CreatePurchaseOrderCommand implements ICreatePurchaseOrderCommand {
 }
 
 export interface ICreatePurchaseOrderCommand {
-    supplierId?: string;
-    warehouseId?: string | undefined;
     expectedDate?: Date | undefined;
     items?: CreatePurchaseOrderItemRequest[];
 }
@@ -24190,7 +23180,6 @@ export interface IResultOfListOfRefreshToken {
 
 export class CreateStockMovementCommand implements ICreateStockMovementCommand {
     productId?: string;
-    warehouseId?: string | undefined;
     movementType?: number;
     quantity?: number;
     reason?: string;
@@ -24207,7 +23196,6 @@ export class CreateStockMovementCommand implements ICreateStockMovementCommand {
     init(_data?: any) {
         if (_data) {
             this.productId = _data["productId"];
-            this.warehouseId = _data["warehouseId"];
             this.movementType = _data["movementType"];
             this.quantity = _data["quantity"];
             this.reason = _data["reason"];
@@ -24224,7 +23212,6 @@ export class CreateStockMovementCommand implements ICreateStockMovementCommand {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["productId"] = this.productId;
-        data["warehouseId"] = this.warehouseId;
         data["movementType"] = this.movementType;
         data["quantity"] = this.quantity;
         data["reason"] = this.reason;
@@ -24234,7 +23221,6 @@ export class CreateStockMovementCommand implements ICreateStockMovementCommand {
 
 export interface ICreateStockMovementCommand {
     productId?: string;
-    warehouseId?: string | undefined;
     movementType?: number;
     quantity?: number;
     reason?: string;
@@ -24242,7 +23228,6 @@ export interface ICreateStockMovementCommand {
 
 export class AdjustStockCommand implements IAdjustStockCommand {
     productId?: string;
-    warehouseId?: string | undefined;
     quantity?: number;
     reason?: string;
 
@@ -24258,7 +23243,6 @@ export class AdjustStockCommand implements IAdjustStockCommand {
     init(_data?: any) {
         if (_data) {
             this.productId = _data["productId"];
-            this.warehouseId = _data["warehouseId"];
             this.quantity = _data["quantity"];
             this.reason = _data["reason"];
         }
@@ -24274,7 +23258,6 @@ export class AdjustStockCommand implements IAdjustStockCommand {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["productId"] = this.productId;
-        data["warehouseId"] = this.warehouseId;
         data["quantity"] = this.quantity;
         data["reason"] = this.reason;
         return data;
@@ -24283,125 +23266,8 @@ export class AdjustStockCommand implements IAdjustStockCommand {
 
 export interface IAdjustStockCommand {
     productId?: string;
-    warehouseId?: string | undefined;
     quantity?: number;
     reason?: string;
-}
-
-export class CreateSupplierCommand implements ICreateSupplierCommand {
-    name?: string;
-    contactName?: string | undefined;
-    contactEmail?: string | undefined;
-    contactPhone?: string | undefined;
-    address?: string | undefined;
-    note?: string | undefined;
-
-    constructor(data?: ICreateSupplierCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.contactName = _data["contactName"];
-            this.contactEmail = _data["contactEmail"];
-            this.contactPhone = _data["contactPhone"];
-            this.address = _data["address"];
-            this.note = _data["note"];
-        }
-    }
-
-    static fromJS(data: any): CreateSupplierCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateSupplierCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["contactName"] = this.contactName;
-        data["contactEmail"] = this.contactEmail;
-        data["contactPhone"] = this.contactPhone;
-        data["address"] = this.address;
-        data["note"] = this.note;
-        return data;
-    }
-}
-
-export interface ICreateSupplierCommand {
-    name?: string;
-    contactName?: string | undefined;
-    contactEmail?: string | undefined;
-    contactPhone?: string | undefined;
-    address?: string | undefined;
-    note?: string | undefined;
-}
-
-export class UpdateSupplierCommand implements IUpdateSupplierCommand {
-    supplierId?: string;
-    name?: string;
-    contactName?: string | undefined;
-    contactEmail?: string | undefined;
-    contactPhone?: string | undefined;
-    address?: string | undefined;
-    note?: string | undefined;
-
-    constructor(data?: IUpdateSupplierCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.supplierId = _data["supplierId"];
-            this.name = _data["name"];
-            this.contactName = _data["contactName"];
-            this.contactEmail = _data["contactEmail"];
-            this.contactPhone = _data["contactPhone"];
-            this.address = _data["address"];
-            this.note = _data["note"];
-        }
-    }
-
-    static fromJS(data: any): UpdateSupplierCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateSupplierCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["supplierId"] = this.supplierId;
-        data["name"] = this.name;
-        data["contactName"] = this.contactName;
-        data["contactEmail"] = this.contactEmail;
-        data["contactPhone"] = this.contactPhone;
-        data["address"] = this.address;
-        data["note"] = this.note;
-        return data;
-    }
-}
-
-export interface IUpdateSupplierCommand {
-    supplierId?: string;
-    name?: string;
-    contactName?: string | undefined;
-    contactEmail?: string | undefined;
-    contactPhone?: string | undefined;
-    address?: string | undefined;
-    note?: string | undefined;
 }
 
 export class ResultOfPagedResultOfUserAddress implements IResultOfPagedResultOfUserAddress {
@@ -25586,138 +24452,6 @@ export interface IPagedResultOfUserSession {
     totalPages?: number;
     hasPreviousPage?: boolean;
     hasNextPage?: boolean;
-}
-
-export class CreateWarehouseCommand implements ICreateWarehouseCommand {
-    name?: string;
-    code?: string | undefined;
-    address?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    country?: string | undefined;
-    phone?: string | undefined;
-    isActive?: boolean;
-
-    constructor(data?: ICreateWarehouseCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.code = _data["code"];
-            this.address = _data["address"];
-            this.city = _data["city"];
-            this.state = _data["state"];
-            this.country = _data["country"];
-            this.phone = _data["phone"];
-            this.isActive = _data["isActive"];
-        }
-    }
-
-    static fromJS(data: any): CreateWarehouseCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateWarehouseCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["code"] = this.code;
-        data["address"] = this.address;
-        data["city"] = this.city;
-        data["state"] = this.state;
-        data["country"] = this.country;
-        data["phone"] = this.phone;
-        data["isActive"] = this.isActive;
-        return data;
-    }
-}
-
-export interface ICreateWarehouseCommand {
-    name?: string;
-    code?: string | undefined;
-    address?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    country?: string | undefined;
-    phone?: string | undefined;
-    isActive?: boolean;
-}
-
-export class UpdateWarehouseCommand implements IUpdateWarehouseCommand {
-    warehouseId?: string;
-    name?: string;
-    code?: string | undefined;
-    address?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    country?: string | undefined;
-    phone?: string | undefined;
-    isActive?: boolean;
-
-    constructor(data?: IUpdateWarehouseCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.warehouseId = _data["warehouseId"];
-            this.name = _data["name"];
-            this.code = _data["code"];
-            this.address = _data["address"];
-            this.city = _data["city"];
-            this.state = _data["state"];
-            this.country = _data["country"];
-            this.phone = _data["phone"];
-            this.isActive = _data["isActive"];
-        }
-    }
-
-    static fromJS(data: any): UpdateWarehouseCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateWarehouseCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["warehouseId"] = this.warehouseId;
-        data["name"] = this.name;
-        data["code"] = this.code;
-        data["address"] = this.address;
-        data["city"] = this.city;
-        data["state"] = this.state;
-        data["country"] = this.country;
-        data["phone"] = this.phone;
-        data["isActive"] = this.isActive;
-        return data;
-    }
-}
-
-export interface IUpdateWarehouseCommand {
-    warehouseId?: string;
-    name?: string;
-    code?: string | undefined;
-    address?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    country?: string | undefined;
-    phone?: string | undefined;
-    isActive?: boolean;
 }
 
 export interface FileParameter {

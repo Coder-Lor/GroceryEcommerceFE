@@ -127,8 +127,19 @@
       <small><i class="pi pi-info-circle"></i> Thanh toán nhanh 1 sản phẩm</small>
     </div>
     
-    <button class="btn-checkout" (click)="placeOrder()" [disabled]="products.length === 0">
-      Đặt hàng
+    <button 
+      class="btn-checkout" 
+      (click)="placeOrder()" 
+      [disabled]="products.length === 0 || isProcessing"
+    >
+      <span *ngIf="!isProcessing">
+        <i class="pi pi-shopping-cart me-2"></i>
+        Đặt hàng
+      </span>
+      <span *ngIf="isProcessing">
+        <i class="pi pi-spin pi-spinner me-2"></i>
+        Đang xử lý...
+      </span>
     </button>
   </section>
 </div>
