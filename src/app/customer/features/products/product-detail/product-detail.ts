@@ -2,6 +2,8 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
+import { GalleriaModule } from 'primeng/galleria';
+import { ImageModule } from 'primeng/image';
 import { ProductClient, GetProductBySlugResponse } from '@core/service/system-admin.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -13,10 +15,17 @@ interface Review {
   comment: string;
 }
 
+interface ProductImage {
+  itemImageSrc: string;
+  thumbnailImageSrc: string;
+  alt: string;
+  title: string;
+}
+
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, FormsModule, TabsModule, RouterModule],
+  imports: [CommonModule, FormsModule, TabsModule, RouterModule, GalleriaModule, ImageModule],
   templateUrl: './product-detail.html',
   styleUrl: './product-detail.scss',
 })
@@ -34,7 +43,29 @@ export class ProductDetail implements OnInit, OnDestroy {
   selectedUnit: 'g' | 'kg' = 'g';
   quantity: number = 1;
 
-  cars: any[] = [];
+  productImages: ProductImage[] = [];
+  responsiveOptions: any[] = [
+    {
+      breakpoint: '1400px',
+      numVisible: 5
+    },
+    {
+      breakpoint: '1200px',
+      numVisible: 4
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 5
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 4
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 3
+    }
+  ];
 
   reviews: Review[] = [
     { id: 1, user: 'Alice', rating: 5, comment: 'Tuyệt vời, cà phê thơm ngon!' },
@@ -60,6 +91,7 @@ export class ProductDetail implements OnInit, OnDestroy {
         next: (response) => {
           if (response?.isSuccess && response?.data) {
             this.product = response.data;
+            this.prepareProductImages();
             console.log('✅ Product loaded:', this.product);
           } else {
             console.error('❌ Failed to load product:', response?.errorMessage);
@@ -74,6 +106,35 @@ export class ProductDetail implements OnInit, OnDestroy {
           // this.router.navigate(['/home']);
         }
       });
+  }
+
+  prepareProductImages(): void {
+    if (!this.product) return;
+
+    this.productImages = [];
+    
+    // Thêm ảnh chính (primary image) vào đầu tiên
+    const primaryImage = this.product.primaryImageUrl || '/images/product-image-1.png';
+    this.productImages.push({
+      itemImageSrc: primaryImage,
+      thumbnailImageSrc: primaryImage,
+      alt: this.product.name || 'Product',
+      title: this.product.name || 'Product'
+    });
+
+    // Thêm các ảnh phụ từ images array (nếu có)
+    if (this.product.images && this.product.images.length > 0) {
+      this.product.images.forEach((img, index) => {
+        if (img.imageUrl && img.imageUrl !== primaryImage) {
+          this.productImages.push({
+            itemImageSrc: img.imageUrl,
+            thumbnailImageSrc: img.imageUrl,
+            alt: `${this.product?.name} - Ảnh ${index + 2}`,
+            title: `${this.product?.name} - Ảnh ${index + 2}`
+          });
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {

@@ -88,9 +88,9 @@ export class Home implements OnInit, OnDestroy {
   seconds = '38';
 
   heroSlides: any[] = [
-    { title: 'banner 1', image: '/images/banner-1.jpg' },
-    { title: 'banner 2', image: '/images/banner-2.jpg' },
-    { title: 'banner 3', image: '/images/banner-3.jpg' },
+    { title: 'banner 1', image1: '/images/banner-1.jpg', image2: '/images/banner-2.jpg'},
+    { title: 'banner 2', image1: '/images/banner-3.jpg', image2: '/images/banner-4.jpg'},
+    { title: 'banner 3', image1: '/images/banner-5.jpg', image2: '/images/banner-6.jpg'},
   ];
 
   policies = [
