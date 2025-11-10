@@ -1,3 +1,5 @@
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Component, inject, OnInit, OnDestroy, ViewEncapsulation, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
@@ -6,17 +8,23 @@ import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { CarouselModule } from 'primeng/carousel';
 import { ProductCard } from '../../shared/components/product-card/product-card';
-import { CategoryDto, ProductBaseResponse } from '@core/service/system-admin.service';
+import { ProductBaseResponse, CategoryClient, CategoryDto } from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
 import { ProductService } from '@core/service/product.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
+import { TransferState, makeStateKey } from '@angular/core';
 import { CategoryService } from '@core/service/category.service';
 
 type Product = ProductBaseResponse;
 type UrlObject = {
   url: string;
+}
+type ResponsiveOp = {breakpoint: string, numVisible: number, numScroll: number}
+
+// State key for TransferState
+const CATEGORIES_KEY = makeStateKey<CategoryDto[]>('categories');
 };
 type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number };
 
@@ -39,9 +47,13 @@ type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number 
   host: { ngSkipHydration: 'true' },
 })
 export class Home implements OnInit, OnDestroy {
+export class Home implements OnInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
+  private categoryService = inject(CategoryClient);
+  private transferState = inject(TransferState);
+  private platformId = inject(PLATFORM_ID);
   private categoryService: CategoryService = inject(CategoryService);
   private destroy$ = new Subject<void>();
 
@@ -63,6 +75,7 @@ export class Home implements OnInit, OnDestroy {
     demand: false,
   };
 
+  categories: CategoryDto[] = [];
   categories: CategoryDto[] = [];
 
   brands = [
@@ -175,6 +188,7 @@ export class Home implements OnInit, OnDestroy {
 
   private carouselImages: UrlObject[];
   ngOnInit(): void {
+    this.loadCategories();
     // Initialize carousel images
     this.carouselImages = [
       { url: '/images/banner-s25-ultra.png' },
@@ -226,6 +240,45 @@ export class Home implements OnInit, OnDestroy {
         },
         error: (err) => console.error('Có lỗi xảy ra: ', err),
       });
+  }
+
+  loadCategories(): void {
+    // Kiểm tra xem có dữ liệu trong TransferState không
+    const cachedCategories = this.transferState.get(CATEGORIES_KEY, null);
+
+    if (cachedCategories) {
+      // Sử dụng dữ liệu từ cache
+      this.categories = cachedCategories;
+      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
+      if (isPlatformBrowser(this.platformId)) {
+        this.transferState.remove(CATEGORIES_KEY);
+      }
+    } else {
+      // Gọi API để lấy danh sách danh mục
+      this.categoryService
+        .getCategoryTree()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response?.isSuccess && response?.data) {
+              this.categories = response.data;
+              
+              // Lưu vào TransferState (chỉ trên server)
+              if (isPlatformServer(this.platformId)) {
+                this.transferState.set(CATEGORIES_KEY, this.categories);
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Lỗi khi tải danh mục', err);
+            this.categories = [];
+          },
+        });
+    }
+  }
+
+  getCategoryImage(category: CategoryDto): string {
+    return category.imageUrl || '/images/no-image.png';
   }
 
   loadProducts(): void {
@@ -298,6 +351,11 @@ export class Home implements OnInit, OnDestroy {
     if (event.action === 'done') {
       console.log('Flash sale kết thúc!');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnDestroy(): void {

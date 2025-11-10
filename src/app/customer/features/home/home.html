@@ -4,12 +4,6 @@
       <swiper-slide *ngFor="let slide of heroSlides">
         <div class="hero-slide position-relative rounded-4 overflow-hidden">
           <img [src]="slide.image" class="w-100 h-100 overflow-hidden object-fit-cover" />
-          <!-- <div class="hero-overlay"></div>
-          <div class="hero-content position-absolute text-white">
-            <h1 class="fw-bold mb-3">{{ slide.title }}</h1>
-            <p class="mb-4">{{ slide.subtitle }}</p>
-            <button class="btn btn-light rounded-pill px-4 py-2">Mua ngay</button>
-          </div> -->
         </div>
       </swiper-slide>
     </swiper-container>
@@ -39,8 +33,13 @@
         class="category-slide"
       >
         <div class="category-card text-center">
-          <img src="/images/product-image-1.png" [alt]="category.name" class="category-img" />
-          <p class="category-name mt-2">{{ category.name }}</p>
+          <img 
+            [src]="getCategoryImage(category)" 
+            [alt]="category.name || 'Danh mục'" 
+            class="category-img"
+            onerror="this.src='/images/no-image.png'"
+          />
+          <p class="category-name mt-2">{{ category.name || 'Không có tên' }}</p>
         </div>
       </swiper-slide> -->
     </swiper-container>
@@ -110,12 +109,6 @@
   <div class="product-list container mt-4">
     <p-dataview #dv [value]="products" [layout]="layout">
       <!-- Header -->
-      <ng-template #header>
-        <div class="section-header text-center mb-5">
-          <h3 class="fw-bold title">Sản Phẩm Nổi Bật</h3>
-          <p class="subtitle">Khám phá những sản phẩm được yêu thích nhất</p>
-        </div>
-      </ng-template>
       <!-- GRID layout -->
       <ng-template #grid let-items>
         <div class="row g-4">
