@@ -294,8 +294,8 @@
           <div class="variant-item">
             <div class="variant-content">
               <div class="variant-image">
-                @if (variant.imageUrl) {
-                <img [src]="variant.imageUrl" [alt]="variant.name || 'Variant image'" />
+                @if (getVariantImagePreview($index)) {
+                <img [src]="getVariantImagePreview($index)" [alt]="variant.name || 'Variant image'" />
                 } @else {
                 <div class="no-image">
                   <fa-icon [icon]="faImage" size="2x"></fa-icon>

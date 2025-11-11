@@ -81,6 +81,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   variantImageFile: File | null = null;
   variantImagePreview: string | null = null;
   variantImages: Map<number, File> = new Map(); // Map variant index to image file
+  variantImagePreviews: Map<number, string> = new Map(); // Map variant index to preview URL
   isVariantDragging: boolean = false;
 
   // Font Awesome icons
@@ -801,9 +802,12 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       const variantIndex = this.variants.length;
       this.variants.push(CreateProductVariantRequest.fromJS(this.currentVariant.toJSON()));
       
-      // Store image file if selected
+      // Store image file and preview if selected
       if (this.variantImageFile) {
         this.variantImages.set(variantIndex, this.variantImageFile);
+        if (this.variantImagePreview) {
+          this.variantImagePreviews.set(variantIndex, this.variantImagePreview);
+        }
       }
       
       this.messageService.add({
@@ -817,12 +821,16 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         this.currentVariant.toJSON()
       );
       
-      // Update image file if changed
+      // Update image file and preview if changed
       if (this.variantImageFile) {
         this.variantImages.set(this.editingVariantIndex, this.variantImageFile);
+        if (this.variantImagePreview) {
+          this.variantImagePreviews.set(this.editingVariantIndex, this.variantImagePreview);
+        }
       } else if (!this.variantImagePreview) {
         // Image was removed
         this.variantImages.delete(this.editingVariantIndex);
+        this.variantImagePreviews.delete(this.editingVariantIndex);
         this.variants[this.editingVariantIndex].imageUrl = undefined;
       }
       
@@ -891,6 +899,18 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'VND',
     }).format(value);
+  }
+
+  getVariantImagePreview(index: number): string | null {
+    // First check if there's a preview from uploaded file
+    if (this.variantImagePreviews.has(index)) {
+      return this.variantImagePreviews.get(index) || null;
+    }
+    // Then check if variant has imageUrl from DB
+    if (this.variants[index]?.imageUrl) {
+      return this.variants[index].imageUrl || null;
+    }
+    return null;
   }
 
   // Variant Image Upload Methods
