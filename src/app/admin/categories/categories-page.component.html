@@ -18,13 +18,13 @@
   <div class="page-header">
     <h2>Quản lý danh mục</h2>
     <div class="header-actions">
-      <button class="btn btn-success" (click)="openAddModal()" title="Thêm danh mục">
+      <button class="btn btn-success" (click)="openAddModal()" appTooltip="Thêm danh mục">
         <fa-icon [icon]="faPlus" size="1x"></fa-icon>
       </button>
-      <button class="btn btn-info" (click)="showCategoryReport()" title="Báo cáo tổng quan">
+      <button class="btn btn-info" (click)="showCategoryReport()" appTooltip="Báo cáo tổng quan">
         <fa-icon [icon]="faChartSimple"></fa-icon>
       </button>
-      <button class="btn btn-secondary" (click)="exportReport()" title="Xuất CSV">
+      <button class="btn btn-secondary" (click)="exportReport()" appTooltip="Xuất CSV">
         <fa-icon [icon]="faDownload"></fa-icon>
       </button>
     </div>
@@ -108,16 +108,16 @@
           </td>
           <td class="text-center">{{ formatDate(category.createdAt) }}</td>
           <td class="text-center actions">
-            <button class="btn-icon btn-view" (click)="viewSubCategories(category)" title="Xem danh mục con">
+            <button class="btn-icon btn-view" (click)="viewSubCategories(category)" appTooltip="Xem danh mục con">
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
-            <button class="btn-icon btn-products" (click)="viewCategoryProducts(category)" title="Xem sản phẩm">
+            <button class="btn-icon btn-products" (click)="viewCategoryProducts(category)" appTooltip="Xem sản phẩm">
               <fa-icon [icon]="faBox"></fa-icon>
             </button>
-            <button class="btn-icon btn-edit" (click)="openEditModal(category)" title="Sửa">
+            <button class="btn-icon btn-edit" (click)="openEditModal(category)" appTooltip="Sửa">
               <fa-icon [icon]="faPenToSquare"></fa-icon>
             </button>
-            <button class="btn-icon btn-delete" (click)="confirmDelete(category)" title="Xóa">
+            <button class="btn-icon btn-delete" (click)="confirmDelete(category)" appTooltip="Xóa">
               <fa-icon [icon]="faTrashCan"></fa-icon>
             </button>
           </td>
@@ -172,7 +172,7 @@
               </div>
             </div>
             <div class="sub-cat-actions">
-              <button class="btn-icon btn-edit" (click)="openEditModal(subCat)" title="Sửa">
+              <button class="btn-icon btn-edit" (click)="openEditModal(subCat)" appTooltip="Sửa">
                 <fa-icon [icon]="faPenToSquare"></fa-icon>
               </button>
             </div>

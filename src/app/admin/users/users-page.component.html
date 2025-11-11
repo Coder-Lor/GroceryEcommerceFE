@@ -18,7 +18,7 @@
   <div class="page-header">
     <h2>Quản lý người dùng</h2>
     <div class="header-actions">
-      <button class="btn btn-info" (click)="loadUsers()" title="Tải lại">
+      <button class="btn btn-info" (click)="loadUsers()" appTooltip="Tải lại">
         <fa-icon [icon]="faUser" size="1x"></fa-icon>
       </button>
     </div>
@@ -112,16 +112,16 @@
             {{ formatDate(user.createdAt) }}
           </td>
           <td class="text-center actions">
-            <button class="btn-icon btn-view" (click)="viewUserDetail(user.userId!)" title="Xem chi tiết">
+            <button class="btn-icon btn-view" (click)="viewUserDetail(user.userId!)" appTooltip="Xem chi tiết">
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
-            <button class="btn-icon btn-role" (click)="openRoleModal(user)" title="Quản lý vai trò">
+            <button class="btn-icon btn-role" (click)="openRoleModal(user)" appTooltip="Quản lý vai trò">
               <fa-icon [icon]="faUserShield"></fa-icon>
             </button>
-            <button class="btn-icon btn-edit" (click)="openEditModal(user)" title="Sửa">
+            <button class="btn-icon btn-edit" (click)="openEditModal(user)" appTooltip="Sửa">
               <fa-icon [icon]="faPenToSquare"></fa-icon>
             </button>
-            <button class="btn-icon btn-delete" (click)="confirmDelete(user)" title="Xóa">
+            <button class="btn-icon btn-delete" (click)="confirmDelete(user)" appTooltip="Xóa">
               <fa-icon [icon]="faTrashCan"></fa-icon>
             </button>
           </td>

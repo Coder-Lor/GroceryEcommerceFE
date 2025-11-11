@@ -54,7 +54,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -101,6 +102,30 @@
   gap: 8px;
   transition: all 0.3s ease;
 
+  // &::after {
+  //   content: attr(data-tooltip); /* Lấy nội dung từ data-tooltip */
+  //   position: absolute;
+  //   bottom: 110%;
+  //   left: 50%;
+  //   transform: translateX(-50%);
+
+  //   /* Tùy chỉnh style của bạn ở đây */
+  //   background-color: #333;
+  //   color: #fff;
+  //   padding: 5px 10px;
+  //   border-radius: 4px;
+  //   font-size: 14px;
+  //   white-space: nowrap;
+
+  //   /* Ẩn/hiện */
+  //   opacity: 0;
+  //   visibility: hidden;
+  //   transition: opacity 0.2s ease-in-out;
+  // }
+  // &:hover::after {
+  //   opacity: 1;
+  //   visibility: visible;
+  // }
   .icon {
     font-size: 16px;
   }
@@ -113,6 +138,7 @@
   &.btn-success {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    position: relative;
   }
 
   &.btn-info {
@@ -1013,7 +1039,7 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); // Tăng min-width
   gap: 16px;
   margin-bottom: 32px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr; // 1 cột trên mobile
   }
@@ -1053,7 +1079,7 @@
       margin-bottom: 4px;
       word-break: break-word; // Xuống dòng nếu quá dài
       line-height: 1.2;
-      
+
       // Responsive font size khi text quá dài
       @media (max-width: 768px) {
         font-size: 20px;
@@ -1129,7 +1155,7 @@
   align-items: center;
   gap: 12px;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     width: 20px;
     height: 20px;
     accent-color: #667eea;
@@ -1270,7 +1296,7 @@
       &:disabled {
         cursor: default;
         border-color: transparent;
-        
+
         &:hover {
           background: white;
         }
@@ -1283,16 +1309,16 @@
 ::ng-deep {
   .p-toast {
     z-index: 9999 !important;
-    
+
     .p-toast-message {
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      
+
       // Solid backgrounds with proper text colors
       &.p-toast-message-success {
         background: #22c55e !important;
         border: none !important;
-        
+
         .p-toast-message-icon,
         .p-toast-message-text,
         .p-toast-summary,
@@ -1300,11 +1326,11 @@
           color: white !important;
         }
       }
-      
+
       &.p-toast-message-info {
         background: #3b82f6 !important;
         border: none !important;
-        
+
         .p-toast-message-icon,
         .p-toast-message-text,
         .p-toast-summary,
@@ -1312,11 +1338,11 @@
           color: white !important;
         }
       }
-      
+
       &.p-toast-message-warn {
         background: #f97316 !important;
         border: none !important;
-        
+
         .p-toast-message-icon,
         .p-toast-message-text,
         .p-toast-summary,
@@ -1324,11 +1350,11 @@
           color: white !important;
         }
       }
-      
+
       &.p-toast-message-error {
         background: #ef4444 !important;
         border: none !important;
-        
+
         .p-toast-message-icon,
         .p-toast-message-text,
         .p-toast-summary,
@@ -1336,45 +1362,45 @@
           color: white !important;
         }
       }
-      
+
       .p-toast-icon-close {
         color: white !important;
         opacity: 0.8;
-        
+
         &:hover {
           opacity: 1;
         }
       }
     }
   }
-  
+
   .p-confirm-dialog {
     .p-dialog-content {
       padding: 1.5rem;
     }
-    
+
     .p-dialog-footer {
       padding: 1rem 1.5rem;
-      
+
       button {
         padding: 0.75rem 1.5rem;
         border-radius: 6px;
         font-weight: 500;
         transition: all 0.3s ease;
-        
+
         &.p-button-danger {
           background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
           border: none;
-          
+
           &:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
           }
         }
-        
+
         &.p-button-text {
           color: #666;
-          
+
           &:hover {
             background: #f0f0f0;
           }
@@ -1383,5 +1409,3 @@
     }
   }
 }
-
-
