@@ -43,7 +43,7 @@ export const routes: Routes = [
       { path: 'login', component: Login },
       { path: 'register', component: Register },
       { path: 'product-detail/:slug', component: ProductDetail },      
-      { path: 'categories', component: ProductList },
+      { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
       { path: 'order-result', component: OrderResult },
       { path: 'profile', component: Profile },
