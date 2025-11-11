@@ -993,6 +993,69 @@
         </p>
       </div>
 
+      <!-- Product Images Section -->
+      <div class="product-images-section" *ngIf="productImageUrls.length > 0">
+        <h4 class="section-title">
+          <fa-icon [icon]="faImages"></fa-icon>
+          Chọn ảnh từ sản phẩm gốc (tùy chọn)
+        </h4>
+        <div class="images-gallery">
+          <div 
+            class="image-item" 
+            *ngFor="let imageUrl of productImageUrls"
+            [class.selected]="selectedImageUrl === imageUrl"
+            (click)="selectProductImage(imageUrl)"
+          >
+            <img [src]="imageUrl" alt="Product image" />
+            <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
+              <fa-icon [icon]="faCheck"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload New Image Section -->
+      <div class="upload-image-section">
+        <h4 class="section-title">
+          <fa-icon [icon]="faUpload"></fa-icon>
+          Hoặc tải lên ảnh mới (tùy chọn)
+        </h4>
+        
+        <div class="upload-area" *ngIf="!variantImageFile">
+          <input 
+            type="file" 
+            #variantFileInput
+            accept="image/*"
+            (change)="onVariantImageSelect($event)"
+            style="display: none"
+          />
+          <button 
+            type="button" 
+            class="btn btn-upload"
+            (click)="variantFileInput.click()"
+          >
+            <fa-icon [icon]="faCloudUpload"></fa-icon>
+            Chọn ảnh từ máy tính
+          </button>
+          <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
+        </div>
+
+        <div class="uploaded-image" *ngIf="variantImageFile">
+          <div class="image-preview">
+            <img [src]="variantImagePreview" alt="Uploaded image" />
+            <button 
+              type="button" 
+              class="btn-remove"
+              (click)="removeVariantImage()"
+              appTooltip="Xóa ảnh"
+            >
+              <fa-icon [icon]="faXmark"></fa-icon>
+            </button>
+          </div>
+          <p class="file-name">{{ variantImageFile.name }}</p>
+        </div>
+      </div>
+
       <form #variantForm="ngForm">
         <!-- Basic Information -->
         <div class="form-section">

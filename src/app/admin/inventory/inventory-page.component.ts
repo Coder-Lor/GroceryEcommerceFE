@@ -32,6 +32,9 @@ import {
   faImages,
   faStar,
   faLayerGroup,
+  faCheck,
+  faUpload,
+  faCloudUpload,
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -46,6 +49,7 @@ import {
   UpdateProductCommand,
   ProductVariantClient,
   CreateProductVariantRequest,
+  ProductImageClient,
 } from '@services/system-admin.service';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Product } from './models/product.model';
@@ -98,6 +102,10 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   showVariantModal: boolean = false;
   currentVariant: CreateProductVariantRequest = new CreateProductVariantRequest();
   variantSourceProduct: Product | null = null;
+  productImageUrls: string[] = [];
+  selectedImageUrl: string | null = null;
+  variantImageFile: File | null = null;
+  variantImagePreview: string | null = null;
   
   // Image management for editing
   newImageFiles: File[] = [];
@@ -148,12 +156,16 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   faStar = faStar;
   faStarRegular = faStarRegular;
   faLayerGroup = faLayerGroup;
+  faCheck = faCheck;
+  faUpload = faUpload;
+  faCloudUpload = faCloudUpload;
 
   constructor(
     private inventoryService: InventoryService,
     private categoryClient: CategoryClient,
     private productClient: ProductClient,
     private productVariantClient: ProductVariantClient,
+    private productImageClient: ProductImageClient,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -1197,7 +1209,34 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.currentVariant.dimensions = product.dimensions;
     this.currentVariant.status = product.status || 1;
     
+    // Load product images
+    if (product.productId) {
+      this.loadProductImages(product.productId);
+    }
+    
     this.showVariantModal = true;
+  }
+
+  // Load product images
+  loadProductImages(productId: string): void {
+    this.productImageClient
+      .getUrlsByProduct(productId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.isSuccess && response.data) {
+            this.productImageUrls = response.data;
+          } else {
+            this.productImageUrls = [];
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading product images:', error);
+          this.productImageUrls = [];
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // Close variant modal
@@ -1205,6 +1244,76 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.showVariantModal = false;
     this.currentVariant = new CreateProductVariantRequest();
     this.variantSourceProduct = null;
+    this.productImageUrls = [];
+    this.selectedImageUrl = null;
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+  }
+
+  // Select existing product image for variant
+  selectProductImage(imageUrl: string): void {
+    if (this.selectedImageUrl === imageUrl) {
+      // Deselect if clicking the same image
+      this.selectedImageUrl = null;
+    } else {
+      this.selectedImageUrl = imageUrl;
+      // Clear new image file if selecting existing image
+      this.variantImageFile = null;
+      this.variantImagePreview = null;
+    }
+  }
+
+  // Handle new image file selection for variant
+  onVariantImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `File ${file.name} vượt quá 5MB`,
+          life: 3000,
+        });
+        input.value = '';
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `File ${file.name} không phải là ảnh`,
+          life: 3000,
+        });
+        input.value = '';
+        return;
+      }
+
+      this.variantImageFile = file;
+      // Clear selected existing image if uploading new file
+      this.selectedImageUrl = null;
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.variantImagePreview = e.target?.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset input
+    input.value = '';
+  }
+
+  // Remove selected variant image
+  removeVariantImage(): void {
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+    this.selectedImageUrl = null;
   }
 
   // Save variant
@@ -1215,6 +1324,44 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
 
+    // Prepare the request based on image selection
+    // Case 1: No image - imageUrl and imageFile remain undefined
+    // Case 2: Selected existing image - set imageUrl
+    if (this.selectedImageUrl) {
+      this.currentVariant.imageUrl = this.selectedImageUrl;
+      this.currentVariant.imageFile = undefined;
+    }
+    // Case 3: New image file - set imageFile
+    else if (this.variantImageFile) {
+      // Convert File to FileUploadDto
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const base64Content = (e.target?.result as string).split(',')[1]; // Remove data:image/...;base64, prefix
+        
+        this.currentVariant.imageFile = {
+          content: base64Content,
+          fileName: this.variantImageFile!.name,
+          contentType: this.variantImageFile!.type
+        } as any;
+        this.currentVariant.imageUrl = undefined;
+
+        // Call API after file is converted
+        this.createVariantRequest();
+      };
+      reader.readAsDataURL(this.variantImageFile);
+      return; // Exit here, will continue in reader.onload
+    } else {
+      // Case 1: No image
+      this.currentVariant.imageUrl = undefined;
+      this.currentVariant.imageFile = undefined;
+    }
+
+    // Call API for cases 1 and 2
+    this.createVariantRequest();
+  }
+
+  // Create variant API request
+  private createVariantRequest(): void {
     this.productVariantClient
       .createVariant(this.currentVariant)
       .pipe(takeUntil(this.destroy$))
