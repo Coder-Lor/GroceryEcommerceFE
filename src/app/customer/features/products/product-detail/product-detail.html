@@ -33,6 +33,7 @@
         <div class="product-gallery">
           <p-galleria 
             [value]="productImages" 
+            [(activeIndex)]="activeIndex"
             [responsiveOptions]="responsiveOptions" 
             [containerStyle]="{ 'width': '100%', 'max-width': '100%' }"
             [numVisible]="5"
@@ -40,6 +41,8 @@
             [showItemNavigators]="true"
             [showThumbnails]="productImages.length > 1"
             [showIndicators]="false"
+            [showItemNavigatorsOnHover]="false"
+            [showThumbnailNavigators]="true"
             [thumbnailsPosition]="'bottom'"
             [autoPlay]="false"
             [transitionInterval]="3000"
