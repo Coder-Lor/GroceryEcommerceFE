@@ -25,6 +25,10 @@ import {
   faCalendar,
   faUserShield,
   faUserTag,
+  faAnglesLeft,
+  faAnglesRight,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   User,
@@ -92,6 +96,10 @@ export class UsersPageComponent implements OnInit {
   faCalendar = faCalendar;
   faUserShield = faUserShield;
   faUserTag = faUserTag;
+  faAnglesLeft = faAnglesLeft;
+  faAnglesRight = faAnglesRight;
+  faChevronLeft = faChevronLeft;
+  faChevronRight = faChevronRight;
 
   users: UserData[] = [];
   filteredUsers: UserData[] = [];

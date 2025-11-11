@@ -132,6 +132,76 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-container">
+    <div class="pagination-info">
+      <span>Hiển thị trang {{ currentPage }} / {{ totalPages }}</span>
+      <div class="page-size-selector">
+        <label for="pageSize">Số người dùng mỗi trang:</label>
+        <select
+          id="pageSize"
+          [(ngModel)]="pageSize"
+          (change)="onPageSizeChange()"
+          class="page-size-select"
+        >
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="pagination-controls">
+      <button
+        class="btn-pagination"
+        (click)="onPageChange(1)"
+        [disabled]="currentPage === 1"
+        appTooltip="Trang đầu"
+      >
+        <fa-icon [icon]="faAnglesLeft"></fa-icon>
+      </button>
+
+      <button
+        class="btn-pagination"
+        (click)="onPageChange(currentPage - 1)"
+        [disabled]="currentPage === 1"
+        appTooltip="Trang trước"
+      >
+        <fa-icon [icon]="faChevronLeft"></fa-icon>
+      </button>
+
+      <div class="page-numbers">
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="btn-page"
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
+
+      <button
+        class="btn-pagination"
+        (click)="onPageChange(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+        appTooltip="Trang sau"
+      >
+        <fa-icon [icon]="faChevronRight"></fa-icon>
+      </button>
+
+      <button
+        class="btn-pagination"
+        (click)="onPageChange(totalPages)"
+        [disabled]="currentPage === totalPages"
+        appTooltip="Trang cuối"
+      >
+        <fa-icon [icon]="faAnglesRight"></fa-icon>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal xem chi tiết -->
