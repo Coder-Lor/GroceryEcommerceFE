@@ -94,7 +94,6 @@ export class ProductDetail implements OnInit, OnDestroy {
           if (response?.isSuccess && response?.data) {
             this.product = response.data;
             this.prepareProductImages();
-            console.log('✅ Product loaded:', this.product);
           } else {
             console.error('❌ Failed to load product:', response?.errorMessage);
             // Có thể redirect về trang home hoặc hiển thị thông báo lỗi
