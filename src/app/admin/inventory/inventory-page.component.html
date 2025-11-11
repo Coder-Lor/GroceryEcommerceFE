@@ -114,6 +114,13 @@
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
             <button 
+              class="btn btn-action btn-variant" 
+              (click)="openAddVariantModal(item)"
+              appTooltip="Thêm phân loại"
+            >
+              <fa-icon [icon]="faLayerGroup"></fa-icon>
+            </button>
+            <button 
               class="btn btn-action btn-delete" 
               (click)="confirmDelete(item)"
               appTooltip="Xóa sản phẩm"
@@ -962,6 +969,183 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" (click)="closeStatusFilterModal()">Áp dụng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal thêm variant -->
+<div class="modal-overlay" *ngIf="showVariantModal" (click)="closeVariantModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faLayerGroup"></fa-icon>
+        Thêm phân loại sản phẩm
+      </h3>
+      <button class="btn-close" (click)="closeVariantModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="source-product-info" *ngIf="variantSourceProduct">
+        <p class="info-text">
+          <strong>Sản phẩm gốc:</strong> {{ variantSourceProduct.name }}
+        </p>
+      </div>
+
+      <form #variantForm="ngForm">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin cơ bản
+          </h4>
+          
+          <div class="form-group">
+            <label>Mã SKU <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.sku"
+              name="variantSku"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Tên phân loại <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.name"
+              name="variantName"
+              class="form-control"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faMoneyBill"></fa-icon>
+            Thông tin giá
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Giá bán <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.price"
+                name="variantPrice"
+                class="form-control"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Giá giảm</label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.discountPrice"
+                name="variantDiscountPrice"
+                class="form-control"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin kho
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Số lượng tồn kho <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.stockQuantity"
+                name="variantStockQuantity"
+                class="form-control"
+                min="0"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Mức tồn tối thiểu <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.minStockLevel"
+                name="variantMinStockLevel"
+                class="form-control"
+                min="0"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Trọng lượng (kg)</label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.weight"
+                name="variantWeight"
+                class="form-control"
+                min="0"
+                step="0.01"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Kích thước</label>
+              <input
+                type="text"
+                [(ngModel)]="currentVariant.dimensions"
+                name="variantDimensions"
+                class="form-control"
+                placeholder="DxRxC (mm)"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Trạng thái
+          </h4>
+
+          <div class="form-group">
+            <label>Trạng thái <span class="required">*</span></label>
+            <select
+              [(ngModel)]="currentVariant.status"
+              name="variantStatus"
+              class="form-control"
+              required
+            >
+              <option [value]="0">Không hoạt động</option>
+              <option [value]="1">Hoạt động</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeVariantModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveVariant()">
+        Thêm phân loại
+      </button>
     </div>
   </div>
 </div>

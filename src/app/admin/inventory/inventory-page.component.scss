@@ -424,6 +424,15 @@
         }
       }
 
+      &.btn-variant {
+        color: #4caf50;
+
+        &:hover {
+          background: rgba(76, 175, 80, 0.1);
+          color: #43a047;
+        }
+      }
+
       &.btn-delete {
         color: #f5576c;
 
@@ -1409,3 +1418,24 @@
     }
   }
 }
+
+// Variant Modal Styles
+.source-product-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+  .info-text {
+    margin: 0;
+    color: white;
+    font-size: 14px;
+    line-height: 1.6;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+}
+
