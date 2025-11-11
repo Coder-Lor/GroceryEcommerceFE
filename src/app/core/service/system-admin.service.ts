@@ -9255,448 +9255,6 @@ export class RefreshTokenClient {
 @Injectable({
     providedIn: 'root'
 })
-export class StockMovementClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ?? "https://localhost:44394";
-    }
-
-    getStockMovementsPaging(page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/StockMovement/paging?";
-        if (page === null)
-            throw new globalThis.Error("The parameter 'page' cannot be null.");
-        else if (page !== undefined)
-            url_ += "Page=" + encodeURIComponent("" + page) + "&";
-        if (pageSize === null)
-            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        if (search !== undefined && search !== null)
-            url_ += "Search=" + encodeURIComponent("" + search) + "&";
-        if (sortBy !== undefined && sortBy !== null)
-            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
-        if (sortDirection === null)
-            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
-        else if (sortDirection !== undefined)
-            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
-        if (filters === null)
-            throw new globalThis.Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            filters && filters.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (entityType !== undefined && entityType !== null)
-            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
-        if (availableFields !== undefined && availableFields !== null)
-            availableFields && availableFields.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (hasFilters === null)
-            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
-        else if (hasFilters !== undefined)
-            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
-        if (hasSearch === null)
-            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
-        else if (hasSearch !== undefined)
-            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
-        if (hasSorting === null)
-            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
-        else if (hasSorting !== undefined)
-            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetStockMovementsPaging(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetStockMovementsPaging(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetStockMovementsPaging(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getStockMovementById(movementId: string): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/StockMovement/{movementId}";
-        if (movementId === undefined || movementId === null)
-            throw new globalThis.Error("The parameter 'movementId' must be defined.");
-        url_ = url_.replace("{movementId}", encodeURIComponent("" + movementId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetStockMovementById(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetStockMovementById(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetStockMovementById(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getStockMovementsByProduct(productId: string, page: number | undefined, pageSize: number | undefined, search: string | null | undefined, sortBy: string | null | undefined, sortDirection: SortDirection | undefined, filters: FilterCriteria[] | undefined, entityType: string | null | undefined, availableFields: SearchableField[] | null | undefined, hasFilters: boolean | undefined, hasSearch: boolean | undefined, hasSorting: boolean | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/StockMovement/product/{productId}/paging?";
-        if (productId === undefined || productId === null)
-            throw new globalThis.Error("The parameter 'productId' must be defined.");
-        url_ = url_.replace("{productId}", encodeURIComponent("" + productId));
-        if (page === null)
-            throw new globalThis.Error("The parameter 'page' cannot be null.");
-        else if (page !== undefined)
-            url_ += "Page=" + encodeURIComponent("" + page) + "&";
-        if (pageSize === null)
-            throw new globalThis.Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        if (search !== undefined && search !== null)
-            url_ += "Search=" + encodeURIComponent("" + search) + "&";
-        if (sortBy !== undefined && sortBy !== null)
-            url_ += "SortBy=" + encodeURIComponent("" + sortBy) + "&";
-        if (sortDirection === null)
-            throw new globalThis.Error("The parameter 'sortDirection' cannot be null.");
-        else if (sortDirection !== undefined)
-            url_ += "SortDirection=" + encodeURIComponent("" + sortDirection) + "&";
-        if (filters === null)
-            throw new globalThis.Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            filters && filters.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (entityType !== undefined && entityType !== null)
-            url_ += "EntityType=" + encodeURIComponent("" + entityType) + "&";
-        if (availableFields !== undefined && availableFields !== null)
-            availableFields && availableFields.forEach((item, index) => {
-                for (const attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "AvailableFields[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (hasFilters === null)
-            throw new globalThis.Error("The parameter 'hasFilters' cannot be null.");
-        else if (hasFilters !== undefined)
-            url_ += "HasFilters=" + encodeURIComponent("" + hasFilters) + "&";
-        if (hasSearch === null)
-            throw new globalThis.Error("The parameter 'hasSearch' cannot be null.");
-        else if (hasSearch !== undefined)
-            url_ += "HasSearch=" + encodeURIComponent("" + hasSearch) + "&";
-        if (hasSorting === null)
-            throw new globalThis.Error("The parameter 'hasSorting' cannot be null.");
-        else if (hasSorting !== undefined)
-            url_ += "HasSorting=" + encodeURIComponent("" + hasSorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetStockMovementsByProduct(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetStockMovementsByProduct(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetStockMovementsByProduct(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    getCurrentStock(productId: string | undefined): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/StockMovement/current-stock?";
-        if (productId === null)
-            throw new globalThis.Error("The parameter 'productId' cannot be null.");
-        else if (productId !== undefined)
-            url_ += "productId=" + encodeURIComponent("" + productId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetCurrentStock(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetCurrentStock(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processGetCurrentStock(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    createStockMovement(command: CreateStockMovementCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/StockMovement";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateStockMovement(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreateStockMovement(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processCreateStockMovement(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    adjustStock(command: AdjustStockCommand): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/StockMovement/adjust";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(command);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            withCredentials: true,
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAdjustStock(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processAdjustStock(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
-        }));
-    }
-
-    protected processAdjustStock(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-}
-
-@Injectable({
-    providedIn: 'root'
-})
 export class UserAddressClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -13115,7 +12673,6 @@ export class Product implements IProduct {
     productTagAssignments?: ProductTagAssignment[];
     productQuestions?: ProductQuestion[];
     reviews?: ProductReview[];
-    stockMovements?: StockMovement[];
 
     constructor(data?: IProduct) {
         if (data) {
@@ -13185,11 +12742,6 @@ export class Product implements IProduct {
                 this.reviews = [] as any;
                 for (let item of _data["reviews"])
                     this.reviews!.push(ProductReview.fromJS(item));
-            }
-            if (Array.isArray(_data["stockMovements"])) {
-                this.stockMovements = [] as any;
-                for (let item of _data["stockMovements"])
-                    this.stockMovements!.push(StockMovement.fromJS(item));
             }
         }
     }
@@ -13261,11 +12813,6 @@ export class Product implements IProduct {
             for (let item of this.reviews)
                 data["reviews"].push(item ? item.toJSON() : undefined as any);
         }
-        if (Array.isArray(this.stockMovements)) {
-            data["stockMovements"] = [];
-            for (let item of this.stockMovements)
-                data["stockMovements"].push(item ? item.toJSON() : undefined as any);
-        }
         return data;
     }
 }
@@ -13305,7 +12852,6 @@ export interface IProduct {
     productTagAssignments?: ProductTagAssignment[];
     productQuestions?: ProductQuestion[];
     reviews?: ProductReview[];
-    stockMovements?: StockMovement[];
 }
 
 export class Category implements ICategory {
@@ -13736,6 +13282,7 @@ export class ProductVariant implements IProductVariant {
     price!: number;
     discountPrice?: number | undefined;
     stockQuantity?: number;
+    minStockLevel?: number;
     weight?: number | undefined;
     imageUrl?: string | undefined;
     status?: number;
@@ -13762,6 +13309,7 @@ export class ProductVariant implements IProductVariant {
             this.price = _data["price"];
             this.discountPrice = _data["discountPrice"];
             this.stockQuantity = _data["stockQuantity"];
+            this.minStockLevel = _data["minStockLevel"];
             this.weight = _data["weight"];
             this.imageUrl = _data["imageUrl"];
             this.status = _data["status"];
@@ -13792,6 +13340,7 @@ export class ProductVariant implements IProductVariant {
         data["price"] = this.price;
         data["discountPrice"] = this.discountPrice;
         data["stockQuantity"] = this.stockQuantity;
+        data["minStockLevel"] = this.minStockLevel;
         data["weight"] = this.weight;
         data["imageUrl"] = this.imageUrl;
         data["status"] = this.status;
@@ -13815,6 +13364,7 @@ export interface IProductVariant {
     price: number;
     discountPrice?: number | undefined;
     stockQuantity?: number;
+    minStockLevel?: number;
     weight?: number | undefined;
     imageUrl?: string | undefined;
     status?: number;
@@ -14541,15 +14091,11 @@ export class OrderShipment implements IOrderShipment {
     shippedAt?: Date | undefined;
     deliveredAt?: Date | undefined;
     status?: number;
-    shippingCost?: number;
-    warehouseId?: string | undefined;
+    shippingCost?: number | undefined;
     createdAt?: Date;
     updatedAt?: Date | undefined;
-    shippedBy?: string | undefined;
     order?: Order;
     shipmentCarrier?: ShipmentCarrier | undefined;
-    warehouse?: Warehouse | undefined;
-    shippedByUser?: User | undefined;
     shipmentItems?: ShipmentItem[];
 
     constructor(data?: IOrderShipment) {
@@ -14572,14 +14118,10 @@ export class OrderShipment implements IOrderShipment {
             this.deliveredAt = _data["deliveredAt"] ? new Date(_data["deliveredAt"].toString()) : undefined as any;
             this.status = _data["status"];
             this.shippingCost = _data["shippingCost"];
-            this.warehouseId = _data["warehouseId"];
             this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
-            this.shippedBy = _data["shippedBy"];
             this.order = _data["order"] ? Order.fromJS(_data["order"]) : undefined as any;
             this.shipmentCarrier = _data["shipmentCarrier"] ? ShipmentCarrier.fromJS(_data["shipmentCarrier"]) : undefined as any;
-            this.warehouse = _data["warehouse"] ? Warehouse.fromJS(_data["warehouse"]) : undefined as any;
-            this.shippedByUser = _data["shippedByUser"] ? User.fromJS(_data["shippedByUser"]) : undefined as any;
             if (Array.isArray(_data["shipmentItems"])) {
                 this.shipmentItems = [] as any;
                 for (let item of _data["shipmentItems"])
@@ -14606,14 +14148,10 @@ export class OrderShipment implements IOrderShipment {
         data["deliveredAt"] = this.deliveredAt ? this.deliveredAt.toISOString() : undefined as any;
         data["status"] = this.status;
         data["shippingCost"] = this.shippingCost;
-        data["warehouseId"] = this.warehouseId;
         data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
-        data["shippedBy"] = this.shippedBy;
         data["order"] = this.order ? this.order.toJSON() : undefined as any;
         data["shipmentCarrier"] = this.shipmentCarrier ? this.shipmentCarrier.toJSON() : undefined as any;
-        data["warehouse"] = this.warehouse ? this.warehouse.toJSON() : undefined as any;
-        data["shippedByUser"] = this.shippedByUser ? this.shippedByUser.toJSON() : undefined as any;
         if (Array.isArray(this.shipmentItems)) {
             data["shipmentItems"] = [];
             for (let item of this.shipmentItems)
@@ -14632,15 +14170,11 @@ export interface IOrderShipment {
     shippedAt?: Date | undefined;
     deliveredAt?: Date | undefined;
     status?: number;
-    shippingCost?: number;
-    warehouseId?: string | undefined;
+    shippingCost?: number | undefined;
     createdAt?: Date;
     updatedAt?: Date | undefined;
-    shippedBy?: string | undefined;
     order?: Order;
     shipmentCarrier?: ShipmentCarrier | undefined;
-    warehouse?: Warehouse | undefined;
-    shippedByUser?: User | undefined;
     shipmentItems?: ShipmentItem[];
 }
 
@@ -14710,362 +14244,6 @@ export interface IShipmentCarrier {
     phone?: string | undefined;
     createdAt?: Date;
     orderShipments?: OrderShipment[];
-}
-
-export class Warehouse implements IWarehouse {
-    warehouseId?: string;
-    name!: string;
-    code?: string | undefined;
-    address?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    country?: string | undefined;
-    phone?: string | undefined;
-    isActive?: boolean;
-    createdAt?: Date;
-    purchaseOrders?: PurchaseOrder[];
-    orderShipments?: OrderShipment[];
-    stockMovements?: StockMovement[];
-
-    constructor(data?: IWarehouse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.warehouseId = _data["warehouseId"];
-            this.name = _data["name"];
-            this.code = _data["code"];
-            this.address = _data["address"];
-            this.city = _data["city"];
-            this.state = _data["state"];
-            this.country = _data["country"];
-            this.phone = _data["phone"];
-            this.isActive = _data["isActive"];
-            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
-            if (Array.isArray(_data["purchaseOrders"])) {
-                this.purchaseOrders = [] as any;
-                for (let item of _data["purchaseOrders"])
-                    this.purchaseOrders!.push(PurchaseOrder.fromJS(item));
-            }
-            if (Array.isArray(_data["orderShipments"])) {
-                this.orderShipments = [] as any;
-                for (let item of _data["orderShipments"])
-                    this.orderShipments!.push(OrderShipment.fromJS(item));
-            }
-            if (Array.isArray(_data["stockMovements"])) {
-                this.stockMovements = [] as any;
-                for (let item of _data["stockMovements"])
-                    this.stockMovements!.push(StockMovement.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): Warehouse {
-        data = typeof data === 'object' ? data : {};
-        let result = new Warehouse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["warehouseId"] = this.warehouseId;
-        data["name"] = this.name;
-        data["code"] = this.code;
-        data["address"] = this.address;
-        data["city"] = this.city;
-        data["state"] = this.state;
-        data["country"] = this.country;
-        data["phone"] = this.phone;
-        data["isActive"] = this.isActive;
-        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
-        if (Array.isArray(this.purchaseOrders)) {
-            data["purchaseOrders"] = [];
-            for (let item of this.purchaseOrders)
-                data["purchaseOrders"].push(item ? item.toJSON() : undefined as any);
-        }
-        if (Array.isArray(this.orderShipments)) {
-            data["orderShipments"] = [];
-            for (let item of this.orderShipments)
-                data["orderShipments"].push(item ? item.toJSON() : undefined as any);
-        }
-        if (Array.isArray(this.stockMovements)) {
-            data["stockMovements"] = [];
-            for (let item of this.stockMovements)
-                data["stockMovements"].push(item ? item.toJSON() : undefined as any);
-        }
-        return data;
-    }
-}
-
-export interface IWarehouse {
-    warehouseId?: string;
-    name: string;
-    code?: string | undefined;
-    address?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    country?: string | undefined;
-    phone?: string | undefined;
-    isActive?: boolean;
-    createdAt?: Date;
-    purchaseOrders?: PurchaseOrder[];
-    orderShipments?: OrderShipment[];
-    stockMovements?: StockMovement[];
-}
-
-export class PurchaseOrder implements IPurchaseOrder {
-    purchaseOrderId?: string;
-    orderNumber!: string;
-    orderDate?: Date;
-    expectedDate?: Date | undefined;
-    status?: number;
-    totalAmount?: number;
-    createdBy?: string | undefined;
-    createdAt?: Date;
-    updatedAt?: Date | undefined;
-    createdByUser?: User | undefined;
-    purchaseOrderItems?: PurchaseOrderItem[];
-
-    constructor(data?: IPurchaseOrder) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.purchaseOrderId = _data["purchaseOrderId"];
-            this.orderNumber = _data["orderNumber"];
-            this.orderDate = _data["orderDate"] ? new Date(_data["orderDate"].toString()) : undefined as any;
-            this.expectedDate = _data["expectedDate"] ? new Date(_data["expectedDate"].toString()) : undefined as any;
-            this.status = _data["status"];
-            this.totalAmount = _data["totalAmount"];
-            this.createdBy = _data["createdBy"];
-            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
-            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
-            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
-            if (Array.isArray(_data["purchaseOrderItems"])) {
-                this.purchaseOrderItems = [] as any;
-                for (let item of _data["purchaseOrderItems"])
-                    this.purchaseOrderItems!.push(PurchaseOrderItem.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): PurchaseOrder {
-        data = typeof data === 'object' ? data : {};
-        let result = new PurchaseOrder();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["purchaseOrderId"] = this.purchaseOrderId;
-        data["orderNumber"] = this.orderNumber;
-        data["orderDate"] = this.orderDate ? this.orderDate.toISOString() : undefined as any;
-        data["expectedDate"] = this.expectedDate ? this.expectedDate.toISOString() : undefined as any;
-        data["status"] = this.status;
-        data["totalAmount"] = this.totalAmount;
-        data["createdBy"] = this.createdBy;
-        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
-        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
-        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
-        if (Array.isArray(this.purchaseOrderItems)) {
-            data["purchaseOrderItems"] = [];
-            for (let item of this.purchaseOrderItems)
-                data["purchaseOrderItems"].push(item ? item.toJSON() : undefined as any);
-        }
-        return data;
-    }
-}
-
-export interface IPurchaseOrder {
-    purchaseOrderId?: string;
-    orderNumber: string;
-    orderDate?: Date;
-    expectedDate?: Date | undefined;
-    status?: number;
-    totalAmount?: number;
-    createdBy?: string | undefined;
-    createdAt?: Date;
-    updatedAt?: Date | undefined;
-    createdByUser?: User | undefined;
-    purchaseOrderItems?: PurchaseOrderItem[];
-}
-
-export class PurchaseOrderItem implements IPurchaseOrderItem {
-    poiId?: string;
-    purchaseOrderId?: string;
-    productId?: string;
-    variantId?: string | undefined;
-    quantity?: number;
-    unitCost!: number;
-    totalCost!: number;
-    purchaseOrder?: PurchaseOrder;
-    product?: Product;
-    productVariant?: ProductVariant | undefined;
-
-    constructor(data?: IPurchaseOrderItem) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.poiId = _data["poiId"];
-            this.purchaseOrderId = _data["purchaseOrderId"];
-            this.productId = _data["productId"];
-            this.variantId = _data["variantId"];
-            this.quantity = _data["quantity"];
-            this.unitCost = _data["unitCost"];
-            this.totalCost = _data["totalCost"];
-            this.purchaseOrder = _data["purchaseOrder"] ? PurchaseOrder.fromJS(_data["purchaseOrder"]) : undefined as any;
-            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
-            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
-        }
-    }
-
-    static fromJS(data: any): PurchaseOrderItem {
-        data = typeof data === 'object' ? data : {};
-        let result = new PurchaseOrderItem();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["poiId"] = this.poiId;
-        data["purchaseOrderId"] = this.purchaseOrderId;
-        data["productId"] = this.productId;
-        data["variantId"] = this.variantId;
-        data["quantity"] = this.quantity;
-        data["unitCost"] = this.unitCost;
-        data["totalCost"] = this.totalCost;
-        data["purchaseOrder"] = this.purchaseOrder ? this.purchaseOrder.toJSON() : undefined as any;
-        data["product"] = this.product ? this.product.toJSON() : undefined as any;
-        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
-        return data;
-    }
-}
-
-export interface IPurchaseOrderItem {
-    poiId?: string;
-    purchaseOrderId?: string;
-    productId?: string;
-    variantId?: string | undefined;
-    quantity?: number;
-    unitCost: number;
-    totalCost: number;
-    purchaseOrder?: PurchaseOrder;
-    product?: Product;
-    productVariant?: ProductVariant | undefined;
-}
-
-export class StockMovement implements IStockMovement {
-    movementId?: string;
-    productId?: string;
-    productVariantId?: string | undefined;
-    movementType?: number;
-    quantity?: number;
-    previousStock?: number;
-    newStock?: number;
-    reason?: string | undefined;
-    referenceId?: string | undefined;
-    referenceType?: number | undefined;
-    createdAt?: Date;
-    createdBy?: string;
-    product?: Product;
-    productVariant?: ProductVariant | undefined;
-    createdByUser?: User;
-
-    constructor(data?: IStockMovement) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.movementId = _data["movementId"];
-            this.productId = _data["productId"];
-            this.productVariantId = _data["productVariantId"];
-            this.movementType = _data["movementType"];
-            this.quantity = _data["quantity"];
-            this.previousStock = _data["previousStock"];
-            this.newStock = _data["newStock"];
-            this.reason = _data["reason"];
-            this.referenceId = _data["referenceId"];
-            this.referenceType = _data["referenceType"];
-            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
-            this.createdBy = _data["createdBy"];
-            this.product = _data["product"] ? Product.fromJS(_data["product"]) : undefined as any;
-            this.productVariant = _data["productVariant"] ? ProductVariant.fromJS(_data["productVariant"]) : undefined as any;
-            this.createdByUser = _data["createdByUser"] ? User.fromJS(_data["createdByUser"]) : undefined as any;
-        }
-    }
-
-    static fromJS(data: any): StockMovement {
-        data = typeof data === 'object' ? data : {};
-        let result = new StockMovement();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["movementId"] = this.movementId;
-        data["productId"] = this.productId;
-        data["productVariantId"] = this.productVariantId;
-        data["movementType"] = this.movementType;
-        data["quantity"] = this.quantity;
-        data["previousStock"] = this.previousStock;
-        data["newStock"] = this.newStock;
-        data["reason"] = this.reason;
-        data["referenceId"] = this.referenceId;
-        data["referenceType"] = this.referenceType;
-        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
-        data["createdBy"] = this.createdBy;
-        data["product"] = this.product ? this.product.toJSON() : undefined as any;
-        data["productVariant"] = this.productVariant ? this.productVariant.toJSON() : undefined as any;
-        data["createdByUser"] = this.createdByUser ? this.createdByUser.toJSON() : undefined as any;
-        return data;
-    }
-}
-
-export interface IStockMovement {
-    movementId?: string;
-    productId?: string;
-    productVariantId?: string | undefined;
-    movementType?: number;
-    quantity?: number;
-    previousStock?: number;
-    newStock?: number;
-    reason?: string | undefined;
-    referenceId?: string | undefined;
-    referenceType?: number | undefined;
-    createdAt?: Date;
-    createdBy?: string;
-    product?: Product;
-    productVariant?: ProductVariant | undefined;
-    createdByUser?: User;
 }
 
 export class OrderStatusHistory implements IOrderStatusHistory {
@@ -23176,98 +22354,6 @@ export interface IResultOfListOfRefreshToken {
     errorMessage?: string | undefined;
     errorCode?: string | undefined;
     errors?: string[];
-}
-
-export class CreateStockMovementCommand implements ICreateStockMovementCommand {
-    productId?: string;
-    movementType?: number;
-    quantity?: number;
-    reason?: string;
-
-    constructor(data?: ICreateStockMovementCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.productId = _data["productId"];
-            this.movementType = _data["movementType"];
-            this.quantity = _data["quantity"];
-            this.reason = _data["reason"];
-        }
-    }
-
-    static fromJS(data: any): CreateStockMovementCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateStockMovementCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["productId"] = this.productId;
-        data["movementType"] = this.movementType;
-        data["quantity"] = this.quantity;
-        data["reason"] = this.reason;
-        return data;
-    }
-}
-
-export interface ICreateStockMovementCommand {
-    productId?: string;
-    movementType?: number;
-    quantity?: number;
-    reason?: string;
-}
-
-export class AdjustStockCommand implements IAdjustStockCommand {
-    productId?: string;
-    quantity?: number;
-    reason?: string;
-
-    constructor(data?: IAdjustStockCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.productId = _data["productId"];
-            this.quantity = _data["quantity"];
-            this.reason = _data["reason"];
-        }
-    }
-
-    static fromJS(data: any): AdjustStockCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new AdjustStockCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["productId"] = this.productId;
-        data["quantity"] = this.quantity;
-        data["reason"] = this.reason;
-        return data;
-    }
-}
-
-export interface IAdjustStockCommand {
-    productId?: string;
-    quantity?: number;
-    reason?: string;
 }
 
 export class ResultOfPagedResultOfUserAddress implements IResultOfPagedResultOfUserAddress {

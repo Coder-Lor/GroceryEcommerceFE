@@ -19,13 +19,13 @@
   <div class="page-header">
     <h2>Quản lý kho hàng</h2>
     <div class="header-actions">
-      <button class="btn btn-success" (click)="openAddModal()" title="Thêm sản phẩm">
+      <button class="btn btn-success" (click)="openAddModal()" appTooltip="Thêm sản phẩm">
         <fa-icon [icon]="faPlus" size="1x"></fa-icon>
       </button>
-      <button class="btn btn-info" (click)="showInventoryReport()" title="Báo cáo tổng quan">
+      <button class="btn btn-info" (click)="showInventoryReport()" appTooltip="Báo cáo tổng quan">
         <fa-icon [icon]="faChartSimple"></fa-icon>
       </button>
-      <button class="btn btn-secondary" (click)="exportReport()" title="Xuất CSV">
+      <button class="btn btn-secondary" (click)="exportReport()" appTooltip="Xuất CSV">
         <fa-icon [icon]="faDownload"></fa-icon>
       </button>
     </div>
@@ -43,10 +43,10 @@
       />
       <button 
         type="button" 
-        class="search-button"
+        class="btn search-button"
         (click)="onSearch()"
         [disabled]="isLoading"
-        title="Tìm kiếm"
+        appTooltip="Tìm kiếm"
       >
         <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
       </button>
@@ -107,16 +107,16 @@
 
           <div class="card-actions">
             <button 
-              class="btn-action btn-view" 
+              class="btn btn-action btn-view" 
               (click)="viewProductDetail(item)"
-              title="Xem chi tiết"
+              appTooltip="Xem chi tiết"
             >
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
             <button 
-              class="btn-action btn-delete" 
+              class="btn btn-action btn-delete" 
               (click)="confirmDelete(item)"
-              title="Xóa sản phẩm"
+              appTooltip="Xóa sản phẩm"
             >
               <fa-icon [icon]="faTrashCan"></fa-icon>
             </button>
@@ -155,7 +155,7 @@
         class="btn-pagination"
         (click)="goToFirstPage()"
         [disabled]="!hasPreviousPage"
-        title="Trang đầu"
+        appTooltip="Trang đầu"
       >
         <fa-icon [icon]="faAnglesLeft"></fa-icon>
       </button>
@@ -164,7 +164,7 @@
         class="btn-pagination"
         (click)="goToPreviousPage()"
         [disabled]="!hasPreviousPage"
-        title="Trang trước"
+        appTooltip="Trang trước"
       >
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
@@ -186,7 +186,7 @@
         class="btn-pagination"
         (click)="goToNextPage()"
         [disabled]="!hasNextPage"
-        title="Trang sau"
+        appTooltip="Trang sau"
       >
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>
@@ -195,7 +195,7 @@
         class="btn-pagination"
         (click)="goToLastPage()"
         [disabled]="!hasNextPage"
-        title="Trang cuối"
+        appTooltip="Trang cuối"
       >
         <fa-icon [icon]="faAnglesRight"></fa-icon>
       </button>
@@ -379,7 +379,7 @@
                         class="btn-image-action"
                         (click)="setEditPrimaryImage(idx)"
                         [class.active]="img.isPrimary"
-                        title="Đặt làm ảnh chính"
+                        appTooltip="Đặt làm ảnh chính"
                       >
                         <fa-icon [icon]="img.isPrimary ? faStar : faStarRegular"></fa-icon>
                       </button>
@@ -387,7 +387,7 @@
                         type="button" 
                         class="btn-image-action btn-delete-image"
                         (click)="removeEditImage(idx)"
-                        title="Xóa ảnh"
+                        appTooltip="Xóa ảnh"
                       >
                         <fa-icon [icon]="faTrashCan"></fa-icon>
                       </button>

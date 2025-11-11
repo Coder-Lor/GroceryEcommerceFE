@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { UserService } from '../../core/service/user.service';
 import { LoadingOverlayComponent } from '../layout/loading-overlay/loading-overlay.component';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -24,12 +24,16 @@ import {
   faPhone,
   faCalendar,
   faUserShield,
-  faUserTag
+  faUserTag,
+  faAnglesLeft,
+  faAnglesRight,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
-import { 
-  User, 
-  UpdateUserCommand, 
-  SortDirection, 
+import {
+  User,
+  UpdateUserCommand,
+  SortDirection,
   FilterCriteria,
   ResultOfUser,
   ResultOfBoolean,
@@ -39,8 +43,9 @@ import {
   RemoveUserRoleCommand,
   ResultOfPagedResultOfUserRole,
   ResultOfListOfString,
-  UserRole
+  UserRole,
 } from '../../core/service/system-admin.service';
+import { TooltipDirective } from '@shared/directives/tooltip';
 
 interface UserData {
   userId?: string;
@@ -61,8 +66,16 @@ interface UserData {
   standalone: true,
   templateUrl: 'users-page.component.html',
   styleUrl: './users-page.component.scss',
-  imports: [CommonModule, FormsModule, LoadingOverlayComponent, FaIconComponent, ToastModule, ConfirmDialogModule],
-  providers: [MessageService, ConfirmationService]
+  imports: [
+    CommonModule,
+    FormsModule,
+    LoadingOverlayComponent,
+    FaIconComponent,
+    ToastModule,
+    ConfirmDialogModule,
+    TooltipDirective
+  ],
+  providers: [MessageService, ConfirmationService],
 })
 export class UsersPageComponent implements OnInit {
   // Font Awesome icons
@@ -83,6 +96,10 @@ export class UsersPageComponent implements OnInit {
   faCalendar = faCalendar;
   faUserShield = faUserShield;
   faUserTag = faUserTag;
+  faAnglesLeft = faAnglesLeft;
+  faAnglesRight = faAnglesRight;
+  faChevronLeft = faChevronLeft;
+  faChevronRight = faChevronRight;
 
   users: UserData[] = [];
   filteredUsers: UserData[] = [];
@@ -91,31 +108,31 @@ export class UsersPageComponent implements OnInit {
   isDetailModalOpen = false;
   isEditModalOpen = false;
   isRoleModalOpen = false;
-  
+
   // Pagination
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
   totalRecords = 0;
-  
+
   // Search & Filter
   searchTerm = '';
   sortColumn = 'createdAt';
   sortDirection: 'asc' | 'desc' = 'desc';
-  
+
   // Edit form
   editForm: UpdateUserCommand = {} as UpdateUserCommand;
-  
+
   // Role management
   availableRoles: UserRole[] = [];
   userRoles: string[] = [];
   selectedRoleIds: string[] = [];
-  
+
   // Status options
   statusOptions = [
     { value: 0, label: 'Không hoạt động' },
     { value: 1, label: 'Hoạt động' },
-    { value: 2, label: 'Bị khóa' }
+    { value: 2, label: 'Bị khóa' },
   ];
 
   // Expose Math and SortDirection to template
@@ -147,7 +164,7 @@ export class UsersPageComponent implements OnInit {
       },
       error: (error) => {
         console.error('Lỗi khi tải danh sách vai trò:', error);
-      }
+      },
     });
   }
 
@@ -156,9 +173,10 @@ export class UsersPageComponent implements OnInit {
    */
   loadUsers(): void {
     this.isLoading = true;
-    
-    const apiSortDirection = this.sortDirection === 'asc' ? SortDirection.Ascending : SortDirection.Descending;
-    
+
+    const apiSortDirection =
+      this.sortDirection === 'asc' ? SortDirection.Ascending : SortDirection.Descending;
+
     this.userService.getUsersPaging(
       this.currentPage,
       this.pageSize,
@@ -173,7 +191,7 @@ export class UsersPageComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Lỗi',
-          detail: 'Không thể tải danh sách người dùng!'
+          detail: 'Không thể tải danh sách người dùng!',
         });
       },
       this.searchTerm || undefined,
@@ -204,7 +222,7 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Không thể tải dữ liệu người dùng'
+            detail: 'Không thể tải dữ liệu người dùng',
           });
         }
       };
@@ -220,12 +238,13 @@ export class UsersPageComponent implements OnInit {
       this.filteredUsers = [...this.users];
     } else {
       const term = this.searchTerm.toLowerCase().trim();
-      this.filteredUsers = this.users.filter(user =>
-        user.username?.toLowerCase().includes(term) ||
-        user.email?.toLowerCase().includes(term) ||
-        user.firstName?.toLowerCase().includes(term) ||
-        user.lastName?.toLowerCase().includes(term) ||
-        user.phoneNumber?.toLowerCase().includes(term)
+      this.filteredUsers = this.users.filter(
+        (user) =>
+          user.username?.toLowerCase().includes(term) ||
+          user.email?.toLowerCase().includes(term) ||
+          user.firstName?.toLowerCase().includes(term) ||
+          user.lastName?.toLowerCase().includes(term) ||
+          user.phoneNumber?.toLowerCase().includes(term)
       );
     }
     this.sortUsers();
@@ -302,7 +321,8 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Không thể tải thông tin người dùng: ' + this.userService.getErrorMessage(result)
+            detail:
+              'Không thể tải thông tin người dùng: ' + this.userService.getErrorMessage(result),
           });
         }
       },
@@ -312,7 +332,7 @@ export class UsersPageComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Lỗi',
-          detail: 'Không thể tải thông tin người dùng!'
+          detail: 'Không thể tải thông tin người dùng!',
         });
       }
     );
@@ -326,7 +346,7 @@ export class UsersPageComponent implements OnInit {
     this.editForm = new UpdateUserCommand({
       userId: user.userId,
       email: user.email,
-      username: user.username
+      username: user.username,
     });
     this.isEditModalOpen = true;
   }
@@ -339,7 +359,7 @@ export class UsersPageComponent implements OnInit {
       this.messageService.add({
         severity: 'warn',
         summary: 'Cảnh báo',
-        detail: 'Thiếu thông tin người dùng!'
+        detail: 'Thiếu thông tin người dùng!',
       });
       return;
     }
@@ -353,7 +373,7 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Thành công',
-            detail: 'Cập nhật người dùng thành công!'
+            detail: 'Cập nhật người dùng thành công!',
           });
           this.isEditModalOpen = false;
           this.loadUsers();
@@ -361,7 +381,7 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Cập nhật thất bại: ' + this.userService.getErrorMessage(result)
+            detail: 'Cập nhật thất bại: ' + this.userService.getErrorMessage(result),
           });
         }
       },
@@ -371,7 +391,7 @@ export class UsersPageComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Lỗi',
-          detail: 'Không thể cập nhật người dùng!'
+          detail: 'Không thể cập nhật người dùng!',
         });
       }
     );
@@ -387,7 +407,7 @@ export class UsersPageComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.deleteUser(user);
-      }
+      },
     });
   }
 
@@ -408,14 +428,14 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Thành công',
-            detail: 'Xóa người dùng thành công!'
+            detail: 'Xóa người dùng thành công!',
           });
           this.loadUsers();
         } else {
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Xóa thất bại: ' + this.userService.getErrorMessage(result)
+            detail: 'Xóa thất bại: ' + this.userService.getErrorMessage(result),
           });
         }
       },
@@ -425,7 +445,7 @@ export class UsersPageComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Lỗi',
-          detail: 'Không thể xóa người dùng!'
+          detail: 'Không thể xóa người dùng!',
         });
       }
     );
@@ -465,8 +485,8 @@ export class UsersPageComponent implements OnInit {
           this.userRoles = result.data;
           // Tìm roleId từ roleName
           this.selectedRoleIds = this.availableRoles
-            .filter(role => this.userRoles.includes(role.roleName || ''))
-            .map(role => role.roleId || '');
+            .filter((role) => this.userRoles.includes(role.roleName || ''))
+            .map((role) => role.roleId || '');
         }
       },
       error: (error) => {
@@ -475,9 +495,9 @@ export class UsersPageComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Lỗi',
-          detail: 'Không thể tải vai trò người dùng!'
+          detail: 'Không thể tải vai trò người dùng!',
         });
-      }
+      },
     });
   }
 
@@ -513,11 +533,11 @@ export class UsersPageComponent implements OnInit {
 
     // Tìm các role cần thêm và cần xóa
     const currentRoleIds = this.availableRoles
-      .filter(role => this.userRoles.includes(role.roleName || ''))
-      .map(role => role.roleId || '');
-    
-    const rolesToAdd = this.selectedRoleIds.filter(id => !currentRoleIds.includes(id));
-    const rolesToRemove = currentRoleIds.filter(id => !this.selectedRoleIds.includes(id));
+      .filter((role) => this.userRoles.includes(role.roleName || ''))
+      .map((role) => role.roleId || '');
+
+    const rolesToAdd = this.selectedRoleIds.filter((id) => !currentRoleIds.includes(id));
+    const rolesToRemove = currentRoleIds.filter((id) => !this.selectedRoleIds.includes(id));
 
     let completedOperations = 0;
     const totalOperations = rolesToAdd.length + rolesToRemove.length;
@@ -527,7 +547,7 @@ export class UsersPageComponent implements OnInit {
       this.messageService.add({
         severity: 'info',
         summary: 'Thông báo',
-        detail: 'Không có thay đổi nào!'
+        detail: 'Không có thay đổi nào!',
       });
       return;
     }
@@ -539,7 +559,7 @@ export class UsersPageComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Thành công',
-          detail: 'Cập nhật vai trò thành công!'
+          detail: 'Cập nhật vai trò thành công!',
         });
         this.isRoleModalOpen = false;
         this.loadUserRoles(userId);
@@ -547,10 +567,10 @@ export class UsersPageComponent implements OnInit {
     };
 
     // Thêm vai trò mới
-    rolesToAdd.forEach(roleId => {
+    rolesToAdd.forEach((roleId) => {
       const command = new AssignUserRoleCommand({
         userId: userId,
-        roleId: roleId
+        roleId: roleId,
       });
 
       this.userRoleAssignmentClient.assign(command).subscribe({
@@ -562,7 +582,7 @@ export class UsersPageComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Lỗi',
-              detail: 'Không thể gán vai trò: ' + (result.errorMessage || 'Unknown error')
+              detail: 'Không thể gán vai trò: ' + (result.errorMessage || 'Unknown error'),
             });
           }
         },
@@ -572,17 +592,17 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Không thể gán vai trò!'
+            detail: 'Không thể gán vai trò!',
           });
-        }
+        },
       });
     });
 
     // Xóa vai trò
-    rolesToRemove.forEach(roleId => {
+    rolesToRemove.forEach((roleId) => {
       const command = new RemoveUserRoleCommand({
         userId: userId,
-        roleId: roleId
+        roleId: roleId,
       });
 
       this.userRoleAssignmentClient.remove(command).subscribe({
@@ -594,7 +614,7 @@ export class UsersPageComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Lỗi',
-              detail: 'Không thể xóa vai trò: ' + (result.errorMessage || 'Unknown error')
+              detail: 'Không thể xóa vai trò: ' + (result.errorMessage || 'Unknown error'),
             });
           }
         },
@@ -604,9 +624,9 @@ export class UsersPageComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
-            detail: 'Không thể xóa vai trò!'
+            detail: 'Không thể xóa vai trò!',
           });
-        }
+        },
       });
     });
   }
@@ -615,7 +635,7 @@ export class UsersPageComponent implements OnInit {
    * Lấy tên trạng thái
    */
   getStatusLabel(status?: number): string {
-    const found = this.statusOptions.find(opt => opt.value === status);
+    const found = this.statusOptions.find((opt) => opt.value === status);
     return found ? found.label : 'Không xác định';
   }
 
@@ -624,9 +644,12 @@ export class UsersPageComponent implements OnInit {
    */
   getStatusClass(status?: number): string {
     switch (status) {
-      case 1: return 'status-active';
-      case 2: return 'status-locked';
-      default: return 'status-inactive';
+      case 1:
+        return 'status-active';
+      case 2:
+        return 'status-locked';
+      default:
+        return 'status-inactive';
     }
   }
 
@@ -639,7 +662,7 @@ export class UsersPageComponent implements OnInit {
     return d.toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: '2-digit',
-      day: '2-digit'
+      day: '2-digit',
     });
   }
 
@@ -651,11 +674,11 @@ export class UsersPageComponent implements OnInit {
     const maxVisible = 5;
     let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
     let end = Math.min(this.totalPages, start + maxVisible - 1);
-    
+
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);
     }
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }

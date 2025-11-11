@@ -1,13 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  FormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { 
-  faArrowLeft, 
-  faXmark, 
-  faSave, 
+import {
+  faArrowLeft,
+  faXmark,
+  faSave,
   faFolder,
   faCheck,
   faMagic,
@@ -17,29 +23,38 @@ import {
   faCloudUpload,
   faPlus,
   faPenToSquare,
-  faCubes
+  faCubes,
 } from '@fortawesome/free-solid-svg-icons';
-import { 
-  CategoryClient, 
-  CategoryDto, 
+import {
+  CategoryClient,
+  CategoryDto,
   ResultOfListOfCategoryDto,
   CreateProductCommand,
   ProductClient,
   FileParameter,
-  CreateProductVariantRequest
+  CreateProductVariantRequest,
 } from '@services/system-admin.service';
 import { InventoryService } from '../../../core/service/inventory.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipDirective } from '@shared/directives/tooltip';
 
 @Component({
   selector: 'app-add-new-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, FaIconComponent, ToastModule, ConfirmDialogModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    FaIconComponent,
+    ToastModule,
+    ConfirmDialogModule,
+    TooltipDirective
+  ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './add-new-product.component.html',
-  styleUrls: ['./add-new-product.component.scss']
+  styleUrls: ['./add-new-product.component.scss'],
 })
 export class AddNewProductComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
@@ -109,48 +124,49 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       sku: ['', [Validators.required]],
       description: ['', [Validators.required]],
       shortDescription: [''],
-      
+
       // Pricing
       price: [0, [Validators.required, Validators.min(0)]],
       discountPrice: [null],
       cost: [null],
-      
+
       // Inventory
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
       minStockLevel: [10, [Validators.required, Validators.min(0)]],
-      
+
       // Physical Properties
       weight: [null],
       dimensions: [''],
-      
+
       // Categorization
       categoryId: ['', [Validators.required]],
       brandId: [null],
-      
+
       // Status & Features
       status: [1], // 1 = Active
       isFeatured: [false],
       isDigital: [false],
-      
+
       // SEO
       metaTitle: [''],
       metaDescription: [''],
-      
+
       // Images (arrays)
       imageFiles: [null],
       imageAltTexts: [[]],
       imageDisplayOrders: [[]],
       imageIsPrimary: [[]],
-      
+
       // Related Data (arrays)
       variants: [[]],
       attributes: [[]],
-      tagIds: [[]]
+      tagIds: [[]],
     });
   }
 
   loadCategories(): void {
-    this.categoryClient.getCategoryTree()
+    this.categoryClient
+      .getCategoryTree()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: ResultOfListOfCategoryDto) => {
@@ -161,7 +177,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
               severity: 'error',
               summary: 'Lỗi',
               detail: response.errorMessage || 'Không thể tải danh mục',
-              life: 3000
+              life: 3000,
             });
           }
         },
@@ -171,9 +187,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
             severity: 'error',
             summary: 'Lỗi',
             detail: 'Có lỗi xảy ra khi tải danh mục',
-            life: 3000
+            life: 3000,
           });
-        }
+        },
       });
   }
 
@@ -198,7 +214,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         severity: 'warn',
         summary: 'Cảnh báo',
         detail: 'Vui lòng điền đầy đủ thông tin bắt buộc',
-        life: 3000
+        life: 3000,
       });
       return;
     }
@@ -207,54 +223,53 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     const formValue = this.productForm.value;
 
     // Prepare image data as FileParameter[]
-    const imageFiles: FileParameter[] | null = this.selectedImages.length > 0 
-      ? this.selectedImages.map(img => ({
-          data: img.file,
-          fileName: img.file.name
-        }))
-      : null;
-    
-    const imageAltTexts: string[] | null = this.selectedImages.length > 0 
-      ? this.selectedImages.map(img => img.altText)
-      : null;
-    
-    const imageDisplayOrders: number[] | null = this.selectedImages.length > 0 
-      ? this.selectedImages.map(img => img.displayOrder)
-      : null;
-    
-    const imageIsPrimary: boolean[] | null = this.selectedImages.length > 0 
-      ? this.selectedImages.map(img => img.isPrimary)
-      : null;
+    const imageFiles: FileParameter[] | null =
+      this.selectedImages.length > 0
+        ? this.selectedImages.map((img) => ({
+            data: img.file,
+            fileName: img.file.name,
+          }))
+        : null;
+
+    const imageAltTexts: string[] | null =
+      this.selectedImages.length > 0 ? this.selectedImages.map((img) => img.altText) : null;
+
+    const imageDisplayOrders: number[] | null =
+      this.selectedImages.length > 0 ? this.selectedImages.map((img) => img.displayOrder) : null;
+
+    const imageIsPrimary: boolean[] | null =
+      this.selectedImages.length > 0 ? this.selectedImages.map((img) => img.isPrimary) : null;
 
     // Call the create method with all parameters
-    this.productClient.create(
-      formValue.name,
-      formValue.slug || null,
-      formValue.sku,
-      formValue.description,
-      formValue.shortDescription || null,
-      formValue.price,
-      formValue.discountPrice,
-      formValue.cost,
-      formValue.stockQuantity,
-      formValue.minStockLevel,
-      formValue.weight,
-      formValue.dimensions || null,
-      formValue.categoryId,
-      formValue.brandId,
-      formValue.status,
-      formValue.isFeatured,
-      formValue.isDigital,
-      formValue.metaTitle || null,
-      formValue.metaDescription || null,
-      imageFiles,
-      imageAltTexts,
-      imageDisplayOrders,
-      imageIsPrimary,
-      this.variants.length > 0 ? this.variants : null,
-      formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null,
-      formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null
-    )
+    this.productClient
+      .create(
+        formValue.name,
+        formValue.slug || null,
+        formValue.sku,
+        formValue.description,
+        formValue.shortDescription || null,
+        formValue.price,
+        formValue.discountPrice,
+        formValue.cost,
+        formValue.stockQuantity,
+        formValue.minStockLevel,
+        formValue.weight,
+        formValue.dimensions || null,
+        formValue.categoryId,
+        formValue.brandId,
+        formValue.status,
+        formValue.isFeatured,
+        formValue.isDigital,
+        formValue.metaTitle || null,
+        formValue.metaDescription || null,
+        imageFiles,
+        imageAltTexts,
+        imageDisplayOrders,
+        imageIsPrimary,
+        this.variants.length > 0 ? this.variants : null,
+        formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null,
+        formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null
+      )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
@@ -263,7 +278,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
               severity: 'success',
               summary: 'Thành công',
               detail: 'Thêm sản phẩm thành công!',
-              life: 3000
+              life: 3000,
             });
             // Refresh danh sách sản phẩm để cập nhật danh sách mới nhất
             this.inventoryService.refreshProducts();
@@ -276,7 +291,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
               severity: 'error',
               summary: 'Lỗi',
               detail: response.errorMessage || 'Không thể thêm sản phẩm',
-              life: 3000
+              life: 3000,
             });
             this.isSubmitting = false;
           }
@@ -287,10 +302,10 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
             severity: 'error',
             summary: 'Lỗi',
             detail: 'Có lỗi xảy ra khi thêm sản phẩm',
-            life: 3000
+            life: 3000,
           });
           this.isSubmitting = false;
-        }
+        },
       });
   }
 
@@ -307,7 +322,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         defaultFocus: 'reject',
         accept: () => {
           this.router.navigate(['/admin/inventory']);
-        }
+        },
       });
     } else {
       this.router.navigate(['/admin/inventory']);
@@ -315,7 +330,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
 
@@ -342,17 +357,20 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }
 
   // Helper method to get flat category list for modal
-  getFlatCategoryList(categories: CategoryDto[], level: number = 0): Array<{ category: CategoryDto, level: number }> {
-    let result: Array<{ category: CategoryDto, level: number }> = [];
-    
+  getFlatCategoryList(
+    categories: CategoryDto[],
+    level: number = 0
+  ): Array<{ category: CategoryDto; level: number }> {
+    let result: Array<{ category: CategoryDto; level: number }> = [];
+
     for (const category of categories) {
       result.push({ category, level });
-      
+
       if (category.subCategories && category.subCategories.length > 0) {
         result = result.concat(this.getFlatCategoryList(category.subCategories, level + 1));
       }
     }
-    
+
     return result;
   }
 
@@ -379,7 +397,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       'Tôm Sú Tươi',
       'Rau Muống',
       'Bí Đỏ',
-      'Dưa Hấu'
+      'Dưa Hấu',
     ];
 
     const shortDescriptions = [
@@ -392,7 +410,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       'Hàng chính hãng, xuất xứ rõ ràng',
       'Sản phẩm bán chạy nhất tháng',
       'Được nhiều khách hàng tin dùng',
-      'Chất lượng cao, giá cả hợp lý'
+      'Chất lượng cao, giá cả hợp lý',
     ];
 
     const descriptions = [
@@ -403,7 +421,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       'Sản phẩm giàu dinh dưỡng, có lợi cho sức khỏe, phù hợp cho mọi lứa tuổi. Được các chuyên gia dinh dưỡng khuyên dùng.',
       'Được chế biến và đóng gói theo quy trình hiện đại, đảm bảo vệ sinh an toàn thực phẩm. Tuân thủ nghiêm ngặt các quy định về ATTP.',
       'Sản phẩm chất lượng cao, được nhiều gia đình Việt Nam tin dùng và lựa chọn. Thương hiệu uy tín trên thị trường.',
-      'Hàng nhập khẩu chính hãng, có giấy tờ đầy đủ, đảm bảo chất lượng tốt nhất. Bảo hành và hỗ trợ khách hàng tận tình.'
+      'Hàng nhập khẩu chính hãng, có giấy tờ đầy đủ, đảm bảo chất lượng tốt nhất. Bảo hành và hỗ trợ khách hàng tận tình.',
     ];
 
     const metaTitles = [
@@ -411,7 +429,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       '{name} Chất Lượng Cao - Giá Cả Phải Chăng',
       '{name} - Sản Phẩm Được Yêu Thích Nhất',
       'Đặt {name} Online - Ưu Đãi Hấp Dẫn',
-      '{name} Chính Hãng - Cam Kết Chất Lượng'
+      '{name} Chính Hãng - Cam Kết Chất Lượng',
     ];
 
     const metaDescriptions = [
@@ -419,38 +437,44 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       '{name} chất lượng cao, nguồn gốc rõ ràng. Giá cả phải chăng, giao hàng tận nơi. Mua ngay hôm nay!',
       'Đặt mua {name} online với giá ưu đãi. Sản phẩm chính hãng, bảo hành đầy đủ. Freeship toàn quốc.',
       '{name} - Sản phẩm được nhiều khách hàng tin dùng. Chất lượng đảm bảo, giá cả cạnh tranh.',
-      'Mua {name} tại cửa hàng uy tín. Cam kết chất lượng, đổi trả dễ dàng. Giao hàng nhanh chóng.'
+      'Mua {name} tại cửa hàng uy tín. Cam kết chất lượng, đổi trả dễ dàng. Giao hàng nhanh chóng.',
     ];
 
     // Generate random data
     const randomProductName = productNames[Math.floor(Math.random() * productNames.length)];
     const randomShortDesc = shortDescriptions[Math.floor(Math.random() * shortDescriptions.length)];
     const randomDesc = descriptions[Math.floor(Math.random() * descriptions.length)];
-    
+
     const randomSKU = `SKU${Math.floor(Math.random() * 900000) + 100000}`;
-    const randomSlug = randomProductName.toLowerCase()
+    const randomSlug = randomProductName
+      .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/đ/g, 'd')
       .replace(/Đ/g, 'D')
       .replace(/\s+/g, '-');
-    
+
     const cost = Math.floor(Math.random() * 50000 + 10000);
     const price = Math.floor(cost * (1.2 + Math.random() * 0.5)); // 20-70% markup
     const discountPrice = Math.random() > 0.5 ? Math.floor(price * 0.9) : null; // 10% discount randomly
-    
+
     const stockQuantity = Math.floor(Math.random() * 500 + 50);
     const minStockLevel = Math.floor(Math.random() * 30 + 10);
-    const weight = Math.round((Math.random() * 4900 + 100)) / 1000; // 0.1 - 5 kg
-    
+    const weight = Math.round(Math.random() * 4900 + 100) / 1000; // 0.1 - 5 kg
+
     const length = Math.floor(Math.random() * 300 + 50);
     const width = Math.floor(Math.random() * 200 + 50);
     const height = Math.floor(Math.random() * 150 + 30);
     const dimensions = `${length}x${width}x${height}`;
 
     // Generate meta tags
-    const randomMetaTitle = metaTitles[Math.floor(Math.random() * metaTitles.length)].replace('{name}', randomProductName);
-    const randomMetaDesc = metaDescriptions[Math.floor(Math.random() * metaDescriptions.length)].replace('{name}', randomProductName);
+    const randomMetaTitle = metaTitles[Math.floor(Math.random() * metaTitles.length)].replace(
+      '{name}',
+      randomProductName
+    );
+    const randomMetaDesc = metaDescriptions[
+      Math.floor(Math.random() * metaDescriptions.length)
+    ].replace('{name}', randomProductName);
 
     // Random status (1 = Active, 2 = Draft, 3 = Archived)
     const statuses = [1, 1, 1, 2]; // Higher chance of Active
@@ -476,33 +500,33 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       sku: randomSKU,
       description: randomDesc,
       shortDescription: randomShortDesc,
-      
+
       // Pricing
       price: price,
       discountPrice: discountPrice,
       cost: cost,
-      
+
       // Inventory
       stockQuantity: stockQuantity,
       minStockLevel: minStockLevel,
-      
+
       // Physical Properties
       weight: weight,
       dimensions: dimensions,
-      
+
       // Categorization
       categoryId: randomCategory?.categoryId || null,
       brandId: null,
-      
+
       // Status & Features
       status: randomStatus,
       isFeatured: isFeatured,
       isDigital: isDigital,
-      
+
       // SEO
       metaTitle: randomMetaTitle,
       metaDescription: randomMetaDesc,
-      
+
       // Images and related data (empty arrays for now)
       imageFiles: null,
       imageAltTexts: [],
@@ -510,7 +534,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       imageIsPrimary: [],
       variants: [],
       attributes: [],
-      tagIds: []
+      tagIds: [],
     });
 
     // Update selected category
@@ -520,7 +544,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
 
     // Mark form as dirty to enable validation display
     this.productForm.markAsDirty();
-    
+
     // Show success message
     console.log('Đã sinh dữ liệu mẫu thành công!');
   }
@@ -558,14 +582,14 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }
 
   private handleFiles(files: File[]): void {
-    const validFiles = files.filter(file => {
+    const validFiles = files.filter((file) => {
       // Check if file is an image
       if (!file.type.startsWith('image/')) {
         this.messageService.add({
           severity: 'warn',
           summary: 'Cảnh báo',
           detail: `${file.name} không phải là file ảnh`,
-          life: 3000
+          life: 3000,
         });
         return false;
       }
@@ -575,14 +599,14 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
           severity: 'warn',
           summary: 'Cảnh báo',
           detail: `${file.name} vượt quá kích thước cho phép (5MB)`,
-          life: 3000
+          life: 3000,
         });
         return false;
       }
       return true;
     });
 
-    validFiles.forEach(file => {
+    validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         const preview = e.target?.result as string;
@@ -591,7 +615,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
           preview: preview,
           altText: '',
           displayOrder: this.selectedImages.length + 1,
-          isPrimary: this.selectedImages.length === 0 // First image is primary by default
+          isPrimary: this.selectedImages.length === 0, // First image is primary by default
         };
         this.selectedImages.push(newImage);
       };
@@ -632,7 +656,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }
 
   // ===== Variants Management Methods =====
-  
+
   openAddVariantModal(): void {
     console.log('openAddVariantModal called');
     this.variantMode = 'add';
@@ -667,7 +691,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         severity: 'warn',
         summary: 'Cảnh báo',
         detail: 'Vui lòng nhập SKU cho biến thể',
-        life: 3000
+        life: 3000,
       });
       return;
     }
@@ -677,7 +701,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         severity: 'warn',
         summary: 'Cảnh báo',
         detail: 'Vui lòng nhập giá hợp lệ cho biến thể',
-        life: 3000
+        life: 3000,
       });
       return;
     }
@@ -687,15 +711,16 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         severity: 'warn',
         summary: 'Cảnh báo',
         detail: 'Vui lòng nhập số lượng tồn kho hợp lệ',
-        life: 3000
+        life: 3000,
       });
       return;
     }
 
     // Check duplicate SKU
-    const isDuplicateSku = this.variants.some((v, idx) => 
-      v.sku === this.currentVariant.sku && 
-      (this.variantMode === 'add' || idx !== this.editingVariantIndex)
+    const isDuplicateSku = this.variants.some(
+      (v, idx) =>
+        v.sku === this.currentVariant.sku &&
+        (this.variantMode === 'add' || idx !== this.editingVariantIndex)
     );
 
     if (isDuplicateSku) {
@@ -703,7 +728,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         severity: 'warn',
         summary: 'Cảnh báo',
         detail: 'SKU biến thể đã tồn tại',
-        life: 3000
+        life: 3000,
       });
       return;
     }
@@ -714,15 +739,17 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         severity: 'success',
         summary: 'Thành công',
         detail: 'Đã thêm biến thể mới',
-        life: 2000
+        life: 2000,
       });
     } else {
-      this.variants[this.editingVariantIndex] = CreateProductVariantRequest.fromJS(this.currentVariant.toJSON());
+      this.variants[this.editingVariantIndex] = CreateProductVariantRequest.fromJS(
+        this.currentVariant.toJSON()
+      );
       this.messageService.add({
         severity: 'success',
         summary: 'Thành công',
         detail: 'Đã cập nhật biến thể',
-        life: 2000
+        life: 2000,
       });
     }
 
@@ -745,27 +772,35 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
           severity: 'success',
           summary: 'Thành công',
           detail: 'Đã xóa biến thể',
-          life: 2000
+          life: 2000,
         });
-      }
+      },
     });
   }
 
   getVariantStatusText(status: number | undefined): string {
     switch (status) {
-      case 1: return 'Hoạt động';
-      case 2: return 'Nháp';
-      case 3: return 'Đã lưu trữ';
-      default: return 'Không xác định';
+      case 1:
+        return 'Hoạt động';
+      case 2:
+        return 'Nháp';
+      case 3:
+        return 'Đã lưu trữ';
+      default:
+        return 'Không xác định';
     }
   }
 
   getVariantStatusClass(status: number | undefined): string {
     switch (status) {
-      case 1: return 'status-active';
-      case 2: return 'status-draft';
-      case 3: return 'status-archived';
-      default: return 'status-unknown';
+      case 1:
+        return 'status-active';
+      case 2:
+        return 'status-draft';
+      case 3:
+        return 'status-archived';
+      default:
+        return 'status-unknown';
     }
   }
 
@@ -773,7 +808,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     if (!value) return '0 ₫';
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(value);
   }
 }

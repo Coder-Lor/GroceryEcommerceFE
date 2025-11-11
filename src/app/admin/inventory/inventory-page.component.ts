@@ -49,6 +49,7 @@ import { Product } from './models/product.model';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { TooltipDirective } from '@shared/directives/tooltip';
 
 @Component({
   selector: 'app-inventory-page',
@@ -59,7 +60,8 @@ import { ToastModule } from 'primeng/toast';
     FaIconComponent,
     LoadingOverlayComponent,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    TooltipDirective
 ],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'inventory-page.component.html',
