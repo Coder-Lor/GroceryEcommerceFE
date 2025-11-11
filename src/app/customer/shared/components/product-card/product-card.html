@@ -36,23 +36,6 @@
       <h5 class="fw-semibold">
         {{ product.discountPrice | currency : 'VND' : 'symbol' : '1.0-0' }}
       </h5>
-      <div class="d-flex gap-2 mt-2">
-        <button
-          class="btn-checkout"
-          pButton
-          label="Mua ngay"
-          class="btn btn-dark flex-fill"
-        ></button>
-        <button
-          (click)="addToCart()"
-          pRipple
-          pButton
-          icon="pi pi-cart-plus"
-          outlined
-          class="btn btn-outline-secondary"
-          title="add to cart"
-        ></button>
-      </div>
     </div>
   </div>
 </div>

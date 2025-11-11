@@ -1,4 +1,7 @@
 <div class="product-page">
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+
   <!-- Breadcrumb -->
   <div class="container mb-4">
     <!-- <app-breadcrumb></app-breadcrumb> -->
@@ -81,6 +84,14 @@
       <div class="col-lg-6 col-md-12">
         <div class="product-info">
           <h1 class="product-name">{{ product.name }}</h1>
+          
+          <!-- Selected Variant Info -->
+          @if (selectedVariantId && getSelectedVariant()) {
+          <div class="selected-variant-info mb-3 p-2 bg-light rounded d-flex align-items-center gap-2">
+            <i class="pi pi-check-circle text-success"></i>
+            <span class="text-muted small">Đã chọn: <strong>{{ getSelectedVariant()?.name }}</strong></span>
+          </div>
+          }
 
           <!-- Rating -->
           <div class="rating-section d-flex align-items-center gap-3 mb-4">
@@ -91,19 +102,27 @@
             </div>
           </div>
 
-          <!-- Size Section -->
-          <div class="size-section mb-4">
-            <h5 class="size-title mb-3"><i class="pi pi-box me-2"></i>Phân loại</h5>
+          <!-- Variant Section -->
+          <div class="variant-section mb-4">
+            <h5 class="variant-title mb-3"><i class="pi pi-box me-2"></i>Phân loại</h5>
 
-            <div class="size-options d-flex gap-3 mt-3">
+            <div class="variant-options d-flex gap-3 mt-3 flex-wrap">
               @if (product.variants.length > 0){ 
-                @for (item of product.variants; track $index) {
-                  <span class="size-option" role="button" tabindex="0">
-                    <span class="size-text">{{ item.name }}</span>
+                @for (item of product.variants; track item.productVariantId) {
+                  <span 
+                    class="variant-option" 
+                    [class.active]="selectedVariantId === item.productVariantId"
+                    role="button" 
+                    tabindex="0"
+                    (click)="selectVariant(item.productVariantId!)"
+                    (keydown.enter)="selectVariant(item.productVariantId!)"
+                    (keydown.space)="selectVariant(item.productVariantId!)"
+                  >
+                    <span class="variant-text">{{ item.name }}</span>
                   </span>
                 } 
               } @else {
-                <span>Không có phân loại.</span>
+                <span class="text-muted">Không có phân loại.</span>
               }
             </div>
           </div>
@@ -113,26 +132,22 @@
             <div class="price-container mb-3">
               <div class="price-row d-flex align-items-center gap-2">
                 <span class="current-price">
-                  {{
-                    product.discountPrice && product.discountPrice < product.price
-                      ? (product.discountPrice | currency : 'VND' : 'symbol' : '1.0-0')
-                      : (product.price | currency : 'VND' : 'symbol' : '1.0-0')
-                  }}
+                  {{ getDisplayPrice() | currency : 'VND' : 'symbol' : '1.0-0' }}
                 </span>
-                @if (product.discountPrice && product.price > product.discountPrice) {
+                @if (getDiscountPrice() && getOriginalPrice() > getDiscountPrice()!) {
                 <span class="discount-badge">
                   <span class="discount-text">
                     -{{
-                      ((product.price - product.discountPrice) / product.price) * 100
+                      ((getOriginalPrice() - getDiscountPrice()!) / getOriginalPrice()) * 100
                         | number : '1.0-0'
                     }}%
                   </span>
                 </span>
                 }
               </div>
-              @if (product.discountPrice && product.price > product.discountPrice) {
+              @if (getDiscountPrice() && getOriginalPrice() > getDiscountPrice()!) {
               <div class="original-price">
-                {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
+                {{ getOriginalPrice() | currency : 'VND' : 'symbol' : '1.0-0' }}
               </div>
               }
             </div>
@@ -144,6 +159,7 @@
                   class="btn btn-sm btn-outline-secondary"
                   (click)="quantity = quantity > 1 ? quantity - 1 : 1"
                   type="button"
+                  [disabled]="getStockQuantity() <= 0"
                 >
                   <i class="pi pi-minus"></i>
                 </button>
@@ -153,28 +169,35 @@
                   style="max-width: 80px"
                   [(ngModel)]="quantity"
                   min="1"
+                  [max]="getStockQuantity()"
+                  [disabled]="getStockQuantity() <= 0"
                 />
                 <button
                   class="btn btn-sm btn-outline-secondary"
                   (click)="quantity = quantity + 1"
                   type="button"
+                  [disabled]="getStockQuantity() <= 0 || quantity >= getStockQuantity()"
                 >
                   <i class="pi pi-plus"></i>
                 </button>
               </div>
+              @if (getStockQuantity() > 0) {
+              <small class="text-muted mt-2 d-block">Còn {{ getStockQuantity() }} sản phẩm</small>
+              }
             </div>
 
             <div class="action-buttons d-flex gap-3 flex-wrap">
               <button
                 class="btn btn-warning text-dark fw-semibold px-4 rounded btn-checkout flex-grow-1"
                 (click)="navigationToCheckout()"
-                [disabled]="product.stockQuantity <= 0"
+                [disabled]="getStockQuantity() <= 0"
               >
                 <i class="pi pi-credit-card me-2"></i>Mua ngay
               </button>
               <button
                 class="btn border rounded add-to-cart-button flex-grow-1"
-                [disabled]="product.stockQuantity <= 0"
+                (click)="addToCart()"
+                [disabled]="getStockQuantity() <= 0"
               >
                 <i class="pi pi-shopping-cart me-2"></i>Thêm vào giỏ
               </button>
