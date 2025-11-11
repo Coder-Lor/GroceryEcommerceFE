@@ -72,7 +72,6 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }> = [];
   isDragging: boolean = false;
 
-  // Variants management
   variants: CreateProductVariantRequest[] = [];
   showVariantModal: boolean = false;
   variantMode: 'add' | 'edit' = 'add';
@@ -243,6 +242,27 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     const imageIsPrimary: boolean[] | null =
       this.selectedImages.length > 0 ? this.selectedImages.map((img) => img.isPrimary) : null;
 
+    // Prepare data to send
+    const variantsToSend = this.variants.length > 0 ? this.variants : null;
+    const attributesToSend = formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null;
+    const tagIdsToSend = formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null;
+
+    // Log data before sending to backend
+    console.log('=== DATA BEING SENT TO BACKEND ===');
+    console.log('Product Form Values:', formValue);
+    console.log('Selected Images Count:', this.selectedImages.length);
+    console.log('Image Files:', imageFiles?.map(f => ({ fileName: f.fileName, size: f.data.size })));
+    console.log('Image Alt Texts:', imageAltTexts);
+    console.log('Image Display Orders:', imageDisplayOrders);
+    console.log('Image Is Primary:', imageIsPrimary);
+    console.log('Variants Count:', this.variants.length);
+    console.log('Variants Data:', variantsToSend);
+    console.log('Variant Images Map:', Array.from(this.variantImages.entries()));
+    console.log('Attributes:', attributesToSend);
+    console.log('Tag IDs:', tagIdsToSend);
+    console.log('Selected Category:', this.selectedCategory);
+    console.log('==================================');
+
     // Call the create method with all parameters
     this.productClient
       .create(
@@ -269,9 +289,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         imageAltTexts,
         imageDisplayOrders,
         imageIsPrimary,
-        this.variants.length > 0 ? this.variants : null,
-        formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null,
-        formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null
+        variantsToSend,
+        attributesToSend,
+        tagIdsToSend
       )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
