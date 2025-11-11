@@ -38,7 +38,6 @@ import { InventoryService } from '../../../core/service/inventory.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipDirective } from '@shared/directives/tooltip';
 
 @Component({
   selector: 'app-add-new-product',
@@ -50,7 +49,6 @@ import { TooltipDirective } from '@shared/directives/tooltip';
     FaIconComponent,
     ToastModule,
     ConfirmDialogModule,
-    TooltipDirective
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './add-new-product.component.html',
@@ -74,12 +72,16 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   }> = [];
   isDragging: boolean = false;
 
-  // Variants management
   variants: CreateProductVariantRequest[] = [];
   showVariantModal: boolean = false;
   variantMode: 'add' | 'edit' = 'add';
   currentVariant: CreateProductVariantRequest = new CreateProductVariantRequest();
   editingVariantIndex: number = -1;
+  variantImageFile: File | null = null;
+  variantImagePreview: string | null = null;
+  variantImages: Map<number, File> = new Map(); // Map variant index to image file
+  variantImagePreviews: Map<number, string> = new Map(); // Map variant index to preview URL
+  isVariantDragging: boolean = false;
 
   // Font Awesome icons
   faArrowLeft = faArrowLeft;
@@ -240,6 +242,27 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     const imageIsPrimary: boolean[] | null =
       this.selectedImages.length > 0 ? this.selectedImages.map((img) => img.isPrimary) : null;
 
+    // Prepare data to send
+    const variantsToSend = this.variants.length > 0 ? this.variants : null;
+    const attributesToSend = formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null;
+    const tagIdsToSend = formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null;
+
+    // Log data before sending to backend
+    console.log('=== DATA BEING SENT TO BACKEND ===');
+    console.log('Product Form Values:', formValue);
+    console.log('Selected Images Count:', this.selectedImages.length);
+    console.log('Image Files:', imageFiles?.map(f => ({ fileName: f.fileName, size: f.data.size })));
+    console.log('Image Alt Texts:', imageAltTexts);
+    console.log('Image Display Orders:', imageDisplayOrders);
+    console.log('Image Is Primary:', imageIsPrimary);
+    console.log('Variants Count:', this.variants.length);
+    console.log('Variants Data:', variantsToSend);
+    console.log('Variant Images Map:', Array.from(this.variantImages.entries()));
+    console.log('Attributes:', attributesToSend);
+    console.log('Tag IDs:', tagIdsToSend);
+    console.log('Selected Category:', this.selectedCategory);
+    console.log('==================================');
+
     // Call the create method with all parameters
     this.productClient
       .create(
@@ -266,9 +289,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         imageAltTexts,
         imageDisplayOrders,
         imageIsPrimary,
-        this.variants.length > 0 ? this.variants : null,
-        formValue.attributes && formValue.attributes.length > 0 ? formValue.attributes : null,
-        formValue.tagIds && formValue.tagIds.length > 0 ? formValue.tagIds : null
+        variantsToSend,
+        attributesToSend,
+        tagIdsToSend
       )
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -374,77 +397,127 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  // Generate sample data
+// Generate sample data
   generateSampleData(): void {
-    // Sample product names with Vietnamese grocery items
-    const productNames = [
-      'Gạo Thơm ST25',
-      'Sữa Tươi Vinamilk',
-      'Trứng Gà Sạch',
-      'Rau Cải Xanh Organic',
-      'Thịt Ba Chỉ',
-      'Cà Chua Đà Lạt',
-      'Bánh Mì Sandwich',
-      'Nước Mắm Phú Quốc',
-      'Dầu Ăn Neptune',
-      'Mì Gói Hảo Hảo',
-      'Cà Phê G7',
-      'Sữa Chua Vinamilk',
-      'Khoai Tây Đà Lạt',
-      'Táo Fuji Nhật',
-      'Cam Sành Cao Phong',
-      'Thịt Heo Xay',
-      'Tôm Sú Tươi',
-      'Rau Muống',
-      'Bí Đỏ',
-      'Dưa Hấu',
+    // 1. Định nghĩa các khuôn mẫu sản phẩm (Product Templates)
+    // Mỗi object chứa dữ liệu liên quan mật thiết đến nhau
+    const productTemplates = [
+      {
+        name: 'Laptop Dell XPS 15 9530 (i9, 32GB, 1TB, RTX 4070)',
+        shortDescription: 'Laptop cao cấp, màn hình 3.5K OLED, vỏ nhôm nguyên khối.',
+        description: 'Trải nghiệm hiệu năng đỉnh cao với vi xử lý Intel Core i9-13900H, card đồ họa NVIDIA RTX 4070. Hoàn hảo cho sáng tạo nội dung và lập trình chuyên nghiệp. Thiết kế sang trọng, mỏng nhẹ.',
+        baseCost: 45000000, // Giá gốc tham khảo
+        weight: 1.9, // kg
+        dimensions: '344x230x18', // mm
+        metaTitle: 'Mua {name} Giá Tốt | Laptop XPS 15 2023 Chính Hãng',
+        metaDescription: 'Đặt mua {name} chính hãng, trả góp 0%. Cấu hình mạnh mẽ, thiết kế sang trọng, bảo hành 12 tháng tại cửa hàng.',
+      },
+      {
+        name: 'ASUS ROG Zephyrus G14 (R9, 32GB, 1TB, RTX 4060)',
+        shortDescription: 'Laptop gaming mỏng nhẹ, màn hình 165Hz, tản nhiệt hiệu quả.',
+        description: 'Chiến game mượt mà với AMD Ryzen 9 7940HS và RTX 4060. Thiết kế AniMe Matrix độc đáo, pin trâu, trọng lượng chỉ 1.72kg, lý tưởng cho game thủ di động.',
+        baseCost: 38000000,
+        weight: 1.72,
+        dimensions: '312x227x20',
+        metaTitle: 'Mua {name} | Laptop Gaming ROG G14 2023 Giá Rẻ',
+        metaDescription: 'Sở hữu ngay {name}, laptop gaming mỏng nhẹ cấu hình khủng. Tản nhiệt tốt, màn hình 2K 165Hz, bảo hành 24 tháng.',
+      },
+      {
+        name: 'iPhone 15 Pro Max 256GB (Titan Tự Nhiên)',
+        shortDescription: 'Khung viền Titan, chip A17 Pro, 5x Telephoto camera, USB-C.',
+        description: 'Siêu phẩm iPhone 15 Pro Max với khung Titan siêu bền nhẹ, chip A17 Pro mạnh mẽ nhất và hệ thống camera zoom quang 5x. Cổng sạc USB-C tiện lợi, quay video ProRes 4K.',
+        baseCost: 29000000,
+        weight: 0.221,
+        dimensions: '159x76x8.25',
+        metaTitle: '{name} Chính Hãng VN/A | Trả Góp 0%',
+        metaDescription: 'Mua {name} Titan Tự Nhiên 256GB VN/A. Giá tốt nhất, bảo hành 12 tháng, thu cũ đổi mới trợ giá cao tại cửa hàng.',
+      },
+      {
+        name: 'Samsung Galaxy S24 Ultra 512GB (Xám Titan)',
+        shortDescription: 'Tích hợp Galaxy AI, S Pen chuyên nghiệp, camera 200MP.',
+        description: 'Trải nghiệm Galaxy AI trên Samsung S24 Ultra. Khung Titan bền bỉ, S Pen tích hợp cho công việc, camera 200MP zoom 100x. Màn hình phẳng, hiệu năng Snapdragon 8 Gen 3 for Galaxy.',
+        baseCost: 31000000,
+        weight: 0.232,
+        dimensions: '162x79x8.6',
+        metaTitle: 'Samsung {name} 512GB | Kỷ Nguyên AI Mới',
+        metaDescription: 'Đặt trước {name} 512GB, nhận ưu đãi độc quyền. Tích hợp AI, S Pen, camera 200MP, trả góp 0% qua thẻ tín dụng.',
+      },
+      {
+        name: 'CPU Intel Core i9-14900K (24 Nhân 32 Luồng)',
+        shortDescription: 'Vi xử lý mạnh nhất cho gaming và sáng tạo, socket LGA 1700.',
+        description: 'CPU Intel Core i9-14900K thế hệ 14, tốc độ boost lên đến 6.0 GHz. Tương thích mainboard Z790/Z690. Yêu cầu tản nhiệt AIO 360mm trở lên để đạt hiệu suất tối đa.',
+        baseCost: 14500000,
+        weight: 0.1,
+        dimensions: '45x37x5',
+        metaTitle: 'CPU {name} Giá Tốt Nhất | Chính Hãng, Bảo Hành 3 Năm',
+        metaDescription: 'Mua {name}, vi xử lý cao cấp cho PC. Hỗ trợ DDR5 và PCIe 5.0. Giao hàng toàn quốc, bảo hành 36 tháng.',
+      },
+      {
+        name: 'Card Đồ Họa NVIDIA GeForce RTX 4080 Super 16GB',
+        shortDescription: 'Card đồ họa cao cấp, 16GB GDDR6X, hiệu năng 4K vượt trội.',
+        description: 'NVIDIA RTX 4080 Super 16GB mang lại trải nghiệm gaming 4K mượt mà với Ray Tracing và DLSS 3. Hiệu năng mạnh mẽ cho đồ họa 3D và render video. Phiên bản 3 fan tản nhiệt mát mẻ.',
+        baseCost: 25000000,
+        weight: 1.5,
+        dimensions: '310x140x61',
+        metaTitle: 'VGA {name} 16GB | Chơi Game 4K, Ray Tracing',
+        metaDescription: 'Mua card {name} 16GB GDDR6X chính hãng (ASUS, GIGABYTE, MSI). Giá tốt, hiệu năng mạnh mẽ. Bảo hành 36 tháng.',
+      },
+      {
+        name: 'RAM Corsair Vengeance 32GB (2x16GB) DDR5 6000MHz',
+        shortDescription: 'Kit RAM DDR5 32GB (2x16GB), bus 6000MHz, tản nhiệt nhôm.',
+        description: 'Nâng cấp hiệu năng hệ thống với kit RAM Corsair Vengeance 32GB DDR5. Tốc độ bus 6000MHz C36, hỗ trợ Intel XMP 3.0. Tản nhiệt nhôm giúp hoạt động mát mẻ, ổn định.',
+        baseCost: 2800000,
+        weight: 0.15,
+        dimensions: '135x35x7',
+        metaTitle: 'RAM {name} DDR5 6000MHz Giá Tốt',
+        metaDescription: 'Mua {name} chính hãng. Bus 6000MHz C36, tối ưu cho Intel Gen 13/14 và AMD Ryzen 7000. Bảo hành 3 năm.',
+      },
+      {
+        name: 'Ổ Cứng SSD Samsung 990 Pro 2TB NVMe PCIe Gen4',
+        shortDescription: 'SSD NVMe Gen4, tốc độ đọc 7450MB/s, ghi 6900MB/s.',
+        description: 'Trải nghiệm tốc độ tối đa với SSD Samsung 990 Pro 2TB. Giao tiếp PCIe Gen4x4, tốc độ đọc/ghi siêu nhanh, lý tưởng để tải game và làm việc với file lớn. Độ bền (TBW) 1200TB.',
+        baseCost: 4100000,
+        weight: 0.05,
+        dimensions: '80x22x2.3',
+        metaTitle: 'SSD {name} 2TB Tốc Độ Cao | Chính Hãng',
+        metaDescription: 'Mua {name} 2TB NVMe Gen4. Tốc độ đọc 7450MB/s. Bảo hành 5 năm chính hãng. Giá tốt nhất thị trường.',
+      },
+      {
+        name: 'Tai Nghe Sony WH-1000XM5 (Chống Ồn Chủ Động)',
+        shortDescription: 'Tai nghe không dây, chống ồn chủ động (ANC) hàng đầu.',
+        description: 'Đắm chìm trong âm thanh với Sony WH-1000XM5. Công nghệ chống ồn tiên tiến nhất, chất âm Hi-Res Audio, thiết kế thoải mái, thời lượng pin 30 giờ. Kết nối Bluetooth 5.2.',
+        baseCost: 6500000,
+        weight: 0.25,
+        dimensions: '200x180x70',
+        metaTitle: 'Tai Nghe {name} | Chống Ồn Đỉnh Cao, Giá Tốt',
+        metaDescription: 'Mua tai nghe {name} chính hãng. Chống ồn chủ động, âm thanh Hi-Res, pin 30 giờ. Trả góp 0%, giao hàng miễn phí.',
+      },
+      {
+        name: 'Bàn Phím Cơ Keychron Q6 Pro (Full-size, Bluetooth)',
+        shortDescription: 'Bàn phím cơ không dây, full-size, vỏ nhôm CNC, QMK/VIA.',
+        description: 'Keychron Q6 Pro là bàn phím cơ full-size cao cấp. Vỏ nhôm CNC nguyên khối, kết nối Bluetooth 5.1 và có dây, Hotswap. Tương thích Mac và Windows. Trải nghiệm gõ tuyệt vời.',
+        baseCost: 4200000,
+        weight: 2.1,
+        dimensions: '445x137x33',
+        metaTitle: 'Bàn Phím Cơ {name} | Không Dây, Vỏ Nhôm, Hotswap',
+        metaDescription: 'Đặt mua {name} chính hãng. Bàn phím cơ full-size cao cấp, hỗ trợ QMK/VIA, Hotswap, Bluetooth. Bảo hành 12 tháng.',
+      },
     ];
 
-    const shortDescriptions = [
-      'Sản phẩm chất lượng cao, nguồn gốc rõ ràng',
-      'Hàng tươi mới, được nhập khẩu trực tiếp',
-      'Sản phẩm organic, an toàn cho sức khỏe',
-      'Được kiểm định chất lượng nghiêm ngặt',
-      'Giá cả phải chăng, chất lượng tốt',
-      'Sản phẩm được yêu thích nhất',
-      'Hàng chính hãng, xuất xứ rõ ràng',
-      'Sản phẩm bán chạy nhất tháng',
-      'Được nhiều khách hàng tin dùng',
-      'Chất lượng cao, giá cả hợp lý',
-    ];
+    // 2. Chọn ngẫu nhiên một khuôn mẫu
+    const template = productTemplates[Math.floor(Math.random() * productTemplates.length)];
 
-    const descriptions = [
-      'Sản phẩm được sản xuất từ nguyên liệu tự nhiên, không chất bảo quản, đảm bảo an toàn vệ sinh thực phẩm. Đây là lựa chọn hoàn hảo cho gia đình bạn.',
-      'Đây là sản phẩm cao cấp, được chọn lọc kỹ càng từ những vùng nguyên liệu tốt nhất. Cam kết chất lượng và độ tươi ngon.',
-      'Sản phẩm có nguồn gốc xuất xứ rõ ràng, được kiểm định chất lượng nghiêm ngặt theo tiêu chuẩn quốc tế. An toàn tuyệt đối cho người tiêu dùng.',
-      'Được đóng gói cẩn thận, bảo quản trong điều kiện tối ưu để giữ độ tươi ngon. Giao hàng nhanh chóng, đảm bảo sản phẩm đến tay khách hàng trong tình trạng tốt nhất.',
-      'Sản phẩm giàu dinh dưỡng, có lợi cho sức khỏe, phù hợp cho mọi lứa tuổi. Được các chuyên gia dinh dưỡng khuyên dùng.',
-      'Được chế biến và đóng gói theo quy trình hiện đại, đảm bảo vệ sinh an toàn thực phẩm. Tuân thủ nghiêm ngặt các quy định về ATTP.',
-      'Sản phẩm chất lượng cao, được nhiều gia đình Việt Nam tin dùng và lựa chọn. Thương hiệu uy tín trên thị trường.',
-      'Hàng nhập khẩu chính hãng, có giấy tờ đầy đủ, đảm bảo chất lượng tốt nhất. Bảo hành và hỗ trợ khách hàng tận tình.',
-    ];
+    // 3. Helper function (giữ nguyên từ lần trước)
+    const roundToThousand = (num: number) => Math.round(num / 1000) * 1000;
 
-    const metaTitles = [
-      'Mua {name} Giá Tốt - Giao Hàng Nhanh',
-      '{name} Chất Lượng Cao - Giá Cả Phải Chăng',
-      '{name} - Sản Phẩm Được Yêu Thích Nhất',
-      'Đặt {name} Online - Ưu Đãi Hấp Dẫn',
-      '{name} Chính Hãng - Cam Kết Chất Lượng',
-    ];
+    // 4. Sinh dữ liệu dựa trên khuôn mẫu
+    const randomProductName = template.name;
+    const randomShortDesc = template.shortDescription;
+    const randomDesc = template.description;
+    const weight = template.weight;
+    const dimensions = template.dimensions;
 
-    const metaDescriptions = [
-      'Mua {name} giá tốt nhất. Giao hàng nhanh, đảm bảo chất lượng. Nhiều khuyến mãi hấp dẫn. Đặt hàng ngay!',
-      '{name} chất lượng cao, nguồn gốc rõ ràng. Giá cả phải chăng, giao hàng tận nơi. Mua ngay hôm nay!',
-      'Đặt mua {name} online với giá ưu đãi. Sản phẩm chính hãng, bảo hành đầy đủ. Freeship toàn quốc.',
-      '{name} - Sản phẩm được nhiều khách hàng tin dùng. Chất lượng đảm bảo, giá cả cạnh tranh.',
-      'Mua {name} tại cửa hàng uy tín. Cam kết chất lượng, đổi trả dễ dàng. Giao hàng nhanh chóng.',
-    ];
-
-    // Generate random data
-    const randomProductName = productNames[Math.floor(Math.random() * productNames.length)];
-    const randomShortDesc = shortDescriptions[Math.floor(Math.random() * shortDescriptions.length)];
-    const randomDesc = descriptions[Math.floor(Math.random() * descriptions.length)];
-
+    // SKU và Slug (vẫn tạo ngẫu nhiên hoặc dựa trên tên)
     const randomSKU = `SKU${Math.floor(Math.random() * 900000) + 100000}`;
     const randomSlug = randomProductName
       .toLowerCase()
@@ -452,82 +525,86 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/đ/g, 'd')
       .replace(/Đ/g, 'D')
-      .replace(/\s+/g, '-');
+      .replace(/[^a-z0-9\s-]/g, '') // Xóa ký tự đặc biệt
+      .replace(/\s+/g, '-'); // Thay khoảng trắng bằng gạch nối
 
-    const cost = Math.floor(Math.random() * 50000 + 10000);
-    const price = Math.floor(cost * (1.2 + Math.random() * 0.5)); // 20-70% markup
-    const discountPrice = Math.random() > 0.5 ? Math.floor(price * 0.9) : null; // 10% discount randomly
+    // Sinh giá (dựa trên baseCost của khuôn mẫu + một chút ngẫu nhiên)
+    const costVariance = 1 + (Math.random() * 0.1 - 0.05); // Biến động giá +/- 5%
+    const cost = roundToThousand(template.baseCost * costVariance);
 
-    const stockQuantity = Math.floor(Math.random() * 500 + 50);
-    const minStockLevel = Math.floor(Math.random() * 30 + 10);
-    const weight = Math.round(Math.random() * 4900 + 100) / 1000; // 0.1 - 5 kg
+    const priceMarkup = 1.1 + Math.random() * 0.2; // Lợi nhuận 10-30%
+    const price = roundToThousand(cost * priceMarkup);
 
-    const length = Math.floor(Math.random() * 300 + 50);
-    const width = Math.floor(Math.random() * 200 + 50);
-    const height = Math.floor(Math.random() * 150 + 30);
-    const dimensions = `${length}x${width}x${height}`;
+    let discountPrice: number | null = null;
+    if (Math.random() > 0.6) { // 40% cơ hội giảm giá
+      const rawDiscountPrice = price * (0.9 + Math.random() * 0.09); // Giảm giá ngẫu nhiên 1-10%
+      discountPrice = roundToThousand(rawDiscountPrice);
+      if (discountPrice >= price) {
+        discountPrice = price - 1000; // Đảm bảo giá giảm luôn thấp hơn
+      }
+    }
 
-    // Generate meta tags
-    const randomMetaTitle = metaTitles[Math.floor(Math.random() * metaTitles.length)].replace(
-      '{name}',
-      randomProductName
-    );
-    const randomMetaDesc = metaDescriptions[
-      Math.floor(Math.random() * metaDescriptions.length)
-    ].replace('{name}', randomProductName);
+    // Tồn kho (vẫn ngẫu nhiên)
+    const stockQuantity = Math.floor(Math.random() * 200 + 20); // Tồn kho 20-220
+    const minStockLevel = Math.floor(Math.random() * 10 + 5); // Cảnh báo tồn kho 5-15
 
-    // Random status (1 = Active, 2 = Draft, 3 = Archived)
+    // Meta (dựa trên khuôn mẫu)
+    const randomMetaTitle = template.metaTitle.replace('{name}', randomProductName);
+    const randomMetaDesc = template.metaDescription.replace('{name}', randomProductName);
+
+    // Dữ liệu ngẫu nhiên khác (như cũ)
     const statuses = [1, 1, 1, 2]; // Higher chance of Active
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-
-    // Random features
     const isFeatured = Math.random() > 0.7; // 30% chance to be featured
-    const isDigital = Math.random() > 0.9; // 10% chance to be digital
+    const isDigital = false; // Tech products are physical
 
-    // Select random category if available
+    // Chọn Category (như cũ)
     let randomCategory: CategoryDto | null = null;
     if (this.categories.length > 0) {
       const flatCategories = this.getFlatCategoryList(this.categories);
-      const randomIndex = Math.floor(Math.random() * flatCategories.length);
-      randomCategory = flatCategories[randomIndex].category;
+      if (flatCategories.length > 0) {
+        const randomIndex = Math.floor(Math.random() * flatCategories.length);
+        randomCategory = flatCategories[randomIndex].category;
+        // Tốt hơn nữa: Bạn có thể thêm 'categoryId' vào template để chọn đúng category
+      }
     }
 
-    // Patch form with generated data
+    // 5. Patch giá trị vào form
     this.productForm.patchValue({
-      // Basic Information
+      // Basic Information (từ template)
       name: randomProductName,
       slug: randomSlug,
       sku: randomSKU,
       description: randomDesc,
       shortDescription: randomShortDesc,
 
-      // Pricing
+      // Pricing (từ template + ngẫu nhiên)
       price: price,
       discountPrice: discountPrice,
       cost: cost,
 
-      // Inventory
+      // Inventory (ngẫu nhiên)
       stockQuantity: stockQuantity,
       minStockLevel: minStockLevel,
 
-      // Physical Properties
+      // Physical Properties (từ template)
       weight: weight,
       dimensions: dimensions,
 
-      // Categorization
+      // Categorization (như cũ)
       categoryId: randomCategory?.categoryId || null,
-      brandId: null,
+      brandId: null, // Có thể thêm brandId vào template
 
-      // Status & Features
+      // Status & Features (ngẫu nhiên)
       status: randomStatus,
       isFeatured: isFeatured,
       isDigital: isDigital,
 
-      // SEO
+      // SEO (từ template)
       metaTitle: randomMetaTitle,
       metaDescription: randomMetaDesc,
 
-      // Images and related data (empty arrays for now)
+      // Dữ liệu khác
       imageFiles: null,
       imageAltTexts: [],
       imageDisplayOrders: [],
@@ -537,16 +614,12 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       tagIds: [],
     });
 
-    // Update selected category
+    // Cập nhật (như cũ)
     if (randomCategory) {
       this.selectedCategory = randomCategory;
     }
-
-    // Mark form as dirty to enable validation display
     this.productForm.markAsDirty();
-
-    // Show success message
-    console.log('Đã sinh dữ liệu mẫu thành công!');
+    console.log(`Đã sinh dữ liệu mẫu (Liên quan) cho: ${randomProductName}`);
   }
 
   // Image upload methods
@@ -661,20 +734,32 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     console.log('openAddVariantModal called');
     this.variantMode = 'add';
     this.currentVariant = new CreateProductVariantRequest();
-    this.currentVariant.status = 1; // Active by default
-    this.currentVariant.stockQuantity = 0;
-    this.currentVariant.minStockLevel = 10;
-    this.currentVariant.price = 0;
+    
+    // Copy values from main product form
+    const formValue = this.productForm.value;
+    
+    this.currentVariant.price = formValue.price || 0;
+    this.currentVariant.discountPrice = formValue.discountPrice || null;
+    this.currentVariant.stockQuantity = formValue.stockQuantity || 0;
+    this.currentVariant.minStockLevel = formValue.minStockLevel || 10;
+    this.currentVariant.weight = formValue.weight || null;
+    this.currentVariant.dimensions = formValue.dimensions || null;
+    this.currentVariant.status = formValue.status || 1; // Active by default
+    
     this.editingVariantIndex = -1;
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
     this.showVariantModal = true;
     console.log('showVariantModal set to:', this.showVariantModal);
-    console.log('currentVariant:', this.currentVariant);
+    console.log('currentVariant with copied values:', this.currentVariant);
   }
 
   openEditVariantModal(variant: CreateProductVariantRequest, index: number): void {
     this.variantMode = 'edit';
     this.currentVariant = CreateProductVariantRequest.fromJS(variant.toJSON());
     this.editingVariantIndex = index;
+    this.variantImageFile = null;
+    this.variantImagePreview = variant.imageUrl || null;
     this.showVariantModal = true;
   }
 
@@ -734,7 +819,17 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     }
 
     if (this.variantMode === 'add') {
+      const variantIndex = this.variants.length;
       this.variants.push(CreateProductVariantRequest.fromJS(this.currentVariant.toJSON()));
+      
+      // Store image file and preview if selected
+      if (this.variantImageFile) {
+        this.variantImages.set(variantIndex, this.variantImageFile);
+        if (this.variantImagePreview) {
+          this.variantImagePreviews.set(variantIndex, this.variantImagePreview);
+        }
+      }
+      
       this.messageService.add({
         severity: 'success',
         summary: 'Thành công',
@@ -745,6 +840,20 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       this.variants[this.editingVariantIndex] = CreateProductVariantRequest.fromJS(
         this.currentVariant.toJSON()
       );
+      
+      // Update image file and preview if changed
+      if (this.variantImageFile) {
+        this.variantImages.set(this.editingVariantIndex, this.variantImageFile);
+        if (this.variantImagePreview) {
+          this.variantImagePreviews.set(this.editingVariantIndex, this.variantImagePreview);
+        }
+      } else if (!this.variantImagePreview) {
+        // Image was removed
+        this.variantImages.delete(this.editingVariantIndex);
+        this.variantImagePreviews.delete(this.editingVariantIndex);
+        this.variants[this.editingVariantIndex].imageUrl = undefined;
+      }
+      
       this.messageService.add({
         severity: 'success',
         summary: 'Thành công',
@@ -810,5 +919,100 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'VND',
     }).format(value);
+  }
+
+  getVariantImagePreview(index: number): string | null {
+    // First check if there's a preview from uploaded file
+    if (this.variantImagePreviews.has(index)) {
+      return this.variantImagePreviews.get(index) || null;
+    }
+    // Then check if variant has imageUrl from DB
+    if (this.variants[index]?.imageUrl) {
+      return this.variants[index].imageUrl || null;
+    }
+    return null;
+  }
+
+  // Variant Image Upload Methods
+  onVariantImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.processVariantImageFile(file);
+      input.value = ''; // Reset input
+    }
+  }
+
+  onVariantDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isVariantDragging = true;
+  }
+
+  onVariantDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isVariantDragging = false;
+  }
+
+  onVariantDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isVariantDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.processVariantImageFile(files[0]);
+    }
+  }
+
+  private processVariantImageFile(file: File): void {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Vui lòng chọn file hình ảnh',
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Kích thước ảnh không được vượt quá 5MB',
+      });
+      return;
+    }
+
+    this.variantImageFile = file;
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.variantImagePreview = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  triggerVariantImageInput(): void {
+    const fileInput = document.getElementById('variantImageInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  removeVariantImage(): void {
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+    this.currentVariant.imageUrl = undefined;
+    
+    // Reset file input
+    const fileInput = document.getElementById('variantImageInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 }

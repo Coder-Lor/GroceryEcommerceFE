@@ -31,6 +31,7 @@ import {
   faEye,
   faImages,
   faStar,
+  faLayerGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -43,6 +44,8 @@ import {
   ProductBaseResponse,
   ProductClient,
   UpdateProductCommand,
+  ProductVariantClient,
+  CreateProductVariantRequest,
 } from '@services/system-admin.service';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Product } from './models/product.model';
@@ -90,6 +93,11 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   detailProduct: Product | null = null;
   isDetailEditMode: boolean = false;
   editingProduct: UpdateProductCommand | null = null;
+  
+  // Variant modal
+  showVariantModal: boolean = false;
+  currentVariant: CreateProductVariantRequest = new CreateProductVariantRequest();
+  variantSourceProduct: Product | null = null;
   
   // Image management for editing
   newImageFiles: File[] = [];
@@ -139,11 +147,13 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   faImages = faImages;
   faStar = faStar;
   faStarRegular = faStarRegular;
+  faLayerGroup = faLayerGroup;
 
   constructor(
     private inventoryService: InventoryService,
     private categoryClient: CategoryClient,
     private productClient: ProductClient,
+    private productVariantClient: ProductVariantClient,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -1169,6 +1179,139 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
   }
+
+  // Open variant modal
+  openAddVariantModal(product: Product): void {
+    this.variantSourceProduct = product;
+    
+    // Initialize variant with product data
+    this.currentVariant = new CreateProductVariantRequest();
+    this.currentVariant.productId = product.productId;
+    this.currentVariant.sku = product.sku + '-VAR-' + Date.now();
+    this.currentVariant.name = product.name + ' - Phân loại';
+    this.currentVariant.price = product.price;
+    this.currentVariant.discountPrice = product.discountPrice;
+    this.currentVariant.stockQuantity = product.stockQuantity;
+    this.currentVariant.minStockLevel = product.minStockLevel;
+    this.currentVariant.weight = product.weight;
+    this.currentVariant.dimensions = product.dimensions;
+    this.currentVariant.status = product.status || 1;
+    
+    this.showVariantModal = true;
+  }
+
+  // Close variant modal
+  closeVariantModal(): void {
+    this.showVariantModal = false;
+    this.currentVariant = new CreateProductVariantRequest();
+    this.variantSourceProduct = null;
+  }
+
+  // Save variant
+  saveVariant(): void {
+    if (!this.validateVariant()) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.productVariantClient
+      .createVariant(this.currentVariant)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Thêm phân loại sản phẩm thành công',
+              life: 3000,
+            });
+            this.closeVariantModal();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể thêm phân loại sản phẩm',
+              life: 3000,
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error creating variant:', error);
+          this.isLoading = false;
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Đã có lỗi xảy ra khi thêm phân loại sản phẩm',
+            life: 3000,
+          });
+        },
+      });
+  }
+
+  // Validate variant
+  private validateVariant(): boolean {
+    if (!this.currentVariant.productId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Không tìm thấy ID sản phẩm',
+        life: 3000,
+      });
+      return false;
+    }
+    if (!this.currentVariant.sku?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập mã SKU cho phân loại',
+        life: 3000,
+      });
+      return false;
+    }
+    if (!this.currentVariant.name?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập tên phân loại',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((this.currentVariant.price || 0) <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Giá bán phải lớn hơn 0',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((this.currentVariant.stockQuantity || 0) < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Số lượng tồn kho không được âm',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((this.currentVariant.minStockLevel || 0) < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Mức tồn tối thiểu không được âm',
+        life: 3000,
+      });
+      return false;
+    }
+    return true;
+  }
+
   getSeverity(product: any) {
     switch (product.inventoryStatus) {
       case 'INSTOCK':

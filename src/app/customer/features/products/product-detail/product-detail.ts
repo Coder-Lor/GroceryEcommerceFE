@@ -44,6 +44,8 @@ export class ProductDetail implements OnInit, OnDestroy {
   quantity: number = 1;
 
   productImages: ProductImage[] = [];
+  activeIndex: number = 0; // Thêm property để track active image
+  
   responsiveOptions: any[] = [
     {
       breakpoint: '1400px',
@@ -134,6 +136,32 @@ export class ProductDetail implements OnInit, OnDestroy {
           });
         }
       });
+    }
+
+    // Reset active index về 0 khi load product mới
+    this.activeIndex = 0;
+  }
+
+  // Phương thức để chuyển đến ảnh tiếp theo (nếu cần custom logic)
+  nextImage(): void {
+    if (this.productImages.length > 0) {
+      this.activeIndex = (this.activeIndex + 1) % this.productImages.length;
+    }
+  }
+
+  // Phương thức để chuyển đến ảnh trước (nếu cần custom logic)
+  prevImage(): void {
+    if (this.productImages.length > 0) {
+      this.activeIndex = this.activeIndex > 0 
+        ? this.activeIndex - 1 
+        : this.productImages.length - 1;
+    }
+  }
+
+  // Phương thức để chuyển đến ảnh cụ thể
+  selectImage(index: number): void {
+    if (index >= 0 && index < this.productImages.length) {
+      this.activeIndex = index;
     }
   }
 
