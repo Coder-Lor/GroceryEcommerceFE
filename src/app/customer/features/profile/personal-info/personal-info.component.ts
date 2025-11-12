@@ -1,12 +1,10 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID, inject, makeStateKey, TransferState } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../core/service/auth.service';
 import { UserService } from '../../../../core/service/user.service';
 import { ResultOfUser, User } from '../../../../core/service/system-admin.service';
 import { Subject, takeUntil, take } from 'rxjs';
-
-// Tạo key để lưu trữ state
-const USER_INFO_KEY = makeStateKey<any>('userInfo');
+import { ProfileDataService } from '../profile-data.service';
 
 @Component({
   selector: 'app-personal-info',
@@ -17,8 +15,6 @@ const USER_INFO_KEY = makeStateKey<any>('userInfo');
 })
 export class PersonalInfoComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  private transferState = inject(TransferState);
-  private platformId = inject(PLATFORM_ID);
   
   isLoading = false;
   errorMessage = '';
@@ -37,12 +33,25 @@ export class PersonalInfoComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private profileDataService: ProfileDataService
   ) {}
 
   ngOnInit(): void {
     console.log('🔵 PersonalInfo ngOnInit called');
-    this.loadUserInfo();
+    
+    // Kiểm tra cache trước
+    if (this.profileDataService.hasCache()) {
+      console.log('📦 Using cached data from service');
+      this.profileDataService.getUserInfo().pipe(take(1)).subscribe(cachedData => {
+        if (cachedData) {
+          this.userInfo = cachedData;
+        }
+      });
+    } else {
+      console.log('📡 No cache - loading data');
+      this.loadUserInfo();
+    }
   }
 
   ngOnDestroy(): void {
@@ -52,76 +61,71 @@ export class PersonalInfoComponent implements OnInit, OnDestroy {
   }
 
   loadUserInfo(): void {
-    console.log('🟡 loadUserInfo called');
-    
-    // Kiểm tra xem đã có data trong TransferState chưa (từ SSR)
-    const cachedUserInfo = this.transferState.get(USER_INFO_KEY, null);
-    
-    if (cachedUserInfo) {
-      console.log('📦 Using cached data from SSR');
-      this.userInfo = cachedUserInfo;
-      this.isLoading = false;
-      return;
-    }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    // Sử dụng pipe(take(1)) để chỉ lấy giá trị đầu tiên và tự động unsubscribe
-    this.authService.currentUser.pipe(take(1)).subscribe({
-      next: (user) => {
-        console.log('🟢 currentUser emitted:', user);
-        if (user && user.id) {
-          console.log('🚀 Calling getById API with userId:', user.id);
-          // Gọi API để lấy thông tin chi tiết
-          this.userService.getById(
-            user.id,
-            (result: ResultOfUser) => {
-              console.log('✅ API Response received:', result);
-              this.isLoading = false;
-              if (result.isSuccess && result.data) {
-                const userData = result.data;
-                this.userInfo = {
-                  firstName: userData.firstName || '',
-                  lastName: userData.lastName || '',
-                  email: userData.email || '',
-                  phone: userData.phoneNumber || '',
-                  dateOfBirth: userData.dateOfBirth ? this.formatDate(userData.dateOfBirth) : '',
-                  gender: this.getGenderText(userData.firstName),
-                  status: userData.status || 0,
-                  emailVerified: userData.emailVerified || false,
-                  phoneVerified: userData.phoneVerified || false
-                };
-                
-                // Lưu vào TransferState nếu đang chạy trên server
-                if (!isPlatformBrowser(this.platformId)) {
-                  console.log('💾 Saving data to TransferState (Server)');
-                  this.transferState.set(USER_INFO_KEY, this.userInfo);
-                } else {
-                  console.log('🌐 Running on Browser - removing TransferState key');
-                  // Xóa key sau khi đã sử dụng trên client
-                  this.transferState.remove(USER_INFO_KEY);
-                }
-              } else {
-                this.errorMessage = 'Không thể lấy thông tin người dùng';
-              }
-            },
-            (error) => {
-              this.isLoading = false;
-              this.errorMessage = 'Đã xảy ra lỗi khi tải thông tin';
-              console.error('Error loading user info:', error);
-            }
-          );
-        } else {
-          this.isLoading = false;
-          this.errorMessage = 'Chưa đăng nhập';
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = 'Không thể xác thực người dùng';
-        console.error('Auth error:', error);
+    // Kiểm tra nếu đang load thì không load lại
+    this.profileDataService.getLoadingState().pipe(take(1)).subscribe(isLoading => {
+      if (isLoading) {
+        console.log('⚠️ Already loading, skip this request');
+        return;
       }
+
+      this.isLoading = true;
+      this.profileDataService.setLoading(true);
+      this.errorMessage = '';
+
+      // Sử dụng pipe(take(1)) để chỉ lấy giá trị đầu tiên và tự động unsubscribe
+      this.authService.currentUser.pipe(take(1)).subscribe({
+        next: (user) => {
+          console.log('🟢 currentUser emitted:', user);
+          if (user && user.id) {
+            console.log('🚀 Calling getById API with userId:', user.id);
+            // Gọi API để lấy thông tin chi tiết
+            this.userService.getById(
+              user.id,
+              (result: ResultOfUser) => {
+                console.log('✅ API Response received:', result);
+                this.isLoading = false;
+                this.profileDataService.setLoading(false);
+                
+                if (result.isSuccess && result.data) {
+                  const userData = result.data;
+                  this.userInfo = {
+                    firstName: userData.firstName || '',
+                    lastName: userData.lastName || '',
+                    email: userData.email || '',
+                    phone: userData.phoneNumber || '',
+                    dateOfBirth: userData.dateOfBirth ? this.formatDate(userData.dateOfBirth) : '',
+                    gender: this.getGenderText(userData.firstName),
+                    status: userData.status || 0,
+                    emailVerified: userData.emailVerified || false,
+                    phoneVerified: userData.phoneVerified || false
+                  };
+                  
+                  // Lưu vào cache
+                  this.profileDataService.setUserInfo(this.userInfo);
+                } else {
+                  this.errorMessage = 'Không thể lấy thông tin người dùng';
+                }
+              },
+              (error) => {
+                this.isLoading = false;
+                this.profileDataService.setLoading(false);
+                this.errorMessage = 'Đã xảy ra lỗi khi tải thông tin';
+                console.error('Error loading user info:', error);
+              }
+            );
+          } else {
+            this.isLoading = false;
+            this.profileDataService.setLoading(false);
+            this.errorMessage = 'Chưa đăng nhập';
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.profileDataService.setLoading(false);
+          this.errorMessage = 'Không thể xác thực người dùng';
+          console.error('Auth error:', error);
+        }
+      });
     });
   }
 
