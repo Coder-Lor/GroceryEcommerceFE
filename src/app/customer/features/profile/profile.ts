@@ -2,16 +2,21 @@ import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ImageModule } from 'primeng/image';
 import { ImageCropperDialogComponent } from './image-cropper-dialog/image-cropper-dialog.component';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ImageModule, ImageCropperDialogComponent],
+  imports: [CommonModule, ImageModule, ImageCropperDialogComponent, RouterModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
 export class Profile {
   @ViewChild(ImageCropperDialogComponent) imageCropper!: ImageCropperDialogComponent;
+
+  constructor(private router: Router) {
+    console.log('🏠 Profile component constructor called');
+  }
 
   // User data - có thể lấy từ service sau
   user = {

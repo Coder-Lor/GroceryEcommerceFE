@@ -26,6 +26,13 @@ import { Checkout } from './customer/features/checkout/checkout';
 import { Profile } from './customer/features/profile/profile';
 import { DiscoverPage } from './customer/pages/customer-page/discover-page/discover-page';
 import { OrderResult } from './customer/features/order-result/order-result';
+import { PersonalInfoComponent } from './customer/features/profile/personal-info/personal-info.component';
+import { UserAddressComponent } from './customer/features/profile/user-address/user-address.component';
+import { UserContactComponent } from './customer/features/profile/user-contact/user-contact.component';
+import { UserBankComponent } from './customer/features/profile/user-bank/user-bank.component';
+import { UserOrdersComponent } from './customer/features/profile/user-orders/user-orders.component';
+import { UserWishlistComponent } from './customer/features/profile/user-wishlist/user-wishlist.component';
+import { UserVouchersComponent } from './customer/features/profile/user-vouchers/user-vouchers.component';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -46,7 +53,20 @@ export const routes: Routes = [
       { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
       { path: 'order-result', component: OrderResult },
-      { path: 'profile', component: Profile },
+      { 
+        path: 'profile', 
+        component: Profile,
+        children: [
+          { path: '', redirectTo: 'personal-info', pathMatch: 'full' },
+          { path: 'personal-info', component: PersonalInfoComponent },
+          { path: 'address', component: UserAddressComponent },
+          { path: 'contact', component: UserContactComponent },
+          { path: 'bank', component: UserBankComponent },
+          { path: 'orders', component: UserOrdersComponent },
+          { path: 'wishlist', component: UserWishlistComponent },
+          { path: 'vouchers', component: UserVouchersComponent },
+        ]
+      },
       { path: 'discover-page', component: DiscoverPage },
     ],
   },

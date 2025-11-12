@@ -1,0 +1,50 @@
+<div class="user-bank">
+  <div class="header">
+    <div>
+      <h2 class="section-title">Ngân hàng liên kết</h2>
+      <p class="section-subtitle">Quản lý thẻ thanh toán của bạn</p>
+    </div>
+    <button class="btn-add" (click)="addNewCard()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Thêm thẻ mới
+    </button>
+  </div>
+
+  <div class="cards-grid">
+    <div *ngFor="let card of cards" class="card-item" [class.visa]="card.type === 'visa'" [class.mastercard]="card.type === 'mastercard'">
+      <div class="card-header">
+        <div class="card-type">{{ card.type.toUpperCase() }}</div>
+        <span *ngIf="card.isDefault" class="badge-default">Mặc định</span>
+      </div>
+      <div class="card-number">{{ maskCardNumber(card.number) }}</div>
+      <div class="card-details">
+        <div>
+          <div class="label">Chủ thẻ</div>
+          <div class="value">{{ card.holder }}</div>
+        </div>
+        <div>
+          <div class="label">Hết hạn</div>
+          <div class="value">{{ card.expired }}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-action" (click)="removeCard(card)">Xóa</button>
+        <button *ngIf="!card.isDefault" class="btn-action btn-default" (click)="setDefaultCard(card)">
+          Đặt làm mặc định
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="cards.length === 0" class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+      <line x1="1" y1="10" x2="23" y2="10"></line>
+    </svg>
+    <p>Chưa có thẻ nào được liên kết</p>
+    <button class="btn-add-empty" (click)="addNewCard()">Thêm thẻ đầu tiên</button>
+  </div>
+</div>

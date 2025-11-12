@@ -1,0 +1,40 @@
+<div class="user-wishlist">
+  <h2 class="section-title">Sản phẩm yêu thích</h2>
+  <p class="section-subtitle">Danh sách các sản phẩm bạn đã lưu</p>
+
+  <div class="wishlist-grid">
+    <div *ngFor="let item of wishlistItems" class="wishlist-card">
+      <button class="btn-remove" (click)="removeFromWishlist(item)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="product-image">
+        <img [src]="item.image" [alt]="item.name" />
+      </div>
+      <div class="product-info">
+        <h3 class="product-name">{{ item.name }}</h3>
+        <div class="product-price">{{ formatPrice(item.price) }}</div>
+        <div class="product-stock" [class.out-of-stock]="!item.inStock">
+          {{ item.inStock ? 'Còn hàng' : 'Hết hàng' }}
+        </div>
+        <button class="btn-add-cart" (click)="addToCart(item)" [disabled]="!item.inStock">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          {{ item.inStock ? 'Thêm vào giỏ' : 'Hết hàng' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="wishlistItems.length === 0" class="empty-state">
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+    <p>Chưa có sản phẩm yêu thích nào</p>
+  </div>
+</div>

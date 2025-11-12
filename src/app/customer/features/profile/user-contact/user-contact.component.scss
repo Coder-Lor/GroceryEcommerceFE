@@ -1,0 +1,110 @@
+.user-contact {
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-subtitle {
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+  }
+
+  .messages-list {
+    display: grid;
+    gap: 1rem;
+
+    .message-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid transparent;
+      transition: all 0.3s;
+
+      &.unread {
+        border-left-color: #4caf50;
+        background-color: #f9fffe;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        .message-subject {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #2c3e50;
+
+          .unread-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #4caf50;
+            border-radius: 50%;
+          }
+        }
+
+        .message-date {
+          color: #7f8c8d;
+          font-size: 0.9rem;
+        }
+      }
+
+      .message-content {
+        color: #555;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .message-actions {
+        display: flex;
+        gap: 1rem;
+
+        .btn-action {
+          padding: 0.5rem 1rem;
+          background-color: transparent;
+          color: #4caf50;
+          border: 1px solid #4caf50;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.3s;
+
+          &:hover {
+            background-color: #4caf50;
+            color: white;
+          }
+
+          &.btn-delete {
+            color: #f44336;
+            border-color: #f44336;
+
+            &:hover {
+              background-color: #f44336;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #7f8c8d;
+
+      svg {
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
