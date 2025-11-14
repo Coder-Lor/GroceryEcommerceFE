@@ -1,31 +1,18 @@
 .homepage {
   padding: 100px 0 40px;
   background-color: var(--secondary-color-background);
+  margin-top: 32px;
 }
 
-// .hero {
-//   height: 455px;
-//   border-radius: 20px;
-//   overflow: hidden;
-// }
+.hero-slider {
+  margin-top: 20px;
+}
 
-// .hero-title {
-//   left: 5%;
-//   top: 15%;
-//   font-size: 42px;
-//   line-height: 60px;
-//   z-index: 2;
-// }
-
-// .hero-img-main {
-//   right: 10%;
-//   top: 9%;
-//   width: 18.6%;
-//   height: 70%;
-//   object-fit: cover;
-// }
 .hero-slide {
-  height: 540px;
+  display: flex;
+  height: 300px;
+  gap: 20px;
+
   .hero-overlay {
     position: absolute;
     inset: 0;
@@ -144,8 +131,9 @@
   .brand-card {
     background: #fff;
     border: 1px solid #eee;
-    border-radius: 12px;
+    border-radius: 50%;
     padding: 20px;
+    width: 120px;
     height: 120px;
     display: flex;
     align-items: center;
@@ -173,6 +161,17 @@
       opacity: 1;
     }
   }
+}
+
+swiper-slide.brand-slide {
+  display: flex !important;
+  margin-right: 0 !important;
+  // margin-left: 25px !important;
+  justify-content: center !important;
+}
+
+.swiper-wrapper {
+  align-items: center !important;
 }
 
 .flash-sale {

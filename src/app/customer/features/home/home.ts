@@ -1,12 +1,25 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  ViewEncapsulation,
+  PLATFORM_ID,
+  makeStateKey,
+  TransferState,
+} from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { CarouselModule } from 'primeng/carousel';
 import { ProductCard } from '../../shared/components/product-card/product-card';
-import { CategoryDto, ProductBaseResponse } from '@core/service/system-admin.service';
+import {
+  ProductBaseResponse,
+  CategoryClient,
+  CategoryDto,
+} from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
 import { ProductService } from '@core/service/product.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -18,6 +31,9 @@ type Product = ProductBaseResponse;
 type UrlObject = {
   url: string;
 };
+// State key for TransferState
+const CATEGORIES_KEY = makeStateKey<CategoryDto[]>('categories');
+
 type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number };
 
 @Component({
@@ -42,10 +58,13 @@ export class Home implements OnInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
-  private categoryService: CategoryService = inject(CategoryService);
+  private categoryService = inject(CategoryClient);
+  private transferState = inject(TransferState);
+  private platformId = inject(PLATFORM_ID);
   private destroy$ = new Subject<void>();
 
   products: Product[] = [];
+  flashSaleProducts: Product[] = [];
 
   layout: 'list' | 'grid' = 'grid';
   options = ['list', 'grid'];
@@ -66,73 +85,28 @@ export class Home implements OnInit, OnDestroy {
   categories: CategoryDto[] = [];
 
   brands = [
-    { name: 'Nestlé', logo: '/images/brands/nestle.png' },
-    { name: 'Starbucks', logo: '/images/brands/starbucks.png' },
-    { name: 'Highlands Coffee', logo: '/images/brands/highlands.png' },
-    { name: 'Vinacafé', logo: '/images/brands/vinacafe.png' },
-    { name: 'Trung Nguyên', logo: '/images/brands/trungnguyen.png' },
-    { name: 'G7', logo: '/images/brands/g7.png' },
-    { name: 'Tchibo', logo: '/images/brands/tchibo.png' },
-  ];
-
-  flashSaleProducts = [
+    { name: 'Nestlé', logo: 'brands-images/nestle.png' },
     {
-      name: 'Cafe Legend 500g',
-      image: '/images/product1.png',
-      price: 182000,
-      discount: 10,
-      progress: 40,
+      name: 'iphone',
+      logo: 'brands-images/iphone.png',
     },
     {
-      name: 'Bình Lock&Lock',
-      image: '/images/product2.png',
-      price: 418000,
-      discount: 43,
-      progress: 50,
+      name: 'samsung',
+      logo: 'brands-images/samsung.png',
     },
     {
-      name: 'Chảo chống dính',
-      image: '/images/product3.png',
-      price: 201000,
-      discount: 37,
-      progress: 70,
+      name: 'toshibar',
+      logo: 'brands-images/toshiba.png',
     },
     {
-      name: 'Sách Toàn tâm toàn ý',
-      image: '/images/product4.png',
-      price: 101200,
-      discount: 32,
-      progress: 20,
-    },
-    { name: 'Pinocchio', image: '/images/product5.png', price: 681500, discount: 9, progress: 80 },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
+      name: 'G7',
+      logo: 'brands-images/G7.png',
     },
     {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
+      name: 'louis vuitton',
+      logo: 'brands-images/luonvuituoi.png',
     },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
-    },
-    {
-      name: 'Inferno - Dan Brown',
-      image: '/images/product6.png',
-      price: 212500,
-      discount: 7,
-      progress: 35,
-    },
+    { name: 'loreal', logo: 'brands-images/loreal.png' },
   ];
 
   hours = '01';
@@ -140,9 +114,9 @@ export class Home implements OnInit, OnDestroy {
   seconds = '38';
 
   heroSlides: any[] = [
-    { title: 'banner 1', image: '/images/banner-1.jpg' },
-    { title: 'banner 2', image: '/images/banner-2.jpg' },
-    { title: 'banner 3', image: '/images/banner-3.jpg' },
+    { title: 'banner 1', image1: '/images/banner-1.jpg', image2: '/images/banner-2.jpg' },
+    { title: 'banner 2', image1: '/images/banner-3.jpg', image2: '/images/banner-4.jpg' },
+    { title: 'banner 3', image1: '/images/banner-5.jpg', image2: '/images/banner-6.jpg' },
   ];
 
   policies = [
@@ -216,16 +190,42 @@ export class Home implements OnInit, OnDestroy {
   }
 
   loadCategories(): void {
-    this.categoryService
-      .getCategoryTree()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.categories = data;
-          console.log(this.categories);
-        },
-        error: (err) => console.error('Có lỗi xảy ra: ', err),
-      });
+    // Kiểm tra xem có dữ liệu trong TransferState không
+    const cachedCategories = this.transferState.get(CATEGORIES_KEY, null);
+
+    if (cachedCategories) {
+      // Sử dụng dữ liệu từ cache
+      this.categories = cachedCategories;
+      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
+      if (isPlatformBrowser(this.platformId)) {
+        this.transferState.remove(CATEGORIES_KEY);
+      }
+    } else {
+      // Gọi API để lấy danh sách danh mục
+      this.categoryService
+        .getCategoryTree()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response?.isSuccess && response?.data) {
+              this.categories = response.data;
+
+              // Lưu vào TransferState (chỉ trên server)
+              if (isPlatformServer(this.platformId)) {
+                this.transferState.set(CATEGORIES_KEY, this.categories);
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Lỗi khi tải danh mục', err);
+            this.categories = [];
+          },
+        });
+    }
+  }
+
+  getCategoryImage(category: CategoryDto): string {
+    return category.imageUrl || '/images/no-image.png';
   }
 
   loadProducts(): void {
@@ -255,6 +255,46 @@ export class Home implements OnInit, OnDestroy {
     }
     this.page++;
     this.loadProducts();
+  }
+
+  loadFlashSaleProducts(): void {
+    // Lấy tất cả sản phẩm có giảm giá > 50%
+    this.productService
+      .getProductByPaging(1, 100) // Lấy nhiều sản phẩm để filter
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          const allProducts = data?.items || [];
+
+          // Lọc các sản phẩm có giảm giá > 50%
+          this.flashSaleProducts = allProducts.filter((product) => {
+            if (product.price && product.discountPrice) {
+              const discountPercent =
+                ((product.price - product.discountPrice) / product.price) * 100;
+              return discountPercent > 50;
+            }
+            return false;
+          });
+        },
+        error: (err) => console.error('Lỗi khi tải flash sale products', err),
+      });
+  }
+
+  getDiscountPercent(product: Product): number {
+    if (product.price && product.discountPrice) {
+      return Math.round(((product.price - product.discountPrice) / product.price) * 100);
+    }
+    return 0;
+  }
+
+  getProductProgress(product: Product): number {
+    // Tính % đã bán dựa trên stockQuantity (giả sử stock ban đầu là 100)
+    if (product.stockQuantity !== undefined) {
+      const initialStock = 100;
+      const sold = initialStock - product.stockQuantity;
+      return Math.min(Math.max((sold / initialStock) * 100, 0), 100);
+    }
+    return 0;
   }
 
   navigationToDetailPage() {

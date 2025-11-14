@@ -71,16 +71,24 @@
     >
       <swiper-slide *ngFor="let product of flashSaleProducts" class="flash-sale-slide">
         <div class="product-card">
-          <div class="discount-badge">-{{ product.discount }}%</div>
+          <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="product-image">
-            <img src="/images/product-image-1.png" [alt]="product.name" />
+            <img
+              [src]="product.primaryImageUrl || '/images/no-image.png'"
+              [alt]="product.name || 'Sản phẩm'"
+              onerror="this.src='/images/no-image.png'"
+            />
           </div>
           <div class="product-price text-danger fw-bold">{{ product.price | number }}đ</div>
           <div class="sale-status">
             <div class="progress-bar">
-              <div class="progress" [style.width.%]="product.progress"></div>
+              <div class="progress" [style.width.%]="getProductProgress(product)"></div>
             </div>
-            <p class="status-text">Vừa mở bán</p>
+            <p class="status-text">
+              {{
+                product.stockQuantity && product.stockQuantity > 50 ? 'Vừa mở bán' : 'Sắp hết hàng'
+              }}
+            </p>
           </div>
         </div>
       </swiper-slide>

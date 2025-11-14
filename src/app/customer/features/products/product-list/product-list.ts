@@ -39,7 +39,7 @@ export class ProductList implements OnInit, OnDestroy {
 
   // paginator state
   first: number = 0;
-  rows: number = 10;
+  rows: number = 12;
 
   // data state
   products: any[] = [];
@@ -51,7 +51,7 @@ export class ProductList implements OnInit, OnDestroy {
     const newRows = event.rows ?? this.rows;
     const page = Math.floor(newFirst / newRows) + 1;
     const size = newRows;
-    this.router.navigate(['/product-list'], {
+    this.router.navigate(['/category'], {
       queryParams: { search: this.keyword || null, page, size },
       queryParamsHandling: 'merge',
     });
@@ -92,17 +92,23 @@ export class ProductList implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Subscribe products and paging info from service
-    this.inventoryService.getProducts().pipe(takeUntil(this.destroy$)).subscribe(items => {
-      this.products = items as any[];
-    });
-    this.inventoryService.getPagingInfo().pipe(takeUntil(this.destroy$)).subscribe(paging => {
-      this.totalRecords = paging.totalCount;
-      this.rows = paging.pageSize;
-      this.first = (paging.currentPage - 1) * paging.pageSize;
-    });
+    this.inventoryService
+      .getProducts()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((items) => {
+        this.products = items as any[];
+      });
+    this.inventoryService
+      .getPagingInfo()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((paging) => {
+        this.totalRecords = paging.totalCount;
+        this.rows = paging.pageSize;
+        this.first = (paging.currentPage - 1) * paging.pageSize;
+      });
 
     // React to query params changes
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       this.keyword = (params['search'] ?? '').toString().trim();
       const page = +(params['page'] ?? 1);
       const size = +(params['size'] ?? this.rows);

@@ -1,8 +1,88 @@
-/* Header base */
-.header-container {
-  width: 100%;
+// top bar
+.topbar-announcement {
   position: fixed;
   top: 0;
+  width: 100%;
+  height: 32px;
+  background: #181818;
+  color: #fff;
+  z-index: 2000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* Container marquee */
+.marquee {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Track chạy */
+.marquee-track {
+  display: inline-flex;
+  gap: 60px;
+  white-space: nowrap;
+  animation: marquee 25s linear infinite;
+}
+
+.marquee-track span {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Animation chạy từ phải sang trái */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Fade 2 bên */
+.fade-left,
+.fade-right {
+  position: absolute;
+  top: 0;
+  width: 80px;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fade-left {
+  left: 0;
+  background: linear-gradient(to right, #343433, transparent);
+}
+
+.fade-right {
+  right: 0;
+  background: linear-gradient(to left, #343433, transparent);
+}
+
+/* Header base */
+
+/* Khi topbar đang hiện */
+.header-container.with-topbar {
+  position: fixed;
+  top: 32px;
+  /* Header nằm dưới topbar */
+  width: 100%;
+  z-index: 111;
+}
+
+/* Khi topbar ẩn */
+.header-container.no-topbar {
+  position: fixed;
+  top: 0;
+  /* Header chạm top 0 */
+  width: 100%;
   z-index: 111;
 }
 
@@ -86,9 +166,10 @@
   // max-width: 980px; /* gần full ở giữa, vẫn chừa không gian 2 bên */
   background: #fff;
   border: 1px solid #e6e8ec;
-  border-radius: 999px; /* pill shape */
+  border-radius: 999px;
+  /* pill shape */
   padding: 8px 8px 8px 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .search-input {
@@ -106,7 +187,8 @@
   align-items: center;
   justify-content: center;
   border: none;
-  background: #67b044; /* xanh chủ đạo */
+  background: #67b044;
+  /* xanh chủ đạo */
   color: #fff;
   width: 44px;
   height: 40px;
@@ -133,8 +215,9 @@
   align-items: center;
   justify-content: center;
   padding: 10px;
-  border-radius: 4px; 
+  border-radius: 4px;
   background-color: var(--secondary-color-background);
+
   &:hover {
     background-color: var(--secondary-color-secondary-3);
   }
@@ -152,9 +235,11 @@
   border-radius: 4px;
   padding: 15px;
   background: var(--secondary-color-background);
+
   .cart-icon {
     line-height: 1;
   }
+
   &:hover {
     background-color: var(--secondary-color-secondary-3);
   }
@@ -185,11 +270,11 @@
   width: 350px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   padding: 16px;
   z-index: 1200;
   animation: fadeInCart 0.2s ease-in-out;
-  
+
   /* Tạo vùng hover vô hình nối liền với button */
   &::before {
     content: '';
@@ -200,7 +285,7 @@
     height: 12px;
     background: transparent;
   }
-  
+
   /* Mũi tên nhọn trỏ lên */
   &::after {
     content: '';
@@ -212,7 +297,7 @@
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-bottom: 10px solid #fff;
-    filter: drop-shadow(0 -2px 3px rgba(0,0,0,0.08));
+    filter: drop-shadow(0 -2px 3px rgba(0, 0, 0, 0.08));
   }
 }
 
@@ -221,6 +306,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -230,21 +316,21 @@
 .mini-cart-items {
   max-height: 320px;
   overflow-y: auto;
-  
+
   /* Custom scrollbar */
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 10px;
-    
+
     &:hover {
       background: #a8a8a8;
     }
@@ -258,11 +344,11 @@
   align-items: center;
   border-radius: 8px;
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background-color: #f9f9f9;
   }
-  
+
   &:not(:last-child) {
     border-bottom: 1px solid #f0f0f0;
   }
@@ -319,13 +405,13 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: #5aa03e;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(103, 176, 68, 0.3);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -478,8 +564,7 @@
 .header-left,
 .navigation-menu,
 .header-right,
-.product-card 
-{
+.product-card {
   width: auto !important;
   min-width: 0 !important;
 }

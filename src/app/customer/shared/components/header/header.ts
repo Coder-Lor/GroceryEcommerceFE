@@ -33,6 +33,7 @@ export class Header implements OnInit, OnChanges {
 
   @ViewChild('userMenu', { static: false }) userMenu!: ElementRef;
 
+  showTopbar: boolean = true;
   isShowSidebar: boolean = false;
   isShowSubMenu: boolean = false;
   isShowSearchBox: boolean = false;
@@ -58,6 +59,18 @@ export class Header implements OnInit, OnChanges {
     //     });
     //   }
     // }
+  }
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+
+    // Nếu đang top 0 → hiển thị topbar
+    if (scrollY === 0) {
+      this.showTopbar = true;
+    } else {
+      // Cuộn xuống → ẩn topbar
+      this.showTopbar = false;
+    }
   }
 
   ngOnInit(): void {
@@ -87,7 +100,7 @@ export class Header implements OnInit, OnChanges {
   }
 
   onLogout() {
-    this.authService.logout(this.refreshtoken).subscribe({
+    this.authService.logout().subscribe({
       next: () => {
         localStorage.clear();
         this.router.navigate(['/login']);
