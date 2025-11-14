@@ -2,14 +2,81 @@
   <!-- Địa chỉ giao hàng -->
   <section class="checkout-section address">
     <h5 class="section-title"><i class="pi pi-map-marker"></i> Địa chỉ nhận hàng</h5>
-    <div class="address-info">
-      <div class="user-info">
-        <span class="user-name">Trần Văn A</span>
-        <span class="user-phone">(+84) 0912 345 678</span>
+    <form [formGroup]="checkoutForm" class="checkout-form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+          <input 
+            type="text" 
+            class="form-control" 
+            formControlName="fullName" 
+            placeholder="Nhập họ và tên"
+            [class.is-invalid]="checkoutForm.get('fullName')?.invalid && checkoutForm.get('fullName')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="checkoutForm.get('fullName')?.invalid && checkoutForm.get('fullName')?.touched">
+            Vui lòng nhập họ và tên
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+          <input 
+            type="tel" 
+            class="form-control" 
+            formControlName="phone" 
+            placeholder="Nhập số điện thoại"
+            [class.is-invalid]="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="checkoutForm.get('phone')?.invalid && checkoutForm.get('phone')?.touched">
+            Vui lòng nhập số điện thoại hợp lệ (10-11 số)
+          </div>
+        </div>
+        
+        <div class="col-12">
+          <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+          <textarea 
+            class="form-control" 
+            formControlName="address" 
+            rows="3" 
+            placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố)"
+            [class.is-invalid]="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched">
+            Vui lòng nhập địa chỉ giao hàng
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Phương thức thanh toán</label>
+          <div class="payment-methods">
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="radio" 
+                formControlName="paymentMethod" 
+                value="cod" 
+                id="cod"
+              />
+              <label class="form-check-label" for="cod">
+                <i class="pi pi-money-bill"></i> Thanh toán khi nhận hàng (COD)
+              </label>
+            </div>
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="radio" 
+                formControlName="paymentMethod" 
+                value="banking" 
+                id="banking"
+              />
+              <label class="form-check-label" for="banking">
+                <i class="pi pi-credit-card"></i> Chuyển khoản ngân hàng
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="user-address">123 Đường ABC, Quận 1, TP. Hồ Chí Minh</p>
-      <button class="btn-change">Thay đổi</button>
-    </div>
+    </form>
   </section>
 
   <!-- Danh sách sản phẩm -->
@@ -23,29 +90,56 @@
 
     <div class="product-item" *ngFor="let item of products">
       <div class="col-product d-flex align-items-center">
-        <img [src]="item.image" alt="Ảnh sản phẩm" class="product-img" />
-        <div class="product-name">{{ item.name }}</div>
+        <img [src]="item.imageUrl" alt="Ảnh sản phẩm" class="product-img" />
+        <div class="product-name">{{ item.productName }}</div>
       </div>
-      <div class="col-price">{{ item.price | currency : 'VND' }}</div>
+      <div class="col-price">{{ item.unitPrice | currency : 'VND' }}</div>
       <div class="col-quantity">{{ item.quantity }}</div>
-      <div class="col-total">{{ item.price * item.quantity | currency : 'VND' }}</div>
+      <div class="col-total">{{ item.unitPrice * item.quantity | currency : 'VND' }}</div>
     </div>
+
+    <!-- Hiển thị thông báo nếu không có sản phẩm -->
+    @if (products.length === 0) {
+    <div class="text-center py-5">
+      <p class="text-muted">Không có sản phẩm nào để thanh toán</p>
+      <button class="btn btn-primary" routerLink="/home">Về trang chủ</button>
+    </div>
+    }
   </section>
 
   <!-- Tổng kết đơn hàng -->
   <section class="checkout-summary">
     <div class="summary-row">
       <span>Tổng tiền hàng</span>
-      <span>{{ totalPrice | currency : 'VND' }}</span>
+      <span>{{ subtotal | currency : 'VND' }}</span>
     </div>
     <div class="summary-row">
       <span>Phí vận chuyển</span>
-      <span>{{ totalPrice | currency : 'VND' }}</span>
+      <span>{{ shippingFee | currency : 'VND' }}</span>
     </div>
     <div class="summary-row total">
       <span>Tổng thanh toán</span>
       <span class="total-price">{{ totalPrice | currency : 'VND' }}</span>
     </div>
-    <button class="btn-checkout">Đặt hàng</button>
+    
+    <!-- Hiển thị chế độ checkout để debug -->
+    <div class="alert alert-info mt-3" *ngIf="checkoutMode === 'single'">
+      <small><i class="pi pi-info-circle"></i> Thanh toán nhanh 1 sản phẩm</small>
+    </div>
+    
+    <button 
+      class="btn-checkout" 
+      (click)="placeOrder()" 
+      [disabled]="products.length === 0 || isProcessing"
+    >
+      <span *ngIf="!isProcessing">
+        <i class="pi pi-shopping-cart me-2"></i>
+        Đặt hàng
+      </span>
+      <span *ngIf="isProcessing">
+        <i class="pi pi-spin pi-spinner me-2"></i>
+        Đang xử lý...
+      </span>
+    </button>
   </section>
 </div>

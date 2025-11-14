@@ -7,9 +7,6 @@ import {
   ProductBaseResponse,
 } from '@core/service/system-admin.service';
 import { TruncatePipe } from '@shared/pipes/truncate-pipe.pipe';
-import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { Ripple } from 'primeng/ripple';
 import { Tag } from 'primeng/tag';
 import { Rating } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
@@ -36,6 +33,12 @@ export class ProductCard {
   ratingValue: number = 5;
 
   navigationToDetailPage() {
+    // Navigate sử dụng slug của product
+    if (this.product?.slug) {
+      this.router.navigate(['/product-detail', this.product.slug]);
+    } else {
+      console.warn('⚠️ Product không có slug, không thể navigate');
+    }
     // Navigate sử dụng slug của product
     if (this.product?.slug) {
       this.router.navigate(['/product-detail', this.product.slug]);

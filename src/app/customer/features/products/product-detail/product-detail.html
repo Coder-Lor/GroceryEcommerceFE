@@ -1,110 +1,206 @@
 <div class="product-page">
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+
   <!-- Breadcrumb -->
   <div class="container mb-4">
     <!-- <app-breadcrumb></app-breadcrumb> -->
   </div>
 
+  <!-- Loading State -->
+  @if (isLoading) {
+  <div class="container text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Đang tải...</span>
+    </div>
+    <p class="mt-3">Đang tải thông tin sản phẩm...</p>
+  </div>
+  }
+
+  <!-- Product Not Found -->
+  @else if (!product) {
+  <div class="container text-center py-5">
+    <i class="pi pi-exclamation-triangle" style="font-size: 3rem; color: #dc3545"></i>
+    <h3 class="mt-3">Không tìm thấy sản phẩm</h3>
+    <p class="text-muted">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+    <button class="btn btn-primary mt-3" routerLink="/home">Về trang chủ</button>
+  </div>
+  }
+
   <!-- Product Details -->
-  <div class="container product-details rounded-3 p-4">
-    <div class="row g-4 align-items-start">
-      <!-- Left: Image -->
-      <div class="col-lg-5 col-md-6">
-        <div class="product-image">
-          <img
-            src="/images/product-image-1.png"
-            alt="Product"
-            class="img-fluid rounded product-img"
-          />
+  @else {
+  <div class="container product-details rounded-3 p-4 mb-5">
+    <div class="row g-4">
+      <!-- Left: Image Gallery -->
+      <div class="col-lg-6 col-md-12">
+        <div class="product-gallery">
+          <p-galleria
+            [value]="productImages"
+            [(activeIndex)]="activeIndex"
+            [responsiveOptions]="responsiveOptions"
+            [containerStyle]="{ width: '100%', 'max-width': '100%' }"
+            [numVisible]="5"
+            [circular]="true"
+            [showItemNavigators]="true"
+            [showThumbnails]="productImages.length > 1"
+            [showIndicators]="false"
+            [showItemNavigatorsOnHover]="false"
+            [showThumbnailNavigators]="true"
+            [thumbnailsPosition]="'bottom'"
+            [autoPlay]="false"
+            [transitionInterval]="3000"
+          >
+            <ng-template pTemplate="item" let-item>
+              <div class="gallery-item">
+                <p-image
+                  [src]="item.itemImageSrc"
+                  [alt]="item.alt"
+                  [preview]="true"
+                  [imageStyle]="{
+                    width: '100%',
+                    height: '480px',
+                    'max-height': '480px',
+                    'object-fit': 'cover'
+                  }"
+                  imageClass="gallery-main-image"
+                />
+              </div>
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-item>
+              <div class="gallery-thumbnail">
+                <img
+                  [src]="item.thumbnailImageSrc"
+                  [alt]="item.alt"
+                  [title]="item.title"
+                  class="thumbnail-image"
+                />
+              </div>
+            </ng-template>
+          </p-galleria>
         </div>
       </div>
 
       <!-- Right: Info -->
-      <div class="col-lg-7 col-md-6">
+      <div class="col-lg-6 col-md-12">
         <div class="product-info">
-          <h2 class="product-name mb-3">Coffee Beans - Espresso Arabica and Robusta Beans</h2>
+          <h1 class="product-name">{{ product.name }}</h1>
+          
+          <!-- Selected Variant Info -->
+          @if (selectedVariantId && getSelectedVariant()) {
+          <div class="selected-variant-info mb-3 p-2 bg-light rounded d-flex align-items-center gap-2">
+            <i class="pi pi-check-circle text-success"></i>
+            <span class="text-muted small">Đã chọn: <strong>{{ getSelectedVariant()?.name }}</strong></span>
+          </div>
+          }
 
-          <div class="row g-4 product-content">
-            <!-- Left info -->
-            <div class="col-md-6">
-              <div class="rating-section d-flex align-items-center gap-3 mb-4">
-                <img src="/icons/Star.svg" alt="Rating" width="24" height="24" />
-                <div class="rating-text">(3.5) 1100 reviews</div>
+          <!-- Rating -->
+          <div class="rating-section d-flex align-items-center gap-3 mb-4">
+            <img src="/icons/Star.svg" alt="Rating" width="24" height="24" />
+            <div class="rating-text">
+              <strong>{{ product.averageRating || 0 | number : '1.1-1' }}</strong>
+              <span class="text-muted">({{ product.reviewCount || 0 }} đánh giá)</span>
+            </div>
+          </div>
+
+          <!-- Variant Section -->
+          <div class="variant-section mb-4">
+            <h5 class="variant-title mb-3"><i class="pi pi-box me-2"></i>Phân loại</h5>
+
+            <div class="variant-options d-flex gap-3 mt-3 flex-wrap">
+              @if (product.variants.length > 0){ 
+                @for (item of product.variants; track item.productVariantId) {
+                  <span 
+                    class="variant-option" 
+                    [class.active]="selectedVariantId === item.productVariantId"
+                    role="button" 
+                    tabindex="0"
+                    (click)="selectVariant(item.productVariantId!)"
+                    (keydown.enter)="selectVariant(item.productVariantId!)"
+                    (keydown.space)="selectVariant(item.productVariantId!)"
+                  >
+                    <span class="variant-text">{{ item.name }}</span>
+                  </span>
+                } 
+              } @else {
+                <span class="text-muted">Không có phân loại.</span>
+              }
+            </div>
+          </div>
+
+          <!-- Purchase Section -->
+          <div class="purchase-section">
+            <div class="price-container mb-3">
+              <div class="price-row d-flex align-items-center gap-2">
+                <span class="current-price">
+                  {{ getDisplayPrice() | currency : 'VND' : 'symbol' : '1.0-0' }}
+                </span>
+                @if (getDiscountPrice() && getOriginalPrice() > getDiscountPrice()!) {
+                <span class="discount-badge">
+                  <span class="discount-text">
+                    -{{
+                      ((getOriginalPrice() - getDiscountPrice()!) / getOriginalPrice()) * 100
+                        | number : '1.0-0'
+                    }}%
+                  </span>
+                </span>
+                }
               </div>
-
-              <div class="size-section">
-                <h5 class="size-title mb-3">Size/Weight</h5>
-                <form class="size-form d-flex align-items-center">
-                  <select class="form-select border-0 fw-semibold" style="max-width: 120px">
-                    <option>250</option>
-                    <option selected>500</option>
-                    <option>750</option>
-                    <option>1000</option>
-                  </select>
-                  <div class="weight-divider mx-2"></div>
-                  <select class="form-select border-0 fw-semibold" style="max-width: 120px">
-                    <option>Gram</option>
-                    <option>Kilogram</option>
-                  </select>
-                </form>
-
-                <div class="size-options d-flex gap-3 mt-3">
-                  <span class="size-option"><span class="size-text">Small</span></span>
-                  <span class="size-option"><span class="size-text">Medium</span></span>
-                  <span class="size-option"><span class="size-text">Large</span></span>
-                </div>
+              @if (getDiscountPrice() && getOriginalPrice() > getDiscountPrice()!) {
+              <div class="original-price">
+                {{ getOriginalPrice() | currency : 'VND' : 'symbol' : '1.0-0' }}
               </div>
+              }
             </div>
 
-            <!-- Right info -->
-            <div class="col-md-6">
-              <div class="d-flex flex-column gap-3">
-                <div class="compare-section d-flex align-items-center gap-3">
-                  <img src="icons/Document.svg" alt="Compare" width="24" height="24" />
-                  <div class="compare-text">Compare</div>
-                </div>
-
-                <div class="delivery-section d-flex align-items-center gap-3">
-                  <img src="icons/buy.svg" alt="Delivery" width="24" height="24" />
-                  <div>
-                    <div class="delivery-title">Delivery</div>
-                    <small class="delivery-subtitle">From $6 for 1-3 days</small>
-                  </div>
-                </div>
-
-                <div class="pickup-section d-flex align-items-center gap-3">
-                  <img src="/icons/Bag.svg" alt="Pickup" width="24" height="24" />
-                  <div>
-                    <div class="pickup-title">Pickup</div>
-                    <small class="pickup-subtitle">Out of 2 stores, today</small>
-                  </div>
-                </div>
-
-                <div class="purchase-section mt-3">
-                  <div class="price-container mb-3">
-                    <div class="price-row d-flex align-items-center gap-2">
-                      <span class="current-price fs-5 fw-semibold">$500.00</span>
-                      <span class="discount-badge px-2 py-1 rounded">
-                        <span class="discount-text">10%</span>
-                      </span>
-                    </div>
-                    <div class="original-price text-muted text-decoration-line-through">
-                      $540.00
-                    </div>
-                  </div>
-
-                  <div class="action-buttons d-flex gap-3">
-                    <button
-                      class="btn btn-warning text-dark fw-semibold px-4 rounded btn-checkout"
-                      (click)="navigationToCheckout()"
-                    >
-                      Checkout
-                    </button>
-                    <button class="btn border rounded add-to-cart-button">
-                      <!-- <fa-icon [icon]="faCartPlus"></fa-icon> -->
-                    </button>
-                  </div>
-                </div>
+            <div class="quantity-selector mb-3">
+              <label class="form-label fw-semibold">Số lượng:</label>
+              <div class="d-flex align-items-center gap-2">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="quantity = quantity > 1 ? quantity - 1 : 1"
+                  type="button"
+                  [disabled]="getStockQuantity() <= 0"
+                >
+                  <i class="pi pi-minus"></i>
+                </button>
+                <input
+                  type="number"
+                  class="form-control text-center"
+                  style="max-width: 80px"
+                  [(ngModel)]="quantity"
+                  min="1"
+                  [max]="getStockQuantity()"
+                  [disabled]="getStockQuantity() <= 0"
+                />
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="quantity = quantity + 1"
+                  type="button"
+                  [disabled]="getStockQuantity() <= 0 || quantity >= getStockQuantity()"
+                >
+                  <i class="pi pi-plus"></i>
+                </button>
               </div>
+              @if (getStockQuantity() > 0) {
+              <small class="text-muted mt-2 d-block">Còn {{ getStockQuantity() }} sản phẩm</small>
+              }
+            </div>
+
+            <div class="action-buttons d-flex gap-3 flex-wrap">
+              <button
+                class="btn btn-warning text-dark fw-semibold px-4 rounded btn-checkout flex-grow-1"
+                (click)="navigationToCheckout()"
+                [disabled]="getStockQuantity() <= 0"
+              >
+                <i class="pi pi-credit-card me-2"></i>Mua ngay
+              </button>
+              <button
+                class="btn border rounded add-to-cart-button flex-grow-1"
+                (click)="addToCart()"
+                [disabled]="getStockQuantity() <= 0"
+              >
+                <i class="pi pi-shopping-cart me-2"></i>Thêm vào giỏ
+              </button>
             </div>
           </div>
         </div>
@@ -123,14 +219,35 @@
       </p-tablist>
       <p-tabpanels>
         <p-tabpanel value="0">
-          <p class="m-0">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-            dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-            mollit anim id est laborum.
-          </p>
+          <div class="product-description">
+            <h5 class="mb-3">Mô tả sản phẩm</h5>
+            <div [innerHTML]="product.description || 'Chưa có mô tả cho sản phẩm này.'"></div>
+
+            @if (product.shortDescription) {
+            <div class="mt-3">
+              <h6>Tóm tắt:</h6>
+              <p class="text-muted">{{ product.shortDescription }}</p>
+            </div>
+            }
+
+            <div class="product-meta mt-4">
+              <p><strong>Danh mục:</strong> {{ product.categoryName || 'Chưa phân loại' }}</p>
+              @if (product.brandName) {
+              <p><strong>Thương hiệu:</strong> {{ product.brandName }}</p>
+              }
+              <p><strong>SKU:</strong> {{ product.sku }}</p>
+              <p>
+                <strong>Trạng thái:</strong>
+                @if (product.stockQuantity > 0) {
+                <span class="badge bg-success"
+                  >Còn hàng ({{ product.stockQuantity }} sản phẩm)</span
+                >
+                } @else {
+                <span class="badge bg-danger">Hết hàng</span>
+                }
+              </p>
+            </div>
+          </div>
         </p-tabpanel>
         <p-tabpanel value="1">
           <p class="m-0">
@@ -222,4 +339,5 @@
       </p-tabpanels>
     </p-tabs>
   </div>
+  }
 </div>

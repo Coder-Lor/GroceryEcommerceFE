@@ -25,6 +25,7 @@ import { ProductService } from '@core/service/product.service';
 import { Subject, takeUntil } from 'rxjs';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
+import { TransferState, makeStateKey } from '@angular/core';
 import { CategoryService } from '@core/service/category.service';
 
 type Product = ProductBaseResponse;
@@ -61,9 +62,13 @@ export class Home implements OnInit, OnDestroy {
   private categoryService = inject(CategoryClient);
   private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
+  private categoryService = inject(CategoryClient);
+  private transferState = inject(TransferState);
+  private platformId = inject(PLATFORM_ID);
   private destroy$ = new Subject<void>();
 
   products: Product[] = [];
+  flashSaleProducts: Product[] = [];
   flashSaleProducts: Product[] = [];
 
   layout: 'list' | 'grid' = 'grid';
@@ -149,6 +154,7 @@ export class Home implements OnInit, OnDestroy {
 
   private carouselImages: UrlObject[];
   ngOnInit(): void {
+    this.loadCategories();
     // Initialize carousel images
     this.carouselImages = [
       { url: '/images/banner-s25-ultra.png' },
@@ -187,6 +193,8 @@ export class Home implements OnInit, OnDestroy {
     this.loadCategories();
 
     this.loadProducts();
+
+    this.loadFlashSaleProducts();
   }
 
   loadCategories(): void {

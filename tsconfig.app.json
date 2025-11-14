@@ -11,7 +11,8 @@
     "paths": {
       "@core/*": ["app/core/*"],
       "@shared/*": ["app/shared/*"],
-      "@services/*": ["app/core/service/*"]
+      "@services/*": ["app/core/service/*"],
+      "@directive/*": ["app/shared/directives/*"]
     }
   },
   "include": [

@@ -740,18 +740,143 @@
       }
     }
   }
+}
 
-  // Variant Modal specific styles
-  .variant-modal {
-    max-width: 700px;
-    
-    .subsection-title {
-      font-size: 1rem;
-      color: #495057;
-      margin-bottom: 1rem;
-      font-weight: 500;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #e9ecef;
+// Variant Modal specific styles (MOVED OUTSIDE MEDIA QUERY)
+.variant-modal {
+  max-width: 700px;
+  
+  .subsection-title {
+    font-size: 1rem;
+    color: #495057;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  // Variant Image Upload Area (similar to main product upload)
+  .variant-image-upload-area {
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    margin-bottom: 1rem;
+
+    &:hover {
+      border-color: #007bff;
+      background: #e7f3ff;
+    }
+
+    &.dragging {
+      border-color: #28a745;
+      background: #d4edda;
+      transform: scale(1.02);
+    }
+
+    .upload-content {
+      pointer-events: none;
+
+      .upload-icon {
+        font-size: 2.5rem;
+        color: #007bff;
+        margin-bottom: 0.75rem;
+      }
+
+      .upload-text {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.25rem;
+      }
+
+      .upload-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+      }
+    }
+  }
+
+  // Variant Image Preview Container
+  .variant-image-preview-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .variant-image-preview {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+
+      .btn-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 1.1rem;
+
+        &.btn-change {
+          background: #007bff;
+
+          &:hover {
+            background: #0056b3;
+            transform: scale(1.15);
+          }
+        }
+
+        &.btn-delete {
+          background: #dc3545;
+
+          &:hover {
+            background: #c82333;
+            transform: scale(1.15);
+          }
+        }
+      }
+    }
+
+    &:hover .image-overlay {
+      opacity: 1;
     }
   }
 }

@@ -27,7 +27,6 @@
   }
 }
 
-
 .categories {
   .section-title {
     font-size: 20px;
@@ -175,7 +174,7 @@ swiper-slide.brand-slide {
 }
 
 .flash-sale {
-  background-color: #f9f9fc;
+  background-color: #f3f3f3;
   border-radius: 16px;
   padding: 10px 20px;
 
@@ -183,6 +182,7 @@ swiper-slide.brand-slide {
     .section-title {
       font-size: 22px;
       color: #1a162e;
+      font-family: 'Momo Signature';
     }
 
     .flash-timer {
@@ -193,6 +193,7 @@ swiper-slide.brand-slide {
       padding: 4px 10px;
       font-size: 1rem;
       letter-spacing: 1px;
+      font-family: 'Momo Signature';
     }
 
     .see-all {
@@ -442,7 +443,7 @@ swiper-container {
 .p-dataview .p-dataview-header {
   background-color: #fff !important;
   color: #111 !important;
-  font-family: "Poppins", sans-serif !important;
+  font-family: "Be Vietnam Pro", "Montserrat", "Poppins", sans-serif !important;
 }
 
 .product-card {}

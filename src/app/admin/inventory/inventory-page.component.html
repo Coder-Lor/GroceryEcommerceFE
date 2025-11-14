@@ -19,13 +19,13 @@
   <div class="page-header">
     <h2>Quản lý kho hàng</h2>
     <div class="header-actions">
-      <button class="btn btn-success" (click)="openAddModal()" title="Thêm sản phẩm">
+      <button class="btn btn-success" (click)="openAddModal()" appTooltip="Thêm sản phẩm">
         <fa-icon [icon]="faPlus" size="1x"></fa-icon>
       </button>
-      <button class="btn btn-info" (click)="showInventoryReport()" title="Báo cáo tổng quan">
+      <button class="btn btn-info" (click)="showInventoryReport()" appTooltip="Báo cáo tổng quan">
         <fa-icon [icon]="faChartSimple"></fa-icon>
       </button>
-      <button class="btn btn-secondary" (click)="exportReport()" title="Xuất CSV">
+      <button class="btn btn-secondary" (click)="exportReport()" appTooltip="Xuất CSV">
         <fa-icon [icon]="faDownload"></fa-icon>
       </button>
     </div>
@@ -43,10 +43,10 @@
       />
       <button 
         type="button" 
-        class="search-button"
+        class="btn search-button"
         (click)="onSearch()"
         [disabled]="isLoading"
-        title="Tìm kiếm"
+        appTooltip="Tìm kiếm"
       >
         <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
       </button>
@@ -107,16 +107,23 @@
 
           <div class="card-actions">
             <button 
-              class="btn-action btn-view" 
+              class="btn btn-action btn-view" 
               (click)="viewProductDetail(item)"
-              title="Xem chi tiết"
+              appTooltip="Xem chi tiết"
             >
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
             <button 
-              class="btn-action btn-delete" 
+              class="btn btn-action btn-variant" 
+              (click)="openAddVariantModal(item)"
+              appTooltip="Thêm phân loại"
+            >
+              <fa-icon [icon]="faLayerGroup"></fa-icon>
+            </button>
+            <button 
+              class="btn btn-action btn-delete" 
               (click)="confirmDelete(item)"
-              title="Xóa sản phẩm"
+              appTooltip="Xóa sản phẩm"
             >
               <fa-icon [icon]="faTrashCan"></fa-icon>
             </button>
@@ -155,7 +162,7 @@
         class="btn-pagination"
         (click)="goToFirstPage()"
         [disabled]="!hasPreviousPage"
-        title="Trang đầu"
+        appTooltip="Trang đầu"
       >
         <fa-icon [icon]="faAnglesLeft"></fa-icon>
       </button>
@@ -164,7 +171,7 @@
         class="btn-pagination"
         (click)="goToPreviousPage()"
         [disabled]="!hasPreviousPage"
-        title="Trang trước"
+        appTooltip="Trang trước"
       >
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
@@ -186,7 +193,7 @@
         class="btn-pagination"
         (click)="goToNextPage()"
         [disabled]="!hasNextPage"
-        title="Trang sau"
+        appTooltip="Trang sau"
       >
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>
@@ -195,7 +202,7 @@
         class="btn-pagination"
         (click)="goToLastPage()"
         [disabled]="!hasNextPage"
-        title="Trang cuối"
+        appTooltip="Trang cuối"
       >
         <fa-icon [icon]="faAnglesRight"></fa-icon>
       </button>
@@ -379,7 +386,7 @@
                         class="btn-image-action"
                         (click)="setEditPrimaryImage(idx)"
                         [class.active]="img.isPrimary"
-                        title="Đặt làm ảnh chính"
+                        appTooltip="Đặt làm ảnh chính"
                       >
                         <fa-icon [icon]="img.isPrimary ? faStar : faStarRegular"></fa-icon>
                       </button>
@@ -387,7 +394,7 @@
                         type="button" 
                         class="btn-image-action btn-delete-image"
                         (click)="removeEditImage(idx)"
-                        title="Xóa ảnh"
+                        appTooltip="Xóa ảnh"
                       >
                         <fa-icon [icon]="faTrashCan"></fa-icon>
                       </button>
@@ -962,6 +969,246 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" (click)="closeStatusFilterModal()">Áp dụng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal thêm variant -->
+<div class="modal-overlay" *ngIf="showVariantModal" (click)="closeVariantModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faLayerGroup"></fa-icon>
+        Thêm phân loại sản phẩm
+      </h3>
+      <button class="btn-close" (click)="closeVariantModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="source-product-info" *ngIf="variantSourceProduct">
+        <p class="info-text">
+          <strong>Sản phẩm gốc:</strong> {{ variantSourceProduct.name }}
+        </p>
+      </div>
+
+      <!-- Product Images Section -->
+      <div class="product-images-section" *ngIf="productImageUrls.length > 0">
+        <h4 class="section-title">
+          <fa-icon [icon]="faImages"></fa-icon>
+          Chọn ảnh từ sản phẩm gốc (tùy chọn)
+        </h4>
+        <div class="images-gallery">
+          <div 
+            class="image-item" 
+            *ngFor="let imageUrl of productImageUrls"
+            [class.selected]="selectedImageUrl === imageUrl"
+            (click)="selectProductImage(imageUrl)"
+          >
+            <img [src]="imageUrl" alt="Product image" />
+            <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
+              <fa-icon [icon]="faCheck"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload New Image Section -->
+      <div class="upload-image-section">
+        <h4 class="section-title">
+          <fa-icon [icon]="faUpload"></fa-icon>
+          Hoặc tải lên ảnh mới (tùy chọn)
+        </h4>
+        
+        <div class="upload-area" *ngIf="!variantImageFile">
+          <input 
+            type="file" 
+            #variantFileInput
+            accept="image/*"
+            (change)="onVariantImageSelect($event)"
+            style="display: none"
+          />
+          <button 
+            type="button" 
+            class="btn btn-upload"
+            (click)="variantFileInput.click()"
+          >
+            <fa-icon [icon]="faCloudUpload"></fa-icon>
+            Chọn ảnh từ máy tính
+          </button>
+          <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
+        </div>
+
+        <div class="uploaded-image" *ngIf="variantImageFile">
+          <div class="image-preview">
+            <img [src]="variantImagePreview" alt="Uploaded image" />
+            <button 
+              type="button" 
+              class="btn-remove"
+              (click)="removeVariantImage()"
+              appTooltip="Xóa ảnh"
+            >
+              <fa-icon [icon]="faXmark"></fa-icon>
+            </button>
+          </div>
+          <p class="file-name">{{ variantImageFile.name }}</p>
+        </div>
+      </div>
+
+      <form #variantForm="ngForm">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin cơ bản
+          </h4>
+          
+          <div class="form-group">
+            <label>Mã SKU <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.sku"
+              name="variantSku"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Tên phân loại <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="currentVariant.name"
+              name="variantName"
+              class="form-control"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faMoneyBill"></fa-icon>
+            Thông tin giá
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Giá bán <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.price"
+                name="variantPrice"
+                class="form-control"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Giá giảm</label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.discountPrice"
+                name="variantDiscountPrice"
+                class="form-control"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin kho
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Số lượng tồn kho <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.stockQuantity"
+                name="variantStockQuantity"
+                class="form-control"
+                min="0"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Mức tồn tối thiểu <span class="required">*</span></label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.minStockLevel"
+                name="variantMinStockLevel"
+                class="form-control"
+                min="0"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Trọng lượng (kg)</label>
+              <input
+                type="number"
+                [(ngModel)]="currentVariant.weight"
+                name="variantWeight"
+                class="form-control"
+                min="0"
+                step="0.01"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Kích thước</label>
+              <input
+                type="text"
+                [(ngModel)]="currentVariant.dimensions"
+                name="variantDimensions"
+                class="form-control"
+                placeholder="DxRxC (mm)"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Trạng thái
+          </h4>
+
+          <div class="form-group">
+            <label>Trạng thái <span class="required">*</span></label>
+            <select
+              [(ngModel)]="currentVariant.status"
+              name="variantStatus"
+              class="form-control"
+              required
+            >
+              <option [value]="0">Không hoạt động</option>
+              <option [value]="1">Hoạt động</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeVariantModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveVariant()">
+        Thêm phân loại
+      </button>
     </div>
   </div>
 </div>

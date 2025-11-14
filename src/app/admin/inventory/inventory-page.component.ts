@@ -31,6 +31,10 @@ import {
   faEye,
   faImages,
   faStar,
+  faLayerGroup,
+  faCheck,
+  faUpload,
+  faCloudUpload,
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -43,12 +47,16 @@ import {
   ProductBaseResponse,
   ProductClient,
   UpdateProductCommand,
+  ProductVariantClient,
+  CreateProductVariantRequest,
+  ProductImageClient,
 } from '@services/system-admin.service';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Product } from './models/product.model';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { TooltipDirective } from '@shared/directives/tooltip';
 
 @Component({
   selector: 'app-inventory-page',
@@ -59,7 +67,8 @@ import { ToastModule } from 'primeng/toast';
     FaIconComponent,
     LoadingOverlayComponent,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    TooltipDirective
 ],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'inventory-page.component.html',
@@ -88,6 +97,15 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   detailProduct: Product | null = null;
   isDetailEditMode: boolean = false;
   editingProduct: UpdateProductCommand | null = null;
+  
+  // Variant modal
+  showVariantModal: boolean = false;
+  currentVariant: CreateProductVariantRequest = new CreateProductVariantRequest();
+  variantSourceProduct: Product | null = null;
+  productImageUrls: string[] = [];
+  selectedImageUrl: string | null = null;
+  variantImageFile: File | null = null;
+  variantImagePreview: string | null = null;
   
   // Image management for editing
   newImageFiles: File[] = [];
@@ -137,11 +155,17 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   faImages = faImages;
   faStar = faStar;
   faStarRegular = faStarRegular;
+  faLayerGroup = faLayerGroup;
+  faCheck = faCheck;
+  faUpload = faUpload;
+  faCloudUpload = faCloudUpload;
 
   constructor(
     private inventoryService: InventoryService,
     private categoryClient: CategoryClient,
     private productClient: ProductClient,
+    private productVariantClient: ProductVariantClient,
+    private productImageClient: ProductImageClient,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -1167,6 +1191,274 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
   }
+
+  // Open variant modal
+  openAddVariantModal(product: Product): void {
+    this.variantSourceProduct = product;
+    
+    // Initialize variant with product data
+    this.currentVariant = new CreateProductVariantRequest();
+    this.currentVariant.productId = product.productId;
+    this.currentVariant.sku = product.sku + '-VAR-' + Date.now();
+    this.currentVariant.name = product.name + ' - Phân loại';
+    this.currentVariant.price = product.price;
+    this.currentVariant.discountPrice = product.discountPrice;
+    this.currentVariant.stockQuantity = product.stockQuantity;
+    this.currentVariant.minStockLevel = product.minStockLevel;
+    this.currentVariant.weight = product.weight;
+    this.currentVariant.dimensions = product.dimensions;
+    this.currentVariant.status = product.status || 1;
+    
+    // Load product images
+    if (product.productId) {
+      this.loadProductImages(product.productId);
+    }
+    
+    this.showVariantModal = true;
+  }
+
+  // Load product images
+  loadProductImages(productId: string): void {
+    this.productImageClient
+      .getUrlsByProduct(productId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.isSuccess && response.data) {
+            this.productImageUrls = response.data;
+          } else {
+            this.productImageUrls = [];
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading product images:', error);
+          this.productImageUrls = [];
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  // Close variant modal
+  closeVariantModal(): void {
+    this.showVariantModal = false;
+    this.currentVariant = new CreateProductVariantRequest();
+    this.variantSourceProduct = null;
+    this.productImageUrls = [];
+    this.selectedImageUrl = null;
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+  }
+
+  // Select existing product image for variant
+  selectProductImage(imageUrl: string): void {
+    if (this.selectedImageUrl === imageUrl) {
+      // Deselect if clicking the same image
+      this.selectedImageUrl = null;
+    } else {
+      this.selectedImageUrl = imageUrl;
+      // Clear new image file if selecting existing image
+      this.variantImageFile = null;
+      this.variantImagePreview = null;
+    }
+  }
+
+  // Handle new image file selection for variant
+  onVariantImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `File ${file.name} vượt quá 5MB`,
+          life: 3000,
+        });
+        input.value = '';
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `File ${file.name} không phải là ảnh`,
+          life: 3000,
+        });
+        input.value = '';
+        return;
+      }
+
+      this.variantImageFile = file;
+      // Clear selected existing image if uploading new file
+      this.selectedImageUrl = null;
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.variantImagePreview = e.target?.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset input
+    input.value = '';
+  }
+
+  // Remove selected variant image
+  removeVariantImage(): void {
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+    this.selectedImageUrl = null;
+  }
+
+  // Save variant
+  saveVariant(): void {
+    if (!this.validateVariant()) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    // Prepare the request based on image selection
+    // Case 1: No image - imageUrl and imageFile remain undefined
+    // Case 2: Selected existing image - set imageUrl
+    if (this.selectedImageUrl) {
+      this.currentVariant.imageUrl = this.selectedImageUrl;
+      this.currentVariant.imageFile = undefined;
+    }
+    // Case 3: New image file - set imageFile
+    else if (this.variantImageFile) {
+      // Convert File to FileUploadDto
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const base64Content = (e.target?.result as string).split(',')[1]; // Remove data:image/...;base64, prefix
+        
+        this.currentVariant.imageFile = {
+          content: base64Content,
+          fileName: this.variantImageFile!.name,
+          contentType: this.variantImageFile!.type
+        } as any;
+        this.currentVariant.imageUrl = undefined;
+
+        // Call API after file is converted
+        this.createVariantRequest();
+      };
+      reader.readAsDataURL(this.variantImageFile);
+      return; // Exit here, will continue in reader.onload
+    } else {
+      // Case 1: No image
+      this.currentVariant.imageUrl = undefined;
+      this.currentVariant.imageFile = undefined;
+    }
+
+    // Call API for cases 1 and 2
+    this.createVariantRequest();
+  }
+
+  // Create variant API request
+  private createVariantRequest(): void {
+    this.productVariantClient
+      .createVariant(this.currentVariant)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Thêm phân loại sản phẩm thành công',
+              life: 3000,
+            });
+            this.closeVariantModal();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể thêm phân loại sản phẩm',
+              life: 3000,
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error creating variant:', error);
+          this.isLoading = false;
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Đã có lỗi xảy ra khi thêm phân loại sản phẩm',
+            life: 3000,
+          });
+        },
+      });
+  }
+
+  // Validate variant
+  private validateVariant(): boolean {
+    if (!this.currentVariant.productId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Không tìm thấy ID sản phẩm',
+        life: 3000,
+      });
+      return false;
+    }
+    if (!this.currentVariant.sku?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập mã SKU cho phân loại',
+        life: 3000,
+      });
+      return false;
+    }
+    if (!this.currentVariant.name?.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập tên phân loại',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((this.currentVariant.price || 0) <= 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Giá bán phải lớn hơn 0',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((this.currentVariant.stockQuantity || 0) < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Số lượng tồn kho không được âm',
+        life: 3000,
+      });
+      return false;
+    }
+    if ((this.currentVariant.minStockLevel || 0) < 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Mức tồn tối thiểu không được âm',
+        life: 3000,
+      });
+      return false;
+    }
+    return true;
+  }
+
   getSeverity(product: any) {
     switch (product.inventoryStatus) {
       case 'INSTOCK':

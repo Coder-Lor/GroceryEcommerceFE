@@ -1,15 +1,16 @@
 <div class="homepage">
   <section class="hero-slider container position-relative mb-4">
-    <swiper-container autoplay-delay="20000" loop="true" pagination="true" navigation="true">
+    <swiper-container autoplay-delay="4000" loop="true" pagination="false" navigation="true">
       <swiper-slide *ngFor="let slide of heroSlides">
-        <div class="hero-slide position-relative rounded-4 overflow-hidden">
-          <img [src]="slide.image" class="w-100 h-100 overflow-hidden object-fit-cover" />
-          <!-- <div class="hero-overlay"></div>
-          <div class="hero-content position-absolute text-white">
-            <h1 class="fw-bold mb-3">{{ slide.title }}</h1>
-            <p class="mb-4">{{ slide.subtitle }}</p>
-            <button class="btn btn-light rounded-pill px-4 py-2">Mua ngay</button>
-          </div> -->
+        <div class="hero-slide position-relative overflow-hidden">
+          <img
+            [src]="slide.image1"
+            class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover"
+          />
+          <img
+            [src]="slide.image2"
+            class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover"
+          />
         </div>
       </swiper-slide>
     </swiper-container>
@@ -39,8 +40,13 @@
         class="category-slide"
       >
         <div class="category-card text-center">
-          <img src="/images/product-image-1.png" [alt]="category.name" class="category-img" />
-          <p class="category-name mt-2">{{ category.name }}</p>
+          <img
+            [src]="getCategoryImage(category)"
+            [alt]="category.name || 'Danh mục'"
+            class="category-img"
+            onerror="this.src='/images/no-image.png'"
+          />
+          <p class="category-name mt-2">{{ category.name || 'Không có tên' }}</p>
         </div>
       </swiper-slide> -->
     </swiper-container>
@@ -72,6 +78,7 @@
       <swiper-slide *ngFor="let product of flashSaleProducts" class="flash-sale-slide">
         <div class="product-card">
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
+          <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="product-image">
             <img
               [src]="product.primaryImageUrl || '/images/no-image.png'"
@@ -79,9 +86,9 @@
               onerror="this.src='/images/no-image.png'"
             />
           </div>
-          <div class="product-price text-danger fw-bold">{{ product.price | number }}đ</div>
           <div class="sale-status">
             <div class="progress-bar">
+              <div class="progress" [style.width.%]="getProductProgress(product)"></div>
               <div class="progress" [style.width.%]="getProductProgress(product)"></div>
             </div>
             <p class="status-text">
@@ -118,12 +125,6 @@
   <div class="product-list container mt-4">
     <p-dataview #dv [value]="products" [layout]="layout">
       <!-- Header -->
-      <ng-template #header>
-        <div class="section-header text-center mb-5">
-          <h3 class="fw-bold title">Sản Phẩm Nổi Bật</h3>
-          <p class="subtitle">Khám phá những sản phẩm được yêu thích nhất</p>
-        </div>
-      </ng-template>
       <!-- GRID layout -->
       <ng-template #grid let-items>
         <div class="row g-4">
