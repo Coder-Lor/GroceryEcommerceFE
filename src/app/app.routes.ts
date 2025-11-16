@@ -20,6 +20,7 @@ import { InventoryPageComponent } from './admin/inventory/inventory-page.compone
 import { AddNewProductComponent } from './admin/inventory/add-new-product/add-new-product.component';
 import { OrdersPageComponent } from './admin/orders/orders-page.component';
 import { CategoriesPageComponent } from './admin/categories/categories-page.component';
+import { OrderManagementPageComponent } from './admin/order-management/order-management-page.component';
 import { authGuard } from './core/service/auth.guard';
 import { NotFoundComponent } from './core/components/not-found/not-found.component';
 import { Checkout } from './customer/features/checkout/checkout';
@@ -75,6 +76,10 @@ export const routes: Routes = [
       {
         path: 'orders',
         component: OrdersPageComponent,
+      },
+      {
+        path: 'order-management',
+        component: OrderManagementPageComponent,
       },
       {
         path: 'categories',
