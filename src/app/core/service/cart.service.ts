@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, tap, switchMap, catchError } from 'rxjs/operators';
+import { map, tap, switchMap, catchError, take } from 'rxjs/operators';
 import { 
   CartClient, 
   AddToCartRequest, 
@@ -132,71 +132,37 @@ export class CartService {
           return of(res);
         }
 
-        // Tìm sản phẩm trong danh sách hiện có
-        const existing = this.items$.value.slice();
-        const idx = existing.findIndex((x) => x.productId === params.productId);
+        // Sau khi thêm thành công, reload cart từ backend để có thông tin đầy đủ và chính xác
+        console.log('✅ Item added to cart, reloading cart from backend...');
         
-        if (idx >= 0) {
-          // Sản phẩm đã có trong giỏ, chỉ cập nhật số lượng
-          existing[idx] = { ...existing[idx], quantity: existing[idx].quantity + params.quantity };
-          this.items$.next(existing);
-          this.saveToLocalStorage();
-          console.log('✅ Updated quantity for existing product:', existing[idx].productName);
-          return of(res);
-        }
-
-        // Sản phẩm mới, cần lấy thông tin từ ProductClient
-        console.log('🔍 Fetching product details for ID:', params.productId);
-        
-        return this.productClient.getById(params.productId).pipe(
-          tap((productRes) => {
-            if (productRes?.isSuccess && productRes.data) {
-              const product = productRes.data;
-              const vm: CartItemViewModel = {
-                cartItemId: crypto.randomUUID(), // Tạm thời, nên lấy từ backend response nếu có
-                productId: params.productId,
-                productName: product.name || 'Unknown Product',
-                imageUrl: product.images?.[0]?.imageUrl || '/images/product-image-1.png',
-                unitPrice: product.price ?? 0,
-                quantity: params.quantity,
-              };
-              existing.unshift(vm);
-              this.items$.next(existing);
-              this.saveToLocalStorage();
-              console.log('✅ Product added to cart:', vm.productName);
-            } else {
-              console.warn('⚠️ Could not fetch product details, using fallback');
-              // Fallback nếu không lấy được thông tin
-              const vm: CartItemViewModel = {
-                cartItemId: crypto.randomUUID(),
-                productId: params.productId,
-                productName: 'Unknown Product',
-                imageUrl: '/images/product-image-1.png',
-                unitPrice: 0,
-                quantity: params.quantity,
-              };
-              existing.unshift(vm);
-              this.items$.next(existing);
-              this.saveToLocalStorage();
+        // Reload cart từ backend để có cartItemId đúng và thông tin đầy đủ
+        return this.authService.currentUser.pipe(
+          take(1),
+          switchMap(user => {
+            if (!user?.id) {
+              console.warn('⚠️ No user logged in, cannot reload cart');
+              return of(res);
             }
+            
+            return this.cartClient.getShoppingCart(user.id).pipe(
+              tap((cartRes) => {
+                if (cartRes?.isSuccess && cartRes.data?.items) {
+                  console.log('✅ Cart reloaded from backend:', cartRes.data.items.length, 'items');
+                  this.setItemsFromBackend(cartRes.data.items);
+                  this.saveToLocalStorage();
+                } else {
+                  console.warn('⚠️ Failed to reload cart from backend');
+                }
+              }),
+              map(() => res),
+              catchError((err) => {
+                console.error('❌ Error reloading cart:', err);
+                // Vẫn return success response ngay cả khi reload fail
+                return of(res);
+              })
+            );
           }),
-          map(() => res),
-          catchError((err) => {
-            console.error('❌ Error fetching product details:', err);
-            // Vẫn thêm sản phẩm với thông tin tối thiểu
-            const vm: CartItemViewModel = {
-              cartItemId: crypto.randomUUID(),
-              productId: params.productId,
-              productName: 'Unknown Product',
-              imageUrl: '/images/product-image-1.png',
-              unitPrice: 0,
-              quantity: params.quantity,
-            };
-            existing.unshift(vm);
-            this.items$.next(existing);
-            this.saveToLocalStorage();
-            return of(res);
-          })
+          catchError(() => of(res)) // Fallback nếu không có user
         );
       })
     );
@@ -240,6 +206,43 @@ export class CartService {
       quantity: it.quantity ?? 0,
     }));
     this.items$.next(vm);
+  }
+
+  /**
+   * Xóa toàn bộ giỏ hàng sau khi đặt hàng thành công
+   */
+  clearCart(): Observable<ResultOfBoolean> {
+    return this.authService.currentUser.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user?.id) {
+          console.warn('⚠️ No user logged in, clearing local cart only');
+          // Vẫn xóa localStorage nếu không có user
+          this.items$.next([]);
+          this.saveToLocalStorage();
+          return of({ isSuccess: true } as ResultOfBoolean);
+        }
+        
+        console.log('🧹 Clearing cart for user:', user.id);
+        return this.cartClient.clearShoppingCart(user.id).pipe(
+          tap((res) => {
+            if (res?.isSuccess) {
+              // Xóa giỏ hàng khỏi state và localStorage
+              this.items$.next([]);
+              this.saveToLocalStorage();
+              console.log('✅ Cart cleared successfully');
+            }
+          }),
+          catchError(err => {
+            console.error('❌ Failed to clear cart:', err);
+            // Vẫn xóa localStorage ngay cả khi API call fail
+            this.items$.next([]);
+            this.saveToLocalStorage();
+            return of(ResultOfBoolean.fromJS({ isSuccess: false, errorMessage: 'Failed to clear cart' }));
+          })
+        );
+      })
+    );
   }
 }
 
