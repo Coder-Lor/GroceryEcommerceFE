@@ -93,7 +93,7 @@
               <strong>{{ order.orderNumber || order.orderId || 'N/A' }}</strong>
             </div>
           </td>
-          <td>{{ order.customerName || 'N/A' }}</td>
+          <td>{{ order.userName || 'N/A' }}</td>
           <td>
             <fa-icon [icon]="faCalendar" class="icon-small"></fa-icon>
             {{ formatDate(order.orderDate) }}
