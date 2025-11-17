@@ -1,0 +1,50 @@
+<div class="user-orders">
+  <h2 class="section-title">Đơn hàng của tôi</h2>
+  <p class="section-subtitle">Quản lý và theo dõi đơn hàng</p>
+
+  <div class="orders-list">
+    <div *ngFor="let order of orders" class="order-card">
+      <div class="order-header">
+        <div class="order-info">
+          <div class="order-id">{{ order.id }}</div>
+          <div class="order-date">{{ order.date }}</div>
+        </div>
+        <div class="order-status" [ngClass]="order.status">
+          <span class="status-dot"></span>
+          {{ order.statusText }}
+        </div>
+      </div>
+
+      <div class="order-items">
+        <div *ngFor="let item of order.items" class="order-item">
+          <div class="item-name">{{ item.name }}</div>
+          <div class="item-details">
+            <span>Số lượng: {{ item.quantity }}</span>
+            <span>{{ formatPrice(item.price) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-footer">
+        <div class="order-total">
+          Tổng cộng: <strong>{{ formatPrice(order.total) }}</strong>
+        </div>
+        <div class="order-actions">
+          <button class="btn-action" (click)="viewOrderDetail(order)">Chi tiết</button>
+          <button class="btn-action btn-primary" (click)="reorder(order)">Mua lại</button>
+          <button *ngIf="order.status === 'processing'" class="btn-action btn-danger" (click)="cancelOrder(order)">
+            Hủy đơn
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="orders.length === 0" class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 11 12 14 22 4"></polyline>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+      </svg>
+      <p>Chưa có đơn hàng nào</p>
+    </div>
+  </div>
+</div>

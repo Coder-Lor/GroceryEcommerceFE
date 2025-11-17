@@ -1,0 +1,45 @@
+<div class="user-vouchers">
+  <h2 class="section-title">Voucher của tôi</h2>
+  <p class="section-subtitle">Quản lý các mã giảm giá</p>
+
+  <div class="vouchers-list">
+    <div *ngFor="let voucher of vouchers" class="voucher-card" [class.used]="voucher.isUsed">
+      <div class="voucher-left">
+        <div class="voucher-discount">{{ voucher.discount }}</div>
+        <div class="voucher-type">OFF</div>
+      </div>
+      <div class="voucher-right">
+        <div class="voucher-header">
+          <h3 class="voucher-title">{{ voucher.title }}</h3>
+          <span *ngIf="voucher.isUsed" class="badge-used">Đã dùng</span>
+        </div>
+        <p class="voucher-description">{{ voucher.description }}</p>
+        <div class="voucher-footer">
+          <div class="voucher-code">
+            <span class="code-label">Mã:</span>
+            <span class="code-value">{{ voucher.code }}</span>
+            <button class="btn-copy" (click)="copyCode(voucher.code)" [disabled]="voucher.isUsed">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="voucher-expiry">HSD: {{ voucher.expiry }}</div>
+        </div>
+        <button *ngIf="!voucher.isUsed" class="btn-use" (click)="useVoucher(voucher)">
+          Sử dụng ngay
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="vouchers.length === 0" class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 7h-3a2 2 0 0 1-2-2V2"></path>
+        <path d="M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z"></path>
+        <path d="M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8"></path>
+      </svg>
+      <p>Chưa có voucher nào</p>
+    </div>
+  </div>
+</div>
