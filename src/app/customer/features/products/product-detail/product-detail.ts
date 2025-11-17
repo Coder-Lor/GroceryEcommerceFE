@@ -6,7 +6,8 @@ import { GalleriaModule } from 'primeng/galleria';
 import { ImageModule } from 'primeng/image';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { ProductClient, GetProductBySlugResponse, CartClient, AddToCartRequest } from '@core/service/system-admin.service';
+import { ProductClient, GetProductBySlugResponse } from '@core/service/system-admin.service';
+import { CartService } from '@core/service/cart.service';
 import { Subject, takeUntil, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/service/auth.service';
@@ -46,7 +47,7 @@ export class ProductDetail implements OnInit, OnDestroy {
   private route: ActivatedRoute = inject(ActivatedRoute);
   private productClient: ProductClient = inject(ProductClient);
   private messageService: MessageService = inject(MessageService);
-  private cartClient: CartClient = inject(CartClient);
+  private cartService: CartService = inject(CartService);
   private authService: AuthService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
@@ -339,16 +340,13 @@ export class ProductDetail implements OnInit, OnDestroy {
           return;
         }
 
-        // Tạo request để thêm vào giỏ hàng
-        const request = new AddToCartRequest({
+        // Sử dụng cartService để thêm vào giỏ hàng (tự động cập nhật state)
+        this.cartService.addItem({
           userId: user.id,
           productId: this.product!.productId,
           productVariantId: this.selectedVariantId || undefined,
           quantity: this.quantity
-        });
-
-        // Gọi API thêm vào giỏ hàng
-        this.cartClient.addItemToCart(request)
+        })
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (response) => {
@@ -361,6 +359,7 @@ export class ProductDetail implements OnInit, OnDestroy {
                 });
                 // Reset quantity về 1 sau khi thêm thành công
                 this.quantity = 1;
+                // Note: Cart will be automatically reloaded by cartService.addItem()
               } else {
                 this.messageService.add({
                   severity: 'error',
