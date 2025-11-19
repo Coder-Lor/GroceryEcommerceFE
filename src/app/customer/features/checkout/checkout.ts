@@ -6,7 +6,8 @@ import { CartService, CartItemViewModel } from '@core/service/cart.service';
 import { OrderService } from '@core/service/order.service';
 import { AuthService } from '@core/service/auth.service';
 import { UserAddressClient, UserAddress, PagedRequest } from '@core/service/system-admin.service';
-import { Observable, of } from 'rxjs';
+import { UserService } from '@core/service/user.service';
+import { Observable, of, forkJoin } from 'rxjs';
 import { switchMap, take, catchError } from 'rxjs/operators';
 
 interface CheckoutProduct {
@@ -37,6 +38,7 @@ export class Checkout implements OnInit {
   private orderService = inject(OrderService);
   private authService = inject(AuthService);
   private userAddressClient = inject(UserAddressClient);
+  private userService = inject(UserService);
 
   checkoutForm: FormGroup;
   products: CheckoutProduct[] = [];
@@ -51,6 +53,10 @@ export class Checkout implements OnInit {
   showTemporaryAddressModal = false;
   temporaryAddress: TemporaryAddress | null = null;
   temporaryAddressForm: FormGroup;
+  
+  // User info for display
+  userFullName: string = '';
+  userPhone: string = '';
 
   constructor() {
     this.checkoutForm = this.fb.group({
@@ -79,8 +85,8 @@ export class Checkout implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load user addresses first
-    this.loadUserAddresses();
+    // Load user info and set default values in form
+    this.loadUserInfoAndAddresses();
 
     // Nếu không có state (checkout từ cart), load từ cartService
     if (this.checkoutMode === 'cart') {
@@ -97,43 +103,103 @@ export class Checkout implements OnInit {
     }
   }
 
-  loadUserAddresses(): void {
+  loadUserInfoAndAddresses(): void {
     this.authService.currentUser.pipe(
       take(1),
       switchMap(user => {
         if (!user?.id) {
-          return of(null);
+          console.warn('⚠️ No user logged in');
+          return of({ userInfo: null, addresses: null });
         }
 
-        // Fetch user addresses
+        console.log('🔍 Loading user info for userId:', user.id);
+
+        // Fetch both user info and addresses in parallel
         const request = new PagedRequest({
           page: 1,
-          pageSize: 100 // Get all addresses
+          pageSize: 100
         });
 
-        return this.userAddressClient.getByUser(user.id, request);
+        // Convert callback-based API to Observable
+        const userInfo$ = new Observable<any>(observer => {
+          this.userService.getById(
+            user.id,
+            (result) => {
+              if (result.isSuccess && result.data) {
+                observer.next(result.data);
+              } else {
+                observer.next(null);
+              }
+              observer.complete();
+            },
+            (error) => {
+              console.error('❌ Failed to load user info:', error);
+              observer.next(null);
+              observer.complete();
+            }
+          );
+        });
+
+        const addresses$ = this.userAddressClient.getByUser(user.id, request).pipe(
+          catchError(err => {
+            console.error('❌ Failed to load addresses:', err);
+            return of(null);
+          })
+        );
+
+        return forkJoin({
+          userInfo: userInfo$,
+          addresses: addresses$
+        });
       })
     ).subscribe({
-      next: (response) => {
-        if (response?.isSuccess && response.data?.items) {
-          this.userAddresses = response.data.items;
-          
+      next: (result) => {
+        console.log('✅ Loaded data:', result);
+
+        // Process user info
+        if (result.userInfo) {
+          const user = result.userInfo;
+          this.userFullName = user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`.trim()
+            : user.firstName || user.lastName || '';
+          this.userPhone = user.phoneNumber || '';
+
+          console.log('👤 Setting default user info - Name:', this.userFullName, 'Phone:', this.userPhone);
+
+          // Set default user info in form
+          this.checkoutForm.patchValue({
+            fullName: this.userFullName,
+            phone: this.userPhone
+          });
+        }
+
+        // Process addresses
+        if (result.addresses?.isSuccess && result.addresses.data?.items) {
+          this.userAddresses = result.addresses.data.items;
+
           // Set default address as selected
           const defaultAddr = this.userAddresses.find(a => a.isDefault);
           if (defaultAddr) {
+            console.log('✅ Found default address:', defaultAddr);
             this.selectedAddress = defaultAddr;
             this.updateFormWithAddress(defaultAddr);
           } else if (this.userAddresses.length > 0) {
-            // If no default, select the first one
+            console.log('✅ Using first address:', this.userAddresses[0]);
             this.selectedAddress = this.userAddresses[0];
             this.updateFormWithAddress(this.userAddresses[0]);
+          } else {
+            console.warn('⚠️ No user addresses found');
           }
-          
+
           console.log('✅ Loaded user addresses:', this.userAddresses.length);
         }
+
+        console.log('📍 Selected address:', this.selectedAddress);
+        console.log('📝 Form after loading:', this.checkoutForm.value);
+        console.log('✅ Form valid:', this.checkoutForm.valid);
       },
       error: (err) => {
-        console.error('❌ Failed to load addresses:', err);
+        console.error('❌ Failed to load user data:', err);
       }
     });
   }
@@ -148,11 +214,16 @@ export class Checkout implements OnInit {
       address.country
     ].filter(Boolean).join(', ');
 
+    // Get current form values for name and phone (keep user's default info)
+    const currentFullName = this.checkoutForm.get('fullName')?.value;
+    const currentPhone = this.checkoutForm.get('phone')?.value;
+
+    // Update form - keep current name and phone if already set, otherwise use from address
     this.checkoutForm.patchValue({
-      fullName: address.user?.firstName && address.user?.lastName 
+      fullName: currentFullName || (address.user?.firstName && address.user?.lastName 
         ? `${address.user.firstName} ${address.user.lastName}` 
-        : '',
-      phone: address.user?.phoneNumber || '',
+        : ''),
+      phone: currentPhone || address.user?.phoneNumber || '',
       address: fullAddress
     });
   }
@@ -166,9 +237,12 @@ export class Checkout implements OnInit {
   }
 
   selectAddress(address: UserAddress): void {
+    console.log('📍 Selecting address:', address);
     this.selectedAddress = address;
     this.temporaryAddress = null; // Clear temporary address if any
     this.updateFormWithAddress(address);
+    console.log('✅ Form updated with address:', this.checkoutForm.value);
+    console.log('✅ Form valid after address selection:', this.checkoutForm.valid);
     this.closeAddressModal();
   }
 
@@ -182,7 +256,10 @@ export class Checkout implements OnInit {
   }
 
   saveTemporaryAddress(): void {
+    console.log('💾 Saving temporary address...');
+    
     if (this.temporaryAddressForm.invalid) {
+      console.warn('⚠️ Temporary address form is invalid');
       Object.keys(this.temporaryAddressForm.controls).forEach(key => {
         this.temporaryAddressForm.get(key)?.markAsTouched();
       });
@@ -190,6 +267,8 @@ export class Checkout implements OnInit {
     }
 
     const formValue = this.temporaryAddressForm.value;
+    console.log('📝 Temporary address form value:', formValue);
+    
     this.temporaryAddress = {
       fullName: formValue.fullName,
       phone: formValue.phone,
@@ -202,6 +281,9 @@ export class Checkout implements OnInit {
       phone: formValue.phone,
       address: formValue.address
     });
+
+    console.log('✅ Checkout form updated:', this.checkoutForm.value);
+    console.log('✅ Checkout form valid:', this.checkoutForm.valid);
 
     // Clear selected address since we're using temporary
     this.selectedAddress = null;
@@ -231,39 +313,68 @@ export class Checkout implements OnInit {
   }
 
   placeOrder() {
+    console.log('🔔 placeOrder() called');
+    console.log('📋 Form valid:', this.checkoutForm.valid);
+    console.log('📋 Form value:', this.checkoutForm.value);
+    console.log('📦 Products:', this.products);
+    console.log('📍 Selected address:', this.selectedAddress);
+    console.log('📍 Temporary address:', this.temporaryAddress);
+
     if (this.checkoutForm.invalid) {
+      console.warn('⚠️ Form is invalid');
+      const invalidFields: string[] = [];
       Object.keys(this.checkoutForm.controls).forEach(key => {
+        const control = this.checkoutForm.get(key);
+        console.log(`Field ${key}: valid=${control?.valid}, value=${control?.value}, errors=`, control?.errors);
+        if (control?.invalid) {
+          invalidFields.push(key);
+        }
         this.checkoutForm.get(key)?.markAsTouched();
       });
+      
+      alert(`⚠️ Vui lòng điền đầy đủ thông tin:\n${invalidFields.join(', ')}`);
       return;
     }
 
-    if (this.isProcessing) return;
+    if (this.isProcessing) {
+      console.warn('⚠️ Already processing');
+      return;
+    }
 
     const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
+    console.log('💳 Payment method:', paymentMethod);
 
     // Chỉ xử lý thanh toán COD
     if (paymentMethod === 'cod') {
+      console.log('✅ Processing COD order...');
       this.processOrder();
     } else {
       // TODO: Xử lý thanh toán online khác
+      console.warn('⚠️ Payment method not supported:', paymentMethod);
       alert('Phương thức thanh toán này chưa được hỗ trợ. Vui lòng chọn COD.');
     }
   }
 
   private processOrder() {
+    console.log('🚀 processOrder() started');
+    
     if (this.checkoutForm.invalid) {
+      console.error('❌ Form validation failed in processOrder');
       Object.keys(this.checkoutForm.controls).forEach(key => {
         this.checkoutForm.get(key)?.markAsTouched();
       });
       return;
     }
 
+    console.log('📝 Getting current user...');
     // Lấy userId từ authService
     this.authService.currentUser.pipe(
       take(1),
       switchMap(user => {
+        console.log('👤 Current user:', user);
+        
         if (!user?.id) {
+          console.error('❌ User not logged in, redirecting to login');
           // Nếu chưa đăng nhập, chuyển đến trang login
           this.router.navigate(['/login'], {
             queryParams: { returnUrl: '/checkout' }
@@ -271,9 +382,11 @@ export class Checkout implements OnInit {
           return of(null);
         }
 
+        console.log('✅ User logged in, userId:', user.id);
         this.isProcessing = true;
 
         const formValue = this.checkoutForm.value;
+        console.log('📝 Form values:', formValue);
         
         // Chuẩn bị dữ liệu đơn hàng với đầy đủ thông tin
         const orderRequest = {
@@ -297,11 +410,12 @@ export class Checkout implements OnInit {
           notes: undefined
         };
 
-        console.log('📦 Submitting order...', orderRequest);
+        console.log('📦 Submitting order...', JSON.stringify(orderRequest, null, 2));
 
         return this.orderService.createOrder(orderRequest).pipe(
           switchMap((response) => {
-            console.log('✅ Order created successfully:', response);
+            console.log('✅ Order created successfully:', JSON.stringify(response, null, 2));
+            console.log('✅ Response data:', response);
             this.isProcessing = false;
 
             // Tính ngày dự kiến giao hàng
@@ -374,13 +488,26 @@ export class Checkout implements OnInit {
           }),
           catchError((err) => {
             console.error('❌ Order creation failed:', err);
+            console.error('❌ Error details:', JSON.stringify(err, null, 2));
+            console.error('❌ Error status:', err?.status);
+            console.error('❌ Error message:', err?.error || err?.message);
             this.isProcessing = false;
+
+            // Lấy error message từ backend response
+            let errorMessage = 'Đã có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau.';
+            if (err?.error?.errorMessage) {
+              errorMessage = err.error.errorMessage;
+            } else if (err?.error?.message) {
+              errorMessage = err.error.message;
+            } else if (err?.message) {
+              errorMessage = err.message;
+            }
 
             // Navigate đến trang kết quả thất bại
             this.router.navigate(['/order-result'], {
               state: {
                 success: false,
-                errorMessage: err?.message || 'Đã có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại sau.'
+                errorMessage: errorMessage
               }
             });
             return of(null);

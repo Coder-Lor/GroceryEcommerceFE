@@ -8,8 +8,8 @@
       <div class="address-display">
         <div class="address-content">
           <div class="user-info">
-            <!-- <strong>{{ temporaryAddress ? temporaryAddress.fullName : (selectedAddress?.user?.firstName + ' ' + selectedAddress?.user?.lastName) }}</strong> -->
-            <span class="phone">{{ temporaryAddress ? temporaryAddress.phone : selectedAddress?.user?.phoneNumber }}</span>
+            <strong>{{ temporaryAddress ? temporaryAddress.fullName : userFullName }}</strong>
+            <span class="phone">{{ temporaryAddress ? temporaryAddress.phone : userPhone }}</span>
           </div>
           <div class="user-address">
             {{ temporaryAddress ? temporaryAddress.address : getFullAddress(selectedAddress) }}
@@ -170,8 +170,8 @@
               >
                 <div class="address-info-modal">
                   <div class="user-info">
-                    <strong>{{ address.user?.firstName }} {{ address.user?.lastName }}</strong>
-                    <span class="phone">{{ address.user?.phoneNumber }}</span>
+                    <strong>{{ userFullName }}</strong>
+                    <span class="phone">{{ userPhone }}</span>
                   </div>
                   <div class="user-address">{{ getFullAddress(address) }}</div>
                   @if (address.isDefault) {
