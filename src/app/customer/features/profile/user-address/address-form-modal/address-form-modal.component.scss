@@ -1,0 +1,43 @@
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.875rem;
+
+    .required {
+      color: var(--red-500);
+    }
+
+    &.mb-0 {
+      margin-bottom: 0;
+    }
+  }
+
+  .p-error {
+    font-size: 0.75rem;
+  }
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.w-full {
+  width: 100%;
+}

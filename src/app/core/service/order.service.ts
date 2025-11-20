@@ -46,7 +46,7 @@ export class OrderService {
     // Parse tên đầy đủ thành firstName và lastName
     const nameParts = orderData.shippingAddress.fullName.trim().split(' ');
     const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || firstName;
+    const lastName = nameParts.slice(1).join(' ') || '';
 
     // Tạo shipping address
     const shippingAddress = new ShippingAddressDto({
@@ -77,8 +77,9 @@ export class OrderService {
     // Tạo order items (không cần orderId vì sẽ được tạo ở backend)
     const items = orderData.items.map(item => 
       new CreateOrderItemRequest({
+        orderId: undefined, // Backend sẽ tạo
         productId: item.productId,
-        productVariantId: item.productVariantId,
+        productVariantId: item.productVariantId || undefined,
         unitPrice: item.unitPrice,
         quantity: item.quantity
       })
@@ -110,6 +111,7 @@ export class OrderService {
     });
 
     console.log('📦 Creating sales order:', request);
+    console.log('📦 Request JSON:', JSON.stringify(request.toJSON(), null, 2));
 
     return this.orderClient.create(request);
   }

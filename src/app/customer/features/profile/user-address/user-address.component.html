@@ -1,35 +1,95 @@
+<p-toast />
+<p-confirmDialog />
+
 <div class="user-address">
   <div class="header">
     <div>
       <h2 class="section-title">Địa chỉ của tôi</h2>
       <p class="section-subtitle">Quản lý địa chỉ giao hàng</p>
     </div>
-    <button class="btn-add" (click)="addNewAddress()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-      Thêm địa chỉ mới
-    </button>
+    <p-button
+      label="Thêm địa chỉ mới"
+      icon="pi pi-plus"
+      (onClick)="addNewAddress()"
+      [disabled]="isLoading"
+    />
   </div>
 
-  <div class="address-list">
-    <div *ngFor="let address of addresses" class="address-card">
-      <div class="address-header">
-        <div class="address-name">{{ address.name }}</div>
-        <span *ngIf="address.isDefault" class="badge-default">Mặc định</span>
-      </div>
-      <div class="address-details">
-        <p class="address-text">{{ address.fullAddress }}</p>
-        <p class="phone-text">Điện thoại: {{ address.phone }}</p>
-      </div>
-      <div class="address-actions">
-        <button class="btn-action" (click)="editAddress(address)">Chỉnh sửa</button>
-        <button class="btn-action" (click)="deleteAddress(address)">Xóa</button>
-        <button *ngIf="!address.isDefault" class="btn-action btn-default" (click)="setDefaultAddress(address)">
-          Đặt làm mặc định
-        </button>
-      </div>
+  <div class="loading-container" *ngIf="isLoading">
+    <p-progressSpinner
+      styleClass="w-4rem h-4rem"
+      strokeWidth="4"
+      animationDuration="1s"
+    />
+  </div>
+
+  <div class="address-list" *ngIf="!isLoading">
+    <div *ngIf="addresses.length === 0" class="empty-state">
+      <i class="pi pi-map-marker" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+      <p>Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới!</p>
     </div>
+
+    <p-card *ngFor="let address of addresses" styleClass="address-card">
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h3>{{ address.addressLine1 }}</h3>
+          <p-tag *ngIf="address.isDefault" value="Mặc định" severity="success" />
+        </div>
+      </ng-template>
+
+      <div class="address-details">
+        <div class="detail-item">
+          <i class="pi pi-map-marker"></i>
+          <span>
+            {{ address.addressLine1 }}
+            <span *ngIf="address.addressLine2">, {{ address.addressLine2 }}</span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <i class="pi pi-building"></i>
+          <span>{{ address.city }}, {{ address.state }} {{ address.zipCode }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="pi pi-globe"></i>
+          <span>{{ address.country }}</span>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <div class="card-actions">
+          <p-button
+            label="Chỉnh sửa"
+            icon="pi pi-pencil"
+            [text]="true"
+            (onClick)="editAddress(address)"
+            [disabled]="isLoading"
+          />
+          <p-button
+            label="Xóa"
+            icon="pi pi-trash"
+            [text]="true"
+            severity="danger"
+            (onClick)="deleteAddress(address)"
+            [disabled]="isLoading"
+          />
+          <p-button
+            *ngIf="!address.isDefault"
+            label="Đặt làm mặc định"
+            icon="pi pi-star"
+            [text]="true"
+            severity="secondary"
+            (onClick)="setDefaultAddress(address)"
+            [disabled]="isLoading"
+          />
+        </div>
+      </ng-template>
+    </p-card>
   </div>
 </div>
+
+<app-address-form-modal
+  [address]="selectedAddress"
+  [isOpen]="isModalOpen"
+  (close)="onCloseModal()"
+  (save)="onSaveAddress($event)"
+/>

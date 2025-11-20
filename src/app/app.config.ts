@@ -20,6 +20,8 @@ import { AuthInterceptor } from './core/service/auth.interceptor';
 import { registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 
+import { API_BASE_URL } from '@core/service/system-admin.service';
+
 registerLocaleData(localeVi);
 
 export const appConfig: ApplicationConfig = {
@@ -47,5 +49,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
     ConfirmationService,
+    // { provide: API_BASE_URL, useValue: 'https://localhost:44394'}
+    { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
   ],
 };

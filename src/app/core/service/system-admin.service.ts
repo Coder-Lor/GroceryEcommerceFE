@@ -18738,7 +18738,7 @@ export class UserAddressClient {
     return _observableOf(null as any);
   }
 
-  create(command: CreateUserAddressCommand): Observable<ResultOfBoolean> {
+  create(command: CreateUserAddressCommand): Observable<ResultOfUserAddress> {
     let url_ = this.baseUrl + '/api/UserAddress/create';
     url_ = url_.replace(/[?&]$/, '');
 
@@ -18768,14 +18768,14 @@ export class UserAddressClient {
             try {
               return this.processCreate(response_ as any);
             } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
+              return _observableThrow(e) as any as Observable<ResultOfUserAddress>;
             }
-          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
+          } else return _observableThrow(response_) as any as Observable<ResultOfUserAddress>;
         })
       );
   }
 
-  protected processCreate(response: HttpResponseBase): Observable<ResultOfBoolean> {
+  protected processCreate(response: HttpResponseBase): Observable<ResultOfUserAddress> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -18796,7 +18796,7 @@ export class UserAddressClient {
           let result200: any = null;
           let resultData200 =
             _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfBoolean.fromJS(resultData200);
+          result200 = ResultOfUserAddress.fromJS(resultData200);
           return _observableOf(result200);
         })
       );
