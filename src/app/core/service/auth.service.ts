@@ -174,10 +174,15 @@ export class AuthService {
     console.log('🔄 refreshOnLoad - Backend will use HttpOnly cookie');
 
     return this.authClient.refreshToken().pipe(
+      tap((result) => {
+        console.log('🔄 Refresh token raw response:', result);
+      }),
       map((result: ResultOfRefreshTokenResponse) => {
         if (!result.isSuccess || !result.data) {
+          console.error('❌ Refresh token response not successful:', result);
           throw new Error(result.errorMessage || 'Refresh token failed');
         }
+        console.log('✅ Refresh token successful');
         return result.data;
       }),
       tap((response: RefreshTokenResponse) => {
@@ -336,16 +341,24 @@ export class AuthService {
 
       // Gọi refresh để lấy accessToken mới
       // Backend tự động lấy refreshToken từ HttpOnly Cookie
+      console.log('🔄 Restoring auth state for user:', user.username);
+
       this.refreshOnLoad().subscribe({
         next: (result) => {
           if (!result) {
             // Refresh thất bại
+            console.error('❌ Refresh failed, clearing auth state');
             this.clearAuthState();
             this.clearLocalStorage();
+          } else {
+            // Nếu thành công, accessToken đã được set trong refreshOnLoad()
+            console.log('✅ Auth state restored successfully');
+            console.log('✅ AccessToken:', this.accessToken ? 'SET' : 'NULL');
+            console.log('✅ User:', this.currentUserValue?.username);
           }
-          // Nếu thành công, accessToken đã được set trong refreshOnLoad()
         },
-        error: () => {
+        error: (err) => {
+          console.error('❌ Refresh error:', err);
           this.clearAuthState();
           this.clearLocalStorage();
         },

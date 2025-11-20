@@ -1,4 +1,4 @@
-import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   Component,
   inject,
@@ -6,8 +6,6 @@ import {
   OnDestroy,
   ViewEncapsulation,
   PLATFORM_ID,
-  makeStateKey,
-  TransferState,
 } from '@angular/core';
 import { Route, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -31,8 +29,6 @@ type Product = ProductBaseResponse;
 type UrlObject = {
   url: string;
 };
-// State key for TransferState
-const CATEGORIES_KEY = makeStateKey<CategoryDto[]>('categories');
 
 type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number };
 
@@ -59,7 +55,6 @@ export class Home implements OnInit, OnDestroy {
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
   private categoryService = inject(CategoryClient);
-  private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
   private destroy$ = new Subject<void>();
 
@@ -193,38 +188,26 @@ export class Home implements OnInit, OnDestroy {
   }
 
   loadCategories(): void {
-    // Kiểm tra xem có dữ liệu trong TransferState không
-    const cachedCategories = this.transferState.get(CATEGORIES_KEY, null);
-
-    if (cachedCategories) {
-      // Sử dụng dữ liệu từ cache
-      this.categories = cachedCategories;
-      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
-      if (isPlatformBrowser(this.platformId)) {
-        this.transferState.remove(CATEGORIES_KEY);
-      }
-    } else {
-      // Gọi API để lấy danh sách danh mục
-      this.categoryService
-        .getCategoryTree()
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            if (response?.isSuccess && response?.data) {
-              this.categories = response.data;
-
-              // Lưu vào TransferState (chỉ trên server)
-              if (isPlatformServer(this.platformId)) {
-                this.transferState.set(CATEGORIES_KEY, this.categories);
-              }
-            }
-          },
-          error: (err) => {
-            console.error('Lỗi khi tải danh mục', err);
-            this.categories = [];
-          },
-        });
+    // Chỉ load categories trên browser để tránh lỗi SSR
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
     }
+
+    // Gọi API để lấy danh sách danh mục
+    this.categoryService
+      .getCategoryTree()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response?.isSuccess && response?.data) {
+            this.categories = response.data;
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải danh mục', err);
+          this.categories = [];
+        },
+      });
   }
 
   getCategoryImage(category: CategoryDto): string {
@@ -232,6 +215,11 @@ export class Home implements OnInit, OnDestroy {
   }
 
   loadProducts(): void {
+    // Chỉ load trên browser
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     if (this.isLoading) return;
     this.isLoading = true;
 
@@ -261,6 +249,11 @@ export class Home implements OnInit, OnDestroy {
   }
 
   loadFlashSaleProducts(): void {
+    // Chỉ load trên browser
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     // Lấy tất cả sản phẩm có giảm giá > 50%
     this.productService
       .getProductByPaging(1, 100) // Lấy nhiều sản phẩm để filter
