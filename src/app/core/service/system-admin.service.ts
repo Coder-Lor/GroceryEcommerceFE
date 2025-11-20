@@ -8412,6 +8412,98 @@ export class OrderPaymentClient {
     }
     return _observableOf(null as any);
   }
+
+  paymentConfirmation(request: PaymentConfirmationRequest): Observable<FileResponse> {
+    let url_ = this.baseUrl + '/api/OrderPayment/payment-confirmation';
+    url_ = url_.replace(/[?&]$/, '');
+
+    const content_ = JSON.stringify(request);
+
+    let options_: any = {
+      body: content_,
+      observe: 'response',
+      responseType: 'blob',
+      withCredentials: true,
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Accept: 'application/octet-stream',
+      }),
+    };
+
+    return this.http
+      .request('post', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processPaymentConfirmation(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processPaymentConfirmation(response_ as any);
+            } catch (e) {
+              return _observableThrow(e) as any as Observable<FileResponse>;
+            }
+          } else return _observableThrow(response_) as any as Observable<FileResponse>;
+        })
+      );
+  }
+
+  protected processPaymentConfirmation(response: HttpResponseBase): Observable<FileResponse> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (response as any).error instanceof Blob
+        ? (response as any).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200 || status === 206) {
+      const contentDisposition = response.headers
+        ? response.headers.get('content-disposition')
+        : undefined;
+      let fileNameMatch = contentDisposition
+        ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition)
+        : undefined;
+      let fileName =
+        fileNameMatch && fileNameMatch.length > 1
+          ? fileNameMatch[3] || fileNameMatch[2]
+          : undefined;
+      if (fileName) {
+        fileName = decodeURIComponent(fileName);
+      } else {
+        fileNameMatch = contentDisposition
+          ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition)
+          : undefined;
+        fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+      }
+      return _observableOf({
+        fileName: fileName,
+        data: responseBlob as any,
+        status: status,
+        headers: _headers,
+      });
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText: string) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return _observableOf(null as any);
+  }
 }
 
 @Injectable({
@@ -18646,7 +18738,7 @@ export class UserAddressClient {
     return _observableOf(null as any);
   }
 
-  create(command: CreateUserAddressCommand): Observable<ResultOfUserAddress> {
+  create(command: CreateUserAddressCommand): Observable<ResultOfBoolean> {
     let url_ = this.baseUrl + '/api/UserAddress/create';
     url_ = url_.replace(/[?&]$/, '');
 
@@ -18676,14 +18768,14 @@ export class UserAddressClient {
             try {
               return this.processCreate(response_ as any);
             } catch (e) {
-              return _observableThrow(e) as any as Observable<ResultOfUserAddress>;
+              return _observableThrow(e) as any as Observable<ResultOfBoolean>;
             }
-          } else return _observableThrow(response_) as any as Observable<ResultOfUserAddress>;
+          } else return _observableThrow(response_) as any as Observable<ResultOfBoolean>;
         })
       );
   }
 
-  protected processCreate(response: HttpResponseBase): Observable<ResultOfUserAddress> {
+  protected processCreate(response: HttpResponseBase): Observable<ResultOfBoolean> {
     const status = response.status;
     const responseBlob =
       response instanceof HttpResponse
@@ -18704,7 +18796,7 @@ export class UserAddressClient {
           let result200: any = null;
           let resultData200 =
             _responseText === '' ? null : JSON.parse(_responseText, this.jsonParseReviver);
-          result200 = ResultOfUserAddress.fromJS(resultData200);
+          result200 = ResultOfBoolean.fromJS(resultData200);
           return _observableOf(result200);
         })
       );
@@ -30014,6 +30106,89 @@ export class UpdatePaymentStatusRequest implements IUpdatePaymentStatusRequest {
 
 export interface IUpdatePaymentStatusRequest {
   status?: number;
+}
+
+export class PaymentConfirmationRequest implements IPaymentConfirmationRequest {
+  id?: number;
+  gateway?: string;
+  transactionDate?: Date;
+  accountNumber?: string | undefined;
+  code?: string | undefined;
+  content?: string | undefined;
+  transferType?: string | undefined;
+  transferAmount?: number;
+  accumulated?: number;
+  subAccount?: string | undefined;
+  referenceCode?: string | undefined;
+  description?: string | undefined;
+
+  constructor(data?: IPaymentConfirmationRequest) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) (this as any)[property] = (data as any)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.id = _data['id'];
+      this.gateway = _data['gateway'];
+      this.transactionDate = _data['transactionDate']
+        ? new Date(_data['transactionDate'].toString())
+        : (undefined as any);
+      this.accountNumber = _data['accountNumber'];
+      this.code = _data['code'];
+      this.content = _data['content'];
+      this.transferType = _data['transferType'];
+      this.transferAmount = _data['transferAmount'];
+      this.accumulated = _data['accumulated'];
+      this.subAccount = _data['subAccount'];
+      this.referenceCode = _data['referenceCode'];
+      this.description = _data['description'];
+    }
+  }
+
+  static fromJS(data: any): PaymentConfirmationRequest {
+    data = typeof data === 'object' ? data : {};
+    let result = new PaymentConfirmationRequest();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['id'] = this.id;
+    data['gateway'] = this.gateway;
+    data['transactionDate'] = this.transactionDate
+      ? this.transactionDate.toISOString()
+      : (undefined as any);
+    data['accountNumber'] = this.accountNumber;
+    data['code'] = this.code;
+    data['content'] = this.content;
+    data['transferType'] = this.transferType;
+    data['transferAmount'] = this.transferAmount;
+    data['accumulated'] = this.accumulated;
+    data['subAccount'] = this.subAccount;
+    data['referenceCode'] = this.referenceCode;
+    data['description'] = this.description;
+    return data;
+  }
+}
+
+export interface IPaymentConfirmationRequest {
+  id?: number;
+  gateway?: string;
+  transactionDate?: Date;
+  accountNumber?: string | undefined;
+  code?: string | undefined;
+  content?: string | undefined;
+  transferType?: string | undefined;
+  transferAmount?: number;
+  accumulated?: number;
+  subAccount?: string | undefined;
+  referenceCode?: string | undefined;
+  description?: string | undefined;
 }
 
 export class ResultOfPagedResultOfOrderRefundDto implements IResultOfPagedResultOfOrderRefundDto {
