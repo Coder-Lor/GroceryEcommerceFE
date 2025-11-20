@@ -4,17 +4,18 @@
 <div class="list-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
-  
+
   <!-- Confirm Dialog -->
   <p-confirmDialog
-    [style]="{width: '450px'}"
+    [style]="{ width: '450px' }"
     [baseZIndex]="10000"
     [closable]="true"
     [closeOnEscape]="true"
     acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text">
+    rejectButtonStyleClass="p-button-secondary p-button-text"
+  >
   </p-confirmDialog>
-  
+
   <div class="list-header">
     <h3>Danh sách đơn hàng</h3>
     <div class="header-actions">
@@ -54,32 +55,72 @@
           <th (click)="changeSortColumn('orderNumber')" class="sortable">
             Mã đơn hàng
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'orderNumber' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="
+                  sortColumn === 'orderNumber'
+                    ? sortDirection === 'asc'
+                      ? faSortUp
+                      : faSortDown
+                    : faSort
+                "
+              ></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('customerName')" class="sortable">
             Khách hàng
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'customerName' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="
+                  sortColumn === 'customerName'
+                    ? sortDirection === 'asc'
+                      ? faSortUp
+                      : faSortDown
+                    : faSort
+                "
+              ></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('orderDate')" class="sortable">
             Ngày đặt
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'orderDate' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="
+                  sortColumn === 'orderDate'
+                    ? sortDirection === 'asc'
+                      ? faSortUp
+                      : faSortDown
+                    : faSort
+                "
+              ></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('totalAmount')" class="sortable text-right">
             Tổng tiền
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'totalAmount' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="
+                  sortColumn === 'totalAmount'
+                    ? sortDirection === 'asc'
+                      ? faSortUp
+                      : faSortDown
+                    : faSort
+                "
+              ></fa-icon>
             </span>
           </th>
           <th>Trạng thái</th>
           <th (click)="changeSortColumn('createdAt')" class="sortable text-center">
             Ngày tạo
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'createdAt' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="
+                  sortColumn === 'createdAt'
+                    ? sortDirection === 'asc'
+                      ? faSortUp
+                      : faSortDown
+                    : faSort
+                "
+              ></fa-icon>
             </span>
           </th>
           <th class="text-center">Thao tác</th>
@@ -93,7 +134,7 @@
               <strong>{{ order.orderNumber || order.orderId || 'N/A' }}</strong>
             </div>
           </td>
-          <td>{{ order.customerName || 'N/A' }}</td>
+          <td>{{ order.userName }}</td>
           <td>
             <fa-icon [icon]="faCalendar" class="icon-small"></fa-icon>
             {{ formatDate(order.orderDate) }}
@@ -109,7 +150,11 @@
             {{ formatDate(order.createdAt) }}
           </td>
           <td class="text-center actions">
-            <button class="btn-icon btn-view" (click)="viewOrderDetail(order.orderId!)" appTooltip="Xem chi tiết">
+            <button
+              class="btn-icon btn-view"
+              (click)="viewOrderDetail(order.orderId!)"
+              appTooltip="Xem chi tiết"
+            >
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
             <button class="btn-icon btn-delete" (click)="confirmDelete(order)" appTooltip="Xóa">
@@ -223,4 +268,3 @@
     </div>
   </div>
 </div>
-

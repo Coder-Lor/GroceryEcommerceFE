@@ -22,17 +22,20 @@ export class AuthInterceptor implements HttpInterceptor {
   );
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // 1. Thêm accessToken vào header nếu có
+    // Clone request với withCredentials và Authorization header
     const token = this.authService.currentAccessToken;
-    if (token) {
-      request = this.addToken(request, token);
-    }
 
-    // 2. Luôn gắn withCredentials
-    request = request.clone({ withCredentials: true });
+    const clonedRequest = token
+      ? request.clone({
+          withCredentials: true,
+          setHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      : request.clone({ withCredentials: true });
 
-    // 3. Xử lý request và bắt lỗi 401
-    return next.handle(request).pipe(
+    // Xử lý request và bắt lỗi 401
+    return next.handle(clonedRequest).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
           return this.handle401Error(request, next);
@@ -43,10 +46,11 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   /**
-   * Thêm Authorization header với Bearer token
+   * Thêm Authorization header với Bearer token VÀ withCredentials
    */
   private addToken(request: HttpRequest<any>, token: string): HttpRequest<any> {
     return request.clone({
+      withCredentials: true,
       setHeaders: {
         Authorization: `Bearer ${token}`,
       },
