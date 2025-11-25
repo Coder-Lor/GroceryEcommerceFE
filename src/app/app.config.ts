@@ -15,7 +15,6 @@ import Aura from '@primeuix/themes/aura';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { CredentialInterceptor } from './core/service/credential.interceptor';
 import { AuthInterceptor } from './core/service/auth.interceptor';
 
 import { registerLocaleData } from '@angular/common';
@@ -47,7 +46,6 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     provideHttpClient(withFetch()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: CredentialInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
     ConfirmationService,

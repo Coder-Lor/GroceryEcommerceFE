@@ -3,8 +3,8 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthService } from '@core/service/auth.service';
-import { RegisterCommand, RegisterResponse } from '@core/service/system-admin.service';
+import { AuthService, AuthPublicResponse } from '@core/service/auth.service';
+import { RegisterCommand } from '@core/service/system-admin.service';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -25,8 +25,8 @@ export class Register implements OnDestroy {
   isSubmitting = false;
   errorMessage = '';
 
-  private destroy$ = new Subject<void>(); // ✅ Cleanup subscription
-  private redirectTimeout: any; // ✅ Giữ ID của setTimeout
+  private destroy$ = new Subject<void>();
+  private redirectTimeout: any;
 
   constructor() {
     this.registerForm = this.fb.group(
@@ -78,16 +78,15 @@ export class Register implements OnDestroy {
 
     this.authService
       .register(registerCommand)
-      .pipe(takeUntil(this.destroy$)) // ✅ Tự động unsubscribe
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: RegisterResponse) => {
-          console.log('Đăng ký thành công:', response);
+        next: (_response: AuthPublicResponse) => {
           this.isSubmitting = false;
 
           this.messageService.add({
             severity: 'success',
-            summary: 'Thành công',
-            detail: 'Đăng ký thành công!',
+            summary: 'Th?nh c?ng',
+            detail: '??ng k? th?nh c?ng!',
             life: 1000,
           });
 
@@ -100,20 +99,18 @@ export class Register implements OnDestroy {
           console.error('Register error:', err);
           this.messageService.add({
             severity: 'error',
-            summary: 'Lỗi',
-            detail: err.message || 'Đăng ký không thành công.',
+            summary: 'L?i',
+            detail: err.message || '??ng k? kh?ng th?nh c?ng.',
             life: 1000,
           });
         },
       });
   }
 
-  // ✅ Cleanup khi component bị hủy
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
 
-    // ✅ Clear timeout nếu còn
     if (this.redirectTimeout) {
       clearTimeout(this.redirectTimeout);
     }
@@ -132,13 +129,13 @@ export class Register implements OnDestroy {
     const field = this.registerForm.get(fieldName);
     if (!field || !field.errors) return '';
 
-    if (field.hasError('required')) return 'Trường này là bắt buộc';
-    if (field.hasError('email')) return 'Email không hợp lệ';
+    if (field.hasError('required')) return 'Tr??ng n?y l? b?t bu?c';
+    if (field.hasError('email')) return 'Email kh?ng h?p l?';
     if (field.hasError('minlength')) {
       const minLength = field.errors['minlength'].requiredLength;
-      return `Tối thiểu ${minLength} ký tự`;
+      return `T?i thi?u ${minLength} k? t?`;
     }
-    if (field.hasError('passwordMismatch')) return 'Mật khẩu không khớp';
+    if (field.hasError('passwordMismatch')) return 'M?t kh?u kh?ng kh?p';
 
     return '';
   }

@@ -16,6 +16,7 @@ import { AuthService } from './auth.service';
 export interface CartItemViewModel {
   cartItemId: string;
   productId: string;
+  productVariantId?: string;
   productName: string;
   imageUrl: string;
   unitPrice: number;
@@ -200,6 +201,7 @@ export class CartService {
     const vm = (items || []).map((it) => ({
       cartItemId: it.cartItemId || '',
       productId: it.productId || '',
+      productVariantId: it.productVariantId || undefined,
       productName: it.productName || '',
       imageUrl: it.productImageUrl || '/images/product-image-1.png',
       unitPrice: it.unitPrice ?? 0,

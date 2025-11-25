@@ -116,7 +116,7 @@
             <button 
               class="btn btn-action btn-variant" 
               (click)="openAddVariantModal(item)"
-              appTooltip="Thêm phân loại"
+              appTooltip="Quản lý phân loại"
             >
               <fa-icon [icon]="faLayerGroup"></fa-icon>
             </button>
@@ -973,13 +973,13 @@
   </div>
 </div>
 
-<!-- Modal thêm variant -->
+<!-- Modal quản lý variant -->
 <div class="modal-overlay" *ngIf="showVariantModal" (click)="closeVariantModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content variant-management-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>
         <fa-icon [icon]="faLayerGroup"></fa-icon>
-        Thêm phân loại sản phẩm
+        Quản lý phân loại sản phẩm
       </h3>
       <button class="btn-close" (click)="closeVariantModal()">
         <fa-icon [icon]="faXmark"></fa-icon>
@@ -993,70 +993,190 @@
         </p>
       </div>
 
-      <!-- Product Images Section -->
-      <div class="product-images-section" *ngIf="productImageUrls.length > 0">
-        <h4 class="section-title">
-          <fa-icon [icon]="faImages"></fa-icon>
-          Chọn ảnh từ sản phẩm gốc (tùy chọn)
-        </h4>
-        <div class="images-gallery">
-          <div 
-            class="image-item" 
-            *ngFor="let imageUrl of productImageUrls"
-            [class.selected]="selectedImageUrl === imageUrl"
-            (click)="selectProductImage(imageUrl)"
-          >
-            <img [src]="imageUrl" alt="Product image" />
-            <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
-              <fa-icon [icon]="faCheck"></fa-icon>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Upload New Image Section -->
-      <div class="upload-image-section">
-        <h4 class="section-title">
-          <fa-icon [icon]="faUpload"></fa-icon>
-          Hoặc tải lên ảnh mới (tùy chọn)
-        </h4>
-        
-        <div class="upload-area" *ngIf="!variantImageFile">
-          <input 
-            type="file" 
-            #variantFileInput
-            accept="image/*"
-            (change)="onVariantImageSelect($event)"
-            style="display: none"
-          />
-          <button 
-            type="button" 
-            class="btn btn-upload"
-            (click)="variantFileInput.click()"
-          >
-            <fa-icon [icon]="faCloudUpload"></fa-icon>
-            Chọn ảnh từ máy tính
-          </button>
-          <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
-        </div>
-
-        <div class="uploaded-image" *ngIf="variantImageFile">
-          <div class="image-preview">
-            <img [src]="variantImagePreview" alt="Uploaded image" />
+      <!-- Danh sách phân loại hiện có -->
+      @if (!showVariantForm) {
+        <div class="variants-list-section">
+          <div class="list-header">
+            <h4 class="section-title">
+              <fa-icon [icon]="faLayerGroup"></fa-icon>
+              Danh sách phân loại ({{ productVariants.length }})
+            </h4>
             <button 
               type="button" 
-              class="btn-remove"
-              (click)="removeVariantImage()"
-              appTooltip="Xóa ảnh"
+              class="btn btn-primary"
+              (click)="openAddVariantForm()"
             >
-              <fa-icon [icon]="faXmark"></fa-icon>
+              <fa-icon [icon]="faPlus"></fa-icon>
+              Thêm phân loại mới
             </button>
           </div>
-          <p class="file-name">{{ variantImageFile.name }}</p>
-        </div>
-      </div>
 
-      <form #variantForm="ngForm">
+          @if (isLoadingVariants) {
+            <div class="loading-variants">
+              <p>Đang tải danh sách phân loại...</p>
+            </div>
+          } @else if (productVariants.length === 0) {
+            <div class="no-variants">
+              <fa-icon [icon]="faBox" size="2x"></fa-icon>
+              <p>Chưa có phân loại nào</p>
+              <button 
+                type="button" 
+                class="btn btn-primary"
+                (click)="openAddVariantForm()"
+              >
+                <fa-icon [icon]="faPlus"></fa-icon>
+                Thêm phân loại đầu tiên
+              </button>
+            </div>
+          } @else {
+            <div class="variants-grid">
+              @for (variant of productVariants; track variant.productVariantId) {
+                <div class="variant-card">
+                  <div class="variant-image">
+                    @if (variant.imageUrl) {
+                      <img [src]="variant.imageUrl" [alt]="variant.name" />
+                    } @else {
+                      <div class="no-image-placeholder">
+                        <fa-icon [icon]="faBox" size="2x"></fa-icon>
+                      </div>
+                    }
+                  </div>
+                  
+                  <div class="variant-info">
+                    <h5 class="variant-name" [title]="variant.name">{{ variant.name }}</h5>
+                    <p class="variant-sku">SKU: {{ variant.sku }}</p>
+                    
+                    <div class="variant-details">
+                      <div class="detail-row">
+                        <span class="label">Giá:</span>
+                        <span class="value">{{ formatCurrency(variant.price || 0) }}</span>
+                      </div>
+                      @if (variant.discountPrice && variant.discountPrice > 0) {
+                        <div class="detail-row">
+                          <span class="label">Giá giảm:</span>
+                          <span class="value discount">{{ formatCurrency(variant.discountPrice) }}</span>
+                        </div>
+                      }
+                      <div class="detail-row">
+                        <span class="label">Tồn kho:</span>
+                        <span class="value">{{ variant.stockQuantity || 0 }}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="label">Trạng thái:</span>
+                        <span class="value" [class.status-active]="variant.status === 1" [class.status-inactive]="variant.status === 0">
+                          {{ variant.status === 1 ? 'Hoạt động' : 'Không hoạt động' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="variant-actions">
+                    <button 
+                      type="button" 
+                      class="btn-action btn-edit"
+                      (click)="openEditVariantForm(variant)"
+                      appTooltip="Sửa"
+                    >
+                      <fa-icon [icon]="faPenToSquare"></fa-icon>
+                    </button>
+                    <button 
+                      type="button" 
+                      class="btn-action btn-delete"
+                      (click)="confirmDeleteVariant(variant)"
+                      appTooltip="Xóa"
+                    >
+                      <fa-icon [icon]="faTrashCan"></fa-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Form thêm/sửa phân loại -->
+      @if (showVariantForm) {
+        <div class="variant-form-section">
+          <div class="form-header">
+            <h4 class="section-title">
+              <fa-icon [icon]="variantFormMode === 'add' ? faPlus : faPenToSquare"></fa-icon>
+              {{ variantFormMode === 'add' ? 'Thêm phân loại mới' : 'Chỉnh sửa phân loại' }}
+            </h4>
+            <button 
+              type="button" 
+              class="btn btn-secondary btn-sm"
+              (click)="cancelVariantForm()"
+            >
+              <fa-icon [icon]="faXmark"></fa-icon>
+              Quay lại
+            </button>
+          </div>
+
+          <!-- Product Images Section -->
+          <div class="product-images-section" *ngIf="productImageUrls.length > 0">
+            <h4 class="section-title">
+              <fa-icon [icon]="faImages"></fa-icon>
+              Chọn ảnh từ sản phẩm gốc (tùy chọn)
+            </h4>
+            <div class="images-gallery">
+              <div 
+                class="image-item" 
+                *ngFor="let imageUrl of productImageUrls"
+                [class.selected]="selectedImageUrl === imageUrl"
+                (click)="selectProductImage(imageUrl)"
+              >
+                <img [src]="imageUrl" alt="Product image" />
+                <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
+                  <fa-icon [icon]="faCheck"></fa-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload New Image Section -->
+          <div class="upload-image-section">
+            <h4 class="section-title">
+              <fa-icon [icon]="faUpload"></fa-icon>
+              Hoặc tải lên ảnh mới (tùy chọn)
+            </h4>
+            
+            <div class="upload-area" *ngIf="!variantImageFile">
+              <input 
+                type="file" 
+                #variantFileInput
+                accept="image/*"
+                (change)="onVariantImageSelect($event)"
+                style="display: none"
+              />
+              <button 
+                type="button" 
+                class="btn btn-upload"
+                (click)="variantFileInput.click()"
+              >
+                <fa-icon [icon]="faCloudUpload"></fa-icon>
+                Chọn ảnh từ máy tính
+              </button>
+              <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
+            </div>
+
+            <div class="uploaded-image" *ngIf="variantImageFile">
+              <div class="image-preview">
+                <img [src]="variantImagePreview" alt="Uploaded image" />
+                <button 
+                  type="button" 
+                  class="btn-remove"
+                  (click)="removeVariantImage()"
+                  appTooltip="Xóa ảnh"
+                >
+                  <fa-icon [icon]="faXmark"></fa-icon>
+                </button>
+              </div>
+              <p class="file-name">{{ variantImageFile.name }}</p>
+            </div>
+          </div>
+
+          <form #variantForm="ngForm">
         <!-- Basic Information -->
         <div class="form-section">
           <h4 class="section-title">
@@ -1068,7 +1188,7 @@
             <label>Mã SKU <span class="required">*</span></label>
             <input
               type="text"
-              [(ngModel)]="currentVariant.sku"
+              [(ngModel)]="variantSku"
               name="variantSku"
               class="form-control"
               required
@@ -1079,7 +1199,7 @@
             <label>Tên phân loại <span class="required">*</span></label>
             <input
               type="text"
-              [(ngModel)]="currentVariant.name"
+              [(ngModel)]="variantName"
               name="variantName"
               class="form-control"
               required
@@ -1099,7 +1219,7 @@
               <label>Giá bán <span class="required">*</span></label>
               <input
                 type="number"
-                [(ngModel)]="currentVariant.price"
+                [(ngModel)]="variantPrice"
                 name="variantPrice"
                 class="form-control"
                 min="0"
@@ -1112,7 +1232,7 @@
               <label>Giá giảm</label>
               <input
                 type="number"
-                [(ngModel)]="currentVariant.discountPrice"
+                [(ngModel)]="variantDiscountPrice"
                 name="variantDiscountPrice"
                 class="form-control"
                 min="0"
@@ -1134,7 +1254,7 @@
               <label>Số lượng tồn kho <span class="required">*</span></label>
               <input
                 type="number"
-                [(ngModel)]="currentVariant.stockQuantity"
+                [(ngModel)]="variantStockQuantity"
                 name="variantStockQuantity"
                 class="form-control"
                 min="0"
@@ -1146,7 +1266,7 @@
               <label>Mức tồn tối thiểu <span class="required">*</span></label>
               <input
                 type="number"
-                [(ngModel)]="currentVariant.minStockLevel"
+                [(ngModel)]="variantMinStockLevel"
                 name="variantMinStockLevel"
                 class="form-control"
                 min="0"
@@ -1160,7 +1280,7 @@
               <label>Trọng lượng (kg)</label>
               <input
                 type="number"
-                [(ngModel)]="currentVariant.weight"
+                [(ngModel)]="variantWeight"
                 name="variantWeight"
                 class="form-control"
                 min="0"
@@ -1172,7 +1292,7 @@
               <label>Kích thước</label>
               <input
                 type="text"
-                [(ngModel)]="currentVariant.dimensions"
+                [(ngModel)]="variantDimensions"
                 name="variantDimensions"
                 class="form-control"
                 placeholder="DxRxC (mm)"
@@ -1181,34 +1301,40 @@
           </div>
         </div>
 
-        <!-- Status Section -->
-        <div class="form-section">
-          <h4 class="section-title">
-            <fa-icon [icon]="faBox"></fa-icon>
-            Trạng thái
-          </h4>
+            <!-- Status Section -->
+            <div class="form-section">
+              <h4 class="section-title">
+                <fa-icon [icon]="faBox"></fa-icon>
+                Trạng thái
+              </h4>
 
-          <div class="form-group">
-            <label>Trạng thái <span class="required">*</span></label>
-            <select
-              [(ngModel)]="currentVariant.status"
-              name="variantStatus"
-              class="form-control"
-              required
-            >
-              <option [value]="0">Không hoạt động</option>
-              <option [value]="1">Hoạt động</option>
-            </select>
+              <div class="form-group">
+                <label>Trạng thái <span class="required">*</span></label>
+                <select
+                  [(ngModel)]="variantStatus"
+                  name="variantStatus"
+                  class="form-control"
+                  required
+                >
+                  <option [value]="0">Không hoạt động</option>
+                  <option [value]="1">Hoạt động</option>
+                </select>
+              </div>
+            </div>
+          </form>
+
+          <div class="form-actions">
+            <button class="btn btn-secondary" (click)="cancelVariantForm()">Hủy</button>
+            <button class="btn btn-primary" (click)="saveVariant()">
+              {{ variantFormMode === 'add' ? 'Thêm phân loại' : 'Cập nhật phân loại' }}
+            </button>
           </div>
         </div>
-      </form>
+      }
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="closeVariantModal()">Hủy</button>
-      <button class="btn btn-primary" (click)="saveVariant()">
-        Thêm phân loại
-      </button>
+    <div class="modal-footer" *ngIf="!showVariantForm">
+      <button class="btn btn-secondary" (click)="closeVariantModal()">Đóng</button>
     </div>
   </div>
 </div>

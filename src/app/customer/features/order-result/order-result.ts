@@ -18,17 +18,18 @@ export class OrderResult implements OnInit {
   orderInfo: any = null;
 
   ngOnInit(): void {
-    // Lấy thông tin từ navigation state
-    const navigation = this.router.getCurrentNavigation();
-    const state = navigation?.extras.state as any;
+    // Lấy thông tin từ navigation state hoặc history.state (trường hợp reload)
+    const navigationState = this.router.getCurrentNavigation()?.extras.state as any;
+    const state = navigationState ?? (history.state as any);
 
-    if (state) {
-      this.isSuccess = state.success || false;
-      this.errorMessage = state.errorMessage || '';
-      this.orderInfo = state.orderInfo || null;
+    if (state && (state.success !== undefined || state.orderInfo)) {
+      this.isSuccess = state.success ?? false;
+      this.errorMessage = state.errorMessage ?? '';
+      this.orderInfo = state.orderInfo ?? null;
     } else {
-      // Nếu không có state (refresh page), redirect về home
-      this.router.navigate(['/home']);
+      // Không chuyển hướng để giữ nguyên route hiển thị component
+      this.isSuccess = false;
+      this.errorMessage = 'Không tìm thấy thông tin đơn hàng. Vui lòng kiểm tra lại.';
     }
   }
 

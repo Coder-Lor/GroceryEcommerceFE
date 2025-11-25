@@ -2,68 +2,42 @@ import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, catchError, finalize, map, filter, take } from 'rxjs/operators';
-import {
-  AuthClient,
-  LoginCommand,
-  LoginResponse,
-  LogoutCommand,
-  RefreshTokenCommand,
-  RefreshTokenResponse,
-  RegisterCommand,
-  RegisterResponse,
-  ResultOfBoolean,
-  ResultOfLoginResponse,
-  ResultOfRefreshTokenResponse,
-  ResultOfRegisterResponse,
-} from './system-admin.service';
+import { AuthClient, LoginCommand, LogoutCommand, RegisterCommand, ResultOfBoolean } from './system-admin.service';
 import { isPlatformBrowser } from '@angular/common';
 
-// --- ĐỊNH NGHĨA CÁC INTERFACE (NÊN ĐẶT Ở FILE RIÊNG) ---
-
-/**
- * Interface cho đối tượng người dùng
- */
 export interface User {
   id: string;
   username: string;
   email: string;
-  // ... (thêm các trường khác)
 }
 
-/**
- * Interface cho phản hồi từ API login/register/refresh
- * Backend CHỈ trả về accessToken. RefreshToken nằm trong HttpOnly Cookie.
- */
-export interface AuthResponse {
-  token: string; // Đây là AccessToken
-  user: User;
+export interface AuthPublicResponse {
+  userId?: string;
+  username?: string;
+  role?: string;
+  email?: string;
+  token?: string;
+  expiresAt?: Date;
 }
 
-// --- AUTH SERVICE ---
+export interface AccessTokenPublicResponse {
+  accessToken?: string;
+  expiresAt?: Date;
+}
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private platformId = inject(PLATFORM_ID);
   private authClient = inject(AuthClient);
 
-  // 1. Quản lý State: Dùng BehaviorSubject để lưu trữ user hiện tại
-  // private: Chỉ service này được phép .next() (phát) giá trị mới
   private currentUserSubject: BehaviorSubject<User | null>;
-  // public: Các component khác có thể .subscribe() để lắng nghe
   public currentUser: Observable<User | null>;
 
-  // 2. In-memory Token: Lưu accessToken và refreshToken trong biến private
   private accessToken: string | null = null;
-  private refreshToken: string | null = null;
-
-  // 3. Refresh Logic: Cờ để tránh gọi refresh nhiều lần cùng lúc
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(private router: Router) {
-    // Khởi tạo state: Mặc định là null (chưa đăng nhập)
     this.currentUserSubject = new BehaviorSubject<User | null>(null);
     this.currentUser = this.currentUserSubject.asObservable();
     if (isPlatformBrowser(this.platformId)) {
@@ -71,88 +45,63 @@ export class AuthService {
     }
   }
 
-  // --- 1. Getters (Hàm truy cập) ---
-
-  /**
-   * Getter để Interceptor lấy accessToken
-   */
   public get currentAccessToken(): string | null {
     return this.accessToken;
   }
 
-  /**
-   * Observable trả về true/false, cho biết đã đăng nhập hay chưa
-   */
   public get isAuthenticated$(): Observable<boolean> {
     return this.currentUser.pipe(map((user) => !!user));
   }
 
-  /**
-   * Getter đồng bộ để check nhanh trạng thái đăng nhập
-   */
   public get isAuthenticated(): boolean {
-    return this.currentUserSubject.value !== null && this.accessToken !== null;
+    return this.currentUserSubject.value !== null;
   }
 
-  /**
-   * Getter để lấy thông tin user hiện tại
-   */
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  // --- 2. Hàm xử lý Auth chính (Login, Register, Logout) ---
-
-  /**
-   * API Đăng nhập
-   */
-  public login(command: LoginCommand): Observable<LoginResponse> {
+  public login(command: LoginCommand): Observable<AuthPublicResponse> {
     return this.authClient.login(command).pipe(
-      map((result: ResultOfLoginResponse) => {
-        if (!result.isSuccess || !result.data) {
-          throw new Error(result.errorMessage || 'Đăng nhập thất bại');
+      map((result: any) => {
+        const data = result?.data as AuthPublicResponse | undefined;
+        if (!result?.isSuccess || !data) {
+          throw new Error(result?.errorMessage || 'Dang nhap that bai');
         }
-        this.handleAuthSuccess(result.data);
-        return result.data;
+        this.handleAuthSuccess(data);
+        return data;
       }),
       catchError((err) => {
-        console.error('❌ Lỗi đăng nhập:', err);
+        console.error('Login error:', err);
         return throwError(() => err);
       })
     );
   }
 
-  /**
-   * API Đăng ký (Đăng ký xong sẽ tự động đăng nhập)
-   */
-  public register(registerData: RegisterCommand): Observable<RegisterResponse> {
+  public register(registerData: RegisterCommand): Observable<AuthPublicResponse> {
     return this.authClient.registerAccount(registerData).pipe(
-      map((response: ResultOfRegisterResponse) => {
-        if (!response.isSuccess || !response.data) {
-          throw new Error(response.errorMessage || 'Đăng ký thất bại');
+      map((response: any) => {
+        const data = response?.data as AuthPublicResponse | undefined;
+        if (!response?.isSuccess || !data) {
+          throw new Error(response?.errorMessage || 'Dang ky that bai');
         }
-        this.handleAuthSuccess(response.data);
-        return response.data;
+        this.handleAuthSuccess(data);
+        return data;
       }),
       catchError((err) => {
-        console.error('❌ Lỗi đăng ký:', err);
+        console.error('Register error:', err);
         return throwError(() => err);
       })
     );
   }
 
-  /**
-   * Đăng xuất
-   */
   public logout(): Observable<ResultOfBoolean> {
-    const logoutCommand = new LogoutCommand({
-      refreshToken: this.refreshToken ?? '',
-    });
+    const logoutCommand = new LogoutCommand({ refreshToken: '' });
 
     return this.authClient.logout(logoutCommand).pipe(
       catchError((err) => {
         console.error('Logout error:', err);
-        return of({ isSuccess: false, errorMessage: 'Lỗi đăng xuất' } as ResultOfBoolean);
+        return of({ isSuccess: false, errorMessage: 'Loi dang xuat' } as ResultOfBoolean);
       }),
       finalize(() => {
         this.clearAuthState();
@@ -161,96 +110,60 @@ export class AuthService {
     );
   }
 
-  // --- 3. Logic Refresh Token (Quan trọng nhất) ---
-
-  /**
-   * HÀM (1): Được gọi khi khôi phục session (F5 hoặc mở lại tab)
-   * Sử dụng refreshToken từ memory để lấy accessToken mới
-   */
+  // Refresh token on reload
   public refreshOnLoad(): Observable<any> {
-    if (!this.refreshToken) {
-      this.clearAuthState();
+    const currentUser = this.currentUserSubject.value;
+    if (!currentUser) {
       return of(null);
     }
 
-    const refreshCommand = new RefreshTokenCommand({
-      refreshToken: this.refreshToken,
-    });
-
-    return this.authClient.refreshToken(refreshCommand).pipe(
-      map((result: ResultOfRefreshTokenResponse) => {
-        if (!result.isSuccess || !result.data) {
-          throw new Error(result.errorMessage || 'Refresh token failed');
+    return this.authClient.refreshToken().pipe(
+      map((result: any) => {
+        const data = result?.data as AccessTokenPublicResponse | undefined;
+        if (!result?.isSuccess || !data) {
+          throw new Error(result?.errorMessage || 'Refresh token failed');
         }
-        return result.data;
+        return data;
       }),
-      tap((response: RefreshTokenResponse) => {
-        const currentUser = this.currentUserSubject.value;
-        if (currentUser) {
+      tap((response: AccessTokenPublicResponse) => {
+        const user = this.currentUserSubject.value;
+        if (user) {
           const newAccessToken = response.accessToken ?? '';
-          const newRefreshToken = response.refreshToken ?? this.refreshToken ?? '';
-
-          this.setAuthState(newAccessToken, newRefreshToken, currentUser);
-
-          // Cập nhật localStorage với refreshToken mới (nếu có)
-          if (response.refreshToken && response.refreshToken !== this.refreshToken) {
-            this.saveAuthToLocalStorage({
-              userId: currentUser.id,
-              username: currentUser.username,
-              email: currentUser.email,
-              token: newAccessToken,
-              refreshToken: newRefreshToken,
-            } as LoginResponse);
-          }
+          this.setAuthState(newAccessToken, user);
         }
       }),
       catchError((err) => {
-        console.error('Refresh token failed:', err.message || err);
-        this.clearAuthState();
-        this.clearLocalStorage();
+        console.error('Refresh token failed:', err?.message || err);
+        // Giữ user state, chỉ trả null để không xóa localStorage (tránh auto logout khi cookie thiếu)
         return of(null);
       })
     );
   }
 
-  /**
-   * HÀM (2): Được gọi bởi AuthInterceptor khi nhận lỗi 401
-   * Xử lý việc refresh token và queue các request
-   */
+  // Refresh when 401
   public handleRefresh(): Observable<string> {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      if (!this.refreshToken) {
-        this.clearAuthState();
-        this.clearLocalStorage();
-        this.router.navigate(['/login']);
-        this.isRefreshing = false;
-        return throwError(() => new Error('No refresh token'));
-      }
-
-      const refreshCommand = new RefreshTokenCommand({
-        refreshToken: this.refreshToken,
-      });
-
-      return this.authClient.refreshToken(refreshCommand).pipe(
-        map((result: ResultOfRefreshTokenResponse) => {
-          if (!result.isSuccess || !result.data) {
-            throw new Error(result.errorMessage || 'Refresh failed');
+      return this.authClient.refreshToken().pipe(
+        map((result: any) => {
+          const data = result?.data as AccessTokenPublicResponse | undefined;
+          if (!result?.isSuccess || !data) {
+            throw new Error(result?.errorMessage || 'Refresh failed');
           }
-          return result.data;
+          return data;
         }),
-        tap((response: RefreshTokenResponse) => {
+        tap((response: AccessTokenPublicResponse) => {
           const currentUser = this.currentUserSubject.value;
           if (currentUser) {
-            this.setAuthState(response.accessToken ?? '', response.refreshToken ?? '', currentUser);
+            this.setAuthState(response.accessToken ?? '', currentUser);
           }
           this.refreshTokenSubject.next(response.accessToken);
         }),
-        map((response) => response.accessToken ?? ''),
+        map((response: AccessTokenPublicResponse) => response.accessToken ?? ''),
         catchError((err) => {
-          console.error('Session expired:', err.message || err);
+          console.error('Session expired:', err?.message || err);
           this.clearAuthState();
           this.clearLocalStorage();
           this.router.navigate(['/login']);
@@ -268,43 +181,27 @@ export class AuthService {
     }
   }
 
-  // --- 4. Các hàm Helper (private) ---
-
-  /**
-   * Xử lý thành công khi login/register
-   */
-  private handleAuthSuccess(data: LoginResponse | RegisterResponse): void {
+  private handleAuthSuccess(data: AuthPublicResponse): void {
     const user: User = {
       id: data.userId ?? '',
       username: data.username ?? '',
       email: data.email ?? '',
     };
-    this.setAuthState(data.token ?? '', data.refreshToken ?? '', user);
+    this.setAuthState(data.token ?? '', user);
     this.saveAuthToLocalStorage(data);
   }
 
-  /**
-   * Lưu accessToken, refreshToken và User vào memory
-   */
-  private setAuthState(token: string, refreshToken: string, user: User): void {
+  private setAuthState(token: string, user: User): void {
     this.accessToken = token;
-    this.refreshToken = refreshToken;
     this.currentUserSubject.next(user);
   }
 
-  /**
-   * Xóa state trong memory
-   */
   private clearAuthState(): void {
     this.accessToken = null;
-    this.refreshToken = null;
     this.currentUserSubject.next(null);
   }
 
-  /**
-   * Lưu user info và refreshToken vào localStorage
-   */
-  private saveAuthToLocalStorage(data: LoginResponse | RegisterResponse): void {
+  private saveAuthToLocalStorage(data: AuthPublicResponse): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     try {
@@ -313,7 +210,6 @@ export class AuthService {
         username: data.username,
         email: data.email,
         role: data.role,
-        refreshToken: data.refreshToken,
       };
       localStorage.setItem('currentUser', JSON.stringify(authData));
     } catch (err) {
@@ -321,9 +217,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Xóa auth data khỏi localStorage
-   */
   private clearLocalStorage(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -334,9 +227,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Khôi phục auth state từ localStorage khi mở lại app
-   */
   private restoreAuthState(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
@@ -346,7 +236,7 @@ export class AuthService {
 
       const data = JSON.parse(userData);
 
-      if (!data.userId || !data.refreshToken) {
+      if (!data.userId) {
         this.clearLocalStorage();
         return;
       }
@@ -357,13 +247,11 @@ export class AuthService {
         username: data.username ?? '',
       };
 
-      this.refreshToken = data.refreshToken;
+      this.currentUserSubject.next(user);
 
       this.refreshOnLoad().subscribe({
         next: (result) => {
-          if (result) {
-            this.currentUserSubject.next(user);
-          } else {
+          if (!result) {
             this.clearAuthState();
             this.clearLocalStorage();
           }

@@ -3,8 +3,8 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { AuthService } from '@core/service/auth.service';
-import { LoginCommand, LoginResponse } from '@core/service/system-admin.service';
+import { AuthService, AuthPublicResponse } from '@core/service/auth.service';
+import { LoginCommand } from '@core/service/system-admin.service';
 import { MessageService } from 'primeng/api';
 
 @Component({
@@ -24,8 +24,8 @@ export class Login implements OnDestroy {
   showPassword = false;
   isSubmitting = false;
   errorMessage = '';
-  private destroy$ = new Subject<void>(); // ✅ Dùng để cleanup subscription
-  private redirectTimeout: any; // ✅ Giữ id của setTimeout
+  private destroy$ = new Subject<void>();
+  private redirectTimeout: any;
 
   constructor() {
     this.loginForm = this.fb.group({
@@ -60,28 +60,27 @@ export class Login implements OnDestroy {
 
     this.authService
       .login(loginCommand)
-      .pipe(takeUntil(this.destroy$)) // ✅ Tự động unsubscribe khi destroy
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: LoginResponse) => {
+        next: (_response: AuthPublicResponse) => {
           this.isSubmitting = false;
           this.messageService.add({
             severity: 'success',
-            summary: 'Thành công',
-            detail: 'Đăng nhập thành công!',
+            summary: 'Th?nh c?ng',
+            detail: '??ng nh?p th?nh c?ng!',
             life: 1000,
           });
 
-          // ✅ Giữ timeout id để clear khi destroy
           this.redirectTimeout = setTimeout(() => {
             this.router.navigate(['/home']);
           }, 300);
         },
         error: (error: any) => {
           this.isSubmitting = false;
-          this.errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại sau.';
+          this.errorMessage = 'C? l?i x?y ra. Vui l?ng th? l?i sau.';
           console.error('Login error:', error);
 
-          let detailMessage = 'Đăng nhập thất bại. Vui lòng thử lại sau.';
+          let detailMessage = '??ng nh?p th?t b?i. Vui l?ng th? l?i sau.';
           let specificErrorMessage: string | null = null;
 
           if (error?.response) {
@@ -89,22 +88,22 @@ export class Login implements OnDestroy {
               const parsed = JSON.parse(error.response);
               if (parsed?.errorMessage) specificErrorMessage = parsed.errorMessage;
             } catch {
-              console.warn('Không thể parse error.response');
+              console.warn('Kh?ng th? parse error.response');
             }
           }
 
           if (specificErrorMessage === 'Invalid credentials') {
-            detailMessage = 'Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.';
+            detailMessage = 'T?i kho?n ho?c m?t kh?u kh?ng ??ng. Vui l?ng ki?m tra l?i.';
           } else if (specificErrorMessage) {
             detailMessage = specificErrorMessage;
           } else if (error.status === 400 || error.status === 401) {
-            detailMessage = 'Yêu cầu không hợp lệ hoặc không được phép.';
+            detailMessage = 'Y?u c?u kh?ng h?p l? ho?c kh?ng ???c ph?p.';
           }
 
           this.errorMessage = detailMessage;
           this.messageService.add({
             severity: 'error',
-            summary: 'Lỗi',
+            summary: 'L?i',
             detail: detailMessage,
             life: 2000,
           });
@@ -112,13 +111,10 @@ export class Login implements OnDestroy {
       });
   }
 
-  // ✅ Cleanup để tránh memory leak
   ngOnDestroy(): void {
-    // Hủy mọi subscription đang mở
     this.destroy$.next();
     this.destroy$.complete();
 
-    // Clear timeout nếu chưa chạy
     if (this.redirectTimeout) {
       clearTimeout(this.redirectTimeout);
     }
@@ -135,10 +131,10 @@ export class Login implements OnDestroy {
   getErrorMessage(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (!field || !field.errors) return '';
-    if (field.hasError('required')) return 'Trường này là bắt buộc';
+    if (field.hasError('required')) return 'Tr??ng n?y l? b?t bu?c';
     if (field.hasError('minlength')) {
       const minLength = field.errors['minlength'].requiredLength;
-      return `Tối thiểu ${minLength} ký tự`;
+      return `T?i thi?u ${minLength} k? t?`;
     }
     return '';
   }

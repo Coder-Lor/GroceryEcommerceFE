@@ -1620,3 +1620,249 @@
   }
 }
 
+// Variant Management Modal Styles
+.variant-management-modal {
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+
+  .modal-body {
+    max-height: calc(85vh - 160px);
+    overflow-y: auto;
+  }
+
+  .source-product-info {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+
+    .info-text {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+
+      strong {
+        color: #667eea;
+      }
+    }
+  }
+
+  // Variants List Section
+  .variants-list-section {
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e0e0e0;
+
+      .section-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        fa-icon {
+          color: #667eea;
+        }
+      }
+    }
+
+    .loading-variants {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .no-variants {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+
+      fa-icon {
+        color: #ccc;
+        margin-bottom: 16px;
+      }
+
+      p {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .variants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+
+      .variant-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+          border-color: #667eea;
+        }
+
+        .variant-image {
+          width: 100%;
+          height: 150px;
+          overflow: hidden;
+          background: #f8f9fa;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .no-image-placeholder {
+            color: #ccc;
+          }
+        }
+
+        .variant-info {
+          padding: 12px;
+          flex: 1;
+
+          .variant-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 6px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .variant-sku {
+            font-size: 12px;
+            color: #999;
+            margin: 0 0 12px 0;
+          }
+
+          .variant-details {
+            .detail-row {
+              display: flex;
+              justify-content: space-between;
+              font-size: 12px;
+              margin-bottom: 6px;
+
+              .label {
+                color: #666;
+              }
+
+              .value {
+                font-weight: 600;
+                color: #333;
+
+                &.discount {
+                  color: #f44336;
+                }
+
+                &.status-active {
+                  color: #4caf50;
+                }
+
+                &.status-inactive {
+                  color: #999;
+                }
+              }
+            }
+          }
+        }
+
+        .variant-actions {
+          display: flex;
+          border-top: 1px solid #e0e0e0;
+          
+          .btn-action {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:not(:last-child) {
+              border-right: 1px solid #e0e0e0;
+            }
+
+            &.btn-edit {
+              color: #667eea;
+
+              &:hover {
+                background: #f0f4ff;
+                color: #4c63d2;
+              }
+            }
+
+            &.btn-delete {
+              color: #f44336;
+
+              &:hover {
+                background: #ffebee;
+                color: #d32f2f;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Variant Form Section
+  .variant-form-section {
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e0e0e0;
+
+      .section-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        fa-icon {
+          color: #667eea;
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+    }
+  }
+}
+

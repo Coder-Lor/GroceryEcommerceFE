@@ -49,6 +49,8 @@ import {
   UpdateProductCommand,
   ProductVariantClient,
   CreateProductVariantRequest,
+  UpdateProductVariantRequest,
+  ProductVariantDto,
   ProductImageClient,
 } from '@services/system-admin.service';
 import { Subject, take, takeUntil } from 'rxjs';
@@ -98,14 +100,122 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   isDetailEditMode: boolean = false;
   editingProduct: UpdateProductCommand | null = null;
   
-  // Variant modal
+  // Variant management modal
   showVariantModal: boolean = false;
-  currentVariant: CreateProductVariantRequest = new CreateProductVariantRequest();
   variantSourceProduct: Product | null = null;
+  productVariants: ProductVariantDto[] = [];
+  isLoadingVariants: boolean = false;
+  
+  // Variant form (add/edit)
+  showVariantForm: boolean = false;
+  variantFormMode: 'add' | 'edit' = 'add';
+  createVariantRequest: CreateProductVariantRequest = new CreateProductVariantRequest();
+  updateVariantRequest: UpdateProductVariantRequest = new UpdateProductVariantRequest();
+  editingVariantId: string | null = null;
   productImageUrls: string[] = [];
   selectedImageUrl: string | null = null;
   variantImageFile: File | null = null;
   variantImagePreview: string | null = null;
+
+  // Getters and setters for two-way binding
+  get variantSku(): string | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.sku : this.updateVariantRequest.sku;
+  }
+  set variantSku(value: string | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.sku = value;
+    } else {
+      this.updateVariantRequest.sku = value;
+    }
+  }
+
+  get variantName(): string | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.name : this.updateVariantRequest.name;
+  }
+  set variantName(value: string | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.name = value;
+    } else {
+      this.updateVariantRequest.name = value;
+    }
+  }
+
+  get variantPrice(): number | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.price : this.updateVariantRequest.price;
+  }
+  set variantPrice(value: number | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.price = value;
+    } else {
+      this.updateVariantRequest.price = value;
+    }
+  }
+
+  get variantDiscountPrice(): number | null | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.discountPrice : this.updateVariantRequest.discountPrice;
+  }
+  set variantDiscountPrice(value: number | null | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.discountPrice = value;
+    } else {
+      this.updateVariantRequest.discountPrice = value;
+    }
+  }
+
+  get variantStockQuantity(): number | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.stockQuantity : this.updateVariantRequest.stockQuantity;
+  }
+  set variantStockQuantity(value: number | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.stockQuantity = value;
+    } else {
+      this.updateVariantRequest.stockQuantity = value;
+    }
+  }
+
+  get variantMinStockLevel(): number | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.minStockLevel : this.updateVariantRequest.minStockLevel;
+  }
+  set variantMinStockLevel(value: number | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.minStockLevel = value;
+    } else {
+      this.updateVariantRequest.minStockLevel = value;
+    }
+  }
+
+  get variantWeight(): number | null | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.weight : this.updateVariantRequest.weight;
+  }
+  set variantWeight(value: number | null | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.weight = value;
+    } else {
+      this.updateVariantRequest.weight = value;
+    }
+  }
+
+  get variantDimensions(): string | null | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.dimensions : this.updateVariantRequest.dimensions;
+  }
+  set variantDimensions(value: string | null | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.dimensions = value;
+    } else {
+      this.updateVariantRequest.dimensions = value;
+    }
+  }
+
+  get variantStatus(): number | undefined {
+    return this.variantFormMode === 'add' ? this.createVariantRequest.status : this.updateVariantRequest.status;
+  }
+  set variantStatus(value: number | undefined) {
+    if (this.variantFormMode === 'add') {
+      this.createVariantRequest.status = value;
+    } else {
+      this.updateVariantRequest.status = value;
+    }
+  }
   
   // Image management for editing
   newImageFiles: File[] = [];
@@ -1192,29 +1302,44 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     return Object.keys(obj);
   }
 
-  // Open variant modal
+  // Open variant management modal
   openAddVariantModal(product: Product): void {
     this.variantSourceProduct = product;
+    this.showVariantForm = false;
+    this.variantFormMode = 'add';
     
-    // Initialize variant with product data
-    this.currentVariant = new CreateProductVariantRequest();
-    this.currentVariant.productId = product.productId;
-    this.currentVariant.sku = product.sku + '-VAR-' + Date.now();
-    this.currentVariant.name = product.name + ' - Phân loại';
-    this.currentVariant.price = product.price;
-    this.currentVariant.discountPrice = product.discountPrice;
-    this.currentVariant.stockQuantity = product.stockQuantity;
-    this.currentVariant.minStockLevel = product.minStockLevel;
-    this.currentVariant.weight = product.weight;
-    this.currentVariant.dimensions = product.dimensions;
-    this.currentVariant.status = product.status || 1;
-    
-    // Load product images
+    // Load product images for variant creation
     if (product.productId) {
       this.loadProductImages(product.productId);
+      this.loadProductVariants(product.productId);
     }
     
     this.showVariantModal = true;
+  }
+
+  // Load product variants
+  loadProductVariants(productId: string): void {
+    this.isLoadingVariants = true;
+    this.productVariantClient
+      .getByProduct(productId, 1, 100, undefined, undefined)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoadingVariants = false;
+          if (response.isSuccess && response.data) {
+            this.productVariants = response.data.items || [];
+          } else {
+            this.productVariants = [];
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading variants:', error);
+          this.isLoadingVariants = false;
+          this.productVariants = [];
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   // Load product images
@@ -1242,9 +1367,71 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   // Close variant modal
   closeVariantModal(): void {
     this.showVariantModal = false;
-    this.currentVariant = new CreateProductVariantRequest();
+    this.showVariantForm = false;
+    this.createVariantRequest = new CreateProductVariantRequest();
+    this.updateVariantRequest = new UpdateProductVariantRequest();
+    this.editingVariantId = null;
     this.variantSourceProduct = null;
+    this.productVariants = [];
     this.productImageUrls = [];
+    this.selectedImageUrl = null;
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+  }
+
+  // Show form to add new variant
+  openAddVariantForm(): void {
+    if (!this.variantSourceProduct) return;
+    
+    this.variantFormMode = 'add';
+    this.createVariantRequest = new CreateProductVariantRequest();
+    this.createVariantRequest.productId = this.variantSourceProduct.productId;
+    this.createVariantRequest.sku = this.variantSourceProduct.sku + '-VAR-' + Date.now();
+    this.createVariantRequest.name = this.variantSourceProduct.name + ' - Phân loại';
+    this.createVariantRequest.price = this.variantSourceProduct.price;
+    this.createVariantRequest.discountPrice = this.variantSourceProduct.discountPrice;
+    this.createVariantRequest.stockQuantity = this.variantSourceProduct.stockQuantity;
+    this.createVariantRequest.minStockLevel = this.variantSourceProduct.minStockLevel;
+    this.createVariantRequest.weight = this.variantSourceProduct.weight;
+    this.createVariantRequest.dimensions = this.variantSourceProduct.dimensions;
+    this.createVariantRequest.status = this.variantSourceProduct.status || 1;
+    
+    this.editingVariantId = null;
+    this.selectedImageUrl = null;
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+    this.showVariantForm = true;
+  }
+
+  // Show form to edit existing variant
+  openEditVariantForm(variant: ProductVariantDto): void {
+    this.variantFormMode = 'edit';
+    this.editingVariantId = variant.productVariantId || null;
+    
+    // Create UpdateProductVariantRequest from existing variant
+    this.updateVariantRequest = new UpdateProductVariantRequest();
+    this.updateVariantRequest.sku = variant.sku;
+    this.updateVariantRequest.name = variant.name;
+    this.updateVariantRequest.price = variant.price;
+    this.updateVariantRequest.discountPrice = variant.discountPrice;
+    this.updateVariantRequest.stockQuantity = variant.stockQuantity;
+    this.updateVariantRequest.minStockLevel = variant.minStockLevel;
+    this.updateVariantRequest.weight = variant.weight;
+    this.updateVariantRequest.dimensions = variant.dimensions;
+    this.updateVariantRequest.status = variant.status;
+    
+    this.selectedImageUrl = variant.imageUrl || null;
+    this.variantImageFile = null;
+    this.variantImagePreview = null;
+    this.showVariantForm = true;
+  }
+
+  // Cancel variant form
+  cancelVariantForm(): void {
+    this.showVariantForm = false;
+    this.createVariantRequest = new CreateProductVariantRequest();
+    this.updateVariantRequest = new UpdateProductVariantRequest();
+    this.editingVariantId = null;
     this.selectedImageUrl = null;
     this.variantImageFile = null;
     this.variantImagePreview = null;
@@ -1316,7 +1503,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.selectedImageUrl = null;
   }
 
-  // Save variant
+  // Save variant (create or update)
   saveVariant(): void {
     if (!this.validateVariant()) {
       return;
@@ -1324,12 +1511,14 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
 
+    const currentRequest = this.variantFormMode === 'add' ? this.createVariantRequest : this.updateVariantRequest;
+
     // Prepare the request based on image selection
     // Case 1: No image - imageUrl and imageFile remain undefined
     // Case 2: Selected existing image - set imageUrl
     if (this.selectedImageUrl) {
-      this.currentVariant.imageUrl = this.selectedImageUrl;
-      this.currentVariant.imageFile = undefined;
+      currentRequest.imageUrl = this.selectedImageUrl;
+      currentRequest.imageFile = undefined;
     }
     // Case 3: New image file - set imageFile
     else if (this.variantImageFile) {
@@ -1338,32 +1527,40 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       reader.onload = (e: ProgressEvent<FileReader>) => {
         const base64Content = (e.target?.result as string).split(',')[1]; // Remove data:image/...;base64, prefix
         
-        this.currentVariant.imageFile = {
+        currentRequest.imageFile = {
           content: base64Content,
           fileName: this.variantImageFile!.name,
           contentType: this.variantImageFile!.type
         } as any;
-        this.currentVariant.imageUrl = undefined;
+        currentRequest.imageUrl = undefined;
 
         // Call API after file is converted
-        this.createVariantRequest();
+        if (this.variantFormMode === 'add') {
+          this.executeCreateVariant();
+        } else {
+          this.executeUpdateVariant();
+        }
       };
       reader.readAsDataURL(this.variantImageFile);
       return; // Exit here, will continue in reader.onload
     } else {
       // Case 1: No image
-      this.currentVariant.imageUrl = undefined;
-      this.currentVariant.imageFile = undefined;
+      currentRequest.imageUrl = undefined;
+      currentRequest.imageFile = undefined;
     }
 
     // Call API for cases 1 and 2
-    this.createVariantRequest();
+    if (this.variantFormMode === 'add') {
+      this.executeCreateVariant();
+    } else {
+      this.executeUpdateVariant();
+    }
   }
 
   // Create variant API request
-  private createVariantRequest(): void {
+  private executeCreateVariant(): void {
     this.productVariantClient
-      .createVariant(this.currentVariant)
+      .createVariant(this.createVariantRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -1376,7 +1573,11 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
               detail: 'Thêm phân loại sản phẩm thành công',
               life: 3000,
             });
-            this.closeVariantModal();
+            this.cancelVariantForm();
+            // Reload variants list
+            if (this.variantSourceProduct?.productId) {
+              this.loadProductVariants(this.variantSourceProduct.productId);
+            }
           } else {
             this.messageService.add({
               severity: 'error',
@@ -1400,18 +1601,140 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Validate variant
-  private validateVariant(): boolean {
-    if (!this.currentVariant.productId) {
+  // Update variant API request
+  private executeUpdateVariant(): void {
+    if (!this.editingVariantId) {
       this.messageService.add({
-        severity: 'warn',
-        summary: 'Cảnh báo',
-        detail: 'Không tìm thấy ID sản phẩm',
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Không tìm thấy ID phân loại cần cập nhật',
         life: 3000,
       });
-      return false;
+      this.isLoading = false;
+      return;
     }
-    if (!this.currentVariant.sku?.trim()) {
+
+    this.productVariantClient
+      .updateVariant(this.editingVariantId, this.updateVariantRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Cập nhật phân loại sản phẩm thành công',
+              life: 3000,
+            });
+            this.cancelVariantForm();
+            // Reload variants list
+            if (this.variantSourceProduct?.productId) {
+              this.loadProductVariants(this.variantSourceProduct.productId);
+            }
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể cập nhật phân loại sản phẩm',
+              life: 3000,
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error updating variant:', error);
+          this.isLoading = false;
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Đã có lỗi xảy ra khi cập nhật phân loại sản phẩm',
+            life: 3000,
+          });
+        },
+      });
+  }
+
+  // Confirm delete variant
+  confirmDeleteVariant(variant: ProductVariantDto): void {
+    this.confirmationService.confirm({
+      message: `Bạn có chắc muốn xóa phân loại "${variant.name}"?<br/>Hành động này không thể hoàn tác.`,
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
+      defaultFocus: 'reject',
+      accept: () => {
+        this.deleteVariant(variant.productVariantId!);
+      },
+    });
+  }
+
+  // Delete variant
+  private deleteVariant(variantId: string): void {
+    this.isLoading = true;
+    
+    this.productVariantClient
+      .deleteVariant(variantId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+
+          if (response.isSuccess) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: 'Xóa phân loại sản phẩm thành công',
+              life: 3000,
+            });
+            // Reload variants list
+            if (this.variantSourceProduct?.productId) {
+              this.loadProductVariants(this.variantSourceProduct.productId);
+            }
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: response.errorMessage || 'Không thể xóa phân loại sản phẩm',
+              life: 3000,
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error deleting variant:', error);
+          this.isLoading = false;
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Đã có lỗi xảy ra khi xóa phân loại sản phẩm',
+            life: 3000,
+          });
+        },
+      });
+  }
+
+  // Validate variant
+  private validateVariant(): boolean {
+    const currentRequest = this.variantFormMode === 'add' ? this.createVariantRequest : this.updateVariantRequest;
+    
+    // Check productId only for create mode
+    if (this.variantFormMode === 'add') {
+      if (!this.createVariantRequest.productId) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: 'Không tìm thấy ID sản phẩm',
+          life: 3000,
+        });
+        return false;
+      }
+    }
+    if (!currentRequest.sku?.trim()) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Cảnh báo',
@@ -1420,7 +1743,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
       return false;
     }
-    if (!this.currentVariant.name?.trim()) {
+    if (!currentRequest.name?.trim()) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Cảnh báo',
@@ -1429,7 +1752,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
       return false;
     }
-    if ((this.currentVariant.price || 0) <= 0) {
+    if ((currentRequest.price || 0) <= 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Cảnh báo',
@@ -1438,7 +1761,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
       return false;
     }
-    if ((this.currentVariant.stockQuantity || 0) < 0) {
+    if ((currentRequest.stockQuantity || 0) < 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Cảnh báo',
@@ -1447,7 +1770,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
       return false;
     }
-    if ((this.currentVariant.minStockLevel || 0) < 0) {
+    if ((currentRequest.minStockLevel || 0) < 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Cảnh báo',

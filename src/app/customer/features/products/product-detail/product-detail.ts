@@ -334,7 +334,7 @@ export class ProductDetail implements OnInit, OnDestroy {
             life: 3000,
           });
           // Redirect to login page
-          this.router.navigate(['/auth/login'], {
+          this.router.navigate(['/login'], {
             queryParams: { returnUrl: this.router.url }
           });
           return;
@@ -427,6 +427,7 @@ export class ProductDetail implements OnInit, OnDestroy {
         product: {
           productId: this.product.productId,
           variantId: this.selectedVariantId,
+          productVariantId: this.selectedVariantId, // giữ cả hai key để tương thích
           productName: this.getProductName(),
           imageUrl: this.getImageUrl(),
           unitPrice: this.getDisplayPrice(),

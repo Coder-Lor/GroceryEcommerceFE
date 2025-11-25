@@ -12,6 +12,7 @@ import { switchMap, take, catchError } from 'rxjs/operators';
 
 interface CheckoutProduct {
   productId: string;
+  productVariantId: string;
   productName: string;
   imageUrl: string;
   unitPrice: number;
@@ -43,7 +44,7 @@ export class Checkout implements OnInit {
   checkoutForm: FormGroup;
   products: CheckoutProduct[] = [];
   checkoutMode: 'cart' | 'single' = 'cart';
-  shippingFee = 30000;
+  shippingFee = 0;
   isProcessing = false;
 
   // Address management
@@ -79,7 +80,15 @@ export class Checkout implements OnInit {
     if (state?.checkoutMode === 'single' && state?.product) {
       // Checkout từ product-detail
       this.checkoutMode = 'single';
-      this.products = [state.product];
+      const productFromState = state.product;
+      this.products = [{
+        productId: productFromState.productId,
+        productVariantId: productFromState.productVariantId ?? productFromState.variantId,
+        productName: productFromState.productName,
+        imageUrl: productFromState.imageUrl,
+        unitPrice: productFromState.unitPrice,
+        quantity: productFromState.quantity
+      }];
       console.log('✅ Checkout mode: Single product', this.products[0]);
     }
   }
@@ -87,12 +96,15 @@ export class Checkout implements OnInit {
   ngOnInit(): void {
     // Load user info and set default values in form
     this.loadUserInfoAndAddresses();
+    // Làm mới giỏ hàng từ backend để đảm bảo có đủ thông tin biến thể
+    this.cartService.loadCartSummary();
 
     // Nếu không có state (checkout từ cart), load từ cartService
     if (this.checkoutMode === 'cart') {
       this.cartService.cartItems$.subscribe(items => {
         this.products = items.map(item => ({
           productId: item.productId,
+          productVariantId: item.productVariantId,
           productName: item.productName,
           imageUrl: item.imageUrl,
           unitPrice: item.unitPrice,
@@ -341,21 +353,19 @@ export class Checkout implements OnInit {
       return;
     }
 
-    const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
+    const paymentMethod = this.checkoutForm.get('paymentMethod')?.value as 'cod' | 'banking';
     console.log('💳 Payment method:', paymentMethod);
 
-    // Chỉ xử lý thanh toán COD
-    if (paymentMethod === 'cod') {
-      console.log('✅ Processing COD order...');
-      this.processOrder();
+    if (paymentMethod === 'cod' || paymentMethod === 'banking') {
+      console.log('✅ Processing order with method:', paymentMethod);
+      this.processOrder(paymentMethod);
     } else {
-      // TODO: Xử lý thanh toán online khác
       console.warn('⚠️ Payment method not supported:', paymentMethod);
-      alert('Phương thức thanh toán này chưa được hỗ trợ. Vui lòng chọn COD.');
+      alert('Phuong thuc thanh toan nay chua duoc ho tro. Vui long chon COD hoac chuyen khoan.');
     }
   }
 
-  private processOrder() {
+  private processOrder(paymentMethod: 'cod' | 'banking') {
     console.log('🚀 processOrder() started');
     
     if (this.checkoutForm.invalid) {
@@ -387,13 +397,14 @@ export class Checkout implements OnInit {
 
         const formValue = this.checkoutForm.value;
         console.log('📝 Form values:', formValue);
+        const selectedPaymentMethod = paymentMethod || 'cod';
         
         // Chuẩn bị dữ liệu đơn hàng với đầy đủ thông tin
         const orderRequest = {
           userId: user.id,
           items: this.products.map(p => ({
             productId: p.productId,
-            productVariantId: undefined, // Có thể thêm sau nếu cần
+            productVariantId: p.productVariantId,
             quantity: p.quantity,
             unitPrice: p.unitPrice
           })),
@@ -402,13 +413,14 @@ export class Checkout implements OnInit {
             phone: formValue.phone,
             address: formValue.address
           },
-          paymentMethod: formValue.paymentMethod || 'cod',
+          paymentMethod: selectedPaymentMethod,
           subtotal: this.subtotal,
           shippingFee: this.shippingFee,
           taxAmount: 0,
           discountAmount: 0,
           notes: undefined
         };
+        console.log('📝 Order request prepared:', orderRequest.items);
 
         console.log('📦 Submitting order...', JSON.stringify(orderRequest, null, 2));
 
@@ -421,6 +433,31 @@ export class Checkout implements OnInit {
             // Tính ngày dự kiến giao hàng
             const expectedDate = new Date();
             expectedDate.setDate(expectedDate.getDate() + 2);
+            const orderData = response.data;
+            const orderInfo = {
+              orderId: orderData?.orderId || orderData?.orderNumber || 'Đang cập nhật',
+              orderNumber: orderData?.orderNumber || 'Đang cập nhật',
+              orderDate: orderData?.orderDate ? new Date(orderData.orderDate) : new Date(),
+              expectedDate: expectedDate.toLocaleDateString('vi-VN'),
+              total: orderData?.totalAmount ?? this.totalPrice,
+              items: this.products,
+              paymentMethod: selectedPaymentMethod,
+              paymentMethodName: orderData?.paymentMethodName,
+              paymentStatusName: orderData?.paymentStatusName,
+              paymentStatus: orderData?.paymentStatus,
+              qrCodeUrl: orderData?.qrCodeUrl,
+              paymentUrl: orderData?.paymentUrl,
+              paymentTransactionId: orderData?.paymentTransactionId
+            };
+
+            const navigateToResult = () => {
+              this.router.navigate(['/order-result'], {
+                state: {
+                  success: true,
+                  orderInfo
+                }
+              });
+            };
 
             // Nếu checkout từ cart, xóa giỏ hàng sau khi tạo order thành công
             if (this.checkoutMode === 'cart') {
@@ -433,56 +470,20 @@ export class Checkout implements OnInit {
                   }
                   
                   // Navigate đến trang kết quả thành công
-                  this.router.navigate(['/order-result'], {
-                    state: {
-                      success: true,
-                      orderInfo: {
-                        orderId: response.data?.orderId || response.data?.orderNumber || 'Đang cập nhật',
-                        orderNumber: response.data?.orderNumber || 'Đang cập nhật',
-                        orderDate: new Date(),
-                        expectedDate: expectedDate.toLocaleDateString('vi-VN'),
-                        total: this.totalPrice,
-                        items: this.products
-                      }
-                    }
-                  });
+                  navigateToResult();
                   
                   return of(null);
                 }),
                 catchError((clearErr) => {
                   console.error('❌ Error clearing cart:', clearErr);
                   // Vẫn navigate ngay cả khi xóa giỏ hàng thất bại
-                  this.router.navigate(['/order-result'], {
-                    state: {
-                      success: true,
-                      orderInfo: {
-                        orderId: response.data?.orderId || response.data?.orderNumber || 'Đang cập nhật',
-                        orderNumber: response.data?.orderNumber || 'Đang cập nhật',
-                        orderDate: new Date(),
-                        expectedDate: expectedDate.toLocaleDateString('vi-VN'),
-                        total: this.totalPrice,
-                        items: this.products
-                      }
-                    }
-                  });
+                  navigateToResult();
                   return of(null);
                 })
               );
             } else {
               // Checkout single product, không cần xóa cart
-              this.router.navigate(['/order-result'], {
-                state: {
-                  success: true,
-                  orderInfo: {
-                    orderId: response.data?.orderId || response.data?.orderNumber || 'Đang cập nhật',
-                    orderNumber: response.data?.orderNumber || 'Đang cập nhật',
-                    orderDate: new Date(),
-                    expectedDate: expectedDate.toLocaleDateString('vi-VN'),
-                    total: this.totalPrice,
-                    items: this.products
-                  }
-                }
-              });
+              navigateToResult();
               return of(null);
             }
           }),
