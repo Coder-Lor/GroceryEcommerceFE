@@ -48,8 +48,14 @@
         </div>
       </div>
 
-      <!-- Center Section: Search -->
-      <div class="search-center d-none d-md-flex">
+      <!-- Center Section: Mega Menu -->
+      <div class="mega-menu-section d-none d-md-flex">
+        <p-megaMenu [model]="categoryMenuItems" styleClass="custom-megamenu"></p-megaMenu>
+        <p-megaMenu [model]="megaMenuItems" styleClass="custom-megamenu"></p-megaMenu>
+      </div>
+
+      <!-- Right Section: Search -->
+      <div class="search-right d-none d-md-flex">
         <div class="search-box d-flex align-items-center text-body">
           <input
             #queryInput
@@ -64,7 +70,7 @@
         </div>
       </div>
 
-      <!-- Right Section -->
+      <!-- Far Right Section: Cart & User -->
       <div class="header-right d-flex align-items-center">
         <!-- Cart & wishlist -->
         <div class="cart-wishlist me-3">
