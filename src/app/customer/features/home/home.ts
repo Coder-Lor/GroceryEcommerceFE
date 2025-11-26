@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { DataViewModule } from 'primeng/dataview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { CarouselModule } from 'primeng/carousel';
+import { SkeletonModule } from 'primeng/skeleton';
 import { ProductCard } from '../../shared/components/product-card/product-card';
 import {
   ProductBaseResponse,
@@ -21,7 +22,7 @@ import {
 } from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
 import { ProductService } from '@core/service/product.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, finalize, takeUntil } from 'rxjs';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
 import { CategoryService } from '@core/service/category.service';
@@ -46,6 +47,7 @@ type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number 
     DataViewModule,
     SelectButtonModule,
     CountdownModule,
+    SkeletonModule,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './home.html',
@@ -73,6 +75,14 @@ export class Home implements OnInit, OnDestroy {
   pageSize: number = 4;
   totalCount = 0;
   isLoading: boolean = false;
+  isLoadingCategories = true;
+  isLoadingFlashSale = true;
+  isLoadingHero = true;
+
+  categorySkeletonItems = Array(6).fill(0);
+  flashSaleSkeletonItems = Array(6).fill(0);
+  productSkeletonItems = Array(8).fill(0);
+  loadingDelayMs = 2000;
 
   // setup countdown flash sale
   countdownConfig = {
@@ -184,6 +194,8 @@ export class Home implements OnInit, OnDestroy {
       },
     ];
 
+    this.finishLoadingWithDelay('isLoadingHero');
+
     this.loadCategories();
 
     this.loadProducts();
@@ -191,37 +203,52 @@ export class Home implements OnInit, OnDestroy {
     this.loadFlashSaleProducts();
   }
 
+  private finishLoadingWithDelay(
+    flag: 'isLoading' | 'isLoadingCategories' | 'isLoadingFlashSale' | 'isLoadingHero',
+  ) {
+    setTimeout(() => {
+      (this as any)[flag] = false;
+    }, this.loadingDelayMs);
+  }
+
   loadCategories(): void {
-    // Kiểm tra xem có dữ liệu trong TransferState không
+    if (this.categories.length) {
+      this.finishLoadingWithDelay('isLoadingCategories');
+      return;
+    }
+
     const cachedCategories = this.transferState.get(CATEGORIES_KEY, null);
 
     if (cachedCategories) {
-      // Sử dụng dữ liệu từ cache
       this.categories = cachedCategories;
-      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
+      this.finishLoadingWithDelay('isLoadingCategories');
+
       if (isPlatformBrowser(this.platformId)) {
         this.transferState.remove(CATEGORIES_KEY);
       }
-    } else {
-      // Gọi API để lấy danh sách danh mục
-      this.categoryService
-        .getCategoryTree()
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (categories) => {
-            this.categories = categories;
-
-            // Lưu vào TransferState (chỉ trên server)
-            if (isPlatformServer(this.platformId)) {
-              this.transferState.set(CATEGORIES_KEY, this.categories);
-            }
-          },
-          error: (err) => {
-            console.error('Lỗi khi tải danh mục', err);
-            this.categories = [];
-          },
-        });
+      return;
     }
+
+    this.isLoadingCategories = true;
+    this.categoryService
+      .getCategoryTree()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.finishLoadingWithDelay('isLoadingCategories')),
+      )
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories;
+
+          if (isPlatformServer(this.platformId)) {
+            this.transferState.set(CATEGORIES_KEY, this.categories);
+          }
+        },
+        error: (err) => {
+          console.error('Error loading categories', err);
+          this.categories = [];
+        },
+      });
   }
 
   getCategoryImage(category: CategoryDto): string {
@@ -234,7 +261,10 @@ export class Home implements OnInit, OnDestroy {
 
     this.productService
       .getProductByPaging(this.page, this.pageSize)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.finishLoadingWithDelay('isLoading')),
+      )
       .subscribe({
         next: (data) => {
           const newItems = data?.items || [];
@@ -243,8 +273,9 @@ export class Home implements OnInit, OnDestroy {
           // ✅ Ghép thêm sản phẩm mới vào danh sách cũ
           this.products = [...this.products, ...newItems];
         },
-        error: (err) => console.error('Lỗi khi tải sản phẩm', err),
-        complete: () => (this.isLoading = false),
+        error: (err) => {
+          console.error('Error loading products', err);
+        },
       });
   }
 
@@ -258,10 +289,15 @@ export class Home implements OnInit, OnDestroy {
   }
 
   loadFlashSaleProducts(): void {
+    this.isLoadingFlashSale = true;
+
     // Lấy tất cả sản phẩm có giảm giá > 50%
     this.productService
       .getProductByPaging(1, 100) // Lấy nhiều sản phẩm để filter
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.finishLoadingWithDelay('isLoadingFlashSale')),
+      )
       .subscribe({
         next: (data) => {
           const allProducts = data?.items || [];
@@ -276,7 +312,9 @@ export class Home implements OnInit, OnDestroy {
             return false;
           });
         },
-        error: (err) => console.error('Lỗi khi tải flash sale products', err),
+        error: (err) => {
+          console.error('Error loading flash sale products', err);
+        },
       });
   }
 
