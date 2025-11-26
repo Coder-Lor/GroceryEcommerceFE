@@ -34,6 +34,7 @@ import {
   OrderDetailDto,
 } from '../../../core/service/system-admin.service';
 import { TooltipDirective } from '@shared/directives/tooltip';
+import { OrderStatusMapper, OrderStatus, PaymentStatus, PaymentMethod } from '../models';
 
 @Component({
   selector: 'app-order-list',
@@ -93,6 +94,9 @@ export class OrderListComponent implements OnInit {
   // Expose Math and SortDirection to template
   Math = Math;
   SortDirection = SortDirection;
+  
+  // Expose OrderStatusMapper to template
+  OrderStatusMapper = OrderStatusMapper;
 
   ngOnInit(): void {
     this.loadOrders();
@@ -368,9 +372,12 @@ export class OrderListComponent implements OnInit {
       orderNumber: 'Mã đơn hàng',
       customerId: 'ID Khách hàng',
       customerName: 'Tên khách hàng',
+      userName: 'Tên khách hàng',
       orderDate: 'Ngày đặt',
       totalAmount: 'Tổng tiền',
-      status: 'Trạng thái',
+      status: 'Trạng thái đơn hàng',
+      paymentStatus: 'Trạng thái thanh toán',
+      paymentMethod: 'Phương thức thanh toán',
       createdAt: 'Ngày tạo',
       updatedAt: 'Ngày cập nhật',
     };
@@ -382,6 +389,19 @@ export class OrderListComponent implements OnInit {
    */
   formatValue(value: any, key: string): string {
     if (value === null || value === undefined) return 'N/A';
+    
+    // Format status fields
+    if (key === 'status') {
+      return OrderStatusMapper.getOrderStatusDisplay(value);
+    }
+    
+    if (key === 'paymentStatus') {
+      return OrderStatusMapper.getPaymentStatusDisplay(value);
+    }
+    
+    if (key === 'paymentMethod') {
+      return OrderStatusMapper.getPaymentMethodDisplay(value);
+    }
     
     if (key.includes('Date') || key.includes('At')) {
       return this.formatDate(value);
@@ -396,6 +416,20 @@ export class OrderListComponent implements OnInit {
     }
     
     return String(value);
+  }
+  
+  /**
+   * Lấy class CSS cho badge trạng thái
+   */
+  getStatusBadgeClass(status: number): string {
+    return OrderStatusMapper.getOrderStatusClass(status);
+  }
+  
+  /**
+   * Lấy class CSS cho badge thanh toán
+   */
+  getPaymentBadgeClass(status: number): string {
+    return OrderStatusMapper.getPaymentStatusClass(status);
   }
 }
 

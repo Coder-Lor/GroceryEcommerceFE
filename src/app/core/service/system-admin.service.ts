@@ -24993,7 +24993,7 @@ export interface IUpdatePaymentStatusRequest {
 export class PaymentConfirmationRequest implements IPaymentConfirmationRequest {
     id?: number;
     gateway?: string;
-    transactionDate?: Date;
+    transactionDate?: Date | undefined;
     accountNumber?: string | undefined;
     code?: string | undefined;
     content?: string | undefined;
@@ -25058,7 +25058,7 @@ export class PaymentConfirmationRequest implements IPaymentConfirmationRequest {
 export interface IPaymentConfirmationRequest {
     id?: number;
     gateway?: string;
-    transactionDate?: Date;
+    transactionDate?: Date | undefined;
     accountNumber?: string | undefined;
     code?: string | undefined;
     content?: string | undefined;

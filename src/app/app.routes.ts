@@ -18,9 +18,8 @@ import { HomePageComponent } from './admin/home/home-page.component';
 import { UsersPageComponent } from './admin/users/users-page.component';
 import { InventoryPageComponent } from './admin/inventory/inventory-page.component';
 import { AddNewProductComponent } from './admin/inventory/add-new-product/add-new-product.component';
-import { OrdersPageComponent } from './admin/orders/orders-page.component';
 import { CategoriesPageComponent } from './admin/categories/categories-page.component';
-import { OrderManagementPageComponent } from './admin/order-management/order-management-page.component';
+import { OrderListComponent } from './admin/order-management/order-list/order-list.component';
 import { authGuard } from './core/service/auth.guard';
 import { NotFoundComponent } from './core/components/not-found/not-found.component';
 import { Checkout } from './customer/features/checkout/checkout';
@@ -95,11 +94,7 @@ export const routes: Routes = [
       },
       {
         path: 'orders',
-        component: OrdersPageComponent,
-      },
-      {
-        path: 'order-management',
-        component: OrderManagementPageComponent,
+        component: OrderListComponent,
       },
       {
         path: 'categories',

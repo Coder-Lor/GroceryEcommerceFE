@@ -1,7 +1,7 @@
 <!-- Loading Overlay for entire page -->
 <app-loading-overlay [show]="isLoading" message="Đang xử lý..."></app-loading-overlay>
 
-<div class="list-container">
+<div class="inventory-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
   
@@ -15,8 +15,8 @@
     rejectButtonStyleClass="p-button-secondary p-button-text">
   </p-confirmDialog>
   
-  <div class="list-header">
-    <h3>Danh sách đơn hàng</h3>
+  <div class="page-header">
+    <h2>Quản lý đơn hàng</h2>
     <div class="header-actions">
       <button class="btn btn-info" (click)="loadOrders()" appTooltip="Tải lại">
         <fa-icon [icon]="faRefresh" size="1x"></fa-icon>
@@ -24,31 +24,32 @@
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-box">
-    <div class="search-box">
-      <div class="search-wrapper">
-        <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearch()"
-          placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng..."
-          class="search-input"
-        />
-        <button class="btn-search" (click)="onSearch()">
-          <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
-        </button>
-      </div>
-      <span class="search-result"
-        >Hiển thị {{ filteredOrders.length }} / {{ totalRecords }} đơn hàng</span
+  <!-- Tìm kiếm -->
+  <div class="search-box">
+    <div class="search-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onSearch()"
+        placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng..."
+        class="search-input"
+      />
+      <button 
+        type="button" 
+        class="btn search-button"
+        (click)="onSearch()"
+        [disabled]="isLoading"
+        appTooltip="Tìm kiếm"
       >
+        <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+      </button>
     </div>
+    <span class="search-result">Hiển thị {{ filteredOrders.length }} / {{ totalRecords }} đơn hàng</span>
   </div>
 
   <!-- Bảng danh sách đơn hàng -->
   <div class="table-container">
-    <table class="data-table">
+    <table class="product-table">
       <thead>
         <tr>
           <th (click)="changeSortColumn('orderNumber')" class="sortable">
@@ -102,7 +103,9 @@
             <strong class="amount">{{ formatCurrency(order.totalAmount) }}</strong>
           </td>
           <td>
-            <span class="status-badge">{{ order.status || 'N/A' }}</span>
+            <span class="status-badge" [ngClass]="getStatusBadgeClass(order.status || 1)">
+              {{ OrderStatusMapper.getOrderStatusDisplay(order.status || 1) }}
+            </span>
           </td>
           <td class="text-center">
             <fa-icon [icon]="faCalendar" class="icon-small"></fa-icon>
@@ -213,7 +216,17 @@
         <h4>Thông tin đơn hàng</h4>
         <div class="detail-row" *ngFor="let key of getObjectKeys(selectedOrder)">
           <div class="label">{{ formatKey(key) }}:</div>
-          <div class="value">{{ formatValue(selectedOrder[key], key) }}</div>
+          <div class="value">
+            <span *ngIf="key === 'status'" class="status-badge" [ngClass]="getStatusBadgeClass(selectedOrder[key])">
+              {{ formatValue(selectedOrder[key], key) }}
+            </span>
+            <span *ngIf="key === 'paymentStatus'" class="status-badge" [ngClass]="getPaymentBadgeClass(selectedOrder[key])">
+              {{ formatValue(selectedOrder[key], key) }}
+            </span>
+            <span *ngIf="key !== 'status' && key !== 'paymentStatus'">
+              {{ formatValue(selectedOrder[key], key) }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
