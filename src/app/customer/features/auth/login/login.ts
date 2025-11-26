@@ -66,8 +66,8 @@ export class Login implements OnDestroy {
           this.isSubmitting = false;
           this.messageService.add({
             severity: 'success',
-            summary: 'Th?nh c?ng',
-            detail: '??ng nh?p th?nh c?ng!',
+            summary: 'Thành công',
+            detail: 'Đăng nhập thành công!',
             life: 1000,
           });
 
@@ -77,10 +77,10 @@ export class Login implements OnDestroy {
         },
         error: (error: any) => {
           this.isSubmitting = false;
-          this.errorMessage = 'C? l?i x?y ra. Vui l?ng th? l?i sau.';
+          this.errorMessage = 'Có lỗi xảy ra. Vui lòng thử lại sau.';
           console.error('Login error:', error);
 
-          let detailMessage = '??ng nh?p th?t b?i. Vui l?ng th? l?i sau.';
+          let detailMessage = 'Đăng nhập thất bại. Vui lòng thử lại sau.';
           let specificErrorMessage: string | null = null;
 
           if (error?.response) {
@@ -88,22 +88,22 @@ export class Login implements OnDestroy {
               const parsed = JSON.parse(error.response);
               if (parsed?.errorMessage) specificErrorMessage = parsed.errorMessage;
             } catch {
-              console.warn('Kh?ng th? parse error.response');
+              console.warn('Không thể parse error.response');
             }
           }
 
           if (specificErrorMessage === 'Invalid credentials') {
-            detailMessage = 'T?i kho?n ho?c m?t kh?u kh?ng ??ng. Vui l?ng ki?m tra l?i.';
+            detailMessage = 'Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.';
           } else if (specificErrorMessage) {
             detailMessage = specificErrorMessage;
           } else if (error.status === 400 || error.status === 401) {
-            detailMessage = 'Y?u c?u kh?ng h?p l? ho?c kh?ng ???c ph?p.';
+            detailMessage = 'Yêu cầu không hợp lệ hoặc không được phép.';
           }
 
           this.errorMessage = detailMessage;
           this.messageService.add({
             severity: 'error',
-            summary: 'L?i',
+            summary: 'Lỗi',
             detail: detailMessage,
             life: 2000,
           });
@@ -131,10 +131,10 @@ export class Login implements OnDestroy {
   getErrorMessage(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (!field || !field.errors) return '';
-    if (field.hasError('required')) return 'Tr??ng n?y l? b?t bu?c';
+    if (field.hasError('required')) return 'Trường này là bắt buộc';
     if (field.hasError('minlength')) {
       const minLength = field.errors['minlength'].requiredLength;
-      return `T?i thi?u ${minLength} k? t?`;
+      return `Tối thiểu ${minLength} ký tự`;
     }
     return '';
   }

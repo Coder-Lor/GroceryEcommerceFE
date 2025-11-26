@@ -87,7 +87,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   categorySkeletonItems = Array(6).fill(0);
   flashSaleSkeletonItems = Array(6).fill(0);
   productSkeletonItems = Array(8).fill(0);
-  loadingDelayMs = 2000;
+  loadingDelayMs = 1300;
 
   // setup countdown flash sale
   countdownConfig = {

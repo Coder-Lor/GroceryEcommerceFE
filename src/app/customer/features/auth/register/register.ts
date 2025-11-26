@@ -85,8 +85,8 @@ export class Register implements OnDestroy {
 
           this.messageService.add({
             severity: 'success',
-            summary: 'Th?nh c?ng',
-            detail: '??ng k? th?nh c?ng!',
+            summary: 'Thành công',
+            detail: 'Đăng ký thành công!',
             life: 1000,
           });
 
@@ -99,8 +99,8 @@ export class Register implements OnDestroy {
           console.error('Register error:', err);
           this.messageService.add({
             severity: 'error',
-            summary: 'L?i',
-            detail: err.message || '??ng k? kh?ng th?nh c?ng.',
+            summary: 'Lỗi',
+            detail: err.message || 'Đăng ký không thành công.',
             life: 1000,
           });
         },
@@ -129,13 +129,13 @@ export class Register implements OnDestroy {
     const field = this.registerForm.get(fieldName);
     if (!field || !field.errors) return '';
 
-    if (field.hasError('required')) return 'Tr??ng n?y l? b?t bu?c';
-    if (field.hasError('email')) return 'Email kh?ng h?p l?';
+    if (field.hasError('required')) return 'Trường này là bắt buộc';
+    if (field.hasError('email')) return 'Email không hợp lệ';
     if (field.hasError('minlength')) {
       const minLength = field.errors['minlength'].requiredLength;
-      return `T?i thi?u ${minLength} k? t?`;
+      return `Tối thiểu ${minLength} ký tự`;
     }
-    if (field.hasError('passwordMismatch')) return 'M?t kh?u kh?ng kh?p';
+    if (field.hasError('passwordMismatch')) return 'Mật khẩu không khớp';
 
     return '';
   }

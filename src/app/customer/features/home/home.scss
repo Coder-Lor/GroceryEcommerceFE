@@ -9,24 +9,41 @@
 
   /* Hero swiper hydration fix */
   .hero-swiper {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
     
-    &.swiper-ready {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    /* Prevent vertical stacking before initialization */
-    &:not(.swiper-initialized) {
+    /* Use max-height and overflow instead of opacity to allow swiper initialization */
+    &:not(.swiper-ready) {
+      max-height: 300px;
+      overflow: hidden;
+      
+      /* Hide slides except first one before ready */
       swiper-slide {
         display: none !important;
         
         &:first-child {
           display: flex !important;
         }
+      }
+      
+      /* Hide navigation buttons before ready */
+      ::part(button-prev),
+      ::part(button-next) {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+    
+    /* Show everything when ready with smooth transition */
+    &.swiper-ready {
+      swiper-slide {
+        display: flex !important;
+      }
+      
+      ::part(button-prev),
+      ::part(button-next) {
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 0.3s ease;
       }
     }
   }

@@ -67,31 +67,41 @@ export class Header implements OnInit, OnChanges {
       items: [
         [
           {
-            label: 'Rau củ quả',
+            label: 'Laptop',
             items: [
-              { label: 'Rau xanh' },
-              { label: 'Củ quả' },
-              { label: 'Trái cây tươi' },
+              { label: 'Lenovo' },
+              { label: 'Acer' },
+              { label: 'Asus' },
+              { label: 'Dell' },
+              { label: 'HP' },
+              { label: 'MSI' },
+              { label: 'Macbook' },
             ],
           },
         ],
         [
           {
-            label: 'Thực phẩm khô',
+            label: 'Làm đẹp và chăm sóc cá nhân',
             items: [
-              { label: 'Gạo, bột, đường' },
-              { label: 'Hạt, ngũ cốc' },
-              { label: 'Gia vị' },
+              { label: 'Chăm sóc da' },
+              { label: 'Trang điểm' },
+              { label: 'Chăm sóc tóc' },
+              { label: 'Nước hoa' },
+              { label: 'Dụng cụ làm đẹp' },
+              { label: 'Phụ kiện làm đẹp' },
             ],
           },
         ],
         [
           {
-            label: 'Đồ uống',
+            label: 'Phụ kiện và thiết bị điện tử',
             items: [
-              { label: 'Nước ngọt'},
-              { label: 'Trà, cà phê' },
-              { label: 'Nước ép' },
+              { label: 'Tai nghe' },
+              { label: 'Loa Bluetooth' },
+              { label: 'Sạc dự phòng' },
+              { label: 'Ốp lưng điện thoại' },
+              { label: 'Thiết bị thông minh' },
+              { label: 'Phụ kiện máy tính' },
             ],
           },
         ],
