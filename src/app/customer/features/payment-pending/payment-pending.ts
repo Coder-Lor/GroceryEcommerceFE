@@ -22,7 +22,7 @@ export class PaymentPending implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   orderInfo: any = null;
-  statusMessage = 'Dang cho xac nhan thanh toan...';
+  statusMessage = 'Đang chờ xác nhận thanh toán...';
   connectionError = '';
   isConnecting = false;
 
@@ -36,7 +36,7 @@ export class PaymentPending implements OnInit, OnDestroy {
       this.router.navigate(['/order-result'], {
         state: {
           success: false,
-          errorMessage: 'Khong tim thay thong tin thanh toan.',
+          errorMessage: 'Không tìm thấy thông tin thanh toán.',
           orderInfo: state?.orderInfo ?? null,
         },
       });
@@ -48,7 +48,7 @@ export class PaymentPending implements OnInit, OnDestroy {
 
   private startListening(): void {
     if (!isPlatformBrowser(this.platformId)) {
-      this.connectionError = 'SignalR chi hoat dong tren trinh duyet.';
+      this.connectionError = 'SignalR chỉ hoạt động trên trình duyệt.';
       return;
     }
 
@@ -59,14 +59,14 @@ export class PaymentPending implements OnInit, OnDestroy {
       .connect()
       .then(() => {
         this.isConnecting = false;
-        this.statusMessage = 'Dang cho xac nhan tu ngan hang...';
+        this.statusMessage = 'Đang chờ xác nhận từ ngân hàng...';
         this.subscribeToNotifications();
       })
       .catch((err) => {
         console.error('SignalR connection failed:', err);
         this.isConnecting = false;
         this.connectionError =
-          'Khong the ket noi den NotificationHub. Vui long thu lai hoac kiem tra don hang trong trang ca nhan.';
+          'Không thể kết nối đến NotificationHub. Vui lòng thử lại hoặc kiểm tra đơn hàng trong trang cá nhân.';
       });
   }
 
@@ -79,7 +79,7 @@ export class PaymentPending implements OnInit, OnDestroy {
             ...this.orderInfo,
             paymentTransactionId: notification.transactionId ?? this.orderInfo?.paymentTransactionId,
             paymentStatus: 'Paid',
-            paymentStatusName: 'Thanh toan thanh cong',
+            paymentStatusName: 'Thanh toán thành công',
           };
           this.navigateToResult(true, notification);
         }
@@ -89,7 +89,7 @@ export class PaymentPending implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((notification) => {
         if (this.matchesOrder(notification)) {
-          this.navigateToResult(false, notification.message || 'Thanh toan that bai.');
+          this.navigateToResult(false, notification.message || 'Thanh toán thất bại.');
         }
       });
   }
@@ -115,7 +115,7 @@ export class PaymentPending implements OnInit, OnDestroy {
   }
 
   cancelPayment(): void {
-    this.navigateToResult(false, 'Ban da huy thanh toan. Don hang se duoc xu ly o trang thai pending.');
+    this.navigateToResult(false, 'Bạn đã hủy thanh toán. Đơn hàng sẽ được xử lý ở trạng thái pending.');
   }
 
   private navigateToResult(success: boolean, notificationOrMessage?: PaymentNotification | string): void {
@@ -128,7 +128,7 @@ export class PaymentPending implements OnInit, OnDestroy {
       state: {
         success,
         orderInfo: this.orderInfo,
-        errorMessage: success ? '' : errorMessage || 'Thanh toan khong thanh cong.',
+        errorMessage: success ? '' : errorMessage || 'Thanh toán không thành công.',
       },
     });
   }
