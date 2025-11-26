@@ -1,0 +1,119 @@
+<div class="payment-pending-page">
+  <div class="container">
+    <div class="pending-card">
+      <div class="status-header text-center">
+        <div class="icon-wrapper mb-3">
+          <i class="pi pi-clock text-warning" style="font-size: 4rem;"></i>
+        </div>
+        <h2 class="fw-bold mb-2">Đang đợi thanh toán</h2>
+        <p class="text-muted mb-3">
+          {{ statusMessage }}
+        </p>
+
+        @if (!connectionError) {
+        <div class="connection-chip" [class.active]="!isConnecting">
+          <i class="pi" [ngClass]="isConnecting ? 'pi-spin pi-spinner' : 'pi-check-circle'"></i>
+          <span>
+            @if (isConnecting) {
+            Đang kết nối đến NotificationHub...
+            } @else {
+            Đã kết nối. Sẽ tự động cập nhật khi thanh toán xác nhận.
+            }
+          </span>
+        </div>
+        }
+
+        @if (connectionError) {
+        <div class="alert alert-danger mt-3">
+          <i class="pi pi-exclamation-triangle me-2"></i>
+          {{ connectionError }}
+        </div>
+        }
+      </div>
+
+      @if (orderInfo) {
+      <div class="payment-layout">
+        <div class="qr-section">
+          <h5 class="fw-bold mb-2">Mã QR thanh toán</h5>
+          <p class="text-muted mb-3">Quét QR bằng ứng dụng ngân hàng để thanh toán.</p>
+
+          @if (orderInfo.qrCodeUrl) {
+          <div class="qr-wrapper mb-3">
+            <img [src]="orderInfo.qrCodeUrl" alt="QR code thanh toán" class="qr-image" />
+          </div>
+          } @else {
+          <div class="alert alert-warning">
+            <i class="pi pi-info-circle me-2"></i>
+            Không tìm thấy mã QR. Vui lòng kiểm tra email hoặc liên hệ hỗ trợ.
+          </div>
+          }
+
+          @if (orderInfo.paymentUrl) {
+          <button class="btn btn-outline-primary w-100 mb-2" (click)="openPaymentUrl()">
+            <i class="pi pi-external-link me-2"></i>
+            Mở link thanh toán
+          </button>
+          }
+
+          <div class="note-box">
+            <i class="pi pi-info-circle me-2"></i>
+            Hệ thống sẽ tự động chuyển sang trang kết quả khi nhận được tín hiệu thanh toán thành công.
+          </div>
+        </div>
+
+        <div class="order-info">
+          <h5 class="fw-bold mb-3">Thông tin đơn hàng</h5>
+          <div class="info-row">
+            <span class="label">Mã đơn hàng:</span>
+            <span class="value fw-semibold">{{ orderInfo.orderNumber || orderInfo.orderId }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Ngày đặt:</span>
+            <span class="value">{{ orderInfo.orderDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Tổng thanh toán:</span>
+            <span class="value fw-bold text-primary">{{ orderInfo.total || 0 | currency : 'VND' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Phương thức:</span>
+            <span class="value">Chuyển khoản ngân hàng</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Trạng thái:</span>
+            <span class="value">
+              {{ orderInfo.paymentStatusName || 'Đang chờ thanh toán' }}
+            </span>
+          </div>
+          @if (orderInfo.paymentTransactionId) {
+          <div class="info-row">
+            <span class="label">Mã giao dịch:</span>
+            <span class="value">{{ orderInfo.paymentTransactionId }}</span>
+          </div>
+          }
+
+          <div class="alert alert-info mt-3">
+            <i class="pi pi-info-circle me-2"></i>
+            Đừng đóng tab này cho đến khi hoàn tất thanh toán. Nếu có vấn đề, bạn có thể hủy và đặt lại.
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons d-flex gap-3 flex-wrap justify-content-center mt-4">
+        <button class="btn btn-danger px-4" (click)="cancelPayment()">
+          <i class="pi pi-times-circle me-2"></i>
+          Hủy thanh toán
+        </button>
+        <button class="btn btn-outline-primary px-4" routerLink="/profile/orders">
+          <i class="pi pi-list me-2"></i>
+          Xem đơn hàng
+        </button>
+        <button class="btn btn-outline-secondary px-4" routerLink="/home">
+          <i class="pi pi-home me-2"></i>
+          Về trang chủ
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+</div>

@@ -40,6 +40,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server
   },
   {
+    path: 'payment-pending',
+    renderMode: RenderMode.Server
+  },
+  {
     path: 'order-result',
     renderMode: RenderMode.Server
   },

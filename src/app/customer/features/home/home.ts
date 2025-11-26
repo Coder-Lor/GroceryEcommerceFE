@@ -17,7 +17,6 @@ import { CarouselModule } from 'primeng/carousel';
 import { ProductCard } from '../../shared/components/product-card/product-card';
 import {
   ProductBaseResponse,
-  CategoryClient,
   CategoryDto,
 } from '@core/service/system-admin.service';
 import { InventoryService } from '@core/service/inventory.service';
@@ -58,7 +57,7 @@ export class Home implements OnInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
-  private categoryService = inject(CategoryClient);
+  private categoryService = inject(CategoryService);
   private transferState = inject(TransferState);
   private platformId = inject(PLATFORM_ID);
   private destroy$ = new Subject<void>();
@@ -209,14 +208,12 @@ export class Home implements OnInit, OnDestroy {
         .getCategoryTree()
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (response) => {
-            if (response?.isSuccess && response?.data) {
-              this.categories = response.data;
+          next: (categories) => {
+            this.categories = categories;
 
-              // Lưu vào TransferState (chỉ trên server)
-              if (isPlatformServer(this.platformId)) {
-                this.transferState.set(CATEGORIES_KEY, this.categories);
-              }
+            // Lưu vào TransferState (chỉ trên server)
+            if (isPlatformServer(this.platformId)) {
+              this.transferState.set(CATEGORIES_KEY, this.categories);
             }
           },
           error: (err) => {

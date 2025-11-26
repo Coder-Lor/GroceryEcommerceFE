@@ -20,7 +20,7 @@ export class OrderResult implements OnInit {
   ngOnInit(): void {
     // Lấy thông tin từ navigation state hoặc history.state (trường hợp reload)
     const navigationState = this.router.getCurrentNavigation()?.extras.state as any;
-    const state = navigationState ?? (history.state as any);
+    const state = navigationState ?? (typeof history !== 'undefined' ? (history.state as any) : null);
 
     if (state && (state.success !== undefined || state.orderInfo)) {
       this.isSuccess = state.success ?? false;

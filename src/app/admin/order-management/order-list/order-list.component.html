@@ -76,7 +76,8 @@
               <fa-icon [icon]="sortColumn === 'totalAmount' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
-          <th>Trạng thái</th>
+          <th>Trạng thái đơn</th>
+          <th>Thanh toán</th>
           <th (click)="changeSortColumn('createdAt')" class="sortable text-center">
             Ngày tạo
             <span class="sort-icon">
@@ -107,6 +108,11 @@
               {{ OrderStatusMapper.getOrderStatusDisplay(order.status || 1) }}
             </span>
           </td>
+          <td>
+            <span class="status-badge" [ngClass]="getPaymentBadgeClass(order.paymentStatus || 1)">
+              {{ OrderStatusMapper.getPaymentStatusDisplay(order.paymentStatus || 1) }}
+            </span>
+          </td>
           <td class="text-center">
             <fa-icon [icon]="faCalendar" class="icon-small"></fa-icon>
             {{ formatDate(order.createdAt) }}
@@ -121,7 +127,7 @@
           </td>
         </tr>
         <tr *ngIf="filteredOrders.length === 0">
-          <td colspan="7" class="no-data">Không tìm thấy đơn hàng nào</td>
+          <td colspan="8" class="no-data">Không tìm thấy đơn hàng nào</td>
         </tr>
       </tbody>
     </table>

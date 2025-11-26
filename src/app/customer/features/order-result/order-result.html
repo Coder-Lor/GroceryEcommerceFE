@@ -34,54 +34,6 @@
         </div>
         }
 
-        @if (orderInfo?.paymentMethod === 'banking') {
-        <div class="payment-info mb-4">
-          <h5 class="fw-bold mb-2">Thanh toán chuyển khoản</h5>
-          <p class="text-muted mb-3">Quét mã QR bên dưới hoặc mở liên kết để hoàn tất thanh toán cho đơn hàng của bạn.</p>
-
-          @if (orderInfo.qrCodeUrl) {
-          <div class="qr-wrapper mb-3">
-            <img [src]="orderInfo.qrCodeUrl" alt="QR code thanh toán" class="qr-image" />
-            <div class="qr-url text-break mt-2">
-              <small>
-                <a [href]="orderInfo.qrCodeUrl" target="_blank" rel="noopener">{{ orderInfo.qrCodeUrl }}</a>
-              </small>
-            </div>
-          </div>
-          } @else {
-          <div class="alert alert-warning mb-3">
-            <i class="pi pi-info-circle me-2"></i>
-            Không tìm thấy mã QR. Vui lòng kiểm tra email hoặc liên hệ hỗ trợ để nhận hướng dẫn thanh toán.
-          </div>
-          }
-
-          <div class="payment-meta">
-            <div class="meta-row">
-              <span class="label">Mã đơn hàng:</span>
-              <span class="value fw-semibold">{{ orderInfo.orderNumber || orderInfo.orderId }}</span>
-            </div>
-            <div class="meta-row">
-              <span class="label">Số tiền cần thanh toán:</span>
-              <span class="value fw-semibold text-primary">{{ orderInfo.total || 0 | currency : 'VND' }}</span>
-            </div>
-            @if (orderInfo.paymentTransactionId) {
-            <div class="meta-row">
-              <span class="label">Mã giao dịch:</span>
-              <span class="value">{{ orderInfo.paymentTransactionId }}</span>
-            </div>
-            }
-          </div>
-
-          @if (orderInfo.paymentUrl) {
-          <div class="text-center mt-3">
-            <a [href]="orderInfo.paymentUrl" target="_blank" rel="noopener" class="btn btn-outline-primary">
-              Mở trang thanh toán
-            </a>
-          </div>
-          }
-        </div>
-        }
-
         <div class="alert alert-info mb-4">
           <i class="pi pi-info-circle me-2"></i>
           Chúng tôi sẽ gửi thông tin chi tiết đơn hàng qua email/SMS của bạn.

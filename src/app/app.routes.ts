@@ -26,6 +26,7 @@ import { Checkout } from './customer/features/checkout/checkout';
 import { Profile } from './customer/features/profile/profile';
 import { DiscoverPage } from './customer/pages/customer-page/discover-page/discover-page';
 import { OrderResult } from './customer/features/order-result/order-result';
+import { PaymentPending } from './customer/features/payment-pending/payment-pending';
 import { PersonalInfoComponent } from './customer/features/profile/personal-info/personal-info.component';
 import { UserAddressComponent } from './customer/features/profile/user-address/user-address.component';
 import { UserContactComponent } from './customer/features/profile/user-contact/user-contact.component';
@@ -52,6 +53,7 @@ export const routes: Routes = [
       { path: 'product-detail/:slug', component: ProductDetail },      
       { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
+      { path: 'payment-pending', component: PaymentPending },
       { path: 'order-result', component: OrderResult },
       { 
         path: 'profile', 

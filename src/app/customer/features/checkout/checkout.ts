@@ -450,13 +450,21 @@ export class Checkout implements OnInit {
               paymentTransactionId: orderData?.paymentTransactionId
             };
 
-            const navigateToResult = () => {
-              this.router.navigate(['/order-result'], {
-                state: {
-                  success: true,
-                  orderInfo
-                }
-              });
+            const navigateAfterCreate = () => {
+              if (selectedPaymentMethod === 'banking') {
+                this.router.navigate(['/payment-pending'], {
+                  state: {
+                    orderInfo
+                  }
+                });
+              } else {
+                this.router.navigate(['/order-result'], {
+                  state: {
+                    success: true,
+                    orderInfo
+                  }
+                });
+              }
             };
 
             // Nếu checkout từ cart, xóa giỏ hàng sau khi tạo order thành công
@@ -470,20 +478,20 @@ export class Checkout implements OnInit {
                   }
                   
                   // Navigate đến trang kết quả thành công
-                  navigateToResult();
+                  navigateAfterCreate();
                   
                   return of(null);
                 }),
                 catchError((clearErr) => {
                   console.error('❌ Error clearing cart:', clearErr);
                   // Vẫn navigate ngay cả khi xóa giỏ hàng thất bại
-                  navigateToResult();
+                  navigateAfterCreate();
                   return of(null);
                 })
               );
             } else {
               // Checkout single product, không cần xóa cart
-              navigateToResult();
+              navigateAfterCreate();
               return of(null);
             }
           }),
