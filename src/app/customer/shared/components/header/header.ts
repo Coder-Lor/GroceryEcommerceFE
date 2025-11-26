@@ -7,8 +7,10 @@ import {
   OnInit,
   PLATFORM_ID,
   ViewChild,
+  makeStateKey,
+  TransferState,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { UtilityPanel } from './utility-panel/utility-panel';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/service/auth.service';
@@ -22,12 +24,16 @@ import { MegaMenuItem } from 'primeng/api';
 import { CategoryService } from '../../../../core/service/category.service';
 import { CategoryDto } from '../../../../core/service/system-admin.service';
 
+// State key for TransferState
+const HEADER_CATEGORIES_KEY = makeStateKey<CategoryDto[]>('header-categories');
+
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule, UtilityPanel, RouterModule, MegaMenuModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
+  host: { ngSkipHydration: 'true' },  // ← Skip SSR cho component này
 })
 export class Header implements OnInit, OnChanges {
   private authService: AuthService = inject(AuthService);
@@ -35,6 +41,7 @@ export class Header implements OnInit, OnChanges {
   private platformId = inject(PLATFORM_ID);
   private cartService: CartService = inject(CartService);
   private categoryService: CategoryService = inject(CategoryService);
+  private transferState = inject(TransferState);
 
   @ViewChild('userMenu', { static: false }) userMenu!: ElementRef;
 
@@ -124,14 +131,15 @@ export class Header implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    // Chỉ load giỏ hàng khi ở browser
     if (isPlatformBrowser(this.platformId)) {
       console.log('🛒 Header ngOnInit - Loading cart...');
       this.cartService.loadCartSummary();
-      this.loadCategories();
     } else {
       console.log('⚠️ Header ngOnInit - Server side, skipping cart load');
     }
+    
+    // Load categories (có TransferState xử lý cả server và browser)
+    this.loadCategories();
 
     // this.authService.isAuthenticated$.subscribe((res) => {
     //   this.isLoggedIn = res;
@@ -226,30 +234,60 @@ export class Header implements OnInit, OnChanges {
   }
 
   private loadCategories(): void {
+    // Kiểm tra xem có dữ liệu trong TransferState không
+    const cachedCategories = this.transferState.get(HEADER_CATEGORIES_KEY, null);
+    
+    if (cachedCategories) {
+      console.log('📦 Header - Using cached categories from TransferState');
+      // Sử dụng dữ liệu từ cache
+      this.buildCategoryMenu(cachedCategories);
+      
+      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
+      if (isPlatformBrowser(this.platformId)) {
+        this.transferState.remove(HEADER_CATEGORIES_KEY);
+      }
+      return;
+    }
+
+    // CHỈ gọi API trên browser để tránh lỗi SSR
+    if (!isPlatformBrowser(this.platformId)) {
+      console.log('⚠️ Header - Server side, skipping API call');
+      return;
+    }
+
+    // Gọi API để lấy danh sách danh mục (CHỈ TRÊN BROWSER)
+    console.log('🌐 Header - Fetching categories from API (browser)');
     this.categoryService.getCategoryTree().subscribe({
       next: (categories) => {
-        // Chỉ lấy danh sách tên danh mục cha
-        const parentCategories = categories.filter(cat => !cat.parentCategoryId);
-        
-        this.categoryMenuItems = [
-          {
-            label: 'Danh mục sản phẩm',
-            items: [
-              parentCategories.map(cat => ({
-                label: cat.name,
-                command: () => {
-                  this.router.navigate(['/category'], { 
-                    queryParams: { categoryId: cat.categoryId } 
-                  });
-                }
-              }))
-            ]
-          }
-        ];
+        console.log('✅ Header - Categories loaded successfully:', categories.length);
+        if (categories.length > 0) {
+          this.buildCategoryMenu(categories);
+        }
       },
       error: (err) => {
-        console.error('❌ Lỗi khi load danh mục:', err);
+        console.error('❌ Lỗi khi load danh mục trong header:', err);
       },
     });
+  }
+
+  private buildCategoryMenu(categories: CategoryDto[]): void {
+    // Chỉ lấy danh sách tên danh mục cha
+    const parentCategories = categories.filter(cat => !cat.parentCategoryId);
+    
+    this.categoryMenuItems = [
+      {
+        label: 'Danh mục sản phẩm',
+        items: [
+          parentCategories.map(cat => ({
+            label: cat.name,
+            command: () => {
+              this.router.navigate(['/category'], { 
+                queryParams: { categoryId: cat.categoryId } 
+              });
+            }
+          }))
+        ]
+      }
+    ];
   }
 }

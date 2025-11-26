@@ -50,8 +50,8 @@
 
       <!-- Center Section: Mega Menu -->
       <div class="mega-menu-section d-none d-md-flex">
-        <p-megaMenu [model]="categoryMenuItems" styleClass="custom-megamenu"></p-megaMenu>
-        <p-megaMenu [model]="megaMenuItems" styleClass="custom-megamenu"></p-megaMenu>
+        <p-megaMenu *ngIf="categoryMenuItems.length > 0" [model]="categoryMenuItems" styleClass="custom-megamenu"></p-megaMenu>
+        <p-megaMenu *ngIf="megaMenuItems.length > 0" [model]="megaMenuItems" styleClass="custom-megamenu"></p-megaMenu>
       </div>
 
       <!-- Right Section: Search -->

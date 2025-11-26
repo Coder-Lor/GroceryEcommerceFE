@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { CategoryClient, CategoryDto, ResultOfListOfCategoryDto } from './system-admin.service';
-import { map, Observable } from 'rxjs';
+import { map, Observable, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +17,11 @@ export class CategoryService {
           console.log('Lỗi: ', res.errorMessage);
           return [];
         }
+      }),
+      catchError((error) => {
+        console.error('❌ CategoryService - Lỗi khi gọi API getCategoryTree:', error);
+        // Trả về mảng rỗng thay vì throw error
+        return of([]);
       })
     );
   }
