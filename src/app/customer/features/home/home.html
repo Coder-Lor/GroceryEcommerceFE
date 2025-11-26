@@ -11,7 +11,13 @@
       </div>
     </div>
     } @else {
-    <swiper-container autoplay-delay="4000" loop="true" pagination="false" navigation="true">
+    <swiper-container 
+      class="hero-swiper"
+      [class.swiper-ready]="isHeroSwiperReady"
+      autoplay-delay="4000" 
+      loop="true" 
+      pagination="false" 
+      navigation="true">
       <swiper-slide *ngFor="let slide of heroSlides">
         <div class="hero-slide position-relative overflow-hidden">
           <img

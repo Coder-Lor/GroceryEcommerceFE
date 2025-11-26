@@ -4,6 +4,7 @@ import {
   inject,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewEncapsulation,
   PLATFORM_ID,
   makeStateKey,
@@ -55,7 +56,7 @@ type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number 
   encapsulation: ViewEncapsulation.None,
   host: { ngSkipHydration: 'true' },
 })
-export class Home implements OnInit, OnDestroy {
+export class Home implements OnInit, AfterViewInit, OnDestroy {
   private route: Router = inject(Router);
   private inventoryService: InventoryService = inject(InventoryService);
   private productService: ProductService = inject(ProductService);
@@ -78,6 +79,10 @@ export class Home implements OnInit, OnDestroy {
   isLoadingCategories = true;
   isLoadingFlashSale = true;
   isLoadingHero = true;
+
+  // Hero swiper hydration fix
+  isHeroSwiperReady = false;
+  isBrowser = false;
 
   categorySkeletonItems = Array(6).fill(0);
   flashSaleSkeletonItems = Array(6).fill(0);
@@ -158,6 +163,9 @@ export class Home implements OnInit, OnDestroy {
 
   private carouselImages: UrlObject[];
   ngOnInit(): void {
+    // Detect if running in browser
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    
     this.loadCategories();
     // Initialize carousel images
     this.carouselImages = [
@@ -375,6 +383,17 @@ export class Home implements OnInit, OnDestroy {
   onCountdownEvent(event: CountdownEvent) {
     if (event.action === 'done') {
       console.log('Flash sale kết thúc!');
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Only initialize hero swiper in browser after hydration
+    if (this.isBrowser) {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          this.isHeroSwiperReady = true;
+        }, 100);
+      });
     }
   }
 

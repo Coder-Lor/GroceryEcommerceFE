@@ -6,6 +6,30 @@
 
 .hero-slider {
   margin-top: 20px;
+
+  /* Hero swiper hydration fix */
+  .hero-swiper {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &.swiper-ready {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Prevent vertical stacking before initialization */
+    &:not(.swiper-initialized) {
+      swiper-slide {
+        display: none !important;
+        
+        &:first-child {
+          display: flex !important;
+        }
+      }
+    }
+  }
 }
 
 .hero-slide {
