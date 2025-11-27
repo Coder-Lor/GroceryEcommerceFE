@@ -1,5 +1,10 @@
 <div class="admin-layout" [class.sidebar-collapsed]="isSidebarCollapsed">
-  <button class="toggle-btn" (click)="toggleSidebar()" [attr.aria-label]="isSidebarCollapsed ? 'Mở sidebar' : 'Đóng sidebar'">
+  <button
+    type="button"
+    class="toggle-btn"
+    (click)="toggleSidebar()"
+    [attr.aria-label]="isSidebarCollapsed ? 'Expand menu' : 'Collapse menu'"
+  >
     <span class="toggle-icon">
       @if (isSidebarCollapsed) {
         <i class="pi pi-angle-right"></i>
@@ -8,28 +13,68 @@
       }
     </span>
   </button>
+
   <aside class="sidebar">
-    <nav>
-      <a routerLink="home" routerLinkActive="active">
-        <span class="nav-text">Trang Chủ</span>
-      </a>
-      <a routerLink="users" routerLinkActive="active">
-        <span class="nav-text">Quản lý người dùng</span>
-      </a>
-      <a routerLink="inventory" routerLinkActive="active">
-        <span class="nav-text">Quản lý kho hàng</span>
-      </a>
-      <a routerLink="orders" routerLinkActive="active">
-        <span class="nav-text">Quản lý đơn hàng</span>
-      </a>
-      <a routerLink="categories" routerLinkActive="active">
-        <span class="nav-text">Quản lý danh mục</span>
-      </a>
-      <a routerLink="vouchers" routerLinkActive="active">
-        <span class="nav-text">Quản lý voucher</span>
-      </a>
-    </nav>
+    <p-menu
+      [model]="menuItems"
+      class="admin-menu"
+      [styleClass]="isSidebarCollapsed ? 'admin-menu-panel collapsed' : 'admin-menu-panel'"
+    >
+      <ng-template pTemplate="start">
+        <div class="brand">
+          <span class="brand-icon">
+           <img class="logo-icon" src="/icons/Icon.svg" />
+          </span>
+          <div class="brand-text">
+            <span class="brand-name">Dashboard</span>
+            <!-- <span class="brand-highlight">dashboard</span> -->
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="submenuheader" let-item>
+        <span class="section-header">{{ item.label }}</span>
+      </ng-template>
+
+      <ng-template pTemplate="item" let-item>
+        <a
+          pRipple
+          class="menu-link p-menuitem-link"
+          (click)="onMenuItemSelect($event, item)"
+          [attr.aria-label]="item.label"
+        >
+          <i [class]="item.icon"></i>
+          <span class="menu-label" [class.hidden]="isSidebarCollapsed">{{ item.label }}</span>
+          <p-badge *ngIf="item.badge" class="menu-badge" [value]="item.badge"></p-badge>
+        </a>
+      </ng-template>
+    </p-menu>
+
+    <div class="profile-section">
+      <button
+        pRipple
+        type="button"
+        class="profile-trigger"
+        (click)="profileMenu.toggle($event)"
+      >
+        <p-avatar [image]="userAvatar" shape="circle"></p-avatar>
+        <div class="profile-meta" [class.hidden]="isSidebarCollapsed">
+          <span class="profile-name">{{ userName }}</span>
+          <span class="profile-role">{{ userRole }}</span>
+        </div>
+        <i class="pi pi-user profile-caret" aria-hidden="true"></i>
+      </button>
+
+      <p-menu
+        #profileMenu
+        [popup]="true"
+        [model]="profileItems"
+        appendTo="body"
+        styleClass="user-menu"
+      ></p-menu>
+    </div>
   </aside>
+
   <main class="content">
     <router-outlet></router-outlet>
   </main>
