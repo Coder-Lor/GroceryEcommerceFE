@@ -1,6 +1,18 @@
 <div class="homepage">
+  @defer {
   <section class="hero-slider container position-relative mb-4">
-    @if (isLoadingHero) {
+    <swiper-container class="hero-swiper" [class.swiper-ready]="isHeroSwiperReady" autoplay-delay="4000" loop="true"
+      pagination="false" navigation="true">
+      <swiper-slide *ngFor="let slide of heroSlides">
+        <div class="hero-slide position-relative overflow-hidden">
+          <img [src]="slide.image1" class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover" />
+          <img [src]="slide.image2" class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover" />
+        </div>
+      </swiper-slide>
+    </swiper-container>
+  </section>
+  } @placeholder(minimum 1200ms) {
+  <section class="hero-slider container position-relative mb-4">
     <div class="row g-3">
       <div class="col-12 col-lg-8">
         <p-skeleton width="100%" height="260px" styleClass="rounded-4"></p-skeleton>
@@ -10,29 +22,9 @@
         <p-skeleton width="100%" height="120px" styleClass="rounded-4"></p-skeleton>
       </div>
     </div>
-    } @else {
-    <swiper-container 
-      class="hero-swiper"
-      [class.swiper-ready]="isHeroSwiperReady"
-      autoplay-delay="4000" 
-      loop="true" 
-      pagination="false" 
-      navigation="true">
-      <swiper-slide *ngFor="let slide of heroSlides">
-        <div class="hero-slide position-relative overflow-hidden">
-          <img
-            [src]="slide.image1"
-            class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover"
-          />
-          <img
-            [src]="slide.image2"
-            class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover"
-          />
-        </div>
-      </swiper-slide>
-    </swiper-container>
-    }
   </section>
+  }
+
   <!-- Categories -->
   <section class="categories container py-2 mb-3">
     <h3 class="section-title fw-bold mb-4">DANH MỤC SẢN PHẨM</h3>
@@ -49,13 +41,7 @@
       }
     </div>
     } @else {
-    <swiper-container
-      slides-per-view="6"
-      space-between="20"
-      navigation="true"
-      loop="false"
-      class="category-swiper"
-    >
+    <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="false" class="category-swiper">
       @for (item of categories; track $index) {
       <swiper-slide (click)="navigationToCategory()" class="category-slide">
         <div class="category-card text-center">
@@ -73,11 +59,7 @@
     <div class="flash-sale-header d-flex justify-content-between align-items-center mb-4">
       <div class="d-flex align-items-center gap-3">
         <h3 class="section-title fw-bold mb-0">Flash Sale</h3>
-        <countdown
-          class="flash-timer"
-          [config]="countdownConfig"
-          (event)="onCountdownEvent($event)"
-        ></countdown>
+        <countdown class="flash-timer" [config]="countdownConfig" (event)="onCountdownEvent($event)"></countdown>
       </div>
       <a class="see-all" href="#">Xem tất cả</a>
     </div>
@@ -95,25 +77,15 @@
       }
     </div>
     } @else {
-    <swiper-container
-      slides-per-view="6"
-      space-between="20"
-      navigation="true"
-      loop="true"
-      autoplay-delay="3000"
-      autoplay-disable-on-interaction="false"
-      class="flash-sale-swiper"
-    >
+    <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="true" autoplay-delay="3000"
+      autoplay-disable-on-interaction="false" class="flash-sale-swiper">
       <swiper-slide *ngFor="let product of flashSaleProducts" class="flash-sale-slide">
         <div class="product-card">
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="product-image">
-            <img
-              [src]="product.primaryImageUrl || '/images/no-image.png'"
-              [alt]="product.name || 'Sản phẩm'"
-              onerror="this.src='/images/no-image.png'"
-            />
+            <img [src]="product.primaryImageUrl || '/images/no-image.png'" [alt]="product.name || 'Sản phẩm'"
+              onerror="this.src='/images/no-image.png'" />
           </div>
           <div class="sale-status">
             <div class="progress-bar">
@@ -122,7 +94,7 @@
             </div>
             <p class="status-text">
               {{
-                product.stockQuantity && product.stockQuantity > 50 ? 'Vừa mới bán' : 'Sắp hết hàng'
+              product.stockQuantity && product.stockQuantity > 50 ? 'Vừa mới bán' : 'Sắp hết hàng'
               }}
             </p>
           </div>
@@ -136,13 +108,7 @@
   <section class="brands container py-5" style="margin-top: 30px">
     <h3 class="section-title fw-bold mb-4">THƯƠNG HIỆU NỔI BẬT</h3>
 
-    <swiper-container
-      slides-per-view="6"
-      space-between="20"
-      navigation="true"
-      loop="true"
-      class="brands-swiper"
-    >
+    <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="true" class="brands-swiper">
       <swiper-slide *ngFor="let brand of brands" class="brand-slide">
         <div class="brand-card">
           <img [src]="brand.logo" [alt]="brand.name" class="brand-logo" />
@@ -173,11 +139,7 @@
         <div class="row g-4">
           @for (item of products; track $index) {
           <div class="col-12 col-sm-6 col-lg-3">
-            <product-card
-              [product]="item"
-              [layout]="'grid'"
-              [getSeverity]="getSeverity.bind(this)"
-            ></product-card>
+            <product-card [product]="item" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
           </div>
           }
         </div>

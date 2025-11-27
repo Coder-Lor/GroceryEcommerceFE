@@ -1,7 +1,7 @@
 .personal-info {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  // padding: 2rem;
 
   :host ::ng-deep {
     .p-card {
@@ -102,22 +102,24 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: transparent;
+    color: black;
+    border-radius: 12px 12px 0 0;
   }
 
   .section-title {
     margin: 0;
     font-size: 1.75rem;
     font-weight: 700;
-    color: white;
+    color: black;
   }
 
   .section-subtitle {
     margin: 0.5rem 0 0 0;
     font-size: 0.95rem;
     opacity: 0.9;
-    color: white;
+    color: black;
   }
 
   .loading-state {
