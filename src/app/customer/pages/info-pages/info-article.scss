@@ -1,0 +1,143 @@
+.info-article {
+  max-width: 1040px;
+  margin: 90px auto;
+  padding: 3rem 1.5rem 4rem;
+  color: #17212b;
+  background: #f9fafb;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.article-hero {
+  background: linear-gradient(135deg, #e8eef7 0%, #ffffff 90%);
+  border: 1px solid #d9e2ec;
+  border-radius: 18px;
+  padding: 2.5rem;
+  box-shadow: 0 16px 40px rgba(18, 38, 63, 0.08);
+}
+
+.article-hero h1,
+.article-hero h2,
+.article-card h3 {
+  font-family: 'Playfair', 'Times New Roman', serif !important;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+
+.eyebrow {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.article-hero h1 {
+  font-size: clamp(2rem, 3vw + 1rem, 2.8rem);
+  margin: 0 0 1rem;
+  line-height: 1.2;
+}
+
+.article-hero .lede {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #334155;
+  margin-bottom: 1.5rem;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.meta-row .dot {
+  width: 6px;
+  height: 6px;
+  background: #94a3b8;
+  border-radius: 50%;
+}
+
+.tag {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 2rem 0;
+}
+
+.article-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.article-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+  font-size: 1.2rem;
+}
+
+.article-card p {
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pullquote {
+  border-left: 4px solid #0ea5e9;
+  padding-left: 1rem;
+  margin: 1rem 0 2rem;
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.list-block {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.list-block h3 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.list-block ul {
+  padding-left: 1.1rem;
+  margin: 0.5rem 0 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.list-block li + li {
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 640px) {
+  .info-article {
+    padding: 2.5rem 1.1rem 3rem;
+  }
+
+  .article-hero {
+    padding: 2rem 1.5rem;
+  }
+}
