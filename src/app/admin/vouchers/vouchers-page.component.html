@@ -1,0 +1,261 @@
+<!-- Loading Overlay -->
+<app-loading-overlay 
+  [show]="isLoadingGiftCards || isLoadingCouponUsages" 
+  message="Đang xử lý...">
+</app-loading-overlay>
+
+<div class="vouchers-container">
+  <!-- Toast messages -->
+  <p-toast></p-toast>
+  
+  <!-- Confirm Dialog -->
+  <p-confirmDialog
+    [style]="{width: '450px'}"
+    [baseZIndex]="10000"
+    [closable]="true"
+    [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger"
+    rejectButtonStyleClass="p-button-secondary p-button-text">
+  </p-confirmDialog>
+  
+  <div class="page-header">
+    <h2>Quản lý Voucher</h2>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'giftcards'"
+      (click)="activeTab = 'giftcards'">
+      <fa-icon [icon]="faGift"></fa-icon>
+      <span>Thẻ quà tặng</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'coupons'"
+      (click)="activeTab = 'coupons'">
+      <fa-icon [icon]="faTicket"></fa-icon>
+      <span>Sử dụng Coupon</span>
+    </button>
+  </div>
+
+  <!-- Gift Cards Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'giftcards'">
+    <div class="section-header">
+      <h3>Thẻ quà tặng</h3>
+      <button class="btn btn-success" (click)="openAddGiftCardModal()">
+        <fa-icon [icon]="faPlus"></fa-icon>
+        <span>Thêm thẻ quà tặng</span>
+      </button>
+    </div>
+
+    <div class="info-box">
+      <p>
+        <fa-icon [icon]="faGift"></fa-icon>
+        Quản lý thẻ quà tặng cho khách hàng. Tạo thẻ mới với số tiền và thời hạn sử dụng.
+      </p>
+    </div>
+
+    <!-- Note: Danh sách sẽ được hiển thị khi có API getPaged/getAll -->
+    <div class="empty-state" *ngIf="giftCards.length === 0">
+      <fa-icon [icon]="faGift" class="empty-icon"></fa-icon>
+      <p>Chưa có thẻ quà tặng nào. Hãy tạo thẻ mới để bắt đầu.</p>
+    </div>
+  </div>
+
+  <!-- Coupon Usage Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'coupons'">
+    <div class="section-header">
+      <h3>Sử dụng Coupon</h3>
+      <button class="btn btn-success" (click)="openAddCouponUsageModal()">
+        <fa-icon [icon]="faPlus"></fa-icon>
+        <span>Thêm sử dụng coupon</span>
+      </button>
+    </div>
+
+    <div class="info-box">
+      <p>
+        <fa-icon [icon]="faTicket"></fa-icon>
+        Quản lý việc sử dụng coupon của khách hàng. Ghi nhận khi khách hàng áp dụng coupon vào đơn hàng.
+      </p>
+    </div>
+
+    <!-- Note: Danh sách sẽ được hiển thị khi có API getPaged/getAll -->
+    <div class="empty-state" *ngIf="couponUsages.length === 0">
+      <fa-icon [icon]="faTicket" class="empty-icon"></fa-icon>
+      <p>Chưa có bản ghi sử dụng coupon nào. Hãy tạo bản ghi mới để bắt đầu.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Gift Card Modal -->
+<div class="modal-overlay" *ngIf="showGiftCardModal" (click)="closeGiftCardModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faGift"></fa-icon>
+        {{ modalMode === 'add' ? 'Thêm thẻ quà tặng' : 'Sửa thẻ quà tặng' }}
+      </h3>
+      <button class="btn-close" (click)="closeGiftCardModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>
+          Tên thẻ quà tặng <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="currentGiftCard.name"
+          placeholder="Nhập tên thẻ quà tặng"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Mô tả</label>
+        <textarea
+          class="form-control"
+          [(ngModel)]="currentGiftCard.description"
+          placeholder="Nhập mô tả (tùy chọn)"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>
+            Số tiền ban đầu (VNĐ) <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="currentGiftCard.initialAmount"
+            placeholder="0"
+            min="0"
+            step="1000"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ngày bắt đầu</label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="getDateString(currentGiftCard.validFrom)"
+            (change)="onValidFromChange($event)"
+          />
+        </div>
+        <div class="form-group">
+          <label>Ngày kết thúc</label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="getDateString(currentGiftCard.validTo)"
+            (change)="onValidToChange($event)"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeGiftCardModal()">
+        Hủy
+      </button>
+      <button class="btn btn-success" (click)="saveGiftCard()">
+        {{ modalMode === 'add' ? 'Tạo mới' : 'Cập nhật' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Coupon Usage Modal -->
+<div class="modal-overlay" *ngIf="showCouponUsageModal" (click)="closeCouponUsageModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faTicket"></fa-icon>
+        Thêm sử dụng coupon
+      </h3>
+      <button class="btn-close" (click)="closeCouponUsageModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>
+          ID Coupon <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="currentCouponUsage.couponId"
+          placeholder="Nhập ID coupon"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>
+          ID Người dùng <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="currentCouponUsage.userId"
+          placeholder="Nhập ID người dùng"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>ID Đơn hàng</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="currentCouponUsage.orderId"
+          placeholder="Nhập ID đơn hàng (tùy chọn)"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>
+            Số tiền đơn hàng (VNĐ)
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="currentCouponUsage.orderAmount"
+            placeholder="0"
+            min="0"
+            step="1000"
+          />
+        </div>
+        <div class="form-group">
+          <label>
+            Số tiền giảm giá (VNĐ) <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="currentCouponUsage.discountAmount"
+            placeholder="0"
+            min="0"
+            step="1000"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeCouponUsageModal()">
+        Hủy
+      </button>
+      <button class="btn btn-success" (click)="saveCouponUsage()">
+        Tạo mới
+      </button>
+    </div>
+  </div>
+</div>
+
