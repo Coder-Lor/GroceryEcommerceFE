@@ -80,6 +80,9 @@ export class AdminLayoutComponent {
     if (item.command) {
       item.command({ originalEvent: event, item });
     }
+    if (item.routerLink) {
+      this.router.navigate([item.routerLink]);
+    }
   }
 
   // Compatibility handler in case template references the old name
