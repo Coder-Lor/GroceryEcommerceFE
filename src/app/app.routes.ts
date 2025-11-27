@@ -34,6 +34,10 @@ import { UserBankComponent } from './customer/features/profile/user-bank/user-ba
 import { UserOrdersComponent } from './customer/features/profile/user-orders/user-orders.component';
 import { UserWishlistComponent } from './customer/features/profile/user-wishlist/user-wishlist.component';
 import { UserVouchersComponent } from './customer/features/profile/user-vouchers/user-vouchers.component';
+import { AboutUsPage } from './customer/pages/info-pages/about-us/about-us-page';
+import { LegalInfoPage } from './customer/pages/info-pages/legal-info/legal-info-page';
+import { TermsOfUsePage } from './customer/pages/info-pages/terms-of-use/terms-of-use-page';
+import { SecurePaymentPage } from './customer/pages/info-pages/secure-payment/secure-payment-page';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -70,6 +74,10 @@ export const routes: Routes = [
         ]
       },
       { path: 'discover-page', component: DiscoverPage },
+      { path: 'about-us', component: AboutUsPage },
+      { path: 'legal-info', component: LegalInfoPage },
+      { path: 'terms-of-use', component: TermsOfUsePage },
+      { path: 'secure-payment', component: SecurePaymentPage },
     ],
   },
   {
