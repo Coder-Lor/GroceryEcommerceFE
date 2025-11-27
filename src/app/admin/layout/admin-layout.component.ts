@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { AvatarModule } from 'primeng/avatar';
@@ -15,6 +15,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [
     CommonModule,
     RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
     MenuModule,
     AvatarModule,
     BadgeModule,
@@ -27,20 +29,23 @@ export class AdminLayoutComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
 
+  readonly defaultActiveOptions = { exact: false };
+  private readonly exactActiveOptions = { exact: true };
+
   isSidebarCollapsed = false;
   userName = 'Admin';
   userRole = 'Administrator';
   userAvatar = 'https://static.vecteezy.com/system/resources/previews/012/210/707/non_2x/worker-employee-businessman-avatar-profile-icon-vector.jpg';
 
-  menuItems: MenuItem[] = [
+  menuItems: (MenuItem & { routerLinkActiveOptions?: any })[] = [
     {
       items: [
-        { label: 'Trang chủ', icon: 'pi pi-home', command: () => this.navigateTo('/admin/home') },
-        { label: 'Người dùng', icon: 'pi pi-users', command: () => this.navigateTo('/admin/users') },
-        { label: 'Kho hàng', icon: 'pi pi-box', command: () => this.navigateTo('/admin/inventory') },
-        { label: 'Đơn hàng', icon: 'pi pi-shopping-bag', command: () => this.navigateTo('/admin/orders') },
-        { label: 'Danh mục', icon: 'pi pi-list', command: () => this.navigateTo('/admin/categories') },
-        { label: 'Voucher', icon: 'pi pi-ticket', command: () => this.navigateTo('/admin/vouchers') }
+        { label: 'Trang chủ', icon: 'pi pi-home', routerLink: '/admin/home', routerLinkActiveOptions: this.exactActiveOptions },
+        { label: 'Người dùng', icon: 'pi pi-users', routerLink: '/admin/users' },
+        { label: 'Kho hàng', icon: 'pi pi-box', routerLink: '/admin/inventory' },
+        { label: 'Đơn hàng', icon: 'pi pi-shopping-bag', routerLink: '/admin/orders' },
+        { label: 'Danh mục', icon: 'pi pi-list', routerLink: '/admin/categories' },
+        { label: 'Voucher', icon: 'pi pi-ticket', routerLink: '/admin/vouchers' }
       ]
     }
   ];
@@ -67,15 +72,19 @@ export class AdminLayoutComponent {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 
-  onMenuItemSelect(event: Event, item: MenuItem) {
-    event.preventDefault();
-    event.stopPropagation();
+  onMenuItemClick(event: Event, item: MenuItem) {
     if (item.disabled) {
+      event.preventDefault();
       return;
     }
     if (item.command) {
       item.command({ originalEvent: event, item });
     }
+  }
+
+  // Compatibility handler in case template references the old name
+  onMenuItemSelect(event: Event, item: MenuItem) {
+    this.onMenuItemClick(event, item);
   }
 
   private navigateTo(path: string) {
