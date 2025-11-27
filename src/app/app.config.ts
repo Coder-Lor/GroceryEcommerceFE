@@ -16,6 +16,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './core/service/auth.interceptor';
+import { ResponseTransformInterceptor } from './core/service/response-transform.interceptor';
 
 import { registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
@@ -44,7 +45,10 @@ export const appConfig: ApplicationConfig = {
       inputVariant: 'filled',
     }),
     provideCharts(withDefaultRegisterables()),
-    provideHttpClient(withFetch()),
+    // Tạm thời bỏ withFetch() để test - có thể không tương thích với responseType blob
+    // provideHttpClient(withFetch()),
+    provideHttpClient(),
+    { provide: HTTP_INTERCEPTORS, useClass: ResponseTransformInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
