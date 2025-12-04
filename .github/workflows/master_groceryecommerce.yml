@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '20-lts'
+          node-version: '20'
 
       - name: npm install, build, and test
         run: |
@@ -62,4 +62,5 @@ jobs:
           app-name: 'groceryecommerce'
           slot-name: 'Production'
           package: .
+
           
