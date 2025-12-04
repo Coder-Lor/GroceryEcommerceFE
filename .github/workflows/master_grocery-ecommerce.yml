@@ -58,13 +58,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
-
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F6873CC1965D4890ABC4C023D42D45E7 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9B7B6C3ED8F44DD5B9A8C5E486A265C6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B90F9D3EE9914C28AA4CC13E6774CBD2 }}
+          
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'grocery-ecommerce'
           slot-name: 'Production'
           package: .
+
