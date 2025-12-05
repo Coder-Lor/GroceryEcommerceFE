@@ -73,7 +73,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
   //biến phân trang
   page: number = 1;
-  pageSize: number = 4;
+  pageSize: number = 12;
   totalCount = 0;
   isLoading: boolean = false;
   isLoadingCategories = true;
@@ -165,7 +165,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     // Detect if running in browser
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
+
     this.loadCategories();
     // Initialize carousel images
     this.carouselImages = [
@@ -341,6 +341,10 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
       return Math.min(Math.max((sold / initialStock) * 100, 0), 100);
     }
     return 0;
+  }
+
+  navigateToProductDetail(slug: string) {
+    this.route.navigate(['/product-detail/' + slug]);
   }
 
   navigationToDetailPage() {

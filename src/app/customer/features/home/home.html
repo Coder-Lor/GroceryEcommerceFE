@@ -77,10 +77,10 @@
       }
     </div>
     } @else {
-    <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="true" autoplay-delay="3000"
+    <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="true" autoplay-delay="5000"
       autoplay-disable-on-interaction="false" class="flash-sale-swiper">
       <swiper-slide *ngFor="let product of flashSaleProducts" class="flash-sale-slide">
-        <div class="product-card">
+        <div class="product-card" (click)="navigateToProductDetail(product.slug)">
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="product-image">
@@ -92,6 +92,11 @@
               <div class="progress" [style.width.%]="getProductProgress(product)"></div>
               <div class="progress" [style.width.%]="getProductProgress(product)"></div>
             </div>
+            <p class="price-text">
+              {{
+              product.cost | currency : 'VND' : 'symbol' : '1.0-0'
+              }}
+            </p>
             <p class="status-text">
               {{
               product.stockQuantity && product.stockQuantity > 50 ? 'Vừa mới bán' : 'Sắp hết hàng'

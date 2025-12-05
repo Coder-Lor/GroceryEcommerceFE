@@ -1,6 +1,6 @@
 @defer () {
 <!-- 🔔 Announcement Topbar -->
-<div class="topbar-announcement" *ngIf="showTopbar">
+<div class="topbar-announcement" [class.hide]="!showTopbar">
   <div class="marquee">
     <div class="marquee-track">
       <span>
@@ -93,7 +93,7 @@
                 </div>
                 } @else {
                 <div class="mini-cart-empty">
-                  <p>Giỏ hàng trống</p>
+                  <p>Giỏ hàng của bạn chưa có gì!</p>
                 </div>
                 }
               </div>
@@ -116,8 +116,9 @@
           @if(isOpen) {
           <div class="user-dropdown">
             <ul>
-              <li (click)="redirectToProfile()">Quản lý hồ sơ</li>
-              <li>Đơn mua</li>
+              <li (click)="redirectToProfile()">
+                <i class="pi pi-id-card"></i> Quản lý hồ sơ
+              </li>
               @if((user$ | async)?.role === 'Admin') {
               <li (click)="redirectToAdmin()">
                 <i style="font-size: 14px" class="pi pi-cog"></i> Trang quản trị
@@ -179,7 +180,7 @@
 
 } @placeholder {
 <!-- 🔔 Announcement Topbar -->
-<div class="topbar-announcement" *ngIf="showTopbar">
+<div class="topbar-announcement" [class.hide]="!showTopbar">
   <div class="marquee">
     <div class="marquee-track">
       <span>

@@ -10,21 +10,21 @@
   /* Hero swiper hydration fix */
   .hero-swiper {
     position: relative;
-    
+
     /* Use max-height and overflow instead of opacity to allow swiper initialization */
     &:not(.swiper-ready) {
       max-height: 300px;
       overflow: hidden;
-      
+
       /* Hide slides except first one before ready */
       swiper-slide {
         display: none !important;
-        
+
         &:first-child {
           display: flex !important;
         }
       }
-      
+
       /* Hide navigation buttons before ready */
       ::part(button-prev),
       ::part(button-next) {
@@ -32,13 +32,13 @@
         pointer-events: none;
       }
     }
-    
+
     /* Show everything when ready with smooth transition */
     &.swiper-ready {
       swiper-slide {
         display: flex !important;
       }
-      
+
       ::part(button-prev),
       ::part(button-next) {
         opacity: 1;
@@ -84,7 +84,7 @@
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 
     &:hover .category-card {
-      transform: translateY(-6px);
+      transform: translateY(-4px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
   }
@@ -93,7 +93,7 @@
     width: 100%;
     background: #fff;
     border: 1px solid #eee;
-    // border-radius: 12px;
+    border-radius: 12px;
     padding: 12px;
     transition: all 0.3s ease;
   }
@@ -114,41 +114,6 @@
     text-overflow: ellipsis;
   }
 }
-
-// .category-swiper {
-//   --swiper-navigation-color: #333;
-
-//   .swiper-slide {
-//     // padding: 0 !important;
-//     /* bỏ padding nội bộ nếu có */
-//     // margin: 0 !important;
-//     /* xóa khoảng cách */
-//   }
-
-//   .category-card {
-//     border: 1px solid #eee;
-//     border-radius: 0 !important;
-//     /* bỏ bo góc */
-//     box-shadow: none;
-//     /* nếu có shadow thì bỏ luôn */
-//   }
-
-//   .category-img {
-//     width: 100%;
-//     height: auto;
-//     border-radius: 0 !important;
-//     /* bỏ bo góc hình */
-//   }
-
-//   swiper-slide {
-//     margin-right: 0 !important;
-//   }
-
-//   .swiper-button-next,
-//   .swiper-button-prev {
-//     background-color: #ccc !important;
-//   }
-// }
 
 .brands {
   background-color: #fff;
@@ -258,9 +223,10 @@ swiper-slide.brand-slide {
       text-align: center;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       transition: all 0.25s ease;
+      cursor: pointer;
 
       &:hover {
-        transform: translateY(-5px);
+
         box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
       }
 
@@ -303,10 +269,17 @@ swiper-slide.brand-slide {
           }
         }
 
+        .price-text {
+          color: #ff424e;
+          font-weight: 600;
+          font-size: 16px;
+          margin-bottom: 4px !important;
+        }
+
         .status-text {
           font-size: 13px;
-          margin-top: 4px;
           color: #555;
+          margin-bottom: 1px !important;
         }
       }
     }
@@ -447,7 +420,7 @@ swiper-container {
 }
 
 .btn-see-more {
-  font-family: 'poppins', sans-serif;
+  font-family: "Be Vietnam Pro", "Montserrat", sans-serif;
   width: 300px;
   background-color: #fff;
   border: 2px solid #111;
@@ -456,10 +429,11 @@ swiper-container {
   padding: 8px 0;
   font-size: 16px;
   box-shadow: #1a162e;
+  transition: transform 0.3s ease;
 }
 
 .btn-see-more:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 

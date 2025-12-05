@@ -10,6 +10,17 @@
   overflow: hidden;
   display: flex;
   align-items: center;
+
+  // Transition mượt mà khi ẩn/hiện
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.4s ease-in-out, opacity 0.3s ease-in-out;
+
+  &.hide {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none; // Không cho tương tác khi ẩn
+  }
 }
 
 /* Container marquee */
@@ -68,6 +79,27 @@
 
 /* Header base */
 
+// .header-container {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   z-index: 1040;
+//   background: white;
+//   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+//   // Thêm transition cho việc di chuyển header
+//   transition: top 0.4s ease-in-out;
+
+//   &.with-topbar {
+//     top: 40px; // chiều cao của topbar
+//   }
+
+//   &.no-topbar {
+//     top: 0;
+//   }
+// }
+
 /* Khi topbar đang hiện */
 .header-container.with-topbar {
   position: fixed;
@@ -89,7 +121,7 @@
 /* header bar: white background + subtle border */
 .header-bar {
   background: var(--background-3);
-  padding: 18px 20px;
+  padding: 10px 20px;
   border-bottom: 1px solid #f1f3f6;
 }
 
@@ -167,13 +199,14 @@
 }
 
 .search-box {
-  width: 480px; /* Thu ngắn một nửa so với trước */
+  width: 480px;
+  /* Thu ngắn một nửa so với trước */
   align-items: center;
   background: #fff;
   border: 1px solid #e6e8ec;
-  border-radius: 999px;
+  border-radius: 100px;
   /* pill shape */
-  padding: 8px 8px 8px 16px;
+  padding: 6px 6px 6px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
@@ -195,9 +228,9 @@
   background: #67b044;
   /* xanh chủ đạo */
   color: #fff;
-  width: 44px;
+  width: 40px;
   height: 40px;
-  border-radius: 999px;
+  border-radius: 50px;
   margin-left: 8px;
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.05s ease;
@@ -579,7 +612,7 @@
     padding: 10px 16px !important;
     border-radius: 6px !important;
     transition: all 0.2s ease !important;
-    
+
     &:hover {
       background-color: #f5f5f5 !important;
       color: #67b044 !important;
@@ -603,7 +636,7 @@
     font-size: 14px !important;
     color: #666 !important;
     padding: 8px 12px !important;
-    
+
     &:hover {
       background-color: #f9f9f9 !important;
       color: #67b044 !important;
