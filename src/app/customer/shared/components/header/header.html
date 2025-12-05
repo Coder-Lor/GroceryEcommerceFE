@@ -1,5 +1,5 @@
 @defer () {
-  <!-- 🔔 Announcement Topbar -->
+<!-- 🔔 Announcement Topbar -->
 <div class="topbar-announcement" *ngIf="showTopbar">
   <div class="marquee">
     <div class="marquee-track">
@@ -8,31 +8,23 @@
         từ 199k 🎉
       </span>
       <span>🎁 Quà tặng bất ngờ cho 100 khách hàng đầu tiên ghé thăm và mua sắm!</span>
-      <span
-        >🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
-        hơn!</span
-      >
+      <span>🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
+        hơn!</span>
 
       <span>
         🎉 Tưng bừng khai trương – Giảm giá lên đến 50% toàn bộ sản phẩm! — Miễn phí vận chuyển đơn
         từ 199k 🎉
       </span>
       <span>🎁 Quà tặng bất ngờ cho 100 khách hàng đầu tiên ghé thăm và mua sắm!</span>
-      <span
-        >🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
-        hơn!</span
-      >
+      <span>🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
+        hơn!</span>
     </div>
     <!-- fade 2 bên -->
     <div class="fade-left"></div>
     <div class="fade-right"></div>
   </div>
 </div>
-<div
-  class="header-container fixed-top"
-  [class.with-topbar]="showTopbar"
-  [class.no-topbar]="!showTopbar"
->
+<div class="header-container fixed-top" [class.with-topbar]="showTopbar" [class.no-topbar]="!showTopbar">
   <div class="header-bar container-fluid">
     <div class="header-content d-flex justify-content-between align-items-center">
       <!-- Left Section -->
@@ -51,20 +43,16 @@
 
       <!-- Center Section: Mega Menu -->
       <div class="mega-menu-section d-none d-md-flex">
-        <p-megaMenu *ngIf="categoryMenuItems.length > 0" [model]="categoryMenuItems" styleClass="custom-megamenu"></p-megaMenu>
+        <p-megaMenu *ngIf="categoryMenuItems.length > 0" [model]="categoryMenuItems"
+          styleClass="custom-megamenu"></p-megaMenu>
         <p-megaMenu *ngIf="megaMenuItems.length > 0" [model]="megaMenuItems" styleClass="custom-megamenu"></p-megaMenu>
       </div>
 
       <!-- Right Section: Search -->
       <div class="search-right d-none d-md-flex">
         <div class="search-box d-flex align-items-center text-body">
-          <input
-            #queryInput
-            class="search-input"
-            type="text"
-            placeholder="Tìm sản phẩm..."
-            (keyup.enter)="onSearch(queryInput.value)"
-          />
+          <input #queryInput class="search-input" type="text" placeholder="Tìm sản phẩm..."
+            (keyup.enter)="onSearch(queryInput.value)" />
           <button class="search-btn" (click)="onSearch(queryInput.value)">
             <i class="pi pi-search"></i>
           </button>
@@ -76,11 +64,7 @@
         <!-- Cart & wishlist -->
         <div class="cart-wishlist me-3">
           <div class="cart-wishlist-content d-flex align-items-center">
-            <div
-              class="cart-section"
-              (mouseenter)="onCartMouseEnter()"
-              (mouseleave)="onCartMouseLeave()"
-            >
+            <div class="cart-section" (mouseenter)="onCartMouseEnter()" (mouseleave)="onCartMouseLeave()">
               <div class="cart-icon-wrapper" (click)="toggleUtilPanel()" style="cursor: pointer">
                 <span class="cart-icon">
                   <i class="pi pi-shopping-cart"></i>
@@ -121,10 +105,7 @@
         <!-- User / Login -->
         @if (isLoggedIn$ | async; as isLoggedIn) {
         <div class="user-menu-wrapper" #userMenu>
-          <div
-            class="user-avatar-container d-flex align-items-center"
-            (click)="toggleUserMenu($event)"
-          >
+          <div class="user-avatar-container d-flex align-items-center" (click)="toggleUserMenu($event)">
             <div class="user-avatar me-2">
               <i class="pi pi-user"></i>
               <span style="margin-left: 5px">{{ (user$ | async)?.username }}</span>
@@ -137,6 +118,11 @@
             <ul>
               <li (click)="redirectToProfile()">Quản lý hồ sơ</li>
               <li>Đơn mua</li>
+              @if((user$ | async)?.role === 'Admin') {
+              <li (click)="redirectToAdmin()">
+                <i style="font-size: 14px" class="pi pi-cog"></i> Trang quản trị
+              </li>
+              }
               <li style="align-items: center" (click)="onLogout()">
                 <i style="font-size: 14px" class="pi pi-sign-out"></i> Đăng Xuất
               </li>
@@ -162,11 +148,7 @@
 
 <!-- sidebar mobile -->
 <div class="overlay" [ngClass]="{ open: isShowSidebar }" (click)="toggleSidebar()">
-  <div
-    class="sidebar-menu"
-    [ngClass]="{ 'active-menu': isShowSidebar }"
-    (click)="$event.stopPropagation()"
-  >
+  <div class="sidebar-menu" [ngClass]="{ 'active-menu': isShowSidebar }" (click)="$event.stopPropagation()">
     <button class="back-btn" (click)="toggleSidebar()">
       <img src="icons/arrow-left.svg" alt="Back" />
     </button>
@@ -190,17 +172,13 @@
     </div>
 
     <!-- utility panel component stays the same -->
-    <app-utility-panel
-      [showCart]="isShowPanel"
-      [showSearch]="isShowSearchBox"
-      (closeCartPanel)="toggleUtilPanel()"
-      (closeSearchPanel)="toggleSearchBox()"
-    ></app-utility-panel>
+    <app-utility-panel [showCart]="isShowPanel" [showSearch]="isShowSearchBox" (closeCartPanel)="toggleUtilPanel()"
+      (closeSearchPanel)="toggleSearchBox()"></app-utility-panel>
   </div>
 </div>
 
 } @placeholder {
-  <!-- 🔔 Announcement Topbar -->
+<!-- 🔔 Announcement Topbar -->
 <div class="topbar-announcement" *ngIf="showTopbar">
   <div class="marquee">
     <div class="marquee-track">
@@ -209,31 +187,23 @@
         từ 199k 🎉
       </span>
       <span>🎁 Quà tặng bất ngờ cho 100 khách hàng đầu tiên ghé thăm và mua sắm!</span>
-      <span
-        >🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
-        hơn!</span
-      >
+      <span>🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
+        hơn!</span>
 
       <span>
         🎉 Tưng bừng khai trương – Giảm giá lên đến 50% toàn bộ sản phẩm! — Miễn phí vận chuyển đơn
         từ 199k 🎉
       </span>
       <span>🎁 Quà tặng bất ngờ cho 100 khách hàng đầu tiên ghé thăm và mua sắm!</span>
-      <span
-        >🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
-        hơn!</span
-      >
+      <span>🌟 Cơ hội duy nhất trong năm để sở hữu những sản phẩm yêu thích với mức giá không thể tốt
+        hơn!</span>
     </div>
     <!-- fade 2 bên -->
     <div class="fade-left"></div>
     <div class="fade-right"></div>
   </div>
 </div>
-<div
-  class="header-container fixed-top"
-  [class.with-topbar]="showTopbar"
-  [class.no-topbar]="!showTopbar"
->
+<div class="header-container fixed-top" [class.with-topbar]="showTopbar" [class.no-topbar]="!showTopbar">
   <div class="header-bar container-fluid">
     <div class="header-content d-flex justify-content-between align-items-center">
       <!-- Left Section -->
@@ -252,20 +222,16 @@
 
       <!-- Center Section: Mega Menu -->
       <div class="mega-menu-section d-none d-md-flex">
-        <p-megaMenu *ngIf="categoryMenuItems.length > 0" [model]="categoryMenuItems" styleClass="custom-megamenu"></p-megaMenu>
+        <p-megaMenu *ngIf="categoryMenuItems.length > 0" [model]="categoryMenuItems"
+          styleClass="custom-megamenu"></p-megaMenu>
         <p-megaMenu *ngIf="megaMenuItems.length > 0" [model]="megaMenuItems" styleClass="custom-megamenu"></p-megaMenu>
       </div>
 
       <!-- Right Section: Search -->
       <div class="search-right d-none d-md-flex">
         <div class="search-box d-flex align-items-center text-body">
-          <input
-            #queryInput
-            class="search-input"
-            type="text"
-            placeholder="Tìm sản phẩm..."
-            (keyup.enter)="onSearch(queryInput.value)"
-          />
+          <input #queryInput class="search-input" type="text" placeholder="Tìm sản phẩm..."
+            (keyup.enter)="onSearch(queryInput.value)" />
           <button class="search-btn" (click)="onSearch(queryInput.value)">
             <i class="pi pi-search"></i>
           </button>
@@ -277,11 +243,7 @@
         <!-- Cart & wishlist -->
         <div class="cart-wishlist me-3">
           <div class="cart-wishlist-content d-flex align-items-center">
-            <div
-              class="cart-section"
-              (mouseenter)="onCartMouseEnter()"
-              (mouseleave)="onCartMouseLeave()"
-            >
+            <div class="cart-section" (mouseenter)="onCartMouseEnter()" (mouseleave)="onCartMouseLeave()">
               <div class="cart-icon-wrapper" (click)="toggleUtilPanel()" style="cursor: pointer">
                 <span class="cart-icon">
                   <i class="pi pi-shopping-cart"></i>
@@ -322,10 +284,7 @@
         <!-- User / Login -->
         @if (isLoggedIn$ | async; as isLoggedIn) {
         <div class="user-menu-wrapper" #userMenu>
-          <div
-            class="user-avatar-container d-flex align-items-center"
-            (click)="toggleUserMenu($event)"
-          >
+          <div class="user-avatar-container d-flex align-items-center" (click)="toggleUserMenu($event)">
             <div class="user-avatar me-2">
               <i class="pi pi-user"></i>
               <span style="margin-left: 5px">{{ (user$ | async)?.username }}</span>
@@ -363,11 +322,7 @@
 
 <!-- sidebar mobile -->
 <div class="overlay" [ngClass]="{ open: isShowSidebar }" (click)="toggleSidebar()">
-  <div
-    class="sidebar-menu"
-    [ngClass]="{ 'active-menu': isShowSidebar }"
-    (click)="$event.stopPropagation()"
-  >
+  <div class="sidebar-menu" [ngClass]="{ 'active-menu': isShowSidebar }" (click)="$event.stopPropagation()">
     <button class="back-btn" (click)="toggleSidebar()">
       <img src="icons/arrow-left.svg" alt="Back" />
     </button>
@@ -391,12 +346,8 @@
     </div>
 
     <!-- utility panel component stays the same -->
-    <app-utility-panel
-      [showCart]="isShowPanel"
-      [showSearch]="isShowSearchBox"
-      (closeCartPanel)="toggleUtilPanel()"
-      (closeSearchPanel)="toggleSearchBox()"
-    ></app-utility-panel>
+    <app-utility-panel [showCart]="isShowPanel" [showSearch]="isShowSearchBox" (closeCartPanel)="toggleUtilPanel()"
+      (closeSearchPanel)="toggleSearchBox()"></app-utility-panel>
   </div>
 </div>
 

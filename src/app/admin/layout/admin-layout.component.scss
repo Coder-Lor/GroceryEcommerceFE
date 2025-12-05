@@ -13,7 +13,7 @@
   min-height: 100vh;
   background: #f8fafc;
   position: relative;
-  transition: grid-template-columns 0.25s ease;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .admin-layout.sidebar-collapsed {
@@ -22,8 +22,8 @@
 
 .toggle-btn {
   position: fixed;
-  top: 33px;
-  left: calc(var(--sidebar-expanded) - 20px);
+  top: 10px;
+  left: calc(var(--sidebar-expanded) + 5px);
   z-index: 10;
   background: linear-gradient(135deg, #0ea5e9, #6366f1);
   color: #fff;
@@ -37,7 +37,7 @@
   justify-content: center;
   gap: 6px;
   box-shadow: 0 12px 30px rgba(99, 102, 241, 0.3);
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toggle-btn:hover {
@@ -72,14 +72,14 @@
 }
 
 .admin-layout.sidebar-collapsed .toggle-btn {
-  left: calc(var(--sidebar-collapsed) - 20px);
+  left: calc(var(--sidebar-collapsed) + 5px);
 }
 
 .sidebar {
   background: #ffffff;
   border-right: 1px solid #e2e8f0;
   padding: 20px 16px;
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: sticky;
   top: 0;
   height: 100vh;
@@ -108,6 +108,7 @@
   .admin-menu-panel {
     background: transparent;
     border: none;
+    min-width: 0px !important;
     box-shadow: none;
     padding: 0;
   }
@@ -121,7 +122,7 @@
     background: linear-gradient(135deg, #0ea5e9, #6366f1);
     color: #fff;
     box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
-    transition: all 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .brand-icon {
@@ -133,6 +134,7 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .brand-name {
@@ -149,6 +151,7 @@
     display: flex;
     flex-direction: column;
     font-size: 14px;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
   }
 
   .section-header {
@@ -159,6 +162,7 @@
     color: #0ea5e9;
     text-transform: uppercase;
     letter-spacing: 0.4px;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
   }
 
   .menu-link {
@@ -171,7 +175,7 @@
     color: #0f172a;
     text-decoration: none;
     position: relative;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .menu-link:hover {
@@ -199,12 +203,14 @@
   .menu-label {
     font-weight: 600;
     color: #0f172a;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
   }
 
   .menu-badge {
     margin-left: auto;
     background: #0ea5e9;
     color: #fff;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
   }
 
   .profile-trigger {
@@ -218,7 +224,7 @@
     border-radius: 12px;
     cursor: pointer;
     color: #0f172a;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .profile-trigger:hover {
@@ -230,6 +236,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
   }
 
   .profile-name {
@@ -245,6 +252,7 @@
   .profile-caret {
     margin-left: auto;
     color: #94a3b8;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
   }
 
   .user-menu {
@@ -274,22 +282,32 @@
   justify-content: center;
   padding: 12px;
   gap: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :host ::ng-deep .admin-layout.sidebar-collapsed .brand-text,
 :host ::ng-deep .admin-layout.sidebar-collapsed .section-header,
-:host ::ng-deep .admin-layout.sidebar-collapsed .menu-label,
 :host ::ng-deep .admin-layout.sidebar-collapsed .profile-meta,
 :host ::ng-deep .admin-layout.sidebar-collapsed .profile-caret,
 :host ::ng-deep .admin-layout.sidebar-collapsed .menu-badge {
+  opacity: 0;
   display: none;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 1, 1), display 0s linear 0.15s;
 }
+
+:host ::ng-deep .admin-layout.sidebar-collapsed .menu-label {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 1, 1), display 0s linear 0.15s;
+}
+
 
 :host ::ng-deep .admin-layout.sidebar-collapsed .menu-link,
 :host ::ng-deep .admin-layout.sidebar-collapsed .profile-trigger {
   justify-content: center;
   padding: 10px;
   gap: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :host ::ng-deep .admin-layout.sidebar-collapsed .menu-link .pi {

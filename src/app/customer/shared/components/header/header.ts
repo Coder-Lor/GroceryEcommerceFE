@@ -56,6 +56,9 @@ export class Header implements OnInit, OnChanges {
   username: string = '';
   isLoggedIn$ = this.authService.isAuthenticated$;
   user$ = this.authService.currentUser;
+  isAdmin$ = this.user$.pipe(
+    tap(user => console.log('User role:', user)),
+  );
   private refreshtoken: any;
 
   cartCount$ = this.cartService.cartCount$;
@@ -147,7 +150,7 @@ export class Header implements OnInit, OnChanges {
     } else {
       console.log('⚠️ Header ngOnInit - Server side, skipping cart load');
     }
-    
+
     // Load categories (có TransferState xử lý cả server và browser)
     this.loadCategories();
 
@@ -166,6 +169,11 @@ export class Header implements OnInit, OnChanges {
   redirectToProfile(): void {
     this.isOpen = !this.isOpen;
     this.router.navigate(['/profile']);
+  }
+
+  redirectToAdmin(): void {
+    this.isOpen = !this.isOpen;
+    this.router.navigate(['/admin']);
   }
 
   onLogout() {
@@ -246,12 +254,12 @@ export class Header implements OnInit, OnChanges {
   private loadCategories(): void {
     // Kiểm tra xem có dữ liệu trong TransferState không
     const cachedCategories = this.transferState.get(HEADER_CATEGORIES_KEY, null);
-    
+
     if (cachedCategories) {
       console.log('📦 Header - Using cached categories from TransferState');
       // Sử dụng dữ liệu từ cache
       this.buildCategoryMenu(cachedCategories);
-      
+
       // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
       if (isPlatformBrowser(this.platformId)) {
         this.transferState.remove(HEADER_CATEGORIES_KEY);
@@ -283,7 +291,7 @@ export class Header implements OnInit, OnChanges {
   private buildCategoryMenu(categories: CategoryDto[]): void {
     // Chỉ lấy danh sách tên danh mục cha
     const parentCategories = categories.filter(cat => !cat.parentCategoryId);
-    
+
     this.categoryMenuItems = [
       {
         label: 'Danh mục sản phẩm',
@@ -291,8 +299,8 @@ export class Header implements OnInit, OnChanges {
           parentCategories.map(cat => ({
             label: cat.name,
             command: () => {
-              this.router.navigate(['/category'], { 
-                queryParams: { categoryId: cat.categoryId } 
+              this.router.navigate(['/category'], {
+                queryParams: { categoryId: cat.categoryId }
               });
             }
           }))

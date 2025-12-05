@@ -9,6 +9,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  role?: string;
 }
 
 export interface AuthPublicResponse {
@@ -186,6 +187,7 @@ export class AuthService {
       id: data.userId ?? '',
       username: data.username ?? '',
       email: data.email ?? '',
+      role: data.role,
     };
     this.setAuthState(data.token ?? '', user);
     this.saveAuthToLocalStorage(data);
@@ -245,6 +247,7 @@ export class AuthService {
         id: data.userId,
         email: data.email ?? '',
         username: data.username ?? '',
+        role: data.role,
       };
 
       this.currentUserSubject.next(user);
