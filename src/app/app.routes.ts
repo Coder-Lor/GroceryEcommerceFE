@@ -50,18 +50,18 @@ export const routes: Routes = [
     path: '',
     component: CustomerPage,
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'home' },
-      { path: 'home', component: Home },
+      // { path: '', pathMatch: 'full', redirectTo: 'home' },
+      { path: '', component: Home },
       { path: 'cart', component: Cart },
       { path: 'login', component: Login },
       { path: 'register', component: Register },
-      { path: 'product-detail/:slug', component: ProductDetail },      
+      { path: 'product-detail/:slug', component: ProductDetail },
       { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
       { path: 'payment-pending', component: PaymentPending },
       { path: 'order-result', component: OrderResult },
-      { 
-        path: 'profile', 
+      {
+        path: 'profile',
         component: Profile,
         children: [
           { path: '', redirectTo: 'personal-info', pathMatch: 'full' },
