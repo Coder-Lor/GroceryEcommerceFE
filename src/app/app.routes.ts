@@ -50,7 +50,7 @@ export const routes: Routes = [
     path: '',
     component: CustomerPage,
     children: [
-      // { path: '', pathMatch: 'full', redirectTo: 'home' },
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
       { path: '', component: Home },
       { path: 'cart', component: Cart },
       { path: 'login', component: Login },
