@@ -1,0 +1,136 @@
+<div class="ai-chat-wrapper">
+    <!-- Toggle Button -->
+    <button class="ai-chat-toggle" (click)="toggleChat()" [class.active]="isOpen">
+        <span class="toggle-icon">
+            @if (isOpen) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path
+                    d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10a10 10 0 0 1-4.5-1.05L2 22l1.05-5.5A10 10 0 0 1 12 2z">
+                </path>
+                <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                <circle cx="8" cy="12" r="1" fill="currentColor"></circle>
+                <circle cx="16" cy="12" r="1" fill="currentColor"></circle>
+            </svg>
+            }
+        </span>
+        <span class="toggle-text">AI</span>
+        <span class="pulse-ring"></span>
+    </button>
+
+    <!-- Chat Popover -->
+    @if (isOpen) {
+    <div class="ai-chat-popover" #chatPopover>
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-title">
+                <span class="ai-icon">🤖</span>
+                <span>Trợ lý AI GroceryMart</span>
+            </div>
+            <button class="close-btn" (click)="toggleChat()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+            <button class="mode-tab" [class.active]="chatMode === 'chat'" (click)="switchMode('chat')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Trò chuyện
+            </button>
+            <button class="mode-tab" [class.active]="chatMode === 'suggest'" (click)="switchMode('suggest')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                    <path d="M11 8v6"></path>
+                    <path d="M8 11h6"></path>
+                </svg>
+                Gợi ý sản phẩm
+            </button>
+        </div>
+
+        <!-- Loading Products Indicator -->
+        @if (chatMode === 'suggest' && isLoadingProducts) {
+        <div class="loading-products">
+            <span class="spinner"></span>
+            Đang tải danh sách sản phẩm...
+        </div>
+        }
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" #chatContainer>
+            @for (message of messages; track message.timestamp) {
+            <div class="message" [class.user]="message.role === 'user'"
+                [class.assistant]="message.role === 'assistant'">
+                <div class="message-content">
+                    @if (message.role === 'assistant') {
+                    <span class="avatar">🤖</span>
+                    }
+                    <div class="message-bubble">
+                        <p [innerHTML]="message.content | slice:0:2000"></p>
+                    </div>
+                    @if (message.role === 'user') {
+                    <span class="avatar user-avatar">👤</span>
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- Typing Indicator -->
+            @if (isLoading) {
+            <div class="message assistant">
+                <div class="message-content">
+                    <span class="avatar">🤖</span>
+                    <div class="message-bubble typing">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <input type="text" [(ngModel)]="userMessage" (keypress)="onKeyPress($event)"
+                    [placeholder]="chatMode === 'chat' ? 'Nhập tin nhắn...' : 'Bạn muốn tìm gì? (VD: nấu phở, ăn sáng...)'"
+                    [disabled]="isLoading" />
+                <button class="send-btn" (click)="sendMessage()" [disabled]="!userMessage.trim() || isLoading">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-footer">
+                <button class="clear-btn" (click)="clearChat()" title="Xóa cuộc trò chuyện">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Xóa chat
+                </button>
+                <span class="powered-by">Powered by Gemini AI</span>
+            </div>
+        </div>
+    </div>
+    }
+</div>

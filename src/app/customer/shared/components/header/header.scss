@@ -654,6 +654,14 @@
   min-width: 0 !important;
 }
 
+/* AI Chat Section */
+.ai-chat-section {
+  position: relative;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+}
+
 /* Responsive tweaks */
 @media (max-width: 767.98px) {
   .navigation-menu {
@@ -674,5 +682,9 @@
 
   .brand-name {
     font-size: 18px;
+  }
+
+  .ai-chat-section {
+    display: none !important;
   }
 }
