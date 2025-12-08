@@ -1,0 +1,63 @@
+<div class="statistics-container">
+    <h2 class="statistics-title">
+        <i class="pi pi-shopping-cart"></i>
+        Thống kê đơn hàng
+    </h2>
+
+    @if (isLoading) {
+    <div class="loading-container">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Đang tải dữ liệu...</span>
+    </div>
+    } @else {
+    <div class="summary-cards">
+        <div class="summary-card revenue">
+            <span class="summary-value">{{ formatCurrency(totalRevenue) }}</span>
+            <span class="summary-label">Tổng doanh thu</span>
+        </div>
+        <div class="summary-card total">
+            <span class="summary-value">{{ orders.length }}</span>
+            <span class="summary-label">Tổng đơn hàng</span>
+        </div>
+        <div class="summary-card pending">
+            <span class="summary-value">{{ pendingOrders }}</span>
+            <span class="summary-label">Đang xử lý</span>
+        </div>
+        <div class="summary-card completed">
+            <span class="summary-value">{{ completedOrders }}</span>
+            <span class="summary-label">Hoàn thành</span>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card full-width">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="lineChartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="barChartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="pieChartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions"
+                    [type]="doughnutChartType">
+                </canvas>
+            </div>
+        </div>
+    </div>
+    }
+</div>

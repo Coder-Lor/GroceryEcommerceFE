@@ -1,0 +1,56 @@
+<div class="statistics-container">
+    <h2 class="statistics-title">
+        <i class="pi pi-shopping-bag"></i>
+        Thống kê kho hàng
+    </h2>
+
+    @if (isLoading) {
+    <div class="loading-container">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Đang tải dữ liệu...</span>
+    </div>
+    } @else {
+    <div class="summary-cards">
+        <div class="summary-card total">
+            <span class="summary-value">{{ totalStock | number }}</span>
+            <span class="summary-label">Tổng tồn kho</span>
+        </div>
+        <div class="summary-card products">
+            <span class="summary-value">{{ products.length }}</span>
+            <span class="summary-label">Tổng sản phẩm</span>
+        </div>
+        <div class="summary-card warning">
+            <span class="summary-value">{{ lowStockCount }}</span>
+            <span class="summary-label">Sắp hết hàng</span>
+        </div>
+        <div class="summary-card danger">
+            <span class="summary-value">{{ outOfStockCount }}</span>
+            <span class="summary-label">Hết hàng</span>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="barChartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="pieChartType">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-wrapper">
+                <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions"
+                    [type]="doughnutChartType">
+                </canvas>
+            </div>
+        </div>
+    </div>
+    }
+</div>

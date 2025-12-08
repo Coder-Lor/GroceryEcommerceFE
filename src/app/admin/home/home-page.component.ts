@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { CommonModule } from '@angular/common';
 import {
   UserClient,
   ProductClient,
@@ -9,12 +8,24 @@ import {
   GiftCardClient,
   SortDirection
 } from '@services/system-admin.service';
-import { forkJoin } from 'rxjs';
+import { UserStatisticsComponent } from './statistics/user-statistics/user-statistics.component';
+import { WarehouseStatisticsComponent } from './statistics/warehouse-statistics/warehouse-statistics.component';
+import { OrderStatisticsComponent } from './statistics/order-statistics/order-statistics.component';
+import { VoucherStatisticsComponent } from './statistics/voucher-statistics/voucher-statistics.component';
+
+export type StatisticsType = 'user' | 'warehouse' | 'order' | 'voucher';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [RouterModule, BaseChartDirective],
+  imports: [
+    RouterModule,
+    CommonModule,
+    UserStatisticsComponent,
+    WarehouseStatisticsComponent,
+    OrderStatisticsComponent,
+    VoucherStatisticsComponent
+  ],
   templateUrl: 'home-page.component.html',
   styleUrls: ['home-page.component.scss']
 })
@@ -31,49 +42,15 @@ export class HomePageComponent implements OnInit {
   totalOrders: number = 0;
   totalVouchers: number = 0;
 
-  // Bar Chart
-  public barChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    scales: {
-      x: {},
-      y: {
-        min: 0
-      }
-    },
-    plugins: {
-      legend: {
-        display: true,
-      }
-    }
-  };
-  public barChartType: ChartType = 'bar';
-  public barChartData: ChartData<'bar'> = {
-    labels: [],
-    datasets: [
-      { data: [], label: 'Doanh thu (triệu VNĐ)' }
-    ]
-  };
-
-  // Pie Chart
-  public pieChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top',
-      }
-    }
-  };
-  public pieChartData: ChartData<'pie', number[], string | string[]> = {
-    labels: [],
-    datasets: [{
-      data: []
-    }]
-  };
-  public pieChartType: ChartType = 'pie';
+  // Current active statistics view
+  activeStatistics: StatisticsType = 'user';
 
   ngOnInit(): void {
     this.loadGeneralReport();
+  }
+
+  selectStatistics(type: StatisticsType): void {
+    this.activeStatistics = type;
   }
 
   loadGeneralReport(): void {

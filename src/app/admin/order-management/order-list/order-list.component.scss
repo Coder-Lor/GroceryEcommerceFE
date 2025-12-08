@@ -3,6 +3,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -13,6 +14,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -20,10 +22,12 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.6;
   }
@@ -67,7 +71,7 @@
   display: inline-flex;
   gap: 8px;
   transition: all 0.3s ease;
-  
+
   .icon {
     font-size: 16px;
   }
@@ -189,6 +193,7 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border-radius: 12px 12px 0 0;
+
     th {
       padding: 16px 12px;
       text-align: left;
@@ -259,54 +264,54 @@
           border-radius: 12px;
           font-size: 12px;
           font-weight: 600;
-          
+
           // Order Status styles
           &.status-pending {
             background: #fff3cd;
             color: #856404;
           }
-          
+
           &.status-processing {
             background: #cfe2ff;
             color: #084298;
           }
-          
+
           &.status-shipping {
             background: #d1ecf1;
             color: #0c5460;
           }
-          
+
           &.status-completed {
             background: #d1e7dd;
             color: #0f5132;
           }
-          
+
           &.status-cancelled {
             background: #f8d7da;
             color: #842029;
           }
-          
+
           // Payment Status styles
           &.payment-pending {
             background: #fff3cd;
             color: #856404;
           }
-          
+
           &.payment-completed {
             background: #d1e7dd;
             color: #0f5132;
           }
-          
+
           &.payment-failed {
             background: #f8d7da;
             color: #842029;
           }
-          
+
           &.payment-refunded {
             background: #e2e3e5;
             color: #41464b;
           }
-          
+
           &.status-unknown,
           &.payment-unknown {
             background: #e9ecef;
@@ -354,6 +359,16 @@
   &.btn-edit:hover {
     background: #e3f2fd;
     color: #1976d2;
+  }
+
+  &.btn-export {
+    color: #667eea;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+      color: #764ba2;
+      transform: scale(1.1);
+    }
   }
 
   &.btn-delete:hover {
@@ -915,7 +930,8 @@
     .product-table {
       font-size: 13px;
 
-      th, td {
+      th,
+      td {
         padding: 12px 8px;
       }
     }

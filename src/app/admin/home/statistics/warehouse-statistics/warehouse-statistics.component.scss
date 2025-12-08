@@ -1,0 +1,123 @@
+.statistics-container {
+    padding: 20px;
+
+    .statistics-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 24px;
+
+        i {
+            color: #f06e17;
+        }
+    }
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 12px;
+    color: #6b7280;
+
+    i {
+        font-size: 2rem;
+        color: #f06e17;
+    }
+}
+
+.summary-cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+
+    .summary-card {
+        flex: 1;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: white;
+
+        &.total {
+            background: linear-gradient(135deg, #f06e17 0%, #e65100 100%);
+        }
+
+        &.products {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        &.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+
+        &.danger {
+            background: linear-gradient(135deg, #ff2626 0%, #c62828 100%);
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+    }
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+
+    .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+        &:first-child {
+            grid-row: span 2;
+        }
+
+        .chart-wrapper {
+            height: 300px;
+            position: relative;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .summary-cards {
+        flex-wrap: wrap;
+
+        .summary-card {
+            flex: 1 1 calc(50% - 10px);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+
+        .chart-card:first-child {
+            grid-row: span 1;
+        }
+    }
+
+    .summary-cards {
+        .summary-card {
+            flex: 1 1 100%;
+        }
+    }
+}

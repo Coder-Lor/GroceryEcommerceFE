@@ -22,6 +22,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faRefresh,
+  faFileInvoice,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   OrderClient,
@@ -35,6 +36,7 @@ import {
 } from '../../../core/service/system-admin.service';
 import { TooltipDirective } from '@shared/directives/tooltip';
 import { OrderStatusMapper, OrderStatus, PaymentStatus, PaymentMethod } from '../models';
+import { InvoicePdfService } from '../services/invoice-pdf.service';
 
 @Component({
   selector: 'app-order-list',
@@ -56,6 +58,7 @@ export class OrderListComponent implements OnInit {
   private orderClient = inject(OrderClient);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private invoicePdfService = inject(InvoicePdfService);
 
   // Icons
   faMagnifyingGlass = faMagnifyingGlass;
@@ -73,6 +76,7 @@ export class OrderListComponent implements OnInit {
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
   faRefresh = faRefresh;
+  faFileInvoice = faFileInvoice;
 
   orders: OrderDto[] = [];
   filteredOrders: OrderDto[] = [];
@@ -94,7 +98,7 @@ export class OrderListComponent implements OnInit {
   // Expose Math and SortDirection to template
   Math = Math;
   SortDirection = SortDirection;
-  
+
   // Expose OrderStatusMapper to template
   OrderStatusMapper = OrderStatusMapper;
 
@@ -389,47 +393,82 @@ export class OrderListComponent implements OnInit {
    */
   formatValue(value: any, key: string): string {
     if (value === null || value === undefined) return 'N/A';
-    
+
     // Format status fields
     if (key === 'status') {
       return OrderStatusMapper.getOrderStatusDisplay(value);
     }
-    
+
     if (key === 'paymentStatus') {
       return OrderStatusMapper.getPaymentStatusDisplay(value);
     }
-    
+
     if (key === 'paymentMethod') {
       return OrderStatusMapper.getPaymentMethodDisplay(value);
     }
-    
+
     if (key.includes('Date') || key.includes('At')) {
       return this.formatDate(value);
     }
-    
+
     if (key.includes('Amount') || key.includes('Price') || key.includes('Cost')) {
       return this.formatCurrency(value);
     }
-    
+
     if (typeof value === 'object') {
       return JSON.stringify(value);
     }
-    
+
     return String(value);
   }
-  
+
   /**
    * Lấy class CSS cho badge trạng thái
    */
   getStatusBadgeClass(status: number): string {
     return OrderStatusMapper.getOrderStatusClass(status);
   }
-  
+
   /**
    * Lấy class CSS cho badge thanh toán
    */
   getPaymentBadgeClass(status: number): string {
     return OrderStatusMapper.getPaymentStatusClass(status);
+  }
+
+  /**
+   * Xuất hóa đơn PDF
+   */
+  exportInvoice(orderId: string): void {
+    this.isLoading = true;
+    this.orderClient.getById(orderId).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response.data) {
+          this.invoicePdfService.exportInvoice(response.data);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Thành công',
+            detail: 'Xuất hóa đơn thành công!',
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Không tìm thấy thông tin đơn hàng!',
+          });
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Lỗi:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Không thể xuất hóa đơn!',
+        });
+      },
+    });
   }
 }
 

@@ -1,6 +1,6 @@
 <div class="page-container">
     <div class="general-report">
-        <div class="card user">
+        <div class="card user" [class.active]="activeStatistics === 'user'" (click)="selectStatistics('user')">
             <div class="card-title">
                 <i class="pi pi-users"></i>
                 <span class="title"> Người dùng</span>
@@ -12,10 +12,11 @@
                 <i class="pi pi-angle-right"></i>
             </div>
         </div>
-        <div class="card warehouse">
+        <div class="card warehouse" [class.active]="activeStatistics === 'warehouse'"
+            (click)="selectStatistics('warehouse')">
             <div class="card-title">
                 <i class="pi pi-shopping-bag"></i>
-                <span class="title"> Số hàng tồn kho</span>
+                <span class="title"> Số sản phẩm</span>
             </div>
             <div class="card-content">
                 <span class="data">{{ totalStock }}</span>
@@ -24,7 +25,7 @@
                 <i class="pi pi-angle-right"></i>
             </div>
         </div>
-        <div class="card order">
+        <div class="card order" [class.active]="activeStatistics === 'order'" (click)="selectStatistics('order')">
             <div class="card-title">
                 <i class="pi pi-shopping-cart"></i>
                 <span class="title"> Tổng đơn hàng</span>
@@ -36,7 +37,7 @@
                 <i class="pi pi-angle-right"></i>
             </div>
         </div>
-        <div class="card voucher">
+        <div class="card voucher" [class.active]="activeStatistics === 'voucher'" (click)="selectStatistics('voucher')">
             <div class="card-title">
                 <i class="pi pi-gift"></i>
                 <span class="title"> Voucher khả dụng</span>
@@ -50,4 +51,20 @@
         </div>
     </div>
 
+    <div class="statistics-section">
+        @switch (activeStatistics) {
+        @case ('user') {
+        <app-user-statistics />
+        }
+        @case ('warehouse') {
+        <app-warehouse-statistics />
+        }
+        @case ('order') {
+        <app-order-statistics />
+        }
+        @case ('voucher') {
+        <app-voucher-statistics />
+        }
+        }
+    </div>
 </div>

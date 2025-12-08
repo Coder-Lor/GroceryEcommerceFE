@@ -23,6 +23,7 @@ import {
   ResultOfGiftCardDto,
   ResultOfCouponUsageDto,
   ResultOfBoolean,
+  SortDirection,
 } from '../../core/service/system-admin.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -51,13 +52,13 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   private confirmationService = inject(ConfirmationService);
 
   activeTab: 'giftcards' | 'coupons' = 'giftcards';
-  
+
   // Gift Cards
   giftCards: GiftCardDto[] = [];
   filteredGiftCards: GiftCardDto[] = [];
   giftCardSearchTerm: string = '';
   isLoadingGiftCards: boolean = false;
-  
+
   // Coupon Usage
   couponUsages: CouponUsageDto[] = [];
   filteredCouponUsages: CouponUsageDto[] = [];
@@ -68,11 +69,11 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   showGiftCardModal: boolean = false;
   showCouponUsageModal: boolean = false;
   modalMode: 'add' | 'edit' = 'add';
-  
+
   // Gift Card Form
   currentGiftCard: CreateGiftCardCommand | UpdateGiftCardCommand = this.getEmptyGiftCard();
   selectedGiftCard: GiftCardDto | null = null;
-  
+
   // Coupon Usage Form
   currentCouponUsage: CreateCouponUsageCommand = this.getEmptyCouponUsage();
   selectedCouponUsage: CouponUsageDto | null = null;
@@ -89,8 +90,27 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   faTicket = faTicket;
 
   ngOnInit(): void {
-    // Note: Vì không có API getPaged/getAll, chúng ta sẽ chỉ hiển thị form tạo mới
-    // Có thể thêm API sau hoặc dùng getById với danh sách ID
+    this.loadGiftCards();
+  }
+
+  loadGiftCards(): void {
+    this.isLoadingGiftCards = true;
+    this.giftCardClient
+      .getPaging(1, 100, null, null, SortDirection.Descending, [], null, null, false, false, false)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoadingGiftCards = false;
+          if (response.isSuccess && response.data) {
+            this.giftCards = response.data.items || [];
+            this.filteredGiftCards = [...this.giftCards];
+          }
+        },
+        error: (error) => {
+          this.isLoadingGiftCards = false;
+          console.error('Error loading gift cards:', error);
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -157,7 +177,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
                 detail: 'Tạo thẻ quà tặng thành công!',
               });
               this.closeGiftCardModal();
-              // Có thể reload danh sách nếu có API
+              this.loadGiftCards();
             } else {
               this.messageService.add({
                 severity: 'error',
@@ -207,6 +227,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
                 detail: 'Cập nhật thẻ quà tặng thành công!',
               });
               this.closeGiftCardModal();
+              this.loadGiftCards();
             } else {
               this.messageService.add({
                 severity: 'error',
@@ -250,7 +271,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
                   summary: 'Thành công',
                   detail: 'Xóa thẻ quà tặng thành công!',
                 });
-                // Có thể reload danh sách nếu có API
+                this.loadGiftCards();
               } else {
                 this.messageService.add({
                   severity: 'error',

@@ -1,40 +1,27 @@
 <!-- Loading Overlay -->
-<app-loading-overlay 
-  [show]="isLoadingGiftCards || isLoadingCouponUsages" 
-  message="Đang xử lý...">
+<app-loading-overlay [show]="isLoadingGiftCards || isLoadingCouponUsages" message="Đang xử lý...">
 </app-loading-overlay>
 
 <div class="vouchers-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
-  
+
   <!-- Confirm Dialog -->
-  <p-confirmDialog
-    [style]="{width: '450px'}"
-    [baseZIndex]="10000"
-    [closable]="true"
-    [closeOnEscape]="true"
-    acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text">
+  <p-confirmDialog [style]="{width: '450px'}" [baseZIndex]="10000" [closable]="true" [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary p-button-text">
   </p-confirmDialog>
-  
+
   <div class="page-header">
     <h2>Quản lý Voucher</h2>
   </div>
 
   <!-- Tabs -->
   <div class="tabs">
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'giftcards'"
-      (click)="activeTab = 'giftcards'">
+    <button class="tab-btn" [class.active]="activeTab === 'giftcards'" (click)="activeTab = 'giftcards'">
       <fa-icon [icon]="faGift"></fa-icon>
       <span>Thẻ quà tặng</span>
     </button>
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'coupons'"
-      (click)="activeTab = 'coupons'">
+    <button class="tab-btn" [class.active]="activeTab === 'coupons'" (click)="activeTab = 'coupons'">
       <fa-icon [icon]="faTicket"></fa-icon>
       <span>Sử dụng Coupon</span>
     </button>
@@ -57,7 +44,46 @@
       </p>
     </div>
 
-    <!-- Note: Danh sách sẽ được hiển thị khi có API getPaged/getAll -->
+    <!-- Gift Cards Table -->
+    <div class="table-container" *ngIf="giftCards.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Mã thẻ</th>
+            <th>Tên</th>
+            <th>Số tiền ban đầu</th>
+            <th>Số dư</th>
+            <th>Ngày hết hạn</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let giftCard of filteredGiftCards">
+            <td><code>{{ giftCard.code }}</code></td>
+            <td>{{ giftCard.name || '-' }}</td>
+            <td>{{ giftCard.initialAmount | number:'1.0-0' }} ₫</td>
+            <td>{{ giftCard.currentBalance | number:'1.0-0' }} ₫</td>
+            <td>{{ giftCard.validTo | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="status-badge" [class.active]="giftCard.isValid" [class.inactive]="!giftCard.isValid">
+                {{ giftCard.statusName || (giftCard.isValid ? 'Hoạt động' : 'Ngừng') }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn-icon btn-edit" (click)="openEditGiftCardModal(giftCard)" title="Sửa">
+                <fa-icon [icon]="faPenToSquare"></fa-icon>
+              </button>
+              <button class="btn-icon btn-delete" (click)="deleteGiftCard(giftCard)" title="Xóa">
+                <fa-icon [icon]="faTrashCan"></fa-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty state -->
     <div class="empty-state" *ngIf="giftCards.length === 0">
       <fa-icon [icon]="faGift" class="empty-icon"></fa-icon>
       <p>Chưa có thẻ quà tặng nào. Hãy tạo thẻ mới để bắt đầu.</p>
@@ -106,22 +132,14 @@
         <label>
           Tên thẻ quà tặng <span class="required">*</span>
         </label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="currentGiftCard.name"
-          placeholder="Nhập tên thẻ quà tặng"
-        />
+        <input type="text" class="form-control" [(ngModel)]="currentGiftCard.name"
+          placeholder="Nhập tên thẻ quà tặng" />
       </div>
 
       <div class="form-group">
         <label>Mô tả</label>
-        <textarea
-          class="form-control"
-          [(ngModel)]="currentGiftCard.description"
-          placeholder="Nhập mô tả (tùy chọn)"
-          rows="3"
-        ></textarea>
+        <textarea class="form-control" [(ngModel)]="currentGiftCard.description" placeholder="Nhập mô tả (tùy chọn)"
+          rows="3"></textarea>
       </div>
 
       <div class="form-row">
@@ -129,35 +147,21 @@
           <label>
             Số tiền ban đầu (VNĐ) <span class="required">*</span>
           </label>
-          <input
-            type="number"
-            class="form-control"
-            [(ngModel)]="currentGiftCard.initialAmount"
-            placeholder="0"
-            min="0"
-            step="1000"
-          />
+          <input type="number" class="form-control" [(ngModel)]="currentGiftCard.initialAmount" placeholder="0" min="0"
+            step="1000" />
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Ngày bắt đầu</label>
-          <input
-            type="date"
-            class="form-control"
-            [value]="getDateString(currentGiftCard.validFrom)"
-            (change)="onValidFromChange($event)"
-          />
+          <input type="date" class="form-control" [value]="getDateString(currentGiftCard.validFrom)"
+            (change)="onValidFromChange($event)" />
         </div>
         <div class="form-group">
           <label>Ngày kết thúc</label>
-          <input
-            type="date"
-            class="form-control"
-            [value]="getDateString(currentGiftCard.validTo)"
-            (change)="onValidToChange($event)"
-          />
+          <input type="date" class="form-control" [value]="getDateString(currentGiftCard.validTo)"
+            (change)="onValidToChange($event)" />
         </div>
       </div>
     </div>
@@ -189,34 +193,22 @@
         <label>
           ID Coupon <span class="required">*</span>
         </label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="currentCouponUsage.couponId"
-          placeholder="Nhập ID coupon"
-        />
+        <input type="text" class="form-control" [(ngModel)]="currentCouponUsage.couponId"
+          placeholder="Nhập ID coupon" />
       </div>
 
       <div class="form-group">
         <label>
           ID Người dùng <span class="required">*</span>
         </label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="currentCouponUsage.userId"
-          placeholder="Nhập ID người dùng"
-        />
+        <input type="text" class="form-control" [(ngModel)]="currentCouponUsage.userId"
+          placeholder="Nhập ID người dùng" />
       </div>
 
       <div class="form-group">
         <label>ID Đơn hàng</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="currentCouponUsage.orderId"
-          placeholder="Nhập ID đơn hàng (tùy chọn)"
-        />
+        <input type="text" class="form-control" [(ngModel)]="currentCouponUsage.orderId"
+          placeholder="Nhập ID đơn hàng (tùy chọn)" />
       </div>
 
       <div class="form-row">
@@ -224,27 +216,15 @@
           <label>
             Số tiền đơn hàng (VNĐ)
           </label>
-          <input
-            type="number"
-            class="form-control"
-            [(ngModel)]="currentCouponUsage.orderAmount"
-            placeholder="0"
-            min="0"
-            step="1000"
-          />
+          <input type="number" class="form-control" [(ngModel)]="currentCouponUsage.orderAmount" placeholder="0" min="0"
+            step="1000" />
         </div>
         <div class="form-group">
           <label>
             Số tiền giảm giá (VNĐ) <span class="required">*</span>
           </label>
-          <input
-            type="number"
-            class="form-control"
-            [(ngModel)]="currentCouponUsage.discountAmount"
-            placeholder="0"
-            min="0"
-            step="1000"
-          />
+          <input type="number" class="form-control" [(ngModel)]="currentCouponUsage.discountAmount" placeholder="0"
+            min="0" step="1000" />
         </div>
       </div>
     </div>
@@ -258,4 +238,3 @@
     </div>
   </div>
 </div>
-

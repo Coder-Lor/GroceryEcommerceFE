@@ -4,17 +4,12 @@
 <div class="inventory-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
-  
+
   <!-- Confirm Dialog -->
-  <p-confirmDialog
-    [style]="{width: '450px'}"
-    [baseZIndex]="10000"
-    [closable]="true"
-    [closeOnEscape]="true"
-    acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text">
+  <p-confirmDialog [style]="{width: '450px'}" [baseZIndex]="10000" [closable]="true" [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary p-button-text">
   </p-confirmDialog>
-  
+
   <div class="page-header">
     <h2>Quản lý đơn hàng</h2>
     <div class="header-actions">
@@ -27,20 +22,9 @@
   <!-- Tìm kiếm -->
   <div class="search-box">
     <div class="search-wrapper">
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        (keyup.enter)="onSearch()"
-        placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng..."
-        class="search-input"
-      />
-      <button 
-        type="button" 
-        class="btn search-button"
-        (click)="onSearch()"
-        [disabled]="isLoading"
-        appTooltip="Tìm kiếm"
-      >
+      <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"
+        placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng..." class="search-input" />
+      <button type="button" class="btn search-button" (click)="onSearch()" [disabled]="isLoading" appTooltip="Tìm kiếm">
         <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
       </button>
     </div>
@@ -55,25 +39,29 @@
           <th (click)="changeSortColumn('orderNumber')" class="sortable">
             Mã đơn hàng
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'orderNumber' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'orderNumber' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('customerName')" class="sortable">
             Khách hàng
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'customerName' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'customerName' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('orderDate')" class="sortable">
             Ngày đặt
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'orderDate' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'orderDate' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('totalAmount')" class="sortable text-right">
             Tổng tiền
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'totalAmount' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'totalAmount' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th>Trạng thái đơn</th>
@@ -81,7 +69,8 @@
           <th (click)="changeSortColumn('createdAt')" class="sortable text-center">
             Ngày tạo
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'createdAt' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'createdAt' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th class="text-center">Thao tác</th>
@@ -121,6 +110,9 @@
             <button class="btn-icon btn-view" (click)="viewOrderDetail(order.orderId!)" appTooltip="Xem chi tiết">
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
+            <button class="btn-icon btn-export" (click)="exportInvoice(order.orderId!)" appTooltip="Xuất hóa đơn PDF">
+              <fa-icon [icon]="faFileInvoice"></fa-icon>
+            </button>
             <button class="btn-icon btn-delete" (click)="confirmDelete(order)" appTooltip="Xóa">
               <fa-icon [icon]="faTrashCan"></fa-icon>
             </button>
@@ -139,12 +131,7 @@
       <span>Hiển thị trang {{ currentPage }} / {{ totalPages }}</span>
       <div class="page-size-selector">
         <label for="pageSize">Số đơn hàng mỗi trang:</label>
-        <select
-          id="pageSize"
-          [(ngModel)]="pageSize"
-          (change)="onPageSizeChange()"
-          class="page-size-select"
-        >
+        <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
           <option [value]="10">10</option>
           <option [value]="20">20</option>
           <option [value]="50">50</option>
@@ -154,50 +141,29 @@
     </div>
 
     <div class="pagination-controls">
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(1)"
-        [disabled]="currentPage === 1"
-        appTooltip="Trang đầu"
-      >
+      <button class="btn-pagination" (click)="onPageChange(1)" [disabled]="currentPage === 1" appTooltip="Trang đầu">
         <fa-icon [icon]="faAnglesLeft"></fa-icon>
       </button>
 
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(currentPage - 1)"
-        [disabled]="currentPage === 1"
-        appTooltip="Trang trước"
-      >
+      <button class="btn-pagination" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+        appTooltip="Trang trước">
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
 
       <div class="page-numbers">
-        <button
-          *ngFor="let page of getPageNumbers()"
-          class="btn-page"
-          [class.active]="page === currentPage"
-          (click)="onPageChange(page)"
-        >
+        <button *ngFor="let page of getPageNumbers()" class="btn-page" [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
           {{ page }}
         </button>
       </div>
 
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(currentPage + 1)"
-        [disabled]="currentPage === totalPages"
-        appTooltip="Trang sau"
-      >
+      <button class="btn-pagination" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages"
+        appTooltip="Trang sau">
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>
 
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(totalPages)"
-        [disabled]="currentPage === totalPages"
-        appTooltip="Trang cuối"
-      >
+      <button class="btn-pagination" (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages"
+        appTooltip="Trang cuối">
         <fa-icon [icon]="faAnglesRight"></fa-icon>
       </button>
     </div>
@@ -226,7 +192,8 @@
             <span *ngIf="key === 'status'" class="status-badge" [ngClass]="getStatusBadgeClass(selectedOrder[key])">
               {{ formatValue(selectedOrder[key], key) }}
             </span>
-            <span *ngIf="key === 'paymentStatus'" class="status-badge" [ngClass]="getPaymentBadgeClass(selectedOrder[key])">
+            <span *ngIf="key === 'paymentStatus'" class="status-badge"
+              [ngClass]="getPaymentBadgeClass(selectedOrder[key])">
               {{ formatValue(selectedOrder[key], key) }}
             </span>
             <span *ngIf="key !== 'status' && key !== 'paymentStatus'">
@@ -242,4 +209,3 @@
     </div>
   </div>
 </div>
-
