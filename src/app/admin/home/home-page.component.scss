@@ -1,0 +1,93 @@
+$card-width: 230px;
+$card-height: 130px;
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+
+    .general-report {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: $card-width;
+    height: $card-height;
+    padding: 16px;
+    background-color: white;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    &.user:hover {
+        .card-title i {
+            color: #667eea;
+        }
+    }
+
+    &.warehouse:hover {
+        .card-title i {
+            color: #f06e17;
+        }
+    }
+
+    &.order:hover {
+        .card-title i {
+            color: #ff2626;
+        }
+    }
+
+    &.voucher:hover {
+        .card-title i {
+            color: #29cc00;
+        }
+    }
+
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #4b5563;
+        font-size: 0.95rem;
+
+        i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .card-content {
+        .data {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+    }
+
+    .card-action {
+        display: flex;
+        justify-content: flex-end;
+
+        i {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
+        }
+    }
+
+    &:hover .card-action i {
+        color: #667eea;
+    }
+}

@@ -1,53 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import {
+  UserClient,
+  ProductClient,
+  OrderClient,
+  GiftCardClient,
+  SortDirection
+} from '@services/system-admin.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
   imports: [RouterModule, BaseChartDirective],
-  template: `
-    <div class="page-container">  
-      <div class="charts-grid">
-        <div class="chart-container">
-          <h2>Doanh thu theo tháng</h2>
-          <canvas baseChart
-            [data]="barChartData"
-            [options]="barChartOptions"
-            [type]="barChartType">
-          </canvas>
-        </div>
-        <div class="chart-container">
-          <h2>Tỷ lệ danh mục sản phẩm</h2>
-          <canvas baseChart
-            [data]="pieChartData"
-            [options]="pieChartOptions"
-            [type]="pieChartType">
-          </canvas>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .page-container {
-      padding: 20px;
-    }
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-    .chart-container {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-  `]
+  templateUrl: 'home-page.component.html',
+  styleUrls: ['home-page.component.scss']
 })
 export class HomePageComponent implements OnInit {
+  // Inject services
+  private userClient = inject(UserClient);
+  private productClient = inject(ProductClient);
+  private orderClient = inject(OrderClient);
+  private giftCardClient = inject(GiftCardClient);
+
+  // General report data
+  totalUsers: number = 0;
+  totalStock: number = 0;
+  totalOrders: number = 0;
+  totalVouchers: number = 0;
+
   // Bar Chart
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -90,7 +73,70 @@ export class HomePageComponent implements OnInit {
   public pieChartType: ChartType = 'pie';
 
   ngOnInit(): void {
+    this.loadGeneralReport();
     this.generateChartData();
+  }
+
+  loadGeneralReport(): void {
+    // Load users count
+    this.userClient.getUsersPaging(
+      1, 1, null, null, SortDirection.Ascending, [], null, null, false, false, false
+    ).subscribe({
+      next: (response) => {
+        // Parse response from blob to get totalCount
+        if (response && response.data) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const result = JSON.parse(reader.result as string);
+              if (result.isSuccess && result.data) {
+                this.totalUsers = result.data.totalCount || 0;
+              }
+            } catch (e) {
+              console.error('Error parsing users response', e);
+            }
+          };
+          reader.readAsText(response.data);
+        }
+      },
+      error: (err) => console.error('Error loading users', err)
+    });
+
+    // Load products count (for stock)
+    this.productClient.getProductsPaging(
+      1, 1, null, null, SortDirection.Ascending, [], null, null, false, false, false
+    ).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.totalStock = response.data.totalCount || 0;
+        }
+      },
+      error: (err) => console.error('Error loading products', err)
+    });
+
+    // Load orders count
+    this.orderClient.getOrdersPaging(
+      1, 1, null, null, SortDirection.Ascending, [], null, null, false, false, false
+    ).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.totalOrders = response.data.totalCount || 0;
+        }
+      },
+      error: (err) => console.error('Error loading orders', err)
+    });
+
+    // Load vouchers count (GiftCard)
+    this.giftCardClient.getPaging(
+      1, 1, null, null, SortDirection.Ascending, [], null, null, false, false, false
+    ).subscribe({
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.totalVouchers = response.data.totalCount || 0;
+        }
+      },
+      error: (err) => console.error('Error loading vouchers', err)
+    });
   }
 
   generateChartData(): void {

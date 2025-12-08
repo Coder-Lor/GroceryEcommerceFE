@@ -1,0 +1,58 @@
+<div class="page-container">
+    <div class="general-report">
+        <div class="card user">
+            <div class="card-title">
+                <i class="pi pi-users"></i>
+                <span class="title"> Người dùng</span>
+            </div>
+            <div class="card-content">
+                <span class="data">{{ totalUsers }}</span>
+            </div>
+            <div class="card-action">
+                <i class="pi pi-angle-right"></i>
+            </div>
+        </div>
+        <div class="card warehouse">
+            <div class="card-title">
+                <i class="pi pi-shopping-bag"></i>
+                <span class="title"> Số hàng tồn kho</span>
+            </div>
+            <div class="card-content">
+                <span class="data">{{ totalStock }}</span>
+            </div>
+            <div class="card-action">
+                <i class="pi pi-angle-right"></i>
+            </div>
+        </div>
+        <div class="card order">
+            <div class="card-title">
+                <i class="pi pi-shopping-cart"></i>
+                <span class="title"> Tổng đơn hàng</span>
+            </div>
+            <div class="card-content">
+                <span class="data">{{ totalOrders }}</span>
+            </div>
+            <div class="card-action">
+                <i class="pi pi-angle-right"></i>
+            </div>
+        </div>
+        <div class="card voucher">
+            <div class="card-title">
+                <i class="pi pi-gift"></i>
+                <span class="title"> Voucher khả dụng</span>
+            </div>
+            <div class="card-content">
+                <span class="data">{{ totalVouchers }}</span>
+            </div>
+            <div class="card-action">
+                <i class="pi pi-angle-right"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-report">
+        <div class="title">
+            Báo cáo số lượng đơn hàng
+        </div>
+    </div>
+</div>
