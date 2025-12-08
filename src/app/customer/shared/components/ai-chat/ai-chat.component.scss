@@ -75,7 +75,7 @@
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
-    width: 380px;
+    width: 480px;
     max-width: 95vw;
     height: 500px;
     max-height: 70vh;
@@ -293,6 +293,7 @@
                 border-radius: 10px;
                 border: 1px solid #e9ecef;
                 transition: all 0.2s ease;
+                cursor: pointer;
 
                 &:hover {
                     background: #fff;

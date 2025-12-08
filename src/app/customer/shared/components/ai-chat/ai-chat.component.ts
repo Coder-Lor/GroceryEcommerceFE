@@ -96,7 +96,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
     private addWelcomeMessage(): void {
         const welcomeMsg = this.chatMode === 'chat'
             ? 'Xin chào! 👋 Tôi là trợ lý AI của GroceryMart. Bạn có thể hỏi tôi bất cứ điều gì - từ công nghệ, thời trang, gia dụng, đến mỹ phẩm, thực phẩm và nhiều hơn nữa!'
-            : 'Xin chào! 👋 Tôi sẽ gợi ý sản phẩm phù hợp với nhu cầu của bạn. Hãy cho tôi biết bạn đang tìm kiếm gì? (Ví dụ: "Laptop cho sinh viên", "Quà tặng cho bạn gái", "Đồ dùng nhà bếp")';
+            : 'Xin chào! 👋 Tôi sẽ gợi ý sản phẩm phù hợp với nhu cầu của bạn. Hãy cho tôi biết bạn đang tìm kiếm gì?';
 
         this.messages.push({
             role: 'assistant',
@@ -284,9 +284,9 @@ Hãy trả lời bằng tiếng Việt, thân thiện, hữu ích và ngắn g�
     viewProduct(product: SuggestedProduct): void {
         this.isOpen = false;
         if (product.slug) {
-            this.router.navigate(['/product', product.slug]);
+            this.router.navigate(['/product-detail', product.slug]);
         } else if (product.productId) {
-            this.router.navigate(['/product', product.productId]);
+            this.router.navigate(['/product-detail', product.productId]);
         }
     }
 

@@ -87,7 +87,7 @@
                         @if (message.suggestedProducts && message.suggestedProducts.length > 0) {
                         <div class="suggested-products">
                             @for (product of message.suggestedProducts; track product.productId) {
-                            <div class="product-card">
+                            <div class="product-card" (click)="viewProduct(product)">
                                 @if (product.imageUrl) {
                                 <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
                                 } @else {
@@ -104,9 +104,6 @@
                                         }
                                     </div>
                                 </div>
-                                <button class="view-product-btn" (click)="viewProduct(product)">
-                                    Xem sản phẩm
-                                </button>
                             </div>
                             }
                         </div>
