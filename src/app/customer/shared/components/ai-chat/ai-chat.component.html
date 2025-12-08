@@ -82,6 +82,35 @@
                     }
                     <div class="message-bubble">
                         <p [innerHTML]="message.content | slice:0:2000"></p>
+
+                        <!-- Suggested Products -->
+                        @if (message.suggestedProducts && message.suggestedProducts.length > 0) {
+                        <div class="suggested-products">
+                            @for (product of message.suggestedProducts; track product.productId) {
+                            <div class="product-card">
+                                @if (product.imageUrl) {
+                                <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
+                                } @else {
+                                <div class="product-image-placeholder">📦</div>
+                                }
+                                <div class="product-info">
+                                    <div class="product-name">{{ product.name }}</div>
+                                    <div class="product-price">
+                                        @if (product.discountPrice) {
+                                        <span class="discount-price">{{ formatPrice(product.discountPrice) }}</span>
+                                        <span class="original-price">{{ formatPrice(product.price) }}</span>
+                                        } @else {
+                                        <span class="current-price">{{ formatPrice(product.price) }}</span>
+                                        }
+                                    </div>
+                                </div>
+                                <button class="view-product-btn" (click)="viewProduct(product)">
+                                    Xem sản phẩm
+                                </button>
+                            </div>
+                            }
+                        </div>
+                        }
                     </div>
                     @if (message.role === 'user') {
                     <span class="avatar user-avatar">👤</span>
@@ -109,7 +138,7 @@
         <div class="chat-input-area">
             <div class="input-wrapper">
                 <input type="text" [(ngModel)]="userMessage" (keypress)="onKeyPress($event)"
-                    [placeholder]="chatMode === 'chat' ? 'Nhập tin nhắn...' : 'Bạn muốn tìm gì? (VD: nấu phở, ăn sáng...)'"
+                    [placeholder]="chatMode === 'chat' ? 'Nhập tin nhắn...' : 'Bạn đang tìm gì? (VD: Laptop, quà tặng, đồ gia dụng...)'"
                     [disabled]="isLoading" />
                 <button class="send-btn" (click)="sendMessage()" [disabled]="!userMessage.trim() || isLoading">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
