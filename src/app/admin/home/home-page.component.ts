@@ -74,7 +74,6 @@ export class HomePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadGeneralReport();
-    this.generateChartData();
   }
 
   loadGeneralReport(): void {
@@ -139,22 +138,4 @@ export class HomePageComponent implements OnInit {
     });
   }
 
-  generateChartData(): void {
-    // Mock data for Bar Chart (Monthly Revenue)
-    this.barChartData.labels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'];
-    this.barChartData.datasets[0].data = [65, 59, 80, 81, 56, 55];
-    this.barChartData.datasets[0].backgroundColor = 'rgba(75, 192, 192, 0.6)';
-
-
-    // Mock data for Pie Chart (Product Categories)
-    this.pieChartData.labels = ['Điện tử', 'Thời trang', 'Gia dụng', 'Sách', 'Thực phẩm'];
-    this.pieChartData.datasets[0].data = [300, 500, 100, 80, 120];
-    this.pieChartData.datasets[0].backgroundColor = [
-      'rgba(255, 99, 132, 0.6)',
-      'rgba(54, 162, 235, 0.6)',
-      'rgba(255, 206, 86, 0.6)',
-      'rgba(75, 192, 192, 0.6)',
-      'rgba(153, 102, 255, 0.6)'
-    ];
-  }
 }
