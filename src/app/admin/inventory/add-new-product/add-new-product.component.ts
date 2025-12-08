@@ -24,6 +24,7 @@ import {
   faPlus,
   faPenToSquare,
   faCubes,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   CategoryClient,
@@ -38,6 +39,7 @@ import { InventoryService } from '../../../core/service/inventory.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { GoogleGenAI } from '@google/genai'
 
 @Component({
   selector: 'app-add-new-product',
@@ -97,6 +99,14 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   faPlus = faPlus;
   faPenToSquare = faPenToSquare;
   faCubes = faCubes;
+  faSpinner = faSpinner;
+
+  // Gemini AI
+  geminiRes: any = "Không có dữ liệu";
+  ai = new GoogleGenAI({
+    apiKey: "AIzaSyAeawecfMakGZ2v2N7DC2dSS7RLP9JJt5w"
+  });
+  isGeneratingWithAI: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -106,7 +116,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     private productClient: ProductClient,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -164,6 +174,165 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       attributes: [[]],
       tagIds: [[]],
     });
+  }
+
+
+  async generateWithAI(): Promise<void> {
+    if (this.isGeneratingWithAI) {
+      return;
+    }
+
+    // Kiểm tra xem đã chọn danh mục chưa
+    if (!this.selectedCategory) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Chưa chọn danh mục',
+        detail: 'Vui lòng chọn danh mục sản phẩm trước khi sinh dữ liệu bằng AI',
+        life: 4000,
+      });
+      // Mở modal chọn danh mục
+      this.openCategoryModal();
+      return;
+    }
+
+    this.isGeneratingWithAI = true;
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Đang xử lý',
+      detail: `AI đang sinh dữ liệu sản phẩm cho danh mục "${this.selectedCategory.name}"...`,
+      life: 5000,
+    });
+
+    try {
+      // Lấy đường dẫn danh mục (parent > child)
+      const categoryPath = this.getCategoryPath(this.selectedCategory);
+      const categoryName = this.selectedCategory.name;
+      const categoryDescription = this.selectedCategory.description || '';
+
+      const prompt = `Bạn là một chuyên gia về sản phẩm tạp hóa/thực phẩm tại Việt Nam.
+
+DANH MỤC SẢN PHẨM: ${categoryName}
+${categoryPath ? `ĐƯỜNG DẪN DANH MỤC: ${categoryPath}` : ''}
+${categoryDescription ? `MÔ TẢ DANH MỤC: ${categoryDescription}` : ''}
+
+Hãy tạo dữ liệu cho MỘT sản phẩm THỰC TẾ thuộc danh mục "${categoryName}" tại Việt Nam.
+Sản phẩm phải là sản phẩm có thật, phổ biến trên thị trường Việt Nam (có thể bao gồm thương hiệu thật như: Vinamilk, TH True Milk, Masan, Acecook, Nestle, Unilever, P&G, Cocacola, Pepsi, Vissan, Cầu Tre, Ba Huân, v.v.).
+
+Trả về dữ liệu dưới dạng JSON với cấu trúc sau (CHỈ TRẢ VỀ JSON, KHÔNG CÓ TEXT KHÁC):
+{
+  "name": "Tên sản phẩm chi tiết (bao gồm thương hiệu, trọng lượng/dung tích nếu có)",
+  "shortDescription": "Mô tả ngắn gọn 1-2 câu về sản phẩm",
+  "description": "Mô tả chi tiết về sản phẩm, công dụng, thành phần chính, cách sử dụng, hạn sử dụng, bảo quản (4-6 câu)",
+  "price": số nguyên (giá bán VND, phải hợp lý với sản phẩm thực tế),
+  "discountPrice": số nguyên hoặc null (giá khuyến mãi nếu có, phải nhỏ hơn price),
+  "cost": số nguyên (giá vốn, khoảng 65-80% giá bán),
+  "weight": số thực (trọng lượng kg, ví dụ: 0.5, 1, 2.5),
+  "dimensions": "kích thước đóng gói cm (ví dụ: 20x15x10)",
+  "stockQuantity": số nguyên (số lượng tồn kho, từ 50-500),
+  "minStockLevel": số nguyên (mức tồn kho tối thiểu, từ 10-50),
+  "isFeatured": boolean (có phải sản phẩm nổi bật không),
+  "metaTitle": "Tiêu đề SEO cho sản phẩm (50-60 ký tự)",
+  "metaDescription": "Mô tả SEO cho sản phẩm (150-160 ký tự)"
+}
+
+Lưu ý quan trọng:
+- Sản phẩm PHẢI thuộc đúng danh mục "${categoryName}"
+- Giá phải hợp lý với thị trường Việt Nam hiện tại
+- Tên sản phẩm phải tự nhiên, giống sản phẩm thật bán tại siêu thị
+- Mô tả phải chi tiết, chuyên nghiệp và hấp dẫn người mua`;
+
+      const response = await this.ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: prompt
+      });
+
+      const responseText = response.text || '';
+      console.log('Gemini AI Response:', responseText);
+
+      // Parse JSON từ response
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Không thể parse dữ liệu từ AI');
+      }
+
+      const productData = JSON.parse(jsonMatch[0]);
+      console.log('Parsed Product Data:', productData);
+
+      // Sinh SKU và Slug
+      const randomSKU = `SKU${Math.floor(Math.random() * 900000) + 100000}`;
+      const randomSlug = productData.name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .substring(0, 100);
+
+      // Patch giá trị vào form (giữ nguyên danh mục đã chọn)
+      this.productForm.patchValue({
+        name: productData.name,
+        slug: randomSlug,
+        sku: randomSKU,
+        description: productData.description,
+        shortDescription: productData.shortDescription,
+        price: productData.price,
+        discountPrice: productData.discountPrice,
+        cost: productData.cost,
+        stockQuantity: productData.stockQuantity,
+        minStockLevel: productData.minStockLevel,
+        weight: productData.weight,
+        dimensions: productData.dimensions,
+        // Giữ nguyên categoryId đã chọn
+        brandId: null,
+        status: 1, // Active
+        isFeatured: productData.isFeatured || false,
+        isDigital: false,
+        metaTitle: productData.metaTitle,
+        metaDescription: productData.metaDescription,
+      });
+
+      this.productForm.markAsDirty();
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Thành công',
+        detail: `AI đã sinh dữ liệu cho sản phẩm: ${productData.name}`,
+        life: 4000,
+      });
+
+    } catch (error: any) {
+      console.error('Error generating with AI:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Không thể sinh dữ liệu từ AI. Vui lòng thử lại.',
+        life: 3000,
+      });
+    } finally {
+      this.isGeneratingWithAI = false;
+    }
+  }
+
+  // Lấy đường dẫn danh mục từ root đến category hiện tại
+  private getCategoryPath(category: CategoryDto): string {
+    const findPath = (categories: CategoryDto[], targetId: string | undefined, path: string[] = []): string[] | null => {
+      for (const cat of categories) {
+        const currentPath = [...path, cat.name || ''];
+        if (cat.categoryId === targetId) {
+          return currentPath;
+        }
+        if (cat.subCategories && cat.subCategories.length > 0) {
+          const result = findPath(cat.subCategories, targetId, currentPath);
+          if (result) return result;
+        }
+      }
+      return null;
+    };
+
+    const pathArray = findPath(this.categories, category.categoryId);
+    return pathArray ? pathArray.join(' > ') : category.name || '';
   }
 
   loadCategories(): void {
@@ -228,9 +397,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     const imageFiles: FileParameter[] | null =
       this.selectedImages.length > 0
         ? this.selectedImages.map((img) => ({
-            data: img.file,
-            fileName: img.file.name,
-          }))
+          data: img.file,
+          fileName: img.file.name,
+        }))
         : null;
 
     const imageAltTexts: string[] | null =
@@ -397,7 +566,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     return result;
   }
 
-// Generate sample data
+  // Generate sample data
   generateSampleData(): void {
     // 1. Định nghĩa các khuôn mẫu sản phẩm (Product Templates)
     // Mỗi object chứa dữ liệu liên quan mật thiết đến nhau
@@ -734,10 +903,10 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     console.log('openAddVariantModal called');
     this.variantMode = 'add';
     this.currentVariant = new CreateProductVariantRequest();
-    
+
     // Copy values from main product form
     const formValue = this.productForm.value;
-    
+
     this.currentVariant.price = formValue.price || 0;
     this.currentVariant.discountPrice = formValue.discountPrice || null;
     this.currentVariant.stockQuantity = formValue.stockQuantity || 0;
@@ -745,7 +914,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     this.currentVariant.weight = formValue.weight || null;
     this.currentVariant.dimensions = formValue.dimensions || null;
     this.currentVariant.status = formValue.status || 1; // Active by default
-    
+
     this.editingVariantIndex = -1;
     this.variantImageFile = null;
     this.variantImagePreview = null;
@@ -821,7 +990,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     if (this.variantMode === 'add') {
       const variantIndex = this.variants.length;
       this.variants.push(CreateProductVariantRequest.fromJS(this.currentVariant.toJSON()));
-      
+
       // Store image file and preview if selected
       if (this.variantImageFile) {
         this.variantImages.set(variantIndex, this.variantImageFile);
@@ -829,7 +998,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
           this.variantImagePreviews.set(variantIndex, this.variantImagePreview);
         }
       }
-      
+
       this.messageService.add({
         severity: 'success',
         summary: 'Thành công',
@@ -840,7 +1009,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
       this.variants[this.editingVariantIndex] = CreateProductVariantRequest.fromJS(
         this.currentVariant.toJSON()
       );
-      
+
       // Update image file and preview if changed
       if (this.variantImageFile) {
         this.variantImages.set(this.editingVariantIndex, this.variantImageFile);
@@ -853,7 +1022,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
         this.variantImagePreviews.delete(this.editingVariantIndex);
         this.variants[this.editingVariantIndex].imageUrl = undefined;
       }
-      
+
       this.messageService.add({
         severity: 'success',
         summary: 'Thành công',
@@ -988,7 +1157,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     }
 
     this.variantImageFile = file;
-    
+
     // Create preview
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -1008,7 +1177,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     this.variantImageFile = null;
     this.variantImagePreview = null;
     this.currentVariant.imageUrl = undefined;
-    
+
     // Reset file input
     const fileInput = document.getElementById('variantImageInput') as HTMLInputElement;
     if (fileInput) {

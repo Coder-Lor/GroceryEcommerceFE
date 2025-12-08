@@ -55,19 +55,39 @@
       transition: all 0.3s ease;
       box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 
-      &:hover {
+      &:hover:not(:disabled) {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
       }
 
-      &:active {
+      &:active:not(:disabled) {
         transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
       }
 
       fa-icon {
         font-size: 1rem;
         animation: sparkle 2s ease-in-out infinite;
+
+        &.fa-spin {
+          animation: spin 1s linear infinite;
+        }
       }
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
     }
   }
 
@@ -616,6 +636,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -626,6 +647,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -633,15 +655,20 @@
 }
 
 @keyframes sparkle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: rotate(0deg) scale(1);
   }
+
   25% {
     transform: rotate(-10deg) scale(1.1);
   }
+
   50% {
     transform: rotate(10deg) scale(1.1);
   }
+
   75% {
     transform: rotate(-10deg) scale(1.1);
   }
@@ -745,7 +772,7 @@
 // Variant Modal specific styles (MOVED OUTSIDE MEDIA QUERY)
 .variant-modal {
   max-width: 700px;
-  
+
   .subsection-title {
     font-size: 1rem;
     color: #495057;

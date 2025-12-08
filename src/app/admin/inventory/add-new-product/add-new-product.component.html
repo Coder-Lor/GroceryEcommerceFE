@@ -1,26 +1,22 @@
 <div class="add-product-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
-  
+
   <!-- Confirm Dialog -->
-  <p-confirmDialog
-    [style]="{width: '450px'}"
-    [baseZIndex]="10000"
-    [closable]="true"
-    [closeOnEscape]="true"
-    acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text">
+  <p-confirmDialog [style]="{width: '450px'}" [baseZIndex]="10000" [closable]="true" [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary p-button-text">
   </p-confirmDialog>
-  
+
   <div class="page-header">
     <button class="btn-back" (click)="goBack()">
       <fa-icon [icon]="faArrowLeft"></fa-icon>
       Quay lại
     </button>
     <h2>Thêm sản phẩm mới</h2>
-    <button class="btn-generate-sample" (click)="generateSampleData()" type="button">
-      <fa-icon [icon]="faMagic"></fa-icon>
-      Sinh dữ liệu mẫu
+    <button class="btn-generate-sample" (click)="generateWithAI()" type="button" [disabled]="isGeneratingWithAI">
+      <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" alt="" width="30"
+        height="30">
+      {{ isGeneratingWithAI ? 'Đang sinh dữ liệu...' : 'Sinh dữ liệu bằng AI' }}
     </button>
   </div>
 
@@ -29,17 +25,12 @@
       <!-- Basic Information Section -->
       <div class="form-section">
         <h3 class="section-title">Thông tin cơ bản</h3>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Mã SKU <span class="required">*</span></label>
-            <input
-              type="text"
-              formControlName="sku"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('sku')"
-              placeholder="Nhập mã SKU"
-            />
+            <input type="text" formControlName="sku" class="form-control" [class.is-invalid]="isFieldInvalid('sku')"
+              placeholder="Nhập mã SKU" />
             <div class="error-message" *ngIf="isFieldInvalid('sku')">
               {{ getErrorMessage('sku') }}
             </div>
@@ -47,24 +38,15 @@
 
           <div class="form-group">
             <label>Slug</label>
-            <input
-              type="text"
-              formControlName="slug"
-              class="form-control"
-              placeholder="Nhập slug (tự động tạo nếu để trống)"
-            />
+            <input type="text" formControlName="slug" class="form-control"
+              placeholder="Nhập slug (tự động tạo nếu để trống)" />
           </div>
         </div>
 
         <div class="form-group">
           <label>Tên sản phẩm <span class="required">*</span></label>
-          <input
-            type="text"
-            formControlName="name"
-            class="form-control"
-            [class.is-invalid]="isFieldInvalid('name')"
-            placeholder="Nhập tên sản phẩm"
-          />
+          <input type="text" formControlName="name" class="form-control" [class.is-invalid]="isFieldInvalid('name')"
+            placeholder="Nhập tên sản phẩm" />
           <div class="error-message" *ngIf="isFieldInvalid('name')">
             {{ getErrorMessage('name') }}
           </div>
@@ -84,41 +66,25 @@
 
         <div class="form-group">
           <label>Mô tả ngắn</label>
-          <input
-            type="text"
-            formControlName="shortDescription"
-            class="form-control"
-            placeholder="Nhập mô tả ngắn"
-          />
+          <input type="text" formControlName="shortDescription" class="form-control" placeholder="Nhập mô tả ngắn" />
         </div>
 
         <div class="form-group">
           <label>Mô tả chi tiết</label>
-          <textarea
-            formControlName="description"
-            class="form-control"
-            rows="5"
-            placeholder="Nhập mô tả chi tiết về sản phẩm"
-          ></textarea>
+          <textarea formControlName="description" class="form-control" rows="5"
+            placeholder="Nhập mô tả chi tiết về sản phẩm"></textarea>
         </div>
       </div>
 
       <!-- Pricing Section -->
       <div class="form-section">
         <h3 class="section-title">Thông tin giá</h3>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Giá vốn <span class="required">*</span></label>
-            <input
-              type="number"
-              formControlName="cost"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('cost')"
-              min="0"
-              step="1000"
-              placeholder="0"
-            />
+            <input type="number" formControlName="cost" class="form-control" [class.is-invalid]="isFieldInvalid('cost')"
+              min="0" step="1000" placeholder="0" />
             <div class="error-message" *ngIf="isFieldInvalid('cost')">
               {{ getErrorMessage('cost') }}
             </div>
@@ -126,15 +92,8 @@
 
           <div class="form-group">
             <label>Giá bán <span class="required">*</span></label>
-            <input
-              type="number"
-              formControlName="price"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('price')"
-              min="0"
-              step="1000"
-              placeholder="0"
-            />
+            <input type="number" formControlName="price" class="form-control"
+              [class.is-invalid]="isFieldInvalid('price')" min="0" step="1000" placeholder="0" />
             <div class="error-message" *ngIf="isFieldInvalid('price')">
               {{ getErrorMessage('price') }}
             </div>
@@ -142,15 +101,8 @@
 
           <div class="form-group">
             <label>Giá giảm</label>
-            <input
-              type="number"
-              formControlName="discountPrice"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('discountPrice')"
-              min="0"
-              step="1000"
-              placeholder="0"
-            />
+            <input type="number" formControlName="discountPrice" class="form-control"
+              [class.is-invalid]="isFieldInvalid('discountPrice')" min="0" step="1000" placeholder="0" />
             <div class="error-message" *ngIf="isFieldInvalid('discountPrice')">
               {{ getErrorMessage('discountPrice') }}
             </div>
@@ -161,18 +113,12 @@
       <!-- Inventory Section -->
       <div class="form-section">
         <h3 class="section-title">Thông tin kho hàng</h3>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Số lượng tồn kho <span class="required">*</span></label>
-            <input
-              type="number"
-              formControlName="stockQuantity"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('stockQuantity')"
-              min="0"
-              placeholder="0"
-            />
+            <input type="number" formControlName="stockQuantity" class="form-control"
+              [class.is-invalid]="isFieldInvalid('stockQuantity')" min="0" placeholder="0" />
             <div class="error-message" *ngIf="isFieldInvalid('stockQuantity')">
               {{ getErrorMessage('stockQuantity') }}
             </div>
@@ -180,14 +126,8 @@
 
           <div class="form-group">
             <label>Mức tồn tối thiểu <span class="required">*</span></label>
-            <input
-              type="number"
-              formControlName="minStockLevel"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('minStockLevel')"
-              min="0"
-              placeholder="10"
-            />
+            <input type="number" formControlName="minStockLevel" class="form-control"
+              [class.is-invalid]="isFieldInvalid('minStockLevel')" min="0" placeholder="10" />
             <div class="error-message" *ngIf="isFieldInvalid('minStockLevel')">
               {{ getErrorMessage('minStockLevel') }}
             </div>
@@ -198,28 +138,16 @@
       <!-- Physical Properties Section -->
       <div class="form-section">
         <h3 class="section-title">Thông tin vật lý</h3>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Trọng lượng (kg)</label>
-            <input
-              type="number"
-              formControlName="weight"
-              class="form-control"
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-            />
+            <input type="number" formControlName="weight" class="form-control" min="0" step="0.01" placeholder="0.00" />
           </div>
 
           <div class="form-group">
             <label>Kích thước (DxRxC mm)</label>
-            <input
-              type="text"
-              formControlName="dimensions"
-              class="form-control"
-              placeholder="VD: 100x200x50"
-            />
+            <input type="text" formControlName="dimensions" class="form-control" placeholder="VD: 100x200x50" />
           </div>
         </div>
       </div>
@@ -227,16 +155,11 @@
       <!-- Additional Information Section -->
       <div class="form-section">
         <h3 class="section-title">Thông tin bổ sung</h3>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Brand ID</label>
-            <input
-              type="text"
-              formControlName="brandId"
-              class="form-control"
-              placeholder="Nhập Brand ID (nếu có)"
-            />
+            <input type="text" formControlName="brandId" class="form-control" placeholder="Nhập Brand ID (nếu có)" />
           </div>
 
           <div class="form-group">
@@ -273,11 +196,7 @@
             <fa-icon [icon]="faCubes"></fa-icon>
             Phân loại sản phẩm
           </h3>
-          <button 
-            type="button" 
-            class="btn btn-sm btn-success"
-            (click)="openAddVariantModal()"
-          >
+          <button type="button" class="btn btn-sm btn-success" (click)="openAddVariantModal()">
             <fa-icon [icon]="faPlus"></fa-icon>
             Thêm phân loại
           </button>
@@ -302,7 +221,7 @@
                 </div>
                 }
               </div>
-              
+
               <div class="variant-info">
                 <div class="variant-name">
                   <strong>{{ variant.name || 'phân loại ' + ($index + 1) }}</strong>
@@ -333,20 +252,11 @@
             </div>
 
             <div class="variant-actions">
-              <button 
-                type="button" 
-                class="btn-icon btn-edit"
-                (click)="openEditVariantModal(variant, $index)"
-                title="Chỉnh sửa"
-              >
+              <button type="button" class="btn-icon btn-edit" (click)="openEditVariantModal(variant, $index)"
+                title="Chỉnh sửa">
                 <fa-icon [icon]="faPenToSquare"></fa-icon>
               </button>
-              <button 
-                type="button" 
-                class="btn-icon btn-delete"
-                (click)="deleteVariant($index)"
-                title="Xóa"
-              >
+              <button type="button" class="btn-icon btn-delete" (click)="deleteVariant($index)" title="Xóa">
                 <fa-icon [icon]="faTrash"></fa-icon>
               </button>
             </div>
@@ -359,28 +269,18 @@
       <!-- SEO Section -->
       <div class="form-section">
         <h3 class="section-title">SEO</h3>
-        
+
         <div class="form-group">
           <label>Meta Title</label>
-          <input
-            type="text"
-            formControlName="metaTitle"
-            class="form-control"
-            placeholder="Nhập tiêu đề SEO"
-            maxlength="60"
-          />
+          <input type="text" formControlName="metaTitle" class="form-control" placeholder="Nhập tiêu đề SEO"
+            maxlength="60" />
           <small class="form-hint">Tối đa 60 ký tự</small>
         </div>
 
         <div class="form-group">
           <label>Meta Description</label>
-          <textarea
-            formControlName="metaDescription"
-            class="form-control"
-            rows="3"
-            placeholder="Nhập mô tả SEO"
-            maxlength="160"
-          ></textarea>
+          <textarea formControlName="metaDescription" class="form-control" rows="3" placeholder="Nhập mô tả SEO"
+            maxlength="160"></textarea>
           <small class="form-hint">Tối đa 160 ký tự</small>
         </div>
       </div>
@@ -388,24 +288,12 @@
       <!-- Image Upload Section -->
       <div class="form-section">
         <h3 class="section-title">Hình ảnh sản phẩm</h3>
-        
+
         <!-- Upload Area -->
-        <div 
-          class="image-upload-area"
-          [class.dragging]="isDragging"
-          (dragover)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)"
-          (drop)="onDrop($event)"
-          (click)="triggerFileInput()"
-        >
-          <input
-            type="file"
-            id="imageFileInput"
-            multiple
-            accept="image/*"
-            (change)="onFileSelected($event)"
-            style="display: none;"
-          />
+        <div class="image-upload-area" [class.dragging]="isDragging" (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="triggerFileInput()">
+          <input type="file" id="imageFileInput" multiple accept="image/*" (change)="onFileSelected($event)"
+            style="display: none;" />
           <div class="upload-content">
             <fa-icon [icon]="faCloudUpload" class="upload-icon"></fa-icon>
             <p class="upload-text">Kéo thả ảnh vào đây hoặc click để chọn</p>
@@ -415,29 +303,16 @@
 
         <!-- Image Preview List -->
         <div class="image-preview-list" *ngIf="selectedImages.length > 0">
-          <div 
-            *ngFor="let image of selectedImages; let i = index" 
-            class="image-preview-item"
-            [class.primary]="image.isPrimary"
-          >
+          <div *ngFor="let image of selectedImages; let i = index" class="image-preview-item"
+            [class.primary]="image.isPrimary">
             <div class="image-preview-wrapper">
               <img [src]="image.preview" [alt]="image.altText || 'Preview'" />
               <div class="image-overlay">
-                <button 
-                  type="button" 
-                  class="btn-icon btn-primary-img" 
-                  (click)="setPrimaryImage(i)"
-                  [class.active]="image.isPrimary"
-                  title="Đặt làm ảnh chính"
-                >
+                <button type="button" class="btn-icon btn-primary-img" (click)="setPrimaryImage(i)"
+                  [class.active]="image.isPrimary" title="Đặt làm ảnh chính">
                   <fa-icon [icon]="faStar"></fa-icon>
                 </button>
-                <button 
-                  type="button" 
-                  class="btn-icon btn-delete" 
-                  (click)="removeImage(i)"
-                  title="Xóa ảnh"
-                >
+                <button type="button" class="btn-icon btn-delete" (click)="removeImage(i)" title="Xóa ảnh">
                   <fa-icon [icon]="faTrash"></fa-icon>
                 </button>
               </div>
@@ -446,13 +321,8 @@
               </span>
             </div>
             <div class="image-info">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Nhập mô tả ảnh (Alt text)"
-                [value]="image.altText"
-                (input)="updateImageAltText(i, $any($event.target).value)"
-              />
+              <input type="text" class="form-control" placeholder="Nhập mô tả ảnh (Alt text)" [value]="image.altText"
+                (input)="updateImageAltText(i, $any($event.target).value)" />
               <small class="image-name">{{ image.file.name }}</small>
               <small class="image-order">Thứ tự: {{ image.displayOrder }}</small>
             </div>
@@ -490,14 +360,11 @@
 
     <div class="modal-body">
       <div class="category-list">
-        <div 
-          *ngFor="let item of getFlatCategoryList(categories)" 
-          class="category-item"
-          [style.padding-left.px]="20 + (item.level * 20)"
-          (click)="selectCategory(item.category)"
-          [class.selected]="selectedCategory?.categoryId === item.category.categoryId"
-        >
-          <fa-icon [icon]="faCheck" class="check-icon" *ngIf="selectedCategory?.categoryId === item.category.categoryId"></fa-icon>
+        <div *ngFor="let item of getFlatCategoryList(categories)" class="category-item"
+          [style.padding-left.px]="20 + (item.level * 20)" (click)="selectCategory(item.category)"
+          [class.selected]="selectedCategory?.categoryId === item.category.categoryId">
+          <fa-icon [icon]="faCheck" class="check-icon"
+            *ngIf="selectedCategory?.categoryId === item.category.categoryId"></fa-icon>
           <span class="category-name">{{ item.category.name }}</span>
         </div>
         <div *ngIf="categories.length === 0" class="no-data">
@@ -529,171 +396,108 @@
     <div class="modal-body">
       <div class="form-section">
         <h4 class="subsection-title">Thông tin cơ bản</h4>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>SKU phân loại <span class="required">*</span></label>
-            <input
-              type="text"
-              [(ngModel)]="currentVariant.sku"
-              class="form-control"
-              placeholder="Nhập SKU phân loại (vd: SKU-001-RED)"
-            />
+            <input type="text" [(ngModel)]="currentVariant.sku" class="form-control"
+              placeholder="Nhập SKU phân loại (vd: SKU-001-RED)" />
           </div>
 
           <div class="form-group">
             <label>Tên phân loại</label>
-            <input
-              type="text"
-              [(ngModel)]="currentVariant.name"
-              class="form-control"
-              placeholder="Nhập tên phân loại (vd: Màu đỏ - Size M)"
-            />
+            <input type="text" [(ngModel)]="currentVariant.name" class="form-control"
+              placeholder="Nhập tên phân loại (vd: Màu đỏ - Size M)" />
           </div>
         </div>
 
         <div class="form-group">
           <label>Hình ảnh phân loại</label>
-          <input
-            type="file"
-            id="variantImageInput"
-            accept="image/*"
-            (change)="onVariantImageSelected($event)"
-            style="display: none;"
-          />
-          
+          <input type="file" id="variantImageInput" accept="image/*" (change)="onVariantImageSelected($event)"
+            style="display: none;" />
+
           <!-- Upload Area or Preview -->
-          <div *ngIf="!variantImagePreview" 
-            class="variant-image-upload-area"
-            [class.dragging]="isVariantDragging"
-            (dragover)="onVariantDragOver($event)"
-            (dragleave)="onVariantDragLeave($event)"
-            (drop)="onVariantDrop($event)"
-            (click)="triggerVariantImageInput()"
-          >
+          <div *ngIf="!variantImagePreview" class="variant-image-upload-area" [class.dragging]="isVariantDragging"
+            (dragover)="onVariantDragOver($event)" (dragleave)="onVariantDragLeave($event)"
+            (drop)="onVariantDrop($event)" (click)="triggerVariantImageInput()">
             <div class="upload-content">
               <fa-icon [icon]="faImage" class="upload-icon"></fa-icon>
               <p class="upload-text">Kéo thả ảnh vào đây hoặc click để chọn</p>
               <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (Tối đa 5MB)</p>
             </div>
           </div>
-          
+
           <!-- Image Preview -->
           <div *ngIf="variantImagePreview" class="variant-image-preview-container">
             <div class="variant-image-preview">
               <img [src]="variantImagePreview" alt="Variant preview" />
               <div class="image-overlay">
-                <button 
-                  type="button" 
-                  class="btn-icon btn-change"
-                  (click)="triggerVariantImageInput()"
-                  title="Thay đổi ảnh"
-                >
+                <button type="button" class="btn-icon btn-change" (click)="triggerVariantImageInput()"
+                  title="Thay đổi ảnh">
                   <fa-icon [icon]="faImage"></fa-icon>
                 </button>
-                <button 
-                  type="button" 
-                  class="btn-icon btn-delete"
-                  (click)="removeVariantImage()"
-                  title="Xóa ảnh"
-                >
+                <button type="button" class="btn-icon btn-delete" (click)="removeVariantImage()" title="Xóa ảnh">
                   <fa-icon [icon]="faTrash"></fa-icon>
                 </button>
               </div>
             </div>
           </div>
-          
+
           <small class="form-hint">Để trống nếu sử dụng ảnh sản phẩm chính</small>
         </div>
       </div>
 
       <div class="form-section">
         <h4 class="subsection-title">Giá & Tồn kho</h4>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Giá bán <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentVariant.price"
-              class="form-control"
-              min="0"
-              step="1000"
-              placeholder="0"
-            />
+            <input type="number" [(ngModel)]="currentVariant.price" class="form-control" min="0" step="1000"
+              placeholder="0" />
           </div>
 
           <div class="form-group">
             <label>Giá giảm</label>
-            <input
-              type="number"
-              [(ngModel)]="currentVariant.discountPrice"
-              class="form-control"
-              min="0"
-              step="1000"
-              placeholder="0"
-            />
+            <input type="number" [(ngModel)]="currentVariant.discountPrice" class="form-control" min="0" step="1000"
+              placeholder="0" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Số lượng tồn kho <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentVariant.stockQuantity"
-              class="form-control"
-              min="0"
-              placeholder="0"
-            />
+            <input type="number" [(ngModel)]="currentVariant.stockQuantity" class="form-control" min="0"
+              placeholder="0" />
           </div>
 
           <div class="form-group">
             <label>Mức tồn tối thiểu <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentVariant.minStockLevel"
-              class="form-control"
-              min="0"
-              placeholder="10"
-            />
+            <input type="number" [(ngModel)]="currentVariant.minStockLevel" class="form-control" min="0"
+              placeholder="10" />
           </div>
         </div>
       </div>
 
       <div class="form-section">
         <h4 class="subsection-title">Thông tin vật lý</h4>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Trọng lượng (kg)</label>
-            <input
-              type="number"
-              [(ngModel)]="currentVariant.weight"
-              class="form-control"
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-            />
+            <input type="number" [(ngModel)]="currentVariant.weight" class="form-control" min="0" step="0.01"
+              placeholder="0.00" />
           </div>
 
           <div class="form-group">
             <label>Kích thước</label>
-            <input
-              type="text"
-              [(ngModel)]="currentVariant.dimensions"
-              class="form-control"
-              placeholder="DxRxC (mm)"
-            />
+            <input type="text" [(ngModel)]="currentVariant.dimensions" class="form-control" placeholder="DxRxC (mm)" />
           </div>
         </div>
 
         <div class="form-group">
           <label>Trạng thái <span class="required">*</span></label>
-          <select
-            [(ngModel)]="currentVariant.status"
-            class="form-control"
-          >
+          <select [(ngModel)]="currentVariant.status" class="form-control">
             <option [value]="1">Hoạt động</option>
             <option [value]="2">Nháp</option>
             <option [value]="3">Đã lưu trữ</option>

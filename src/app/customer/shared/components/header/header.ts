@@ -64,54 +64,6 @@ export class Header implements OnInit, OnChanges {
   cartCount$ = this.cartService.cartCount$;
   miniItems$ = this.cartService.cartItems$;
 
-  megaMenuItems: MegaMenuItem[] = [
-    {
-      label: 'Sản phẩm nổi bật',
-      items: [
-        [
-          {
-            label: 'Laptop',
-            items: [
-              { label: 'Lenovo' },
-              { label: 'Acer' },
-              { label: 'Asus' },
-              { label: 'Dell' },
-              { label: 'HP' },
-              { label: 'MSI' },
-              { label: 'Macbook' },
-            ],
-          },
-        ],
-        [
-          {
-            label: 'Làm đẹp và chăm sóc cá nhân',
-            items: [
-              { label: 'Chăm sóc da' },
-              { label: 'Trang điểm' },
-              { label: 'Chăm sóc tóc' },
-              { label: 'Nước hoa' },
-              { label: 'Dụng cụ làm đẹp' },
-              { label: 'Phụ kiện làm đẹp' },
-            ],
-          },
-        ],
-        [
-          {
-            label: 'Phụ kiện và thiết bị điện tử',
-            items: [
-              { label: 'Tai nghe' },
-              { label: 'Loa Bluetooth' },
-              { label: 'Sạc dự phòng' },
-              { label: 'Ốp lưng điện thoại' },
-              { label: 'Thiết bị thông minh' },
-              { label: 'Phụ kiện máy tính' },
-            ],
-          },
-        ],
-      ],
-    },
-  ];
-
   categoryMenuItems: MegaMenuItem[] = [
     {
       label: 'Danh mục sản phẩm',
