@@ -107,14 +107,8 @@
             {{ formatDate(order.createdAt) }}
           </td>
           <td class="text-center actions">
-            <button class="btn-icon btn-view" (click)="viewOrderDetail(order.orderId!)" appTooltip="Xem chi tiết">
-              <fa-icon [icon]="faEye"></fa-icon>
-            </button>
-            <button class="btn-icon btn-export" (click)="exportInvoice(order.orderId!)" appTooltip="Xuất hóa đơn PDF">
-              <fa-icon [icon]="faFileInvoice"></fa-icon>
-            </button>
-            <button class="btn-icon btn-delete" (click)="confirmDelete(order)" appTooltip="Xóa">
-              <fa-icon [icon]="faTrashCan"></fa-icon>
+            <button class="btn-icon btn-action-menu" (click)="showActionMenu($event, order)" appTooltip="Thao tác">
+              <fa-icon [icon]="faEllipsisVertical"></fa-icon>
             </button>
           </td>
         </tr>
@@ -206,6 +200,65 @@
 
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="closeModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Action Menu Popup -->
+<p-menu #actionMenu [model]="actionMenuItems" [popup]="true" appendTo="body" styleClass="action-menu"></p-menu>
+
+<!-- Modal cập nhật đơn hàng -->
+<div class="modal-overlay" *ngIf="isEditModalOpen" (click)="closeEditModal()">
+  <div class="modal-content edit-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <fa-icon [icon]="faPenToSquare"></fa-icon>
+        Cập nhật đơn hàng
+      </h3>
+      <button class="btn-close" (click)="closeEditModal()">
+        <fa-icon [icon]="faXmark"></fa-icon>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="editingOrder">
+      <div class="order-info-summary">
+        <div class="info-item">
+          <span class="info-label">Mã đơn hàng:</span>
+          <span class="info-value">{{ editingOrder.orderNumber || editingOrder.orderId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Khách hàng:</span>
+          <span class="info-value">{{ editingOrder.userName || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Tổng tiền:</span>
+          <span class="info-value amount">{{ formatCurrency(editingOrder.totalAmount) }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="orderStatus">Trạng thái đơn hàng <span class="required">*</span></label>
+        <select id="orderStatus" [(ngModel)]="editOrderStatus" class="form-control">
+          <option *ngFor="let status of getOrderStatusOptions()" [ngValue]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="status-preview">
+        <span class="preview-label">Trạng thái hiện tại:</span>
+        <span class="status-badge" [ngClass]="getStatusBadgeClass(editOrderStatus)">
+          {{ OrderStatusMapper.getOrderStatusDisplay(editOrderStatus) }}
+        </span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeEditModal()">Hủy</button>
+      <button class="btn btn-primary" (click)="saveOrderUpdate()" [disabled]="isLoading">
+        <span *ngIf="isLoading">Đang xử lý...</span>
+        <span *ngIf="!isLoading">Cập nhật</span>
+      </button>
     </div>
   </div>
 </div>

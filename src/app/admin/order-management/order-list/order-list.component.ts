@@ -1,11 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { LoadingOverlayComponent } from '../../layout/loading-overlay/loading-overlay.component';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MenuModule, Menu } from 'primeng/menu';
 import {
   faMagnifyingGlass,
   faPenToSquare,
@@ -23,6 +24,7 @@ import {
   faChevronRight,
   faRefresh,
   faFileInvoice,
+  faEllipsisVertical,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   OrderClient,
@@ -33,6 +35,7 @@ import {
   ResultOfBoolean,
   OrderDto,
   OrderDetailDto,
+  UpdateOrderStatusRequest,
 } from '../../../core/service/system-admin.service';
 import { TooltipDirective } from '@shared/directives/tooltip';
 import { OrderStatusMapper, OrderStatus, PaymentStatus, PaymentMethod } from '../models';
@@ -51,6 +54,7 @@ import { InvoicePdfService } from '../services/invoice-pdf.service';
     ToastModule,
     ConfirmDialogModule,
     TooltipDirective,
+    MenuModule,
   ],
   providers: [MessageService, ConfirmationService],
 })
@@ -77,6 +81,18 @@ export class OrderListComponent implements OnInit {
   faChevronRight = faChevronRight;
   faRefresh = faRefresh;
   faFileInvoice = faFileInvoice;
+  faEllipsisVertical = faEllipsisVertical;
+
+  // Menu
+  @ViewChild('actionMenu') actionMenu!: Menu;
+  actionMenuItems: MenuItem[] = [];
+  selectedOrderForAction: OrderDto | null = null;
+
+  // Edit modal
+  isEditModalOpen = false;
+  editingOrder: OrderDto | null = null;
+  editOrderStatus: number = 1;
+  editPaymentStatus: number = 1;
 
   orders: OrderDto[] = [];
   filteredOrders: OrderDto[] = [];
@@ -469,6 +485,125 @@ export class OrderListComponent implements OnInit {
         });
       },
     });
+  }
+
+  /**
+   * Hiển thị menu hành động
+   */
+  showActionMenu(event: Event, order: OrderDto): void {
+    this.selectedOrderForAction = order;
+    this.actionMenuItems = [
+      {
+        label: 'Xem chi tiết',
+        icon: 'pi pi-eye',
+        command: () => this.viewOrderDetail(order.orderId!),
+      },
+      {
+        label: 'Cập nhật đơn hàng',
+        icon: 'pi pi-pencil',
+        command: () => this.openEditModal(order),
+      },
+      {
+        label: 'Xuất hóa đơn PDF',
+        icon: 'pi pi-file-pdf',
+        command: () => this.exportInvoice(order.orderId!),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Xóa đơn hàng',
+        icon: 'pi pi-trash',
+        styleClass: 'menu-item-danger',
+        command: () => this.confirmDelete(order),
+      },
+    ];
+    this.actionMenu.toggle(event);
+  }
+
+  /**
+   * Mở modal cập nhật đơn hàng
+   */
+  openEditModal(order: OrderDto): void {
+    this.editingOrder = order;
+    this.editOrderStatus = order.status || 1;
+    this.editPaymentStatus = order.paymentStatus || 1;
+    this.isEditModalOpen = true;
+  }
+
+  /**
+   * Đóng modal cập nhật
+   */
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+    this.editingOrder = null;
+  }
+
+  /**
+   * Lưu cập nhật đơn hàng
+   */
+  saveOrderUpdate(): void {
+    if (!this.editingOrder?.orderId) return;
+
+    this.isLoading = true;
+    const request = new UpdateOrderStatusRequest({
+      status: this.editOrderStatus,
+    });
+
+    this.orderClient.updateStatus(this.editingOrder.orderId, request).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response.isSuccess !== false) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Thành công',
+            detail: 'Cập nhật đơn hàng thành công!',
+          });
+          this.closeEditModal();
+          this.loadOrders();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: response.errorMessage || 'Cập nhật thất bại',
+          });
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Lỗi:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Không thể cập nhật đơn hàng!',
+        });
+      },
+    });
+  }
+
+  /**
+   * Lấy danh sách trạng thái đơn hàng
+   */
+  getOrderStatusOptions(): { value: number; label: string }[] {
+    return [
+      { value: 1, label: 'Chờ xử lý' },
+      { value: 2, label: 'Đang xử lý' },
+      { value: 3, label: 'Đang giao hàng' },
+      { value: 4, label: 'Hoàn thành' },
+      { value: 5, label: 'Đã hủy' },
+    ];
+  }
+
+  /**
+   * Lấy danh sách trạng thái thanh toán
+   */
+  getPaymentStatusOptions(): { value: number; label: string }[] {
+    return [
+      { value: 1, label: 'Chờ thanh toán' },
+      { value: 2, label: 'Đã thanh toán' },
+      { value: 3, label: 'Thanh toán thất bại' },
+      { value: 4, label: 'Đã hoàn tiền' },
+    ];
   }
 }
 
