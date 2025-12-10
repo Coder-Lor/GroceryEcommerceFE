@@ -46,11 +46,11 @@ const scrollOpts: InMemoryScrollingOptions = {
 };
 
 export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: '',
     component: CustomerPage,
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
       { path: 'cart', component: Cart },
       { path: 'login', component: Login },
