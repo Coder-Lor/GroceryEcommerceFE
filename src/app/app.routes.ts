@@ -50,7 +50,7 @@ export const routes: Routes = [
   {
     path: '',
     component: CustomerPage,
-    redirectTo: '/home',
+    // redirectTo: '/home',
     children: [
       { path: 'home', component: Home },
       { path: 'cart', component: Cart },
