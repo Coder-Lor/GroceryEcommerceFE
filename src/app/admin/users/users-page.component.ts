@@ -104,6 +104,7 @@ export class UsersPageComponent implements OnInit {
   users: UserData[] = [];
   filteredUsers: UserData[] = [];
   selectedUser: UserData | null = null;
+  selectedUsers: string[] = []; // Track selected user IDs
   isLoading = false;
   isDetailModalOpen = false;
   isEditModalOpen = false;
@@ -145,7 +146,7 @@ export class UsersPageComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private userRoleAssignmentClient: UserRoleAssignmentClient,
     private userRoleClient: UserRoleClient
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -683,5 +684,146 @@ export class UsersPageComponent implements OnInit {
       pages.push(i);
     }
     return pages;
+  }
+
+  /**
+   * Kiểm tra xem user có được chọn không
+   */
+  isUserSelected(userId: string): boolean {
+    return this.selectedUsers.includes(userId);
+  }
+
+  /**
+   * Toggle chọn một user
+   */
+  toggleUserSelection(userId: string): void {
+    const index = this.selectedUsers.indexOf(userId);
+    if (index > -1) {
+      this.selectedUsers.splice(index, 1);
+    } else {
+      this.selectedUsers.push(userId);
+    }
+  }
+
+  /**
+   * Kiểm tra xem tất cả đã được chọn chưa
+   */
+  isAllSelected(): boolean {
+    return this.filteredUsers.length > 0 &&
+      this.filteredUsers.every(user => this.selectedUsers.includes(user.userId!));
+  }
+
+  /**
+   * Kiểm tra trạng thái indeterminate (một số được chọn)
+   */
+  isIndeterminate(): boolean {
+    const selectedCount = this.filteredUsers.filter(user =>
+      this.selectedUsers.includes(user.userId!)
+    ).length;
+    return selectedCount > 0 && selectedCount < this.filteredUsers.length;
+  }
+
+  /**
+   * Toggle chọn tất cả
+   */
+  toggleSelectAll(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      // Chọn tất cả users trong filteredUsers
+      this.filteredUsers.forEach(user => {
+        if (user.userId && !this.selectedUsers.includes(user.userId)) {
+          this.selectedUsers.push(user.userId);
+        }
+      });
+    } else {
+      // Bỏ chọn tất cả users trong filteredUsers
+      this.filteredUsers.forEach(user => {
+        const index = this.selectedUsers.indexOf(user.userId!);
+        if (index > -1) {
+          this.selectedUsers.splice(index, 1);
+        }
+      });
+    }
+  }
+
+  /**
+   * Xóa tất cả lựa chọn
+   */
+  clearSelection(): void {
+    this.selectedUsers = [];
+  }
+
+  /**
+   * Xác nhận xóa hàng loạt
+   */
+  confirmBulkDelete(): void {
+    const count = this.selectedUsers.length;
+    this.confirmationService.confirm({
+      message: `Bạn có chắc chắn muốn xóa <strong>${count} người dùng</strong> đã chọn? Hành động này không thể hoàn tác!`,
+      header: 'Xác nhận xóa hàng loạt',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.bulkDeleteUsers();
+      },
+    });
+  }
+
+  /**
+   * Xóa hàng loạt users
+   */
+  bulkDeleteUsers(): void {
+    this.isLoading = true;
+    let completedCount = 0;
+    let successCount = 0;
+    let failCount = 0;
+    const totalCount = this.selectedUsers.length;
+
+    this.selectedUsers.forEach(userId => {
+      this.userService.delete(
+        userId,
+        (result: ResultOfBoolean) => {
+          completedCount++;
+          if (this.userService.isSuccess(result)) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+
+          // Kiểm tra xem đã hoàn thành tất cả chưa
+          if (completedCount === totalCount) {
+            this.isLoading = false;
+            this.selectedUsers = [];
+
+            if (successCount > 0) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: `Đã xóa thành công ${successCount} người dùng!`,
+              });
+            }
+
+            if (failCount > 0) {
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Cảnh báo',
+                detail: `${failCount} người dùng không thể xóa!`,
+              });
+            }
+
+            this.loadUsers();
+          }
+        },
+        (error) => {
+          completedCount++;
+          failCount++;
+
+          if (completedCount === totalCount) {
+            this.isLoading = false;
+            this.selectedUsers = [];
+            this.loadUsers();
+          }
+        }
+      );
+    });
   }
 }

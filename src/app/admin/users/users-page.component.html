@@ -4,20 +4,27 @@
 <div class="users-container">
   <!-- Toast messages -->
   <p-toast></p-toast>
-  
+
   <!-- Confirm Dialog -->
-  <p-confirmDialog
-    [style]="{width: '450px'}"
-    [baseZIndex]="10000"
-    [closable]="true"
-    [closeOnEscape]="true"
-    acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text">
+  <p-confirmDialog [style]="{width: '450px'}" [baseZIndex]="10000" [closable]="true" [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary p-button-text">
   </p-confirmDialog>
-  
+
   <div class="page-header">
     <h2>Quản lý người dùng</h2>
     <div class="header-actions">
+      <!-- Bulk actions - hiển thị khi có item được chọn -->
+      <div class="bulk-actions" *ngIf="selectedUsers.length > 0">
+        <span class="selected-count">Đã chọn {{ selectedUsers.length }} người dùng</span>
+        <button class="btn btn-danger" (click)="confirmBulkDelete()" appTooltip="Xóa các mục đã chọn">
+          <fa-icon [icon]="faTrashCan"></fa-icon>
+          Xóa đã chọn
+        </button>
+        <button class="btn btn-secondary" (click)="clearSelection()" appTooltip="Bỏ chọn tất cả">
+          <fa-icon [icon]="faXmark"></fa-icon>
+          Bỏ chọn
+        </button>
+      </div>
       <button class="btn btn-info" (click)="loadUsers()" appTooltip="Tải lại">
         <fa-icon [icon]="faUser" size="1x"></fa-icon>
       </button>
@@ -28,17 +35,10 @@
   <div class="search-box">
     <div class="search-wrapper">
       <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        (input)="filterUsers()"
-        placeholder="Tìm kiếm theo username, email, họ tên, số điện thoại..."
-        class="search-input"
-      />
+      <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()"
+        placeholder="Tìm kiếm theo username, email, họ tên, số điện thoại..." class="search-input" />
     </div>
-    <span class="search-result"
-      >Hiển thị {{ filteredUsers.length }} / {{ users.length }} người dùng</span
-    >
+    <span class="search-result">Hiển thị {{ filteredUsers.length }} / {{ users.length }} người dùng</span>
   </div>
 
   <!-- Bảng danh sách người dùng -->
@@ -46,16 +46,22 @@
     <table class="user-table">
       <thead>
         <tr>
+          <th class="checkbox-column">
+            <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isIndeterminate()"
+              (change)="toggleSelectAll($event)" class="select-checkbox" appTooltip="Chọn tất cả" />
+          </th>
           <th (click)="changeSortColumn('username')" class="sortable">
             Username
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'username' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'username' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th (click)="changeSortColumn('email')" class="sortable">
             Email
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'email' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'email' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th>Họ tên</th>
@@ -63,21 +69,27 @@
           <th (click)="changeSortColumn('status')" class="sortable text-center">
             Trạng thái
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'status' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'status' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th class="text-center">Email xác thực</th>
           <th (click)="changeSortColumn('createdAt')" class="sortable text-center">
             Ngày tạo
             <span class="sort-icon">
-              <fa-icon [icon]="sortColumn === 'createdAt' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+              <fa-icon
+                [icon]="sortColumn === 'createdAt' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
             </span>
           </th>
           <th class="text-center">Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of filteredUsers">
+        <tr *ngFor="let user of filteredUsers" [class.selected-row]="isUserSelected(user.userId!)">
+          <td class="checkbox-column">
+            <input type="checkbox" [checked]="isUserSelected(user.userId!)" (change)="toggleUserSelection(user.userId!)"
+              class="select-checkbox" (click)="$event.stopPropagation()" />
+          </td>
           <td>
             <div class="user-name">
               <fa-icon [icon]="faUser" class="user-icon"></fa-icon>
@@ -127,7 +139,7 @@
           </td>
         </tr>
         <tr *ngIf="filteredUsers.length === 0">
-          <td colspan="8" class="no-data">Không tìm thấy người dùng nào</td>
+          <td colspan="9" class="no-data">Không tìm thấy người dùng nào</td>
         </tr>
       </tbody>
     </table>
@@ -139,12 +151,7 @@
       <span>Hiển thị trang {{ currentPage }} / {{ totalPages }}</span>
       <div class="page-size-selector">
         <label for="pageSize">Số người dùng mỗi trang:</label>
-        <select
-          id="pageSize"
-          [(ngModel)]="pageSize"
-          (change)="onPageSizeChange()"
-          class="page-size-select"
-        >
+        <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
           <option [value]="10">10</option>
           <option [value]="20">20</option>
           <option [value]="50">50</option>
@@ -154,50 +161,29 @@
     </div>
 
     <div class="pagination-controls">
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(1)"
-        [disabled]="currentPage === 1"
-        appTooltip="Trang đầu"
-      >
+      <button class="btn-pagination" (click)="onPageChange(1)" [disabled]="currentPage === 1" appTooltip="Trang đầu">
         <fa-icon [icon]="faAnglesLeft"></fa-icon>
       </button>
 
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(currentPage - 1)"
-        [disabled]="currentPage === 1"
-        appTooltip="Trang trước"
-      >
+      <button class="btn-pagination" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+        appTooltip="Trang trước">
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
 
       <div class="page-numbers">
-        <button
-          *ngFor="let page of getPageNumbers()"
-          class="btn-page"
-          [class.active]="page === currentPage"
-          (click)="onPageChange(page)"
-        >
+        <button *ngFor="let page of getPageNumbers()" class="btn-page" [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
           {{ page }}
         </button>
       </div>
 
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(currentPage + 1)"
-        [disabled]="currentPage === totalPages"
-        appTooltip="Trang sau"
-      >
+      <button class="btn-pagination" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages"
+        appTooltip="Trang sau">
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>
 
-      <button
-        class="btn-pagination"
-        (click)="onPageChange(totalPages)"
-        [disabled]="currentPage === totalPages"
-        appTooltip="Trang cuối"
-      >
+      <button class="btn-pagination" (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages"
+        appTooltip="Trang cuối">
         <fa-icon [icon]="faAnglesRight"></fa-icon>
       </button>
     </div>
@@ -297,32 +283,18 @@
         <label>
           Username <span class="required">*</span>
         </label>
-        <input 
-          type="text" 
-          class="form-control" 
-          [(ngModel)]="editForm.username" 
-          placeholder="Nhập username" 
-        />
+        <input type="text" class="form-control" [(ngModel)]="editForm.username" placeholder="Nhập username" />
       </div>
       <div class="form-group">
         <label>
           Email <span class="required">*</span>
         </label>
-        <input 
-          type="email" 
-          class="form-control" 
-          [(ngModel)]="editForm.email" 
-          placeholder="Nhập email" 
-        />
+        <input type="email" class="form-control" [(ngModel)]="editForm.email" placeholder="Nhập email" />
       </div>
       <div class="form-group">
         <label>Mật khẩu mới (để trống nếu không đổi)</label>
-        <input 
-          type="password" 
-          class="form-control" 
-          [(ngModel)]="editForm.passwordHash" 
-          placeholder="Nhập mật khẩu mới" 
-        />
+        <input type="password" class="form-control" [(ngModel)]="editForm.passwordHash"
+          placeholder="Nhập mật khẩu mới" />
       </div>
     </div>
 
@@ -363,11 +335,7 @@
         <h4>Chọn vai trò:</h4>
         <div class="roles-grid">
           <label class="role-checkbox" *ngFor="let role of availableRoles">
-            <input 
-              type="checkbox" 
-              [checked]="isRoleSelected(role.roleId!)"
-              (change)="toggleRole(role.roleId!)"
-            />
+            <input type="checkbox" [checked]="isRoleSelected(role.roleId!)" (change)="toggleRole(role.roleId!)" />
             <span class="role-name">{{ role.roleName }}</span>
             <span class="role-description" *ngIf="role.description">{{ role.description }}</span>
           </label>
