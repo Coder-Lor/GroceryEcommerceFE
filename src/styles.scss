@@ -9,7 +9,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  user-select: none;
+  // user-select: none;
 }
 
 body {
@@ -192,7 +192,8 @@ swiper-container::part(button-prev).swiper-button-disabled {
 /* styles.scss */
 
 .btn {
-  position: relative; /* rất quan trọng để ::after định vị đúng */
+  position: relative;
+  /* rất quan trọng để ::after định vị đúng */
   padding: 10px 20px;
   align-items: center;
   justify-content: center;
