@@ -50,7 +50,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
 
     // Gemini AI
     private ai = new GoogleGenAI({
-        apiKey: 'AIzaSyAeawecfMakGZ2v2N7DC2dSS7RLP9JJt5w'
+        apiKey: 'AIzaSyBfnLfv5Rmjq0vFBkTCGCiSIEY-wTjqQog'
     });
 
     ngOnInit(): void {

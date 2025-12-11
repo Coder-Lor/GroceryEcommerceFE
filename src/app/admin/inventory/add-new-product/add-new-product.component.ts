@@ -104,7 +104,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   // Gemini AI
   geminiRes: any = "Không có dữ liệu";
   ai = new GoogleGenAI({
-    apiKey: "AIzaSyAeawecfMakGZ2v2N7DC2dSS7RLP9JJt5w"
+    apiKey: "AIzaSyBfnLfv5Rmjq0vFBkTCGCiSIEY-wTjqQog"
   });
   isGeneratingWithAI: boolean = false;
 
