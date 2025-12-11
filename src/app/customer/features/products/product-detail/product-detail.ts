@@ -6,11 +6,12 @@ import { GalleriaModule } from 'primeng/galleria';
 import { ImageModule } from 'primeng/image';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { ProductClient, GetProductBySlugResponse } from '@core/service/system-admin.service';
+import { ProductClient, GetProductBySlugResponse, ProductBaseResponse, FilterCriteria, FilterOperator, SortDirection } from '@core/service/system-admin.service';
 import { CartService } from '@core/service/cart.service';
 import { Subject, takeUntil, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/service/auth.service';
+import { ProductCard } from '../../../shared/components/product-card/product-card';
 
 interface Review {
   id: number;
@@ -37,6 +38,7 @@ interface ProductImage {
     GalleriaModule,
     ImageModule,
     ToastModule,
+    ProductCard,
   ],
   providers: [MessageService],
   templateUrl: './product-detail.html',
@@ -53,6 +55,10 @@ export class ProductDetail implements OnInit, OnDestroy {
 
   product: GetProductBySlugResponse | null = null;
   isLoading: boolean = true;
+
+  // Related products
+  relatedProducts: ProductBaseResponse[] = [];
+  isLoadingRelated: boolean = false;
 
   isFavorite: boolean = false;
   selectedValue: string = '500';
@@ -113,6 +119,8 @@ export class ProductDetail implements OnInit, OnDestroy {
           if (response?.isSuccess && response?.data) {
             this.product = response.data;
             this.prepareProductImages();
+            // Load related products after getting current product
+            this.loadRelatedProducts();
           } else {
             console.error('❌ Failed to load product:', response?.errorMessage);
             // Có thể redirect về trang home hoặc hiển thị thông báo lỗi
@@ -126,6 +134,63 @@ export class ProductDetail implements OnInit, OnDestroy {
           // this.router.navigate(['/home']);
         },
       });
+  }
+
+  // Load related products (same category)
+  loadRelatedProducts(): void {
+    if (!this.product?.categoryId) return;
+
+    this.isLoadingRelated = true;
+
+    // Create filter to get products in same category
+    const categoryFilter = new FilterCriteria({
+      fieldName: 'CategoryId',
+      operator: FilterOperator.Equals,
+      value: this.product.categoryId,
+    });
+    const filters: FilterCriteria[] = [categoryFilter];
+
+    this.productClient
+      .getProductsPaging(
+        1, // page
+        8, // pageSize - lấy 8 sản phẩm
+        undefined, // search
+        undefined, // sortBy
+        SortDirection.Ascending, // sortDirection
+        filters, // filters
+        undefined, // entityType
+        undefined, // availableFields
+        true, // hasFilters
+        false, // hasSearch
+        false // hasSorting
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response?.isSuccess && response?.data?.items) {
+            // Filter out the current product from related products
+            this.relatedProducts = response.data.items.filter(
+              (p) => p.productId !== this.product?.productId
+            );
+          }
+          this.isLoadingRelated = false;
+        },
+        error: (err) => {
+          console.error('❌ Error loading related products:', err);
+          this.isLoadingRelated = false;
+        },
+      });
+  }
+
+  // Get severity for product tag (discount badge)
+  getSeverity(product: ProductBaseResponse): string {
+    if (!product.discountPrice || product.discountPrice >= product.price!) {
+      return 'secondary';
+    }
+    const discountPercent = ((product.price! - product.discountPrice) / product.price!) * 100;
+    if (discountPercent >= 30) return 'danger';
+    if (discountPercent >= 15) return 'warn';
+    return 'success';
   }
 
   prepareProductImages(): void {

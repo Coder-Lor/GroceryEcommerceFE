@@ -53,7 +53,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     MessageService,
     ConfirmationService,
-    // { provide: API_BASE_URL, useValue: 'https://localhost:44394' }
-    { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
+    { provide: API_BASE_URL, useValue: 'https://localhost:44394' }
+    // { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
   ],
 };

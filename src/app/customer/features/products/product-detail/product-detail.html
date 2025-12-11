@@ -34,46 +34,24 @@
       <!-- Left: Image Gallery -->
       <div class="col-lg-6 col-md-12">
         <div class="product-gallery">
-          <p-galleria
-            [value]="productImages"
-            [(activeIndex)]="activeIndex"
-            [responsiveOptions]="responsiveOptions"
-            [containerStyle]="{ width: '100%', 'max-width': '100%' }"
-            [numVisible]="5"
-            [circular]="true"
-            [showItemNavigators]="false"
-            [showThumbnails]="productImages.length > 1"
-            [showIndicators]="false"
-            [showItemNavigatorsOnHover]="false"
-            [showThumbnailNavigators]="true"
-            [thumbnailsPosition]="'bottom'"
-            [autoPlay]="false"
-            [transitionInterval]="3000"
-          >
+          <p-galleria [value]="productImages" [(activeIndex)]="activeIndex" [responsiveOptions]="responsiveOptions"
+            [containerStyle]="{ width: '100%', 'max-width': '100%' }" [numVisible]="5" [circular]="true"
+            [showItemNavigators]="false" [showThumbnails]="productImages.length > 1" [showIndicators]="false"
+            [showItemNavigatorsOnHover]="false" [showThumbnailNavigators]="true" [thumbnailsPosition]="'bottom'"
+            [autoPlay]="false" [transitionInterval]="3000">
             <ng-template pTemplate="item" let-item>
               <div class="gallery-item">
-                <p-image
-                  [src]="item.itemImageSrc"
-                  [alt]="item.alt"
-                  [preview]="true"
-                  [imageStyle]="{
+                <p-image [src]="item.itemImageSrc" [alt]="item.alt" [preview]="true" [imageStyle]="{
                     width: '100%',
                     height: '480px',
                     'max-height': '480px',
                     'object-fit': 'cover'
-                  }"
-                  imageClass="gallery-main-image"
-                />
+                  }" imageClass="gallery-main-image" />
               </div>
             </ng-template>
             <ng-template pTemplate="thumbnail" let-item>
               <div class="gallery-thumbnail">
-                <img
-                  [src]="item.thumbnailImageSrc"
-                  [alt]="item.alt"
-                  [title]="item.title"
-                  class="thumbnail-image"
-                />
+                <img [src]="item.thumbnailImageSrc" [alt]="item.alt" [title]="item.title" class="thumbnail-image" />
               </div>
             </ng-template>
           </p-galleria>
@@ -84,7 +62,7 @@
       <div class="col-lg-6 col-md-12">
         <div class="product-info">
           <h1 class="product-name">{{ product.name }}</h1>
-          
+
           <!-- Selected Variant Info -->
           @if (selectedVariantId && getSelectedVariant()) {
           <div class="selected-variant-info mb-3 p-2 bg-light rounded d-flex align-items-center gap-2">
@@ -107,22 +85,17 @@
             <h5 class="variant-title mb-3"><i class="pi pi-box me-2"></i>Phân loại</h5>
 
             <div class="variant-options d-flex gap-3 mt-3 flex-wrap">
-              @if (product.variants.length > 0){ 
-                @for (item of product.variants; track item.productVariantId) {
-                  <span 
-                    class="variant-option" 
-                    [class.active]="selectedVariantId === item.productVariantId"
-                    role="button" 
-                    tabindex="0"
-                    (click)="selectVariant(item.productVariantId!)"
-                    (keydown.enter)="selectVariant(item.productVariantId!)"
-                    (keydown.space)="selectVariant(item.productVariantId!)"
-                  >
-                    <span class="variant-text">{{ item.name }}</span>
-                  </span>
-                } 
+              @if (product.variants.length > 0){
+              @for (item of product.variants; track item.productVariantId) {
+              <span class="variant-option" [class.active]="selectedVariantId === item.productVariantId" role="button"
+                tabindex="0" (click)="selectVariant(item.productVariantId!)"
+                (keydown.enter)="selectVariant(item.productVariantId!)"
+                (keydown.space)="selectVariant(item.productVariantId!)">
+                <span class="variant-text">{{ item.name }}</span>
+              </span>
+              }
               } @else {
-                <span class="text-muted">Không có phân loại.</span>
+              <span class="text-muted">Không có phân loại.</span>
               }
             </div>
           </div>
@@ -138,8 +111,8 @@
                 <span class="discount-badge">
                   <span class="discount-text">
                     -{{
-                      ((getOriginalPrice() - getDiscountPrice()!) / getOriginalPrice()) * 100
-                        | number : '1.0-0'
+                    ((getOriginalPrice() - getDiscountPrice()!) / getOriginalPrice()) * 100
+                    | number : '1.0-0'
                     }}%
                   </span>
                 </span>
@@ -155,29 +128,14 @@
             <div class="quantity-selector mb-3">
               <label class="form-label fw-semibold">Số lượng:</label>
               <div class="d-flex align-items-center gap-2">
-                <button
-                  class="btn btn-sm btn-outline-secondary"
-                  (click)="quantity = quantity > 1 ? quantity - 1 : 1"
-                  type="button"
-                  [disabled]="getStockQuantity() <= 0"
-                >
+                <button class="btn btn-sm btn-outline-secondary" (click)="quantity = quantity > 1 ? quantity - 1 : 1"
+                  type="button" [disabled]="getStockQuantity() <= 0">
                   <i class="pi pi-minus"></i>
                 </button>
-                <input
-                  type="number"
-                  class="form-control text-center"
-                  style="max-width: 80px"
-                  [(ngModel)]="quantity"
-                  min="1"
-                  [max]="getStockQuantity()"
-                  [disabled]="getStockQuantity() <= 0"
-                />
-                <button
-                  class="btn btn-sm btn-outline-secondary"
-                  (click)="quantity = quantity + 1"
-                  type="button"
-                  [disabled]="getStockQuantity() <= 0 || quantity >= getStockQuantity()"
-                >
+                <input type="number" class="form-control text-center" style="max-width: 80px" [(ngModel)]="quantity"
+                  min="1" [max]="getStockQuantity()" [disabled]="getStockQuantity() <= 0" />
+                <button class="btn btn-sm btn-outline-secondary" (click)="quantity = quantity + 1" type="button"
+                  [disabled]="getStockQuantity() <= 0 || quantity >= getStockQuantity()">
                   <i class="pi pi-plus"></i>
                 </button>
               </div>
@@ -187,18 +145,12 @@
             </div>
 
             <div class="action-buttons d-flex gap-3 flex-wrap">
-              <button
-                class="btn btn-warning text-dark fw-semibold px-4 rounded btn-checkout flex-grow-1"
-                (click)="navigationToCheckout()"
-                [disabled]="getStockQuantity() <= 0"
-              >
+              <button class="btn btn-warning text-dark fw-semibold px-4 rounded btn-checkout flex-grow-1"
+                (click)="navigationToCheckout()" [disabled]="getStockQuantity() <= 0">
                 <i class="pi pi-credit-card me-2"></i>Mua ngay
               </button>
-              <button
-                class="btn border rounded add-to-cart-button flex-grow-1"
-                (click)="addToCart()"
-                [disabled]="getStockQuantity() <= 0"
-              >
+              <button class="btn border rounded add-to-cart-button flex-grow-1" (click)="addToCart()"
+                [disabled]="getStockQuantity() <= 0">
                 <i class="pi pi-shopping-cart me-2"></i>Thêm vào giỏ
               </button>
             </div>
@@ -210,12 +162,11 @@
 
   <!-- Tabs Section -->
   <div class="container product-tabs mt-5">
-    <p-tabs value="2">
+    <p-tabs value="0">
       <p-tablist>
-        <p-tab value="0">Description</p-tab>
-        <p-tab value="1">Features</p-tab>
-        <p-tab value="2">Review (1100)</p-tab>
-        <p-tab value="3">Similar</p-tab>
+        <p-tab value="0">Mô tả</p-tab>
+        <p-tab value="2">Đánh giá</p-tab>
+        <p-tab value="3">Sản phẩm tương tự</p-tab>
       </p-tablist>
       <p-tabpanels>
         <p-tabpanel value="0">
@@ -239,9 +190,7 @@
               <p>
                 <strong>Trạng thái:</strong>
                 @if (product.stockQuantity > 0) {
-                <span class="badge bg-success"
-                  >Còn hàng ({{ product.stockQuantity }} sản phẩm)</span
-                >
+                <span class="badge bg-success">Còn hàng ({{ product.stockQuantity }} sản phẩm)</span>
                 } @else {
                 <span class="badge bg-danger">Hết hàng</span>
                 }
@@ -249,19 +198,10 @@
             </div>
           </div>
         </p-tabpanel>
-        <p-tabpanel value="1">
-          <p class="m-0">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-            laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-            architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas
-            sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
-            voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-          </p>
-        </p-tabpanel>
         <p-tabpanel value="2">
           <div class="reviews-section mt-2">
             <div class="reviews-title d-flex justify-content-between align-items-center">
-              <h4 class="mb-0 fw-semibold text-dark">What our customers are saying</h4>
+              <h4 class="mb-0 fw-semibold text-dark">Những gì khách hàng khác đang bình luận...</h4>
               <button class="filter d-flex align-items-center gap-2">
                 <i class="pi pi-filter"></i> Filter
               </button>
@@ -274,9 +214,7 @@
                   <img class="reviewer-avatar rounded-circle" src="ellipse-610.png" alt="avatar" />
                   <div class="reviewer-info flex-grow-1">
                     <div class="review-header mb-2">
-                      <div
-                        class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between"
-                      >
+                      <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
                         <span class="reviewer-name fw-semibold text-dark">Mariya Lykra</span>
                         <div class="stars d-flex">
                           <img src="icons/Star.svg" alt="" />
@@ -302,9 +240,7 @@
                   <img class="reviewer-avatar rounded-circle" src="ellipse-611.png" alt="avatar" />
                   <div class="reviewer-info flex-grow-1">
                     <div class="review-header mb-2">
-                      <div
-                        class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between"
-                      >
+                      <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between">
                         <span class="reviewer-name fw-semibold text-dark">Moris Willson</span>
                         <div class="stars d-flex">
                           <img src="icons/Star.svg" alt="" />
@@ -327,14 +263,31 @@
           </div>
         </p-tabpanel>
         <p-tabpanel value="3">
-          <p class="m-0">
-            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium
-            voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint
-            occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt
-            mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et
-            expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque
-            nihil impedit quo minus.
-          </p>
+          <div class="related-products-section">
+
+            @if (isLoadingRelated) {
+            <div class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Đang tải...</span>
+              </div>
+              <p class="mt-2 text-muted small">Đang tải sản phẩm tương tự...</p>
+            </div>
+            } @else if (relatedProducts.length === 0) {
+            <div class="text-center py-4">
+              <i class="pi pi-box text-muted" style="font-size: 2rem"></i>
+              <p class="mt-2 text-muted">Không có sản phẩm tương tự</p>
+            </div>
+            } @else {
+            <div class="row g-3">
+              @for (relatedProduct of relatedProducts; track relatedProduct.productId) {
+              <div class="col-6 col-md-4 col-lg-3">
+                <product-card [product]="relatedProduct" [layout]="'grid'" [getSeverity]="getSeverity">
+                </product-card>
+              </div>
+              }
+            </div>
+            }
+          </div>
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
