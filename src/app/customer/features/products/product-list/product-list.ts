@@ -45,6 +45,7 @@ export class ProductList implements OnInit, OnDestroy {
   products: any[] = [];
   totalRecords: number = 0;
   keyword: string = '';
+  categoryId: string = '';
 
   onPageChange(event: PaginatorState) {
     const newFirst = event.first ?? 0;
@@ -52,7 +53,12 @@ export class ProductList implements OnInit, OnDestroy {
     const page = Math.floor(newFirst / newRows) + 1;
     const size = newRows;
     this.router.navigate(['/category'], {
-      queryParams: { search: this.keyword || null, page, size },
+      queryParams: {
+        search: this.keyword || null,
+        page,
+        size,
+        categoryId: this.categoryId || null
+      },
       queryParamsHandling: 'merge',
     });
   }
@@ -110,10 +116,11 @@ export class ProductList implements OnInit, OnDestroy {
     // React to query params changes
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       this.keyword = (params['search'] ?? '').toString().trim();
+      this.categoryId = (params['categoryId'] ?? '').toString().trim();
       const page = +(params['page'] ?? 1);
       const size = +(params['size'] ?? this.rows);
       this.first = (page - 1) * size;
-      this.inventoryService.loadProducts(page, size, this.keyword || undefined);
+      this.inventoryService.loadProducts(page, size, this.keyword || undefined, this.categoryId || undefined);
     });
   }
 

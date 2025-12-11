@@ -1,20 +1,10 @@
 @if(layout === 'grid') {
 <div class="card h-100 border-1 shadow-sm bg-white">
-  <div
-    class="rounded-top d-flex justify-content-center p-3 position-relative"
-    (click)="navigationToDetailPage()"
-  >
-    <img
-      [src]="product?.primaryImageUrl"
-      [alt]="product?.images[0]?.altText"
-      class="img-fluid rounded"
-      style="max-width: 200px; min-height: 200px"
-    />
-    <p-tag
-      [value]="getDiscountPercent(product.price, product.discountPrice).toString() | percent"
-      [severity]="getSeverity(product)"
-      class="position-absolute top-0 start-0 m-2"
-    ></p-tag>
+  <div class="rounded-top d-flex justify-content-center p-3 position-relative" (click)="navigationToDetailPage()">
+    <img [src]="product?.primaryImageUrl" [alt]="product?.images[0]?.altText" class="img-fluid rounded"
+      style="max-width: 200px; min-height: 200px" />
+    <p-tag [value]="getDiscountPercent(product.price, product.discountPrice).toString() | percent"
+      [severity]="getSeverity(product)" class="position-absolute top-0 start-0 m-2"></p-tag>
   </div>
   <div class="card-body d-flex flex-column">
     <div class="d-block justify-content-between">
@@ -31,7 +21,7 @@
     <div class="mt-3">
       <small class="text-muted" style="text-decoration: line-through">{{
         product.price | currency : 'VND' : 'symbol' : '1.0-0'
-      }}</small>
+        }}</small>
       <h5 class="fw-semibold">
         {{ product.discountPrice | currency : 'VND' : 'symbol' : '1.0-0' }}
       </h5>

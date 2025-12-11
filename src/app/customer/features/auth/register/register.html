@@ -8,11 +8,8 @@
       <img src="/images/background.png" alt="Banner đăng ký" class="register-banner" />
       <div class="register-left-content">
         <h3>
-          <img
-            src="/icons/Icon.svg"
-            alt="Biểu tượng GroceryMart"
-            style="width: 28px; height: 28px; margin-bottom: 5px"
-          />
+          <img src="/icons/Icon.svg" alt="Biểu tượng GroceryMart"
+            style="width: 28px; height: 28px; margin-bottom: 5px" />
           GroceryMart
         </h3>
         <p>Sản phẩm tạp hóa cao cấp, chất lượng &amp; đáng tin cậy.</p>
@@ -27,17 +24,11 @@
         <!-- Email -->
         <div class="form-group position-relative">
           <div class="input">
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="Nhập email của bạn"
-              class="form-control input-with-icon"
-            />
+            <input type="email" formControlName="email" placeholder="Nhập email của bạn"
+              class="form-control input-with-icon" />
             <i class="pi pi-envelope input-icon"></i>
           </div>
-          <small
-            *ngIf="registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched"
-          >
+          <small *ngIf="registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched">
             *Không được bỏ trống.
           </small>
           @if (registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.dirty) {
@@ -47,12 +38,8 @@
         <!-- Username -->
         <div class="form-group position-relative">
           <div class="input">
-            <input
-              type="text"
-              formControlName="username"
-              placeholder="Nhập tên người dùng"
-              class="form-control input-with-icon"
-            />
+            <input type="text" formControlName="username" placeholder="Nhập tên người dùng"
+              class="form-control input-with-icon" />
             <i class="pi pi-user input-icon"></i>
           </div>
           @if(registerForm.get('username')?.errors?.['required'] &&
@@ -67,17 +54,10 @@
         <!-- Password -->
         <div class="form-group position-relative">
           <div class="input">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="password"
-              placeholder="Nhập mật khẩu của bạn"
-              class="form-control input-with-icon"
-            />
-            <i
-              [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-              class="input-icon clickable"
-              (click)="togglePassword()"
-            ></i>
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+              placeholder="Nhập mật khẩu của bạn" class="form-control input-with-icon" />
+            <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
+              (click)="togglePassword()"></i>
           </div>
           @if(registerForm.get('password')?.errors?.['required'] &&
           registerForm.get('password')?.touched) {
@@ -90,17 +70,10 @@
 
         <div class="form-group position-relative">
           <div class="input">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="confirmPassword"
-              placeholder="Xác nhận mật khẩu của bạn"
-              class="form-control input-with-icon"
-            />
-            <i
-              [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
-              class="input-icon clickable"
-              (click)="togglePassword()"
-            ></i>
+            <input [type]="showPassword ? 'text' : 'password'" formControlName="confirmPassword"
+              placeholder="Xác nhận mật khẩu của bạn" class="form-control input-with-icon" />
+            <i [ngClass]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="input-icon clickable"
+              (click)="togglePassword()"></i>
           </div>
           @if(registerForm.get('confirmPassword')?.errors?.['required'] &&
           registerForm.get('confirmPassword')?.touched) {
@@ -118,17 +91,8 @@
         </div>
 
         <!-- Buttons -->
-        <button
-          type="submit"
-          class="btn-register"
-          [disabled]="isSubmitting || registerForm.invalid"
-        >
+        <button type="submit" class="btn-register" [disabled]="isSubmitting || registerForm.invalid">
           Đăng ký
-        </button>
-
-        <button type="button" class="btn-google">
-          <i class="pi pi-google"></i>
-          Đăng nhập với Google
         </button>
       </form>
       <p class="text-muted">

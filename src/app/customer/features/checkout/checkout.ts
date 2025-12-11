@@ -1,11 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { CartService, CartItemViewModel } from '@core/service/cart.service';
 import { OrderService } from '@core/service/order.service';
 import { AuthService } from '@core/service/auth.service';
-import { UserAddressClient, UserAddress, PagedRequest } from '@core/service/system-admin.service';
+import { UserAddressClient, UserAddress, PagedRequest, GiftCardClient, GiftCardDto, SortDirection } from '@core/service/system-admin.service';
 import { UserService } from '@core/service/user.service';
 import { Observable, of, forkJoin } from 'rxjs';
 import { switchMap, take, catchError } from 'rxjs/operators';
@@ -28,7 +28,7 @@ interface TemporaryAddress {
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss',
 })
@@ -40,6 +40,7 @@ export class Checkout implements OnInit {
   private authService = inject(AuthService);
   private userAddressClient = inject(UserAddressClient);
   private userService = inject(UserService);
+  private giftCardClient = inject(GiftCardClient);
 
   checkoutForm: FormGroup;
   products: CheckoutProduct[] = [];
@@ -54,10 +55,19 @@ export class Checkout implements OnInit {
   showTemporaryAddressModal = false;
   temporaryAddress: TemporaryAddress | null = null;
   temporaryAddressForm: FormGroup;
-  
+
   // User info for display
   userFullName: string = '';
   userPhone: string = '';
+
+  // Voucher management
+  availableVouchers: GiftCardDto[] = [];
+  selectedVoucher: GiftCardDto | null = null;
+  voucherCode: string = '';
+  voucherError: string = '';
+  voucherSuccess: string = '';
+  isApplyingVoucher = false;
+  showVoucherModal = false;
 
   constructor() {
     this.checkoutForm = this.fb.group({
@@ -76,7 +86,7 @@ export class Checkout implements OnInit {
     // Kiểm tra navigation state
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as any;
-    
+
     if (state?.checkoutMode === 'single' && state?.product) {
       // Checkout từ product-detail
       this.checkoutMode = 'single';
@@ -98,6 +108,8 @@ export class Checkout implements OnInit {
     this.loadUserInfoAndAddresses();
     // Làm mới giỏ hàng từ backend để đảm bảo có đủ thông tin biến thể
     this.cartService.loadCartSummary();
+    // Load available vouchers
+    this.loadAvailableVouchers();
 
     // Nếu không có state (checkout từ cart), load từ cartService
     if (this.checkoutMode === 'cart') {
@@ -232,8 +244,8 @@ export class Checkout implements OnInit {
 
     // Update form - keep current name and phone if already set, otherwise use from address
     this.checkoutForm.patchValue({
-      fullName: currentFullName || (address.user?.firstName && address.user?.lastName 
-        ? `${address.user.firstName} ${address.user.lastName}` 
+      fullName: currentFullName || (address.user?.firstName && address.user?.lastName
+        ? `${address.user.firstName} ${address.user.lastName}`
         : ''),
       phone: currentPhone || address.user?.phoneNumber || '',
       address: fullAddress
@@ -269,7 +281,7 @@ export class Checkout implements OnInit {
 
   saveTemporaryAddress(): void {
     console.log('💾 Saving temporary address...');
-    
+
     if (this.temporaryAddressForm.invalid) {
       console.warn('⚠️ Temporary address form is invalid');
       Object.keys(this.temporaryAddressForm.controls).forEach(key => {
@@ -280,7 +292,7 @@ export class Checkout implements OnInit {
 
     const formValue = this.temporaryAddressForm.value;
     console.log('📝 Temporary address form value:', formValue);
-    
+
     this.temporaryAddress = {
       fullName: formValue.fullName,
       phone: formValue.phone,
@@ -299,7 +311,7 @@ export class Checkout implements OnInit {
 
     // Clear selected address since we're using temporary
     this.selectedAddress = null;
-    
+
     this.closeTemporaryAddressModal();
     console.log('✅ Using temporary address for this order only');
   }
@@ -308,13 +320,125 @@ export class Checkout implements OnInit {
     return this.products.reduce((sum, p) => sum + p.unitPrice * p.quantity, 0);
   }
 
+  get discountAmount() {
+    if (!this.selectedVoucher || !this.selectedVoucher.currentBalance) {
+      return 0;
+    }
+    // Giảm giá tối đa bằng số dư voucher hoặc tổng tiền hàng (không giảm quá tổng tiền)
+    return Math.min(this.selectedVoucher.currentBalance, this.subtotal);
+  }
+
   get totalPrice() {
-    return this.subtotal + this.shippingFee;
+    return Math.max(0, this.subtotal + this.shippingFee - this.discountAmount);
+  }
+
+  // Voucher methods
+  loadAvailableVouchers(): void {
+    this.giftCardClient.getPaging(1, 50, null, null, SortDirection.Descending, [], null, null, false, false, false)
+      .pipe(catchError(err => {
+        console.error('❌ Failed to load vouchers:', err);
+        return of(null);
+      }))
+      .subscribe(response => {
+        if (response?.isSuccess && response.data?.items) {
+          // Lọc chỉ lấy các voucher còn hạn và còn số dư
+          const now = new Date();
+          this.availableVouchers = response.data.items.filter(v =>
+            v.isValid &&
+            v.currentBalance && v.currentBalance > 0 &&
+            v.validFrom && new Date(v.validFrom) <= now &&
+            v.validTo && new Date(v.validTo) >= now
+          );
+          console.log('✅ Loaded available vouchers:', this.availableVouchers.length);
+        }
+      });
+  }
+
+  applyVoucherCode(): void {
+    if (!this.voucherCode.trim()) {
+      this.voucherError = 'Vui lòng nhập mã voucher';
+      return;
+    }
+
+    this.isApplyingVoucher = true;
+    this.voucherError = '';
+    this.voucherSuccess = '';
+
+    this.giftCardClient.getByCode(this.voucherCode.trim())
+      .pipe(catchError(err => {
+        console.error('❌ Failed to get voucher by code:', err);
+        return of(null);
+      }))
+      .subscribe(response => {
+        this.isApplyingVoucher = false;
+
+        if (response?.isSuccess && response.data) {
+          const voucher = response.data;
+          const now = new Date();
+
+          // Validate voucher
+          if (!voucher.isValid) {
+            this.voucherError = voucher.validationMessage || 'Mã voucher không hợp lệ';
+            return;
+          }
+
+          if (!voucher.currentBalance || voucher.currentBalance <= 0) {
+            this.voucherError = 'Mã voucher đã hết số dư';
+            return;
+          }
+
+          if (voucher.validFrom && new Date(voucher.validFrom) > now) {
+            this.voucherError = 'Mã voucher chưa đến thời gian sử dụng';
+            return;
+          }
+
+          if (voucher.validTo && new Date(voucher.validTo) < now) {
+            this.voucherError = 'Mã voucher đã hết hạn';
+            return;
+          }
+
+          // Apply voucher
+          this.selectedVoucher = voucher;
+          this.voucherSuccess = `Áp dụng thành công! Giảm ${this.formatCurrency(this.discountAmount)}`;
+          console.log('✅ Voucher applied:', voucher);
+        } else {
+          this.voucherError = 'Mã voucher không tồn tại';
+        }
+      });
+  }
+
+  selectVoucher(voucher: GiftCardDto): void {
+    this.selectedVoucher = voucher;
+    this.voucherCode = voucher.code || '';
+    this.voucherError = '';
+    this.voucherSuccess = `Áp dụng thành công! Giảm ${this.formatCurrency(this.discountAmount)}`;
+    this.closeVoucherModal();
+    console.log('✅ Voucher selected:', voucher);
+  }
+
+  removeVoucher(): void {
+    this.selectedVoucher = null;
+    this.voucherCode = '';
+    this.voucherError = '';
+    this.voucherSuccess = '';
+    console.log('✅ Voucher removed');
+  }
+
+  openVoucherModal(): void {
+    this.showVoucherModal = true;
+  }
+
+  closeVoucherModal(): void {
+    this.showVoucherModal = false;
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   }
 
   getFullAddress(address: UserAddress | null): string {
     if (!address) return '';
-    
+
     return [
       address.addressLine1,
       address.addressLine2,
@@ -343,7 +467,7 @@ export class Checkout implements OnInit {
         }
         this.checkoutForm.get(key)?.markAsTouched();
       });
-      
+
       alert(`⚠️ Vui lòng điền đầy đủ thông tin:\n${invalidFields.join(', ')}`);
       return;
     }
@@ -367,7 +491,7 @@ export class Checkout implements OnInit {
 
   private processOrder(paymentMethod: 'cod' | 'banking') {
     console.log('🚀 processOrder() started');
-    
+
     if (this.checkoutForm.invalid) {
       console.error('❌ Form validation failed in processOrder');
       Object.keys(this.checkoutForm.controls).forEach(key => {
@@ -382,7 +506,7 @@ export class Checkout implements OnInit {
       take(1),
       switchMap(user => {
         console.log('👤 Current user:', user);
-        
+
         if (!user?.id) {
           console.error('❌ User not logged in, redirecting to login');
           // Nếu chưa đăng nhập, chuyển đến trang login
@@ -398,7 +522,7 @@ export class Checkout implements OnInit {
         const formValue = this.checkoutForm.value;
         console.log('📝 Form values:', formValue);
         const selectedPaymentMethod = paymentMethod || 'cod';
-        
+
         // Chuẩn bị dữ liệu đơn hàng với đầy đủ thông tin
         const orderRequest = {
           userId: user.id,
@@ -417,10 +541,12 @@ export class Checkout implements OnInit {
           subtotal: this.subtotal,
           shippingFee: this.shippingFee,
           taxAmount: 0,
-          discountAmount: 0,
+          discountAmount: this.discountAmount,
+          couponCode: this.selectedVoucher?.code || undefined,
           notes: undefined
         };
         console.log('📝 Order request prepared:', orderRequest.items);
+        console.log('🎫 Voucher applied:', this.selectedVoucher?.code, 'Discount:', this.discountAmount);
 
         console.log('📦 Submitting order...', JSON.stringify(orderRequest, null, 2));
 
@@ -476,10 +602,10 @@ export class Checkout implements OnInit {
                   } else {
                     console.warn('⚠️ Cart clear may have failed, but order was created');
                   }
-                  
+
                   // Navigate đến trang kết quả thành công
                   navigateAfterCreate();
-                  
+
                   return of(null);
                 }),
                 catchError((clearErr) => {

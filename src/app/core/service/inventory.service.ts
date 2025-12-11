@@ -10,6 +10,8 @@ import {
   UpdateProductCommand,
   ResultOfUpdateProductResponse,
   FileParameter,
+  FilterCriteria,
+  FilterOperator,
 } from '@services/system-admin.service';
 
 export interface PagingInfo {
@@ -58,8 +60,18 @@ export class InventoryService {
   // }
 
   // Load products from API with paging and optional search keyword
-  loadProducts(page: number = 1, pageSize: number = 12, search?: string): void {
+  loadProducts(page: number = 1, pageSize: number = 12, search?: string, categoryId?: string): void {
     this.loadingSubject.next(true); // Start loading
+
+    // Build filters array
+    const filters: FilterCriteria[] = [];
+    if (categoryId) {
+      const categoryFilter = new FilterCriteria();
+      categoryFilter.fieldName = 'CategoryId';
+      categoryFilter.value = categoryId;
+      categoryFilter.operator = FilterOperator.Equals;
+      filters.push(categoryFilter);
+    }
 
     this.productClient
       .getProductsPaging(
@@ -68,10 +80,10 @@ export class InventoryService {
         search, // search
         undefined, // sortBy
         SortDirection.Ascending, // sortDirection
-        [], // filters
+        filters, // filters
         undefined, // entityType
         undefined, // availableFields
-        false, // hasFilters
+        filters.length > 0, // hasFilters
         !!search, // hasSearch
         false // hasSorting
       )

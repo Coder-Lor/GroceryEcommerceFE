@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { 
+import {
   OrderClient,
   CreateOrderRequest as BackendCreateOrderRequest,
   CreateOrderItemRequest,
@@ -28,6 +28,7 @@ export interface CreateOrderRequest {
   shippingFee: number;
   taxAmount?: number;
   discountAmount?: number;
+  couponCode?: string;
   notes?: string;
 }
 
@@ -75,7 +76,7 @@ export class OrderService {
     });
 
     // Tạo order items (không cần orderId vì sẽ được tạo ở backend)
-    const items = orderData.items.map(item => 
+    const items = orderData.items.map(item =>
       new CreateOrderItemRequest({
         orderId: undefined, // Backend sẽ tạo
         productId: item.productId,
@@ -104,6 +105,7 @@ export class OrderService {
       discountAmount: discountAmount,
       totalAmount: totalAmount,
       paymentMethod: paymentMethod,
+      couponCode: orderData.couponCode,
       shippingAddress: shippingAddress,
       billingAddress: billingAddress,
       notes: orderData.notes,

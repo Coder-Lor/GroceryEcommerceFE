@@ -43,7 +43,7 @@
     } @else {
     <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="false" class="category-swiper">
       @for (item of categories; track $index) {
-      <swiper-slide (click)="navigationToCategory()" class="category-slide">
+      <swiper-slide (click)="navigationToCategory(item)" class="category-slide">
         <div class="category-card text-center">
           <img [src]="item.imageUrl" [alt]="item.name" class="category-img" />
           <p class="category-name mt-2">{{ item.name }}</p>

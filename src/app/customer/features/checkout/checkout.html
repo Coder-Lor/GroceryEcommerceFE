@@ -2,37 +2,37 @@
   <!-- Địa chỉ giao hàng -->
   <section class="checkout-section address">
     <h5 class="section-title"><i class="pi pi-map-marker"></i> Địa chỉ nhận hàng</h5>
-    
+
     <!-- Display selected address or temporary address -->
     @if (selectedAddress || temporaryAddress) {
-      <div class="address-display">
-        <div class="address-content">
-          <div class="user-info">
-            <strong>{{ temporaryAddress ? temporaryAddress.fullName : userFullName }}</strong>
-            <span class="phone">{{ temporaryAddress ? temporaryAddress.phone : userPhone }}</span>
-          </div>
-          <div class="user-address">
-            {{ temporaryAddress ? temporaryAddress.address : getFullAddress(selectedAddress) }}
-          </div>
-          @if (selectedAddress?.isDefault && !temporaryAddress) {
-            <span class="badge-default">Mặc định</span>
-          }
-          @if (temporaryAddress) {
-            <span class="badge-temporary">Địa chỉ tạm thời</span>
-          }
+    <div class="address-display">
+      <div class="address-content">
+        <div class="user-info">
+          <strong>{{ temporaryAddress ? temporaryAddress.fullName : userFullName }}</strong>
+          <span class="phone">{{ temporaryAddress ? temporaryAddress.phone : userPhone }}</span>
         </div>
-        <div class="address-actions">
-          <button class="btn-change" (click)="openAddressModal()">
-            <i class="pi pi-sync"></i> Thay đổi
-          </button>
+        <div class="user-address">
+          {{ temporaryAddress ? temporaryAddress.address : getFullAddress(selectedAddress) }}
         </div>
+        @if (selectedAddress?.isDefault && !temporaryAddress) {
+        <span class="badge-default">Mặc định</span>
+        }
+        @if (temporaryAddress) {
+        <span class="badge-temporary">Địa chỉ tạm thời</span>
+        }
       </div>
+      <div class="address-actions">
+        <button class="btn-change" (click)="openAddressModal()">
+          <i class="pi pi-sync"></i> Thay đổi
+        </button>
+      </div>
+    </div>
     }
-    
+
     @if (!selectedAddress && !temporaryAddress) {
-      <div class="no-address">
-        <p class="text-muted">Chưa có địa chỉ giao hàng</p>
-      </div>
+    <div class="no-address">
+      <p class="text-muted">Chưa có địa chỉ giao hàng</p>
+    </div>
     }
 
     <!-- Button to add temporary address -->
@@ -40,7 +40,8 @@
       <button class="btn-add-temp" (click)="openTemporaryAddressModal()">
         <i class="pi pi-plus"></i> Thêm địa chỉ mới cho đơn hàng này
       </button>
-      <small class="text-muted d-block mt-1">Địa chỉ này chỉ dùng cho đơn hàng hiện tại và không được lưu vào danh sách địa chỉ của bạn</small>
+      <small class="text-muted d-block mt-1">Địa chỉ này chỉ dùng cho đơn hàng hiện tại và không được lưu vào danh sách
+        địa chỉ của bạn</small>
     </div>
 
     <!-- Payment method -->
@@ -49,31 +50,76 @@
       <form [formGroup]="checkoutForm">
         <div class="payment-methods">
           <div class="form-check">
-            <input 
-              class="form-check-input" 
-              type="radio" 
-              formControlName="paymentMethod" 
-              value="cod" 
-              id="cod"
-            />
+            <input class="form-check-input" type="radio" formControlName="paymentMethod" value="cod" id="cod" />
             <label class="form-check-label" for="cod">
               <i class="pi pi-money-bill"></i> Thanh toán khi nhận hàng (COD)
             </label>
           </div>
           <div class="form-check">
-            <input 
-              class="form-check-input" 
-              type="radio" 
-              formControlName="paymentMethod" 
-              value="banking" 
-              id="banking"
-            />
+            <input class="form-check-input" type="radio" formControlName="paymentMethod" value="banking" id="banking" />
             <label class="form-check-label" for="banking">
               <i class="pi pi-credit-card"></i> Chuyển khoản ngân hàng
             </label>
           </div>
         </div>
       </form>
+    </div>
+
+    <!-- Voucher section -->
+    <div class="voucher-section mt-4">
+      <label class="form-label fw-semibold"><i class="pi pi-ticket"></i> Mã giảm giá / Voucher</label>
+
+      <!-- Applied voucher display -->
+      @if (selectedVoucher) {
+      <div class="applied-voucher">
+        <div class="voucher-info">
+          <div class="voucher-icon">
+            <i class="pi pi-ticket"></i>
+          </div>
+          <div class="voucher-details">
+            <span class="voucher-code">{{ selectedVoucher.code }}</span>
+            <span class="voucher-name">{{ selectedVoucher.name }}</span>
+            <span class="voucher-discount">Giảm {{ discountAmount | currency : 'VND' }}</span>
+          </div>
+        </div>
+        <button class="btn-remove-voucher" (click)="removeVoucher()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      } @else {
+      <!-- Voucher input -->
+      <div class="voucher-input-group">
+        <div class="input-wrapper">
+          <input type="text" class="form-control voucher-input" [(ngModel)]="voucherCode" placeholder="Nhập mã voucher"
+            [class.is-invalid]="voucherError" [class.is-valid]="voucherSuccess" />
+          <button class="btn-apply-voucher" (click)="applyVoucherCode()"
+            [disabled]="isApplyingVoucher || !voucherCode.trim()">
+            @if (isApplyingVoucher) {
+            <i class="pi pi-spin pi-spinner"></i>
+            } @else {
+            Áp dụng
+            }
+          </button>
+        </div>
+        @if (voucherError) {
+        <div class="voucher-error">
+          <i class="pi pi-exclamation-circle"></i> {{ voucherError }}
+        </div>
+        }
+        @if (voucherSuccess) {
+        <div class="voucher-success">
+          <i class="pi pi-check-circle"></i> {{ voucherSuccess }}
+        </div>
+        }
+      </div>
+
+      <!-- Available vouchers button -->
+      @if (availableVouchers.length > 0) {
+      <button class="btn-select-voucher" (click)="openVoucherModal()">
+        <i class="pi pi-gift"></i> Chọn voucher từ danh sách ({{ availableVouchers.length }} có sẵn)
+      </button>
+      }
+      }
     </div>
   </section>
 
@@ -115,21 +161,25 @@
       <span>Phí vận chuyển</span>
       <span>{{ shippingFee | currency : 'VND' }}</span>
     </div>
+    @if (selectedVoucher && discountAmount > 0) {
+    <div class="summary-row discount">
+      <span>
+        <i class="pi pi-ticket"></i> Giảm giá ({{ selectedVoucher.code }})
+      </span>
+      <span class="discount-amount">-{{ discountAmount | currency : 'VND' }}</span>
+    </div>
+    }
     <div class="summary-row total">
       <span>Tổng thanh toán</span>
       <span class="total-price">{{ totalPrice | currency : 'VND' }}</span>
     </div>
-    
+
     <!-- Hiển thị chế độ checkout để debug -->
     <div class="alert alert-info mt-3" *ngIf="checkoutMode === 'single'">
       <small><i class="pi pi-info-circle"></i> Thanh toán nhanh 1 sản phẩm</small>
     </div>
-    
-    <button 
-      class="btn-checkout" 
-      (click)="placeOrder()" 
-      [disabled]="products.length === 0 || isProcessing"
-    >
+
+    <button class="btn-checkout" (click)="placeOrder()" [disabled]="products.length === 0 || isProcessing">
       <span *ngIf="!isProcessing">
         <i class="pi pi-shopping-cart me-2"></i>
         Đặt hàng
@@ -144,121 +194,163 @@
 
 <!-- Address Selection Modal -->
 @if (showAddressModal) {
-  <div class="modal-overlay" (click)="closeAddressModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="pi pi-map-marker"></i> Chọn địa chỉ giao hàng</h5>
-        <button class="btn-close" (click)="closeAddressModal()">
-          <i class="pi pi-times"></i>
+<div class="modal-overlay" (click)="closeAddressModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title"><i class="pi pi-map-marker"></i> Chọn địa chỉ giao hàng</h5>
+      <button class="btn-close" (click)="closeAddressModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      @if (userAddresses.length === 0) {
+      <div class="text-center py-4">
+        <p class="text-muted">Bạn chưa có địa chỉ nào được lưu</p>
+        <button class="btn btn-primary" (click)="closeAddressModal(); openTemporaryAddressModal()">
+          Thêm địa chỉ mới
         </button>
       </div>
-      <div class="modal-body">
-        @if (userAddresses.length === 0) {
-          <div class="text-center py-4">
-            <p class="text-muted">Bạn chưa có địa chỉ nào được lưu</p>
-            <button class="btn btn-primary" (click)="closeAddressModal(); openTemporaryAddressModal()">
-              Thêm địa chỉ mới
-            </button>
-          </div>
-        } @else {
-          <div class="address-list">
-            @for (address of userAddresses; track address.addressId) {
-              <div 
-                class="address-item" 
-                [class.selected]="selectedAddress?.addressId === address.addressId"
-                (click)="selectAddress(address)"
-              >
-                <div class="address-info-modal">
-                  <div class="user-info">
-                    <strong>{{ userFullName }}</strong>
-                    <span class="phone">{{ userPhone }}</span>
-                  </div>
-                  <div class="user-address">{{ getFullAddress(address) }}</div>
-                  @if (address.isDefault) {
-                    <span class="badge-default">Mặc định</span>
-                  }
-                </div>
-                @if (selectedAddress?.addressId === address.addressId) {
-                  <i class="pi pi-check-circle selected-icon"></i>
-                }
-              </div>
+      } @else {
+      <div class="address-list">
+        @for (address of userAddresses; track address.addressId) {
+        <div class="address-item" [class.selected]="selectedAddress?.addressId === address.addressId"
+          (click)="selectAddress(address)">
+          <div class="address-info-modal">
+            <div class="user-info">
+              <strong>{{ userFullName }}</strong>
+              <span class="phone">{{ userPhone }}</span>
+            </div>
+            <div class="user-address">{{ getFullAddress(address) }}</div>
+            @if (address.isDefault) {
+            <span class="badge-default">Mặc định</span>
             }
           </div>
+          @if (selectedAddress?.addressId === address.addressId) {
+          <i class="pi pi-check-circle selected-icon"></i>
+          }
+        </div>
         }
       </div>
+      }
     </div>
   </div>
+</div>
 }
 
 <!-- Temporary Address Modal -->
 @if (showTemporaryAddressModal) {
-  <div class="modal-overlay" (click)="closeTemporaryAddressModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h5 class="modal-title"><i class="pi pi-plus"></i> Thêm địa chỉ mới</h5>
-        <button class="btn-close" (click)="closeTemporaryAddressModal()">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form [formGroup]="temporaryAddressForm">
-          <div class="mb-3">
-            <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
-            <input 
-              type="text" 
-              class="form-control" 
-              formControlName="fullName" 
-              placeholder="Nhập họ và tên"
-              [class.is-invalid]="temporaryAddressForm.get('fullName')?.invalid && temporaryAddressForm.get('fullName')?.touched"
-            />
-            <div class="invalid-feedback" *ngIf="temporaryAddressForm.get('fullName')?.invalid && temporaryAddressForm.get('fullName')?.touched">
-              Vui lòng nhập họ và tên
-            </div>
+<div class="modal-overlay" (click)="closeTemporaryAddressModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title"><i class="pi pi-plus"></i> Thêm địa chỉ mới</h5>
+      <button class="btn-close" (click)="closeTemporaryAddressModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="temporaryAddressForm">
+        <div class="mb-3">
+          <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="fullName" placeholder="Nhập họ và tên"
+            [class.is-invalid]="temporaryAddressForm.get('fullName')?.invalid && temporaryAddressForm.get('fullName')?.touched" />
+          <div class="invalid-feedback"
+            *ngIf="temporaryAddressForm.get('fullName')?.invalid && temporaryAddressForm.get('fullName')?.touched">
+            Vui lòng nhập họ và tên
           </div>
+        </div>
 
-          <div class="mb-3">
-            <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-            <input 
-              type="tel" 
-              class="form-control" 
-              formControlName="phone" 
-              placeholder="Nhập số điện thoại"
-              [class.is-invalid]="temporaryAddressForm.get('phone')?.invalid && temporaryAddressForm.get('phone')?.touched"
-            />
-            <div class="invalid-feedback" *ngIf="temporaryAddressForm.get('phone')?.invalid && temporaryAddressForm.get('phone')?.touched">
-              Vui lòng nhập số điện thoại hợp lệ (10-11 số)
-            </div>
+        <div class="mb-3">
+          <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+          <input type="tel" class="form-control" formControlName="phone" placeholder="Nhập số điện thoại"
+            [class.is-invalid]="temporaryAddressForm.get('phone')?.invalid && temporaryAddressForm.get('phone')?.touched" />
+          <div class="invalid-feedback"
+            *ngIf="temporaryAddressForm.get('phone')?.invalid && temporaryAddressForm.get('phone')?.touched">
+            Vui lòng nhập số điện thoại hợp lệ (10-11 số)
           </div>
+        </div>
 
-          <div class="mb-3">
-            <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
-            <textarea 
-              class="form-control" 
-              formControlName="address" 
-              rows="3" 
-              placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố)"
-              [class.is-invalid]="temporaryAddressForm.get('address')?.invalid && temporaryAddressForm.get('address')?.touched"
-            ></textarea>
-            <div class="invalid-feedback" *ngIf="temporaryAddressForm.get('address')?.invalid && temporaryAddressForm.get('address')?.touched">
-              Vui lòng nhập địa chỉ giao hàng
-            </div>
+        <div class="mb-3">
+          <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+          <textarea class="form-control" formControlName="address" rows="3"
+            placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố)"
+            [class.is-invalid]="temporaryAddressForm.get('address')?.invalid && temporaryAddressForm.get('address')?.touched"></textarea>
+          <div class="invalid-feedback"
+            *ngIf="temporaryAddressForm.get('address')?.invalid && temporaryAddressForm.get('address')?.touched">
+            Vui lòng nhập địa chỉ giao hàng
           </div>
+        </div>
 
-          <div class="alert alert-info">
-            <i class="pi pi-info-circle"></i>
-            <small>Địa chỉ này chỉ dùng cho đơn hàng hiện tại và sẽ không được lưu vào danh sách địa chỉ của bạn</small>
-          </div>
+        <div class="alert alert-info">
+          <i class="pi pi-info-circle"></i>
+          <small>Địa chỉ này chỉ dùng cho đơn hàng hiện tại và sẽ không được lưu vào danh sách địa chỉ của bạn</small>
+        </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeTemporaryAddressModal()">
-              Hủy
-            </button>
-            <button type="button" class="btn btn-primary" (click)="saveTemporaryAddress()">
-              <i class="pi pi-check"></i> Sử dụng địa chỉ này
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeTemporaryAddressModal()">
+            Hủy
+          </button>
+          <button type="button" class="btn btn-primary" (click)="saveTemporaryAddress()">
+            <i class="pi pi-check"></i> Sử dụng địa chỉ này
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+}
+
+<!-- Voucher Selection Modal -->
+@if (showVoucherModal) {
+<div class="modal-overlay" (click)="closeVoucherModal()">
+  <div class="modal-content voucher-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title"><i class="pi pi-gift"></i> Chọn mã giảm giá</h5>
+      <button class="btn-close" (click)="closeVoucherModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      @if (availableVouchers.length === 0) {
+      <div class="text-center py-4">
+        <i class="pi pi-ticket empty-voucher-icon"></i>
+        <p class="text-muted mt-3">Không có mã giảm giá khả dụng</p>
+      </div>
+      } @else {
+      <div class="voucher-list">
+        @for (voucher of availableVouchers; track voucher.giftCardId) {
+        <div class="voucher-item" [class.selected]="selectedVoucher?.giftCardId === voucher.giftCardId"
+          (click)="selectVoucher(voucher)">
+          <div class="voucher-item-left">
+            <div class="voucher-item-icon">
+              <i class="pi pi-ticket"></i>
+            </div>
+          </div>
+          <div class="voucher-item-content">
+            <div class="voucher-item-header">
+              <span class="voucher-item-code">{{ voucher.code }}</span>
+              @if (voucher.currentBalance && voucher.currentBalance >= subtotal) {
+              <span class="badge-full-discount">Giảm hết</span>
+              }
+            </div>
+            <div class="voucher-item-name">{{ voucher.name }}</div>
+            <div class="voucher-item-balance">
+              Số dư: <strong>{{ voucher.currentBalance | currency : 'VND' }}</strong>
+            </div>
+            <div class="voucher-item-validity">
+              <i class="pi pi-calendar"></i>
+              HSD: {{ voucher.validTo | date : 'dd/MM/yyyy' }}
+            </div>
+          </div>
+          @if (selectedVoucher?.giftCardId === voucher.giftCardId) {
+          <div class="voucher-item-selected">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
 }

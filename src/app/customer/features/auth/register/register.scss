@@ -10,7 +10,8 @@
   align-items: center;
   z-index: 2000;
   transition: opacity 0.3s ease;
-  font-family: "Be Vietnam Pro', 'Montserrat", sans-serif;}
+  font-family: "Be Vietnam Pro', 'Montserrat", sans-serif;
+}
 
 .register-overlay.active {
   display: flex;
@@ -104,12 +105,15 @@
   // justify-content: center;
   background: #ffffff;
   overflow-y: auto;
+
   &::-webkit-scrollbar {
     width: 12px;
   }
+
   &::-webkit-scrollbar-track {
     background: --background-3;
   }
+
   &::-webkit-scrollbar-thumb {
     background: --secondary-color;
     border-radius: 12px;
@@ -231,26 +235,6 @@
   transform: translateY(-1px);
 }
 
-.btn-google {
-  width: 100%;
-  margin-top: 16px;
-  padding: 10px;
-  border: 1px solid #d6dce8;
-  border-radius: 6px;
-  background: #fff;
-  color: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.btn-google img {
-  width: 20px;
-  height: 20px;
-}
-
 /* Icon position */
 .input-icon {
   position: absolute;
@@ -261,9 +245,11 @@
   font-size: 1.1rem;
   pointer-events: none;
 }
-.input{
+
+.input {
   position: relative;
 }
+
 button:disabled {
   cursor: not-allowed;
   opacity: 0.8;

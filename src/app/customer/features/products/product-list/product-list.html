@@ -21,7 +21,7 @@
         </ul>
       </div>
 
-      <div class="filter-section location mt-4">
+      <!-- <div class="filter-section location mt-4">
         <h6 class="filter-title"><i class="pi pi-filter mr-2"></i> BỘ LỌC TÌM KIẾM</h6>
         <div class="filter-subtitle">Nơi Bán</div>
         <div class="checkbox-list">
@@ -39,7 +39,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </aside>
 
     <!-- RIGHT PRODUCT LIST -->
@@ -56,13 +56,8 @@
               <p-button label="Phổ biến" severity="secondary" />
               <p-button label="Mới nhất" severity="secondary" />
               <p-button label="Bán chạy" severity="secondary" />
-              <p-select
-                [options]="sortByPrice"
-                [(ngModel)]="selectField"
-                optionLabel="title"
-                placeholder="Giá: "
-                class="w-full md:w-56"
-              />
+              <p-select [options]="sortByPrice" [(ngModel)]="selectField" optionLabel="title" placeholder="Giá: "
+                class="w-full md:w-56" />
             </div>
           </ng-template>
 
@@ -71,16 +66,9 @@
             <div class="row g-4">
               @for (item of products; track $index) {
               <div class="col-12 col-sm-6 col-lg-3">
-                <product-card
-                  [product]="item"
-                  [layout]="'grid'"
-                  [getSeverity]="getSeverity.bind(this)"
-                ></product-card>
+                <product-card [product]="item" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
               </div>
               }
-              <!-- <div *ngFor="let product of items" class="col-12 col-sm-6 col-md-4 col-xl-6">
-            <product-card [product]="product" [layout]="'grid'" [getSeverity]="getSeverity.bind(this)"></product-card>
-          </div> -->
             </div>
           </ng-template>
         </p-dataview>
@@ -89,12 +77,7 @@
   </div>
   <div class="row">
     <div class="d-flex justify-content-center mt-4">
-      <p-paginator
-        (onPageChange)="onPageChange($event)"
-        [first]="first"
-        [rows]="rows"
-        [totalRecords]="totalRecords"
-      />
+      <p-paginator (onPageChange)="onPageChange($event)" [first]="first" [rows]="rows" [totalRecords]="totalRecords" />
     </div>
   </div>
 </div>
