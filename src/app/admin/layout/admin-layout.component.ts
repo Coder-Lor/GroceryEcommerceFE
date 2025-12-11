@@ -15,8 +15,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [
     CommonModule,
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     MenuModule,
     AvatarModule,
     BadgeModule,
