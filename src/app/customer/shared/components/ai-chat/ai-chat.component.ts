@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { GoogleGenAI } from '@google/genai';
+import { environment } from '../../../../../environments/environment';
 import { ProductService } from '@core/service/product.service';
 import { ProductBaseResponse } from '@services/system-admin.service';
 
@@ -50,7 +51,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
 
     // Gemini AI
     private ai = new GoogleGenAI({
-        apiKey: 'AIzaSyAeawecfMakGZ2v2N7DC2dSS7RLP9JJt5w'
+        apiKey: environment.geminiAI.apiKey
     });
 
     ngOnInit(): void {
@@ -198,7 +199,7 @@ Hãy trả lời bằng tiếng Việt, thân thiện, hữu ích và ngắn g�
             }
 
             const response = await this.ai.models.generateContent({
-                model: 'gemini-2.0-flash',
+                model: environment.geminiAI.model,
                 contents: prompt
             });
 

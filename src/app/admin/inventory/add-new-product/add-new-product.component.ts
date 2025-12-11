@@ -39,7 +39,8 @@ import { InventoryService } from '../../../core/service/inventory.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenAI } from '@google/genai';
+import { environment } from '../../../../environments/environment'
 
 @Component({
   selector: 'app-add-new-product',
@@ -104,7 +105,7 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   // Gemini AI
   geminiRes: any = "Không có dữ liệu";
   ai = new GoogleGenAI({
-    apiKey: "AIzaSyAeawecfMakGZ2v2N7DC2dSS7RLP9JJt5w"
+    apiKey: environment.geminiAI.apiKey
   });
   isGeneratingWithAI: boolean = false;
 
@@ -242,7 +243,7 @@ Lưu ý quan trọng:
 - Mô tả phải chi tiết, chuyên nghiệp và hấp dẫn người mua`;
 
       const response = await this.ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: environment.geminiAI.model,
         contents: prompt
       });
 
