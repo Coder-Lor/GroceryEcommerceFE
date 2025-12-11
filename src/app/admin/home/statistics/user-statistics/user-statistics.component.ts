@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { UserClient, SortDirection } from '@services/system-admin.service';
+import { DialogModule } from 'primeng/dialog';
 
 interface UserData {
     userId: string;
@@ -16,7 +17,7 @@ interface UserData {
 @Component({
     selector: 'app-user-statistics',
     standalone: true,
-    imports: [CommonModule, BaseChartDirective],
+    imports: [CommonModule, BaseChartDirective, DialogModule],
     templateUrl: './user-statistics.component.html',
     styleUrls: ['./user-statistics.component.scss']
 })
@@ -25,6 +26,11 @@ export class UserStatisticsComponent implements OnInit {
 
     isLoading = true;
     users: UserData[] = [];
+
+    // Dialog state
+    showDetailDialog = false;
+    detailDialogTitle = '';
+    detailUsers: UserData[] = [];
 
     // Bar Chart - Người dùng theo tháng
     public barChartOptions: ChartConfiguration['options'] = {
@@ -242,5 +248,31 @@ export class UserStatisticsComponent implements OnInit {
         });
 
         return [active, inactive];
+    }
+
+    showAllUsersDetail(): void {
+        this.detailDialogTitle = 'Tất cả người dùng';
+        this.detailUsers = [...this.users];
+        this.showDetailDialog = true;
+    }
+
+    showActiveUsersDetail(): void {
+        this.detailDialogTitle = 'Người dùng đang hoạt động';
+        this.detailUsers = this.users.filter(u => u.isActive);
+        this.showDetailDialog = true;
+    }
+
+    showInactiveUsersDetail(): void {
+        this.detailDialogTitle = 'Người dùng không hoạt động';
+        this.detailUsers = this.users.filter(u => !u.isActive);
+        this.showDetailDialog = true;
+    }
+
+    formatDate(date: Date): string {
+        return new Date(date).toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
     }
 }

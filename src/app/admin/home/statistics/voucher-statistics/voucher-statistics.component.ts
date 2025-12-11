@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { GiftCardClient, SortDirection } from '@services/system-admin.service';
+import { DialogModule } from 'primeng/dialog';
 
 interface VoucherData {
     giftCardId: string;
@@ -21,7 +22,7 @@ interface VoucherData {
 @Component({
     selector: 'app-voucher-statistics',
     standalone: true,
-    imports: [CommonModule, BaseChartDirective],
+    imports: [CommonModule, BaseChartDirective, DialogModule],
     templateUrl: './voucher-statistics.component.html',
     styleUrls: ['./voucher-statistics.component.scss']
 })
@@ -34,6 +35,11 @@ export class VoucherStatisticsComponent implements OnInit {
     totalUsed = 0;
     activeVouchers = 0;
     expiredVouchers = 0;
+
+    // Dialog state
+    showDetailDialog = false;
+    detailDialogTitle = '';
+    detailVouchers: VoucherData[] = [];
 
     // Bar Chart - Voucher tạo theo tháng
     public barChartOptions: ChartConfiguration['options'] = {
@@ -334,5 +340,47 @@ export class VoucherStatisticsComponent implements OnInit {
 
     formatCurrency(value: number): string {
         return value.toLocaleString('vi-VN') + ' đ';
+    }
+
+    showTotalValueDetail(): void {
+        this.detailDialogTitle = 'Tất cả voucher';
+        this.detailVouchers = [...this.vouchers];
+        this.showDetailDialog = true;
+    }
+
+    showUsedValueDetail(): void {
+        this.detailDialogTitle = 'Voucher đã sử dụng';
+        this.detailVouchers = this.vouchers.filter(v => v.usedAmount > 0);
+        this.showDetailDialog = true;
+    }
+
+    showActiveVouchersDetail(): void {
+        this.detailDialogTitle = 'Voucher đang hoạt động';
+        const now = new Date();
+        this.detailVouchers = this.vouchers.filter(v =>
+            v.status === 1 && new Date(v.validTo) >= now
+        );
+        this.showDetailDialog = true;
+    }
+
+    showExpiredVouchersDetail(): void {
+        this.detailDialogTitle = 'Voucher đã hết hạn';
+        const now = new Date();
+        this.detailVouchers = this.vouchers.filter(v =>
+            new Date(v.validTo) < now
+        );
+        this.showDetailDialog = true;
+    }
+
+    formatDate(date: Date): string {
+        return new Date(date).toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
+    getDetailVouchersTotal(): number {
+        return this.detailVouchers.reduce((sum, v) => sum + v.initialAmount, 0);
     }
 }

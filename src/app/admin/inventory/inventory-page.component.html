@@ -6,14 +6,8 @@
   <p-toast></p-toast>
 
   <!-- Confirm Dialog -->
-  <p-confirmDialog
-    [style]="{ width: '450px' }"
-    [baseZIndex]="10000"
-    [closable]="true"
-    [closeOnEscape]="true"
-    acceptButtonStyleClass="p-button-danger"
-    rejectButtonStyleClass="p-button-secondary p-button-text"
-  >
+  <p-confirmDialog [style]="{ width: '450px' }" [baseZIndex]="10000" [closable]="true" [closeOnEscape]="true"
+    acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-secondary p-button-text">
   </p-confirmDialog>
 
   <div class="page-header">
@@ -34,20 +28,9 @@
   <!-- Tìm kiếm -->
   <div class="search-box">
     <div class="search-wrapper">
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        placeholder="Tìm kiếm theo tên, SKU hoặc mô tả..."
-        class="search-input"
-        (keyup.enter)="onSearch()"
-      />
-      <button 
-        type="button" 
-        class="btn search-button"
-        (click)="onSearch()"
-        [disabled]="isLoading"
-        appTooltip="Tìm kiếm"
-      >
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Tìm kiếm theo tên, SKU hoặc mô tả..."
+        class="search-input" (keyup.enter)="onSearch()" />
+      <button type="button" class="btn search-button" (click)="onSearch()" [disabled]="isLoading" appTooltip="Tìm kiếm">
         <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
       </button>
     </div>
@@ -63,13 +46,13 @@
         <div class="admin-product-card">
           <div class="card-image">
             @if (item.primaryImageUrl) {
-              <img [src]="item.primaryImageUrl" [alt]="item.name" />
+            <img [src]="item.primaryImageUrl" [alt]="item.name" />
             } @else {
-              <div class="no-image">
-                <fa-icon [icon]="faBox" size="3x"></fa-icon>
-              </div>
+            <div class="no-image">
+              <fa-icon [icon]="faBox" size="3x"></fa-icon>
+            </div>
             }
-            
+
             <!-- Stock Status Badge -->
             <div class="stock-badge" [ngClass]="getStockStatusClass(item)">
               {{ getStockStatus(item) }}
@@ -79,7 +62,7 @@
           <div class="card-content">
             <h3 class="product-name" [title]="item.name">{{ item.name }}</h3>
             <p class="product-sku">SKU: {{ item.sku }}</p>
-            
+
             <div class="product-prices">
               <div class="price-row">
                 <span class="price-label">Giá bán:</span>
@@ -106,25 +89,14 @@
           </div>
 
           <div class="card-actions">
-            <button 
-              class="btn btn-action btn-view" 
-              (click)="viewProductDetail(item)"
-              appTooltip="Xem chi tiết"
-            >
+            <button class="btn btn-action btn-view" (click)="viewProductDetail(item)" appTooltip="Xem chi tiết">
               <fa-icon [icon]="faEye"></fa-icon>
             </button>
-            <button 
-              class="btn btn-action btn-variant" 
-              (click)="openAddVariantModal(item)"
-              appTooltip="Quản lý phân loại"
-            >
+            <button class="btn btn-action btn-variant" (click)="openAddVariantModal(item)"
+              appTooltip="Quản lý phân loại">
               <fa-icon [icon]="faLayerGroup"></fa-icon>
             </button>
-            <button 
-              class="btn btn-action btn-delete" 
-              (click)="confirmDelete(item)"
-              appTooltip="Xóa sản phẩm"
-            >
+            <button class="btn btn-action btn-delete" (click)="confirmDelete(item)" appTooltip="Xóa sản phẩm">
               <fa-icon [icon]="faTrashCan"></fa-icon>
             </button>
           </div>
@@ -146,64 +118,35 @@
       <span>Hiển thị trang {{ currentPage }} / {{ totalPages }}</span>
       <div class="page-size-selector">
         <label for="pageSize">Số sản phẩm mỗi trang:</label>
-        <select
-          id="pageSize"
-          [(ngModel)]="pageSize"
-          (change)="onPageSizeChange()"
-          class="page-size-select"
-        >
+        <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
           <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
         </select>
       </div>
     </div>
 
     <div class="pagination-controls">
-      <button
-        class="btn-pagination"
-        (click)="goToFirstPage()"
-        [disabled]="!hasPreviousPage"
-        appTooltip="Trang đầu"
-      >
+      <button class="btn-pagination" (click)="goToFirstPage()" [disabled]="!hasPreviousPage" appTooltip="Trang đầu">
         <fa-icon [icon]="faAnglesLeft"></fa-icon>
       </button>
 
-      <button
-        class="btn-pagination"
-        (click)="goToPreviousPage()"
-        [disabled]="!hasPreviousPage"
-        appTooltip="Trang trước"
-      >
+      <button class="btn-pagination" (click)="goToPreviousPage()" [disabled]="!hasPreviousPage"
+        appTooltip="Trang trước">
         <fa-icon [icon]="faChevronLeft"></fa-icon>
       </button>
 
       <div class="page-numbers">
-        <button
-          *ngFor="let page of getPageNumbers()"
-          class="btn-page"
-          [class.active]="page === currentPage"
-          [disabled]="page === -1"
-          (click)="goToPage(page)"
-        >
+        <button *ngFor="let page of getPageNumbers()" class="btn-page" [class.active]="page === currentPage"
+          [disabled]="page === -1" (click)="goToPage(page)">
           <span *ngIf="page === -1">...</span>
           <span *ngIf="page !== -1">{{ page }}</span>
         </button>
       </div>
 
-      <button
-        class="btn-pagination"
-        (click)="goToNextPage()"
-        [disabled]="!hasNextPage"
-        appTooltip="Trang sau"
-      >
+      <button class="btn-pagination" (click)="goToNextPage()" [disabled]="!hasNextPage" appTooltip="Trang sau">
         <fa-icon [icon]="faChevronRight"></fa-icon>
       </button>
 
-      <button
-        class="btn-pagination"
-        (click)="goToLastPage()"
-        [disabled]="!hasNextPage"
-        appTooltip="Trang cuối"
-      >
+      <button class="btn-pagination" (click)="goToLastPage()" [disabled]="!hasNextPage" appTooltip="Trang cuối">
         <fa-icon [icon]="faAnglesRight"></fa-icon>
       </button>
     </div>
@@ -225,481 +168,368 @@
 
     <div class="modal-body">
       @if (!isDetailEditMode) {
-        <!-- View Mode -->
-        <div class="detail-view">
-          <!-- Product Images Section -->
-          @if (detailProduct.images && detailProduct.images.length > 0) {
-          <div class="detail-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faImages"></fa-icon>
-              Hình ảnh sản phẩm
-            </h4>
-            <div class="product-images-grid">
-              @for (img of detailProduct.images; track img.productImageId) {
-              <div class="image-item" [class.primary]="img.isPrimary">
-                <img [src]="img.imageUrl" [alt]="img.altText || detailProduct.name" />
-                @if (img.isPrimary) {
-                <span class="primary-badge">Ảnh chính</span>
-                }
-              </div>
+      <!-- View Mode -->
+      <div class="detail-view">
+        <!-- Product Images Section -->
+        @if (detailProduct.images && detailProduct.images.length > 0) {
+        <div class="detail-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faImages"></fa-icon>
+            Hình ảnh sản phẩm
+          </h4>
+          <div class="product-images-grid">
+            @for (img of detailProduct.images; track img.productImageId) {
+            <div class="image-item" [class.primary]="img.isPrimary">
+              <img [src]="img.imageUrl" [alt]="img.altText || detailProduct.name" />
+              @if (img.isPrimary) {
+              <span class="primary-badge">Ảnh chính</span>
               }
-            </div>
-          </div>
-          }
-
-          <div class="detail-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              Thông tin cơ bản
-            </h4>
-            
-            <div class="detail-row">
-              <span class="detail-label">Mã SKU:</span>
-              <span class="detail-value">{{ detailProduct.sku }}</span>
-            </div>
-
-            <div class="detail-row">
-              <span class="detail-label">Tên sản phẩm:</span>
-              <span class="detail-value">{{ detailProduct.name }}</span>
-            </div>
-
-            <div class="detail-row">
-              <span class="detail-label">Slug:</span>
-              <span class="detail-value">{{ detailProduct.slug || 'Chưa có' }}</span>
-            </div>
-
-            <div class="detail-row">
-              <span class="detail-label">Mô tả ngắn:</span>
-              <span class="detail-value">{{ detailProduct.shortDescription || 'Chưa có' }}</span>
-            </div>
-
-            <div class="detail-row">
-              <span class="detail-label">Mô tả chi tiết:</span>
-              <span class="detail-value">{{ detailProduct.description || 'Chưa có' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faMoneyBill"></fa-icon>
-              Thông tin giá
-            </h4>
-
-            <div class="detail-row">
-              <span class="detail-label">Giá vốn:</span>
-              <span class="detail-value">{{ formatCurrency(detailProduct.cost || 0) }}</span>
-            </div>
-
-            <div class="detail-row">
-              <span class="detail-label">Giá bán:</span>
-              <span class="detail-value price-highlight">{{ formatCurrency(detailProduct.price || 0) }}</span>
-            </div>
-
-            @if (detailProduct.discountPrice && detailProduct.discountPrice > 0) {
-            <div class="detail-row">
-              <span class="detail-label">Giá giảm:</span>
-              <span class="detail-value discount-highlight">{{ formatCurrency(detailProduct.discountPrice) }}</span>
             </div>
             }
           </div>
+        </div>
+        }
 
-          <div class="detail-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              Thông tin kho
-            </h4>
+        <div class="detail-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin cơ bản
+          </h4>
 
-            <div class="detail-row">
-              <span class="detail-label">Số lượng tồn kho:</span>
-              <span class="detail-value stock-highlight">{{ detailProduct.stockQuantity || 0 }}</span>
+          <div class="detail-row">
+            <span class="detail-label">Mã SKU:</span>
+            <span class="detail-value">{{ detailProduct.sku }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Tên sản phẩm:</span>
+            <span class="detail-value">{{ detailProduct.name }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Slug:</span>
+            <span class="detail-value">{{ detailProduct.slug || 'Chưa có' }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Mô tả ngắn:</span>
+            <span class="detail-value">{{ detailProduct.shortDescription || 'Chưa có' }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Mô tả chi tiết:</span>
+            <span class="detail-value">{{ detailProduct.description || 'Chưa có' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faMoneyBill"></fa-icon>
+            Thông tin giá
+          </h4>
+
+          <div class="detail-row">
+            <span class="detail-label">Giá vốn:</span>
+            <span class="detail-value">{{ formatCurrency(detailProduct.cost || 0) }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Giá bán:</span>
+            <span class="detail-value price-highlight">{{ formatCurrency(detailProduct.price || 0) }}</span>
+          </div>
+
+          @if (detailProduct.discountPrice && detailProduct.discountPrice > 0) {
+          <div class="detail-row">
+            <span class="detail-label">Giá giảm:</span>
+            <span class="detail-value discount-highlight">{{ formatCurrency(detailProduct.discountPrice) }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin kho
+          </h4>
+
+          <div class="detail-row">
+            <span class="detail-label">Số lượng tồn kho:</span>
+            <span class="detail-value stock-highlight">{{ detailProduct.stockQuantity || 0 }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Mức tồn tối thiểu:</span>
+            <span class="detail-value">{{ detailProduct.minStockLevel || 0 }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Trọng lượng:</span>
+            <span class="detail-value">{{ detailProduct.weight || 0 }} kg</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Kích thước:</span>
+            <span class="detail-value">{{ detailProduct.dimensions || 'Chưa có' }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Trạng thái kho:</span>
+            <span class="detail-value" [ngClass]="getStockStatusClass(detailProduct)">
+              {{ getStockStatus(detailProduct) }}
+            </span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Giá trị tồn kho:</span>
+            <span class="detail-value">{{ formatCurrency(calculateStockValue(detailProduct)) }}</span>
+          </div>
+        </div>
+      </div>
+      } @else {
+      <!-- Edit Mode -->
+      <form #detailEditForm="ngForm">
+        <!-- Image Management Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faImages"></fa-icon>
+            Quản lý hình ảnh
+          </h4>
+
+          <div class="image-upload-section">
+            <div class="upload-area">
+              <input type="file" #editFileInput accept="image/*" multiple (change)="onEditImageSelect($event)"
+                style="display: none" />
+              <button type="button" class="btn-upload" (click)="editFileInput.click()">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                Thêm ảnh mới
+              </button>
+              <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
             </div>
 
-            <div class="detail-row">
-              <span class="detail-label">Mức tồn tối thiểu:</span>
-              <span class="detail-value">{{ detailProduct.minStockLevel || 0 }}</span>
+            @if (existingImages && existingImages.length > 0) {
+            <div class="images-manager">
+              <div class="images-grid-edit">
+                @for (img of existingImages; track img.productImageId; let idx = $index) {
+                <div class="image-edit-item">
+                  <img [src]="img.imageUrl" [alt]="img.altText || 'Product image'" />
+
+                  <div class="image-overlay">
+                    <button type="button" class="btn-image-action" (click)="setEditPrimaryImage(idx)"
+                      [class.active]="img.isPrimary" appTooltip="Đặt làm ảnh chính">
+                      <fa-icon [icon]="img.isPrimary ? faStar : faStarRegular"></fa-icon>
+                    </button>
+                    <button type="button" class="btn-image-action btn-delete-image" (click)="removeEditImage(idx)"
+                      appTooltip="Xóa ảnh">
+                      <fa-icon [icon]="faTrashCan"></fa-icon>
+                    </button>
+                  </div>
+
+                  @if (img.isPrimary) {
+                  <span class="primary-badge-edit">Ảnh chính</span>
+                  }
+                  @if (img.isNew) {
+                  <span class="new-badge-edit">Mới</span>
+                  }
+                </div>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin cơ bản
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mã SKU <span class="required">*</span></label>
+              <input type="text" [(ngModel)]="editingProduct.sku" name="sku" class="form-control" required />
             </div>
 
-            <div class="detail-row">
-              <span class="detail-label">Trọng lượng:</span>
-              <span class="detail-value">{{ detailProduct.weight || 0 }} kg</span>
+            <div class="form-group">
+              <label>Slug</label>
+              <input type="text" [(ngModel)]="editingProduct.slug" name="slug" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tên sản phẩm <span class="required">*</span></label>
+            <input type="text" [(ngModel)]="editingProduct.name" name="name" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label>Mô tả ngắn</label>
+            <input type="text" [(ngModel)]="editingProduct.shortDescription" name="shortDescription"
+              class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>Mô tả chi tiết</label>
+            <textarea [(ngModel)]="editingProduct.description" name="description" class="form-control"
+              rows="4"></textarea>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faMoneyBill"></fa-icon>
+            Thông tin giá
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Giá vốn <span class="required">*</span></label>
+              <input type="number" [(ngModel)]="editingProduct.cost" name="cost" class="form-control" min="0"
+                step="0.01" required />
             </div>
 
-            <div class="detail-row">
-              <span class="detail-label">Kích thước:</span>
-              <span class="detail-value">{{ detailProduct.dimensions || 'Chưa có' }}</span>
+            <div class="form-group">
+              <label>Giá bán <span class="required">*</span></label>
+              <input type="number" [(ngModel)]="editingProduct.price" name="price" class="form-control" min="0"
+                step="0.01" required />
             </div>
 
-            <div class="detail-row">
-              <span class="detail-label">Trạng thái kho:</span>
-              <span class="detail-value" [ngClass]="getStockStatusClass(detailProduct)">
-                {{ getStockStatus(detailProduct) }}
-              </span>
-            </div>
-
-            <div class="detail-row">
-              <span class="detail-label">Giá trị tồn kho:</span>
-              <span class="detail-value">{{ formatCurrency(calculateStockValue(detailProduct)) }}</span>
+            <div class="form-group">
+              <label>Giá giảm</label>
+              <input type="number" [(ngModel)]="editingProduct.discountPrice" name="discountPrice" class="form-control"
+                min="0" step="0.01" />
             </div>
           </div>
         </div>
-      } @else {
-        <!-- Edit Mode -->
-        <form #detailEditForm="ngForm">
-          <!-- Image Management Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faImages"></fa-icon>
-              Quản lý hình ảnh
-            </h4>
-            
-            <div class="image-upload-section">
-              <div class="upload-area">
-                <input 
-                  type="file" 
-                  #editFileInput 
-                  accept="image/*" 
-                  multiple
-                  (change)="onEditImageSelect($event)"
-                  style="display: none"
-                />
-                <button 
-                  type="button" 
-                  class="btn-upload"
-                  (click)="editFileInput.click()"
-                >
-                  <fa-icon [icon]="faPlus"></fa-icon>
-                  Thêm ảnh mới
-                </button>
-                <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
-              </div>
 
-              @if (existingImages && existingImages.length > 0) {
-              <div class="images-manager">
-                <div class="images-grid-edit">
-                  @for (img of existingImages; track img.productImageId; let idx = $index) {
-                  <div class="image-edit-item">
-                    <img [src]="img.imageUrl" [alt]="img.altText || 'Product image'" />
-                    
-                    <div class="image-overlay">
-                      <button 
-                        type="button" 
-                        class="btn-image-action"
-                        (click)="setEditPrimaryImage(idx)"
-                        [class.active]="img.isPrimary"
-                        appTooltip="Đặt làm ảnh chính"
-                      >
-                        <fa-icon [icon]="img.isPrimary ? faStar : faStarRegular"></fa-icon>
-                      </button>
-                      <button 
-                        type="button" 
-                        class="btn-image-action btn-delete-image"
-                        (click)="removeEditImage(idx)"
-                        appTooltip="Xóa ảnh"
-                      >
-                        <fa-icon [icon]="faTrashCan"></fa-icon>
-                      </button>
-                    </div>
+        <!-- Inventory Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Thông tin kho
+          </h4>
 
-                    @if (img.isPrimary) {
-                    <span class="primary-badge-edit">Ảnh chính</span>
-                    }
-                    @if (img.isNew) {
-                    <span class="new-badge-edit">Mới</span>
-                    }
-                  </div>
-                  }
-                </div>
-              </div>
-              }
-            </div>
-          </div>
-
-          <!-- Basic Information Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              Thông tin cơ bản
-            </h4>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label>Mã SKU <span class="required">*</span></label>
-                <input
-                  type="text"
-                  [(ngModel)]="editingProduct.sku"
-                  name="sku"
-                  class="form-control"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label>Slug</label>
-                <input type="text" [(ngModel)]="editingProduct.slug" name="slug" class="form-control" />
-              </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Số lượng tồn kho <span class="required">*</span></label>
+              <input type="number" [(ngModel)]="editingProduct.stockQuantity" name="stockQuantity" class="form-control"
+                min="0" required />
             </div>
 
             <div class="form-group">
-              <label>Tên sản phẩm <span class="required">*</span></label>
-              <input
-                type="text"
-                [(ngModel)]="editingProduct.name"
-                name="name"
-                class="form-control"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Mô tả ngắn</label>
-              <input
-                type="text"
-                [(ngModel)]="editingProduct.shortDescription"
-                name="shortDescription"
-                class="form-control"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Mô tả chi tiết</label>
-              <textarea
-                [(ngModel)]="editingProduct.description"
-                name="description"
-                class="form-control"
-                rows="4"
-              ></textarea>
+              <label>Mức tồn tối thiểu <span class="required">*</span></label>
+              <input type="number" [(ngModel)]="editingProduct.minStockLevel" name="minStockLevel" class="form-control"
+                min="0" required />
             </div>
           </div>
 
-          <!-- Pricing Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faMoneyBill"></fa-icon>
-              Thông tin giá
-            </h4>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Giá vốn <span class="required">*</span></label>
-                <input
-                  type="number"
-                  [(ngModel)]="editingProduct.cost"
-                  name="cost"
-                  class="form-control"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label>Giá bán <span class="required">*</span></label>
-                <input
-                  type="number"
-                  [(ngModel)]="editingProduct.price"
-                  name="price"
-                  class="form-control"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label>Giá giảm</label>
-                <input
-                  type="number"
-                  [(ngModel)]="editingProduct.discountPrice"
-                  name="discountPrice"
-                  class="form-control"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Trọng lượng (kg)</label>
+              <input type="number" [(ngModel)]="editingProduct.weight" name="weight" class="form-control" min="0"
+                step="0.01" />
             </div>
-          </div>
-
-          <!-- Inventory Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              Thông tin kho
-            </h4>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Số lượng tồn kho <span class="required">*</span></label>
-                <input
-                  type="number"
-                  [(ngModel)]="editingProduct.stockQuantity"
-                  name="stockQuantity"
-                  class="form-control"
-                  min="0"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label>Mức tồn tối thiểu <span class="required">*</span></label>
-                <input
-                  type="number"
-                  [(ngModel)]="editingProduct.minStockLevel"
-                  name="minStockLevel"
-                  class="form-control"
-                  min="0"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Trọng lượng (kg)</label>
-                <input
-                  type="number"
-                  [(ngModel)]="editingProduct.weight"
-                  name="weight"
-                  class="form-control"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
-
-              <div class="form-group">
-                <label>Kích thước</label>
-                <input
-                  type="text"
-                  [(ngModel)]="editingProduct.dimensions"
-                  name="dimensions"
-                  class="form-control"
-                  placeholder="DxRxC (mm)"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Category Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              Danh mục
-            </h4>
 
             <div class="form-group">
-              <label>Danh mục <span class="required">*</span></label>
-              <select
-                [(ngModel)]="editingProduct.categoryId"
-                name="categoryId"
-                class="form-control"
-                required
-              >
-                <option value="">-- Chọn danh mục --</option>
-                <option *ngFor="let cat of categories" [value]="cat.categoryId">
-                  {{ cat.name }}
-                </option>
+              <label>Kích thước</label>
+              <input type="text" [(ngModel)]="editingProduct.dimensions" name="dimensions" class="form-control"
+                placeholder="DxRxC (mm)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Danh mục
+          </h4>
+
+          <div class="form-group">
+            <label>Danh mục <span class="required">*</span></label>
+            <select [(ngModel)]="editingProduct.categoryId" name="categoryId" class="form-control" required>
+              <option value="">-- Chọn danh mục --</option>
+              <option *ngFor="let cat of categories" [value]="cat.categoryId">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Thương hiệu</label>
+            <input type="text" [(ngModel)]="editingProduct.brandId" name="brandId" class="form-control"
+              placeholder="ID thương hiệu (nếu có)" />
+          </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            Trạng thái
+          </h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Trạng thái</label>
+              <select [(ngModel)]="editingProduct.status" name="status" class="form-control">
+                <option [value]="0">Nháp</option>
+                <option [value]="1">Hoạt động</option>
+                <option [value]="2">Tạm ngưng</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Thương hiệu</label>
-              <input
-                type="text"
-                [(ngModel)]="editingProduct.brandId"
-                name="brandId"
-                class="form-control"
-                placeholder="ID thương hiệu (nếu có)"
-              />
-            </div>
-          </div>
-
-          <!-- Status Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              Trạng thái
-            </h4>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Trạng thái</label>
-                <select
-                  [(ngModel)]="editingProduct.status"
-                  name="status"
-                  class="form-control"
-                >
-                  <option [value]="0">Nháp</option>
-                  <option [value]="1">Hoạt động</option>
-                  <option [value]="2">Tạm ngưng</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="checkbox-label">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="editingProduct.isFeatured"
-                    name="isFeatured"
-                  />
-                  Sản phẩm nổi bật
-                </label>
-              </div>
-
-              <div class="form-group">
-                <label class="checkbox-label">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="editingProduct.isDigital"
-                    name="isDigital"
-                  />
-                  Sản phẩm số
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- SEO Section -->
-          <div class="form-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faBox"></fa-icon>
-              SEO
-            </h4>
-
-            <div class="form-group">
-              <label>Meta Title</label>
-              <input
-                type="text"
-                [(ngModel)]="editingProduct.metaTitle"
-                name="metaTitle"
-                class="form-control"
-              />
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="editingProduct.isFeatured" name="isFeatured" />
+                Sản phẩm nổi bật
+              </label>
             </div>
 
             <div class="form-group">
-              <label>Meta Description</label>
-              <textarea
-                [(ngModel)]="editingProduct.metaDescription"
-                name="metaDescription"
-                class="form-control"
-                rows="3"
-              ></textarea>
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="editingProduct.isDigital" name="isDigital" />
+                Sản phẩm số
+              </label>
             </div>
           </div>
-        </form>
+        </div>
+
+        <!-- SEO Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faBox"></fa-icon>
+            SEO
+          </h4>
+
+          <div class="form-group">
+            <label>Meta Title</label>
+            <input type="text" [(ngModel)]="editingProduct.metaTitle" name="metaTitle" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>Meta Description</label>
+            <textarea [(ngModel)]="editingProduct.metaDescription" name="metaDescription" class="form-control"
+              rows="3"></textarea>
+          </div>
+        </div>
+      </form>
       }
     </div>
 
     <div class="modal-footer">
       @if (!isDetailEditMode) {
-        <button class="btn btn-secondary" (click)="closeDetailModal()">Đóng</button>
-        <button class="btn btn-primary" (click)="enableEditMode()">
-          <fa-icon [icon]="faPenToSquare"></fa-icon>
-          Chỉnh sửa
-        </button>
+      <button class="btn btn-secondary" (click)="closeDetailModal()">Đóng</button>
+      <button class="btn btn-primary" (click)="enableEditMode()">
+        <fa-icon [icon]="faPenToSquare"></fa-icon>
+        Chỉnh sửa
+      </button>
       } @else {
-        <button class="btn btn-secondary" (click)="isDetailEditMode = false">Hủy</button>
-        <button class="btn btn-primary" (click)="saveDetailChanges()">
-          Lưu thay đổi
-        </button>
+      <button class="btn btn-secondary" (click)="isDetailEditMode = false">Hủy</button>
+      <button class="btn btn-primary" (click)="saveDetailChanges()">
+        Lưu thay đổi
+      </button>
       }
     </div>
   </div>
@@ -720,13 +550,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>Mã SKU <span class="required">*</span></label>
-            <input
-              type="text"
-              [(ngModel)]="currentProduct.sku"
-              name="sku"
-              class="form-control"
-              required
-            />
+            <input type="text" [(ngModel)]="currentProduct.sku" name="sku" class="form-control" required />
           </div>
 
           <div class="form-group">
@@ -737,123 +561,66 @@
 
         <div class="form-group">
           <label>Tên sản phẩm <span class="required">*</span></label>
-          <input
-            type="text"
-            [(ngModel)]="currentProduct.name"
-            name="name"
-            class="form-control"
-            required
-          />
+          <input type="text" [(ngModel)]="currentProduct.name" name="name" class="form-control" required />
         </div>
 
         <div class="form-group">
           <label>Mô tả ngắn</label>
-          <input
-            type="text"
-            [(ngModel)]="currentProduct.shortDescription"
-            name="shortDescription"
-            class="form-control"
-          />
+          <input type="text" [(ngModel)]="currentProduct.shortDescription" name="shortDescription"
+            class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Mô tả chi tiết</label>
-          <textarea
-            [(ngModel)]="currentProduct.description"
-            name="description"
-            class="form-control"
-            rows="4"
-          ></textarea>
+          <textarea [(ngModel)]="currentProduct.description" name="description" class="form-control"
+            rows="4"></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Giá vốn <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentProduct.cost"
-              name="cost"
-              class="form-control"
-              min="0"
-              step="0.01"
-              required
-            />
+            <input type="number" [(ngModel)]="currentProduct.cost" name="cost" class="form-control" min="0" step="0.01"
+              required />
           </div>
 
           <div class="form-group">
             <label>Giá bán <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentProduct.price"
-              name="price"
-              class="form-control"
-              min="0"
-              step="0.01"
-              required
-            />
+            <input type="number" [(ngModel)]="currentProduct.price" name="price" class="form-control" min="0"
+              step="0.01" required />
           </div>
 
           <div class="form-group">
             <label>Giá giảm</label>
-            <input
-              type="number"
-              [(ngModel)]="currentProduct.discountPrice"
-              name="discountPrice"
-              class="form-control"
-              min="0"
-              step="0.01"
-            />
+            <input type="number" [(ngModel)]="currentProduct.discountPrice" name="discountPrice" class="form-control"
+              min="0" step="0.01" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Số lượng tồn kho <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentProduct.stockQuantity"
-              name="stockQuantity"
-              class="form-control"
-              min="0"
-              required
-            />
+            <input type="number" [(ngModel)]="currentProduct.stockQuantity" name="stockQuantity" class="form-control"
+              min="0" required />
           </div>
 
           <div class="form-group">
             <label>Mức tồn tối thiểu <span class="required">*</span></label>
-            <input
-              type="number"
-              [(ngModel)]="currentProduct.minStockLevel"
-              name="minStockLevel"
-              class="form-control"
-              min="0"
-              required
-            />
+            <input type="number" [(ngModel)]="currentProduct.minStockLevel" name="minStockLevel" class="form-control"
+              min="0" required />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label>Trọng lượng (kg)</label>
-            <input
-              type="number"
-              [(ngModel)]="currentProduct.weight"
-              name="weight"
-              class="form-control"
-              min="0"
-              step="0.01"
-            />
+            <input type="number" [(ngModel)]="currentProduct.weight" name="weight" class="form-control" min="0"
+              step="0.01" />
           </div>
 
           <div class="form-group">
             <label>Kích thước</label>
-            <input
-              type="text"
-              [(ngModel)]="currentProduct.dimensions"
-              name="dimensions"
-              class="form-control"
-              placeholder="DxRxC (mm)"
-            />
+            <input type="text" [(ngModel)]="currentProduct.dimensions" name="dimensions" class="form-control"
+              placeholder="DxRxC (mm)" />
           </div>
         </div>
       </form>
@@ -957,12 +724,8 @@
     <div class="modal-body">
       <div class="filter-options-container">
         <div *ngFor="let status of statusOptions" class="filter-option">
-          <input
-            type="checkbox"
-            [id]="'status-modal-' + status"
-            [(ngModel)]="statusFilters[status]"
-            (ngModelChange)="filterProducts()"
-          />
+          <input type="checkbox" [id]="'status-modal-' + status" [(ngModel)]="statusFilters[status]"
+            (ngModelChange)="filterProducts()" />
           <label [for]="'status-modal-' + status">{{ status }}</label>
         </div>
       </div>
@@ -995,341 +758,250 @@
 
       <!-- Danh sách phân loại hiện có -->
       @if (!showVariantForm) {
-        <div class="variants-list-section">
-          <div class="list-header">
-            <h4 class="section-title">
-              <fa-icon [icon]="faLayerGroup"></fa-icon>
-              Danh sách phân loại ({{ productVariants.length }})
-            </h4>
-            <button 
-              type="button" 
-              class="btn btn-primary"
-              (click)="openAddVariantForm()"
-            >
-              <fa-icon [icon]="faPlus"></fa-icon>
-              Thêm phân loại mới
-            </button>
-          </div>
+      <div class="variants-list-section">
+        <div class="list-header">
+          <h4 class="section-title">
+            <fa-icon [icon]="faLayerGroup"></fa-icon>
+            Danh sách phân loại ({{ productVariants.length }})
+          </h4>
+          <button type="button" class="btn btn-primary" (click)="openAddVariantForm()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Thêm phân loại mới
+          </button>
+        </div>
 
-          @if (isLoadingVariants) {
-            <div class="loading-variants">
-              <p>Đang tải danh sách phân loại...</p>
-            </div>
-          } @else if (productVariants.length === 0) {
-            <div class="no-variants">
-              <fa-icon [icon]="faBox" size="2x"></fa-icon>
-              <p>Chưa có phân loại nào</p>
-              <button 
-                type="button" 
-                class="btn btn-primary"
-                (click)="openAddVariantForm()"
-              >
-                <fa-icon [icon]="faPlus"></fa-icon>
-                Thêm phân loại đầu tiên
-              </button>
-            </div>
-          } @else {
-            <div class="variants-grid">
-              @for (variant of productVariants; track variant.productVariantId) {
-                <div class="variant-card">
-                  <div class="variant-image">
-                    @if (variant.imageUrl) {
-                      <img [src]="variant.imageUrl" [alt]="variant.name" />
-                    } @else {
-                      <div class="no-image-placeholder">
-                        <fa-icon [icon]="faBox" size="2x"></fa-icon>
-                      </div>
-                    }
-                  </div>
-                  
-                  <div class="variant-info">
-                    <h5 class="variant-name" [title]="variant.name">{{ variant.name }}</h5>
-                    <p class="variant-sku">SKU: {{ variant.sku }}</p>
-                    
-                    <div class="variant-details">
-                      <div class="detail-row">
-                        <span class="label">Giá:</span>
-                        <span class="value">{{ formatCurrency(variant.price || 0) }}</span>
-                      </div>
-                      @if (variant.discountPrice && variant.discountPrice > 0) {
-                        <div class="detail-row">
-                          <span class="label">Giá giảm:</span>
-                          <span class="value discount">{{ formatCurrency(variant.discountPrice) }}</span>
-                        </div>
-                      }
-                      <div class="detail-row">
-                        <span class="label">Tồn kho:</span>
-                        <span class="value">{{ variant.stockQuantity || 0 }}</span>
-                      </div>
-                      <div class="detail-row">
-                        <span class="label">Trạng thái:</span>
-                        <span class="value" [class.status-active]="variant.status === 1" [class.status-inactive]="variant.status === 0">
-                          {{ variant.status === 1 ? 'Hoạt động' : 'Không hoạt động' }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="variant-actions">
-                    <button 
-                      type="button" 
-                      class="btn-action btn-edit"
-                      (click)="openEditVariantForm(variant)"
-                      appTooltip="Sửa"
-                    >
-                      <fa-icon [icon]="faPenToSquare"></fa-icon>
-                    </button>
-                    <button 
-                      type="button" 
-                      class="btn-action btn-delete"
-                      (click)="confirmDeleteVariant(variant)"
-                      appTooltip="Xóa"
-                    >
-                      <fa-icon [icon]="faTrashCan"></fa-icon>
-                    </button>
-                  </div>
-                </div>
+        @if (isLoadingVariants) {
+        <div class="loading-variants">
+          <p>Đang tải danh sách phân loại...</p>
+        </div>
+        } @else if (productVariants.length === 0) {
+        <div class="no-variants">
+          <fa-icon [icon]="faBox" size="2x"></fa-icon>
+          <p>Chưa có phân loại nào</p>
+          <button type="button" class="btn btn-primary" (click)="openAddVariantForm()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Thêm phân loại đầu tiên
+          </button>
+        </div>
+        } @else {
+        <div class="variants-grid">
+          @for (variant of productVariants; track variant.productVariantId) {
+          <div class="variant-card">
+            <div class="variant-image">
+              @if (variant.imageUrl) {
+              <img [src]="variant.imageUrl" [alt]="variant.name" />
+              } @else {
+              <div class="no-image-placeholder">
+                <fa-icon [icon]="faBox" size="2x"></fa-icon>
+              </div>
               }
             </div>
+
+            <div class="variant-info">
+              <h5 class="variant-name" [title]="variant.name">{{ variant.name }}</h5>
+              <p class="variant-sku">SKU: {{ variant.sku }}</p>
+
+              <div class="variant-details">
+                <div class="detail-row">
+                  <span class="label">Giá:</span>
+                  <span class="value">{{ formatCurrency(variant.price || 0) }}</span>
+                </div>
+                @if (variant.discountPrice && variant.discountPrice > 0) {
+                <div class="detail-row">
+                  <span class="label">Giá giảm:</span>
+                  <span class="value discount">{{ formatCurrency(variant.discountPrice) }}</span>
+                </div>
+                }
+                <div class="detail-row">
+                  <span class="label">Tồn kho:</span>
+                  <span class="value">{{ variant.stockQuantity || 0 }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Trạng thái:</span>
+                  <span class="value" [class.status-active]="variant.status === 1"
+                    [class.status-inactive]="variant.status === 0">
+                    {{ variant.status === 1 ? 'Hoạt động' : 'Không hoạt động' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="variant-actions">
+              <button type="button" class="btn-action btn-edit" (click)="openEditVariantForm(variant)" appTooltip="Sửa">
+                <fa-icon [icon]="faPenToSquare"></fa-icon>
+              </button>
+              <button type="button" class="btn-action btn-delete" (click)="confirmDeleteVariant(variant)"
+                appTooltip="Xóa">
+                <fa-icon [icon]="faTrashCan"></fa-icon>
+              </button>
+            </div>
+          </div>
           }
         </div>
+        }
+      </div>
       }
 
       <!-- Form thêm/sửa phân loại -->
       @if (showVariantForm) {
-        <div class="variant-form-section">
-          <div class="form-header">
-            <h4 class="section-title">
-              <fa-icon [icon]="variantFormMode === 'add' ? faPlus : faPenToSquare"></fa-icon>
-              {{ variantFormMode === 'add' ? 'Thêm phân loại mới' : 'Chỉnh sửa phân loại' }}
-            </h4>
-            <button 
-              type="button" 
-              class="btn btn-secondary btn-sm"
-              (click)="cancelVariantForm()"
-            >
-              <fa-icon [icon]="faXmark"></fa-icon>
-              Quay lại
+      <div class="variant-form-section">
+        <div class="form-header">
+          <h4 class="section-title">
+            <fa-icon [icon]="variantFormMode === 'add' ? faPlus : faPenToSquare"></fa-icon>
+            {{ variantFormMode === 'add' ? 'Thêm phân loại mới' : 'Chỉnh sửa phân loại' }}
+          </h4>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="cancelVariantForm()">
+            <fa-icon [icon]="faXmark"></fa-icon>
+            Quay lại
+          </button>
+        </div>
+
+        <!-- Product Images Section -->
+        <div class="product-images-section" *ngIf="productImageUrls.length > 0">
+          <h4 class="section-title">
+            <fa-icon [icon]="faImages"></fa-icon>
+            Chọn ảnh từ sản phẩm gốc (tùy chọn)
+          </h4>
+          <div class="images-gallery">
+            <div class="image-item" *ngFor="let imageUrl of productImageUrls"
+              [class.selected]="selectedImageUrl === imageUrl" (click)="selectProductImage(imageUrl)">
+              <img [src]="imageUrl" alt="Product image" />
+              <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
+                <fa-icon [icon]="faCheck"></fa-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload New Image Section -->
+        <div class="upload-image-section">
+          <h4 class="section-title">
+            <fa-icon [icon]="faUpload"></fa-icon>
+            Hoặc tải lên ảnh mới (tùy chọn)
+          </h4>
+
+          <div class="upload-area" *ngIf="!variantImageFile">
+            <input type="file" #variantFileInput accept="image/*" (change)="onVariantImageSelect($event)"
+              style="display: none" />
+            <button type="button" class="btn btn-upload" (click)="variantFileInput.click()">
+              <fa-icon [icon]="faCloudUpload"></fa-icon>
+              Chọn ảnh từ máy tính
             </button>
+            <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
           </div>
 
-          <!-- Product Images Section -->
-          <div class="product-images-section" *ngIf="productImageUrls.length > 0">
-            <h4 class="section-title">
-              <fa-icon [icon]="faImages"></fa-icon>
-              Chọn ảnh từ sản phẩm gốc (tùy chọn)
-            </h4>
-            <div class="images-gallery">
-              <div 
-                class="image-item" 
-                *ngFor="let imageUrl of productImageUrls"
-                [class.selected]="selectedImageUrl === imageUrl"
-                (click)="selectProductImage(imageUrl)"
-              >
-                <img [src]="imageUrl" alt="Product image" />
-                <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
-                  <fa-icon [icon]="faCheck"></fa-icon>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Upload New Image Section -->
-          <div class="upload-image-section">
-            <h4 class="section-title">
-              <fa-icon [icon]="faUpload"></fa-icon>
-              Hoặc tải lên ảnh mới (tùy chọn)
-            </h4>
-            
-            <div class="upload-area" *ngIf="!variantImageFile">
-              <input 
-                type="file" 
-                #variantFileInput
-                accept="image/*"
-                (change)="onVariantImageSelect($event)"
-                style="display: none"
-              />
-              <button 
-                type="button" 
-                class="btn btn-upload"
-                (click)="variantFileInput.click()"
-              >
-                <fa-icon [icon]="faCloudUpload"></fa-icon>
-                Chọn ảnh từ máy tính
+          <div class="uploaded-image" *ngIf="variantImageFile">
+            <div class="image-preview">
+              <img [src]="variantImagePreview" alt="Uploaded image" />
+              <button type="button" class="btn-remove" (click)="removeVariantImage()" appTooltip="Xóa ảnh">
+                <fa-icon [icon]="faXmark"></fa-icon>
               </button>
-              <p class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
+            </div>
+            <p class="file-name">{{ variantImageFile.name }}</p>
+          </div>
+        </div>
+
+        <form #variantForm="ngForm">
+          <!-- Basic Information -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <fa-icon [icon]="faBox"></fa-icon>
+              Thông tin cơ bản
+            </h4>
+
+            <div class="form-group">
+              <label>Mã SKU <span class="required">*</span></label>
+              <input type="text" [(ngModel)]="variantSku" name="variantSku" class="form-control" required />
             </div>
 
-            <div class="uploaded-image" *ngIf="variantImageFile">
-              <div class="image-preview">
-                <img [src]="variantImagePreview" alt="Uploaded image" />
-                <button 
-                  type="button" 
-                  class="btn-remove"
-                  (click)="removeVariantImage()"
-                  appTooltip="Xóa ảnh"
-                >
-                  <fa-icon [icon]="faXmark"></fa-icon>
-                </button>
+            <div class="form-group">
+              <label>Tên phân loại <span class="required">*</span></label>
+              <input type="text" [(ngModel)]="variantName" name="variantName" class="form-control" required />
+            </div>
+          </div>
+
+          <!-- Pricing Section -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <fa-icon [icon]="faMoneyBill"></fa-icon>
+              Thông tin giá
+            </h4>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Giá bán <span class="required">*</span></label>
+                <input type="number" [(ngModel)]="variantPrice" name="variantPrice" class="form-control" min="0"
+                  step="0.01" required />
               </div>
-              <p class="file-name">{{ variantImageFile.name }}</p>
-            </div>
-          </div>
-
-          <form #variantForm="ngForm">
-        <!-- Basic Information -->
-        <div class="form-section">
-          <h4 class="section-title">
-            <fa-icon [icon]="faBox"></fa-icon>
-            Thông tin cơ bản
-          </h4>
-          
-          <div class="form-group">
-            <label>Mã SKU <span class="required">*</span></label>
-            <input
-              type="text"
-              [(ngModel)]="variantSku"
-              name="variantSku"
-              class="form-control"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Tên phân loại <span class="required">*</span></label>
-            <input
-              type="text"
-              [(ngModel)]="variantName"
-              name="variantName"
-              class="form-control"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Pricing Section -->
-        <div class="form-section">
-          <h4 class="section-title">
-            <fa-icon [icon]="faMoneyBill"></fa-icon>
-            Thông tin giá
-          </h4>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Giá bán <span class="required">*</span></label>
-              <input
-                type="number"
-                [(ngModel)]="variantPrice"
-                name="variantPrice"
-                class="form-control"
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Giá giảm</label>
-              <input
-                type="number"
-                [(ngModel)]="variantDiscountPrice"
-                name="variantDiscountPrice"
-                class="form-control"
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Inventory Section -->
-        <div class="form-section">
-          <h4 class="section-title">
-            <fa-icon [icon]="faBox"></fa-icon>
-            Thông tin kho
-          </h4>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Số lượng tồn kho <span class="required">*</span></label>
-              <input
-                type="number"
-                [(ngModel)]="variantStockQuantity"
-                name="variantStockQuantity"
-                class="form-control"
-                min="0"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Mức tồn tối thiểu <span class="required">*</span></label>
-              <input
-                type="number"
-                [(ngModel)]="variantMinStockLevel"
-                name="variantMinStockLevel"
-                class="form-control"
-                min="0"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Trọng lượng (kg)</label>
-              <input
-                type="number"
-                [(ngModel)]="variantWeight"
-                name="variantWeight"
-                class="form-control"
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Kích thước</label>
-              <input
-                type="text"
-                [(ngModel)]="variantDimensions"
-                name="variantDimensions"
-                class="form-control"
-                placeholder="DxRxC (mm)"
-              />
-            </div>
-          </div>
-        </div>
-
-            <!-- Status Section -->
-            <div class="form-section">
-              <h4 class="section-title">
-                <fa-icon [icon]="faBox"></fa-icon>
-                Trạng thái
-              </h4>
 
               <div class="form-group">
-                <label>Trạng thái <span class="required">*</span></label>
-                <select
-                  [(ngModel)]="variantStatus"
-                  name="variantStatus"
-                  class="form-control"
-                  required
-                >
-                  <option [value]="0">Không hoạt động</option>
-                  <option [value]="1">Hoạt động</option>
-                </select>
+                <label>Giá giảm</label>
+                <input type="number" [(ngModel)]="variantDiscountPrice" name="variantDiscountPrice" class="form-control"
+                  min="0" step="0.01" />
               </div>
             </div>
-          </form>
-
-          <div class="form-actions">
-            <button class="btn btn-secondary" (click)="cancelVariantForm()">Hủy</button>
-            <button class="btn btn-primary" (click)="saveVariant()">
-              {{ variantFormMode === 'add' ? 'Thêm phân loại' : 'Cập nhật phân loại' }}
-            </button>
           </div>
+
+          <!-- Inventory Section -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <fa-icon [icon]="faBox"></fa-icon>
+              Thông tin kho
+            </h4>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Số lượng tồn kho <span class="required">*</span></label>
+                <input type="number" [(ngModel)]="variantStockQuantity" name="variantStockQuantity" class="form-control"
+                  min="0" required />
+              </div>
+
+              <div class="form-group">
+                <label>Mức tồn tối thiểu <span class="required">*</span></label>
+                <input type="number" [(ngModel)]="variantMinStockLevel" name="variantMinStockLevel" class="form-control"
+                  min="0" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Trọng lượng (kg)</label>
+                <input type="number" [(ngModel)]="variantWeight" name="variantWeight" class="form-control" min="0"
+                  step="0.01" />
+              </div>
+
+              <div class="form-group">
+                <label>Kích thước</label>
+                <input type="text" [(ngModel)]="variantDimensions" name="variantDimensions" class="form-control"
+                  placeholder="DxRxC (mm)" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Section -->
+          <div class="form-section">
+            <h4 class="section-title">
+              <fa-icon [icon]="faBox"></fa-icon>
+              Trạng thái
+            </h4>
+
+            <div class="form-group">
+              <label>Trạng thái <span class="required">*</span></label>
+              <select [(ngModel)]="variantStatus" name="variantStatus" class="form-control" required>
+                <option [value]="0">Không hoạt động</option>
+                <option [value]="1">Hoạt động</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+        <div class="form-actions">
+          <button class="btn btn-secondary" (click)="cancelVariantForm()">Hủy</button>
+          <button class="btn btn-primary" (click)="saveVariant()">
+            {{ variantFormMode === 'add' ? 'Thêm phân loại' : 'Cập nhật phân loại' }}
+          </button>
         </div>
+      </div>
       }
     </div>
 

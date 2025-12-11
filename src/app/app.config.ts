@@ -22,6 +22,7 @@ import { registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 
 import { API_BASE_URL } from '@core/service/system-admin.service';
+import { API_KEY } from './customer/shared/components/ai-chat/ai-chat.component';
 
 registerLocaleData(localeVi);
 
@@ -55,5 +56,6 @@ export const appConfig: ApplicationConfig = {
     ConfirmationService,
     // { provide: API_BASE_URL, useValue: 'https://localhost:44394' }
     { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
+    { provide: API_KEY, useValue: "AIzaSyBfnLfv5Rmjq0vFBkTCGCiSIEY" }
   ],
 };

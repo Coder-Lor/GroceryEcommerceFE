@@ -11,21 +11,25 @@
     </div>
     } @else {
     <div class="summary-cards">
-        <div class="summary-card total-value">
+        <div class="summary-card total-value clickable" (click)="showTotalValueDetail()">
             <span class="summary-value">{{ formatCurrency(totalValue) }}</span>
             <span class="summary-label">Tổng giá trị phát hành</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card used-value">
+        <div class="summary-card used-value clickable" (click)="showUsedValueDetail()">
             <span class="summary-value">{{ formatCurrency(totalUsed) }}</span>
             <span class="summary-label">Đã sử dụng</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card active">
+        <div class="summary-card active clickable" (click)="showActiveVouchersDetail()">
             <span class="summary-value">{{ activeVouchers }}</span>
             <span class="summary-label">Đang hoạt động</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card expired">
+        <div class="summary-card expired clickable" (click)="showExpiredVouchersDetail()">
             <span class="summary-value">{{ expiredVouchers }}</span>
             <span class="summary-label">Đã hết hạn</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
     </div>
 
@@ -61,3 +65,43 @@
     </div>
     }
 </div>
+
+<p-dialog [(visible)]="showDetailDialog" [header]="detailDialogTitle" [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '900px' }" [contentStyle]="{ 'max-height': '70vh', 'overflow': 'auto' }"
+    [dismissableMask]="true">
+    <div class="detail-list">
+        @if (detailVouchers.length === 0) {
+        <div class="empty-state">
+            <i class="pi pi-gift"></i>
+            <p>Không có dữ liệu</p>
+        </div>
+        } @else {
+        <div class="detail-table">
+            <div class="table-header">
+                <span class="col-code">Mã voucher</span>
+                <span class="col-name">Tên voucher</span>
+                <span class="col-value">Giá trị</span>
+                <span class="col-used">Đã dùng</span>
+                <span class="col-date">Hạn sử dụng</span>
+                <span class="col-status">Trạng thái</span>
+            </div>
+            @for (voucher of detailVouchers; track voucher.giftCardId) {
+            <div class="table-row">
+                <span class="col-code">{{ voucher.code }}</span>
+                <span class="col-name">{{ voucher.name }}</span>
+                <span class="col-value">{{ formatCurrency(voucher.initialAmount) }}</span>
+                <span class="col-used">{{ formatCurrency(voucher.usedAmount) }}</span>
+                <span class="col-date">{{ formatDate(voucher.validTo) }}</span>
+                <span class="col-status">
+                    <span class="status-badge status-{{ voucher.status }}">{{ voucher.statusName }}</span>
+                </span>
+            </div>
+            }
+        </div>
+        <div class="detail-summary">
+            <span>Tổng: {{ detailVouchers.length }} voucher</span>
+            <span>Tổng giá trị: {{ formatCurrency(getDetailVouchersTotal()) }}</span>
+        </div>
+        }
+    </div>
+</p-dialog>

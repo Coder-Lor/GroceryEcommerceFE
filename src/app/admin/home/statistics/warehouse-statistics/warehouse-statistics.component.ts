@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { ProductClient, SortDirection } from '@services/system-admin.service';
+import { DialogModule } from 'primeng/dialog';
 
 interface ProductData {
     productId: string;
@@ -17,7 +18,7 @@ interface ProductData {
 @Component({
     selector: 'app-warehouse-statistics',
     standalone: true,
-    imports: [CommonModule, BaseChartDirective],
+    imports: [CommonModule, BaseChartDirective, DialogModule],
     templateUrl: './warehouse-statistics.component.html',
     styleUrls: ['./warehouse-statistics.component.scss']
 })
@@ -29,6 +30,11 @@ export class WarehouseStatisticsComponent implements OnInit {
     totalStock = 0;
     lowStockCount = 0;
     outOfStockCount = 0;
+
+    // Dialog state
+    showDetailDialog = false;
+    detailDialogTitle = '';
+    detailProducts: ProductData[] = [];
 
     // Bar Chart - Top sản phẩm theo tồn kho
     public barChartOptions: ChartConfiguration['options'] = {
@@ -197,5 +203,37 @@ export class WarehouseStatisticsComponent implements OnInit {
             labels: sorted.map(([name]) => name),
             data: sorted.map(([, stock]) => stock)
         };
+    }
+
+    showTotalStockDetail(): void {
+        this.detailDialogTitle = 'Tất cả sản phẩm';
+        this.detailProducts = [...this.products].sort((a, b) => b.stock - a.stock);
+        this.showDetailDialog = true;
+    }
+
+    showAllProductsDetail(): void {
+        this.detailDialogTitle = 'Tất cả sản phẩm';
+        this.detailProducts = [...this.products];
+        this.showDetailDialog = true;
+    }
+
+    showLowStockDetail(): void {
+        this.detailDialogTitle = 'Sản phẩm sắp hết hàng';
+        this.detailProducts = this.products.filter(p => p.stock > 0 && p.stock <= 10);
+        this.showDetailDialog = true;
+    }
+
+    showOutOfStockDetail(): void {
+        this.detailDialogTitle = 'Sản phẩm hết hàng';
+        this.detailProducts = this.products.filter(p => p.stock === 0);
+        this.showDetailDialog = true;
+    }
+
+    formatCurrency(value: number): string {
+        return value.toLocaleString('vi-VN') + ' đ';
+    }
+
+    getDetailProductsStock(): number {
+        return this.detailProducts.reduce((sum, p) => sum + p.stock, 0);
     }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { OrderClient, SortDirection } from '@services/system-admin.service';
+import { DialogModule } from 'primeng/dialog';
 
 interface OrderData {
     orderId: string;
@@ -18,7 +19,7 @@ interface OrderData {
 @Component({
     selector: 'app-order-statistics',
     standalone: true,
-    imports: [CommonModule, BaseChartDirective],
+    imports: [CommonModule, BaseChartDirective, DialogModule],
     templateUrl: './order-statistics.component.html',
     styleUrls: ['./order-statistics.component.scss']
 })
@@ -27,10 +28,15 @@ export class OrderStatisticsComponent implements OnInit {
 
     isLoading = true;
     orders: OrderData[] = [];
-    totalRevenue = 0;
+    totalOrderValue = 0;
     pendingOrders = 0;
     completedOrders = 0;
     cancelledOrders = 0;
+
+    // Dialog state
+    showDetailDialog = false;
+    detailDialogTitle = '';
+    detailOrders: OrderData[] = [];
 
     // Line Chart - Doanh thu theo tháng
     public lineChartOptions: ChartConfiguration['options'] = {
@@ -53,7 +59,7 @@ export class OrderStatisticsComponent implements OnInit {
             },
             title: {
                 display: true,
-                text: 'Doanh thu theo tháng (6 tháng gần nhất)'
+                text: 'Giá trị đơn hàng theo tháng (6 tháng gần nhất)'
             }
         }
     };
@@ -63,7 +69,7 @@ export class OrderStatisticsComponent implements OnInit {
         datasets: [
             {
                 data: [],
-                label: 'Doanh thu (VNĐ)',
+                label: 'Giá trị đơn hàng (VNĐ)',
                 borderColor: '#ff2626',
                 backgroundColor: 'rgba(255, 38, 38, 0.1)',
                 fill: true,
@@ -185,9 +191,9 @@ export class OrderStatisticsComponent implements OnInit {
     }
 
     processChartData(): void {
-        // Tính tổng doanh thu (chỉ tính đơn hoàn thành)
-        this.totalRevenue = this.orders
-            .filter(o => o.status === 4) // Giả sử status 4 là hoàn thành
+        // Tính tổng giá trị đơn hàng đã hoàn thành
+        this.totalOrderValue = this.orders
+            .filter(o => o.status === 4) // Đơn hàng hoàn thành
             .reduce((sum, o) => sum + o.totalAmount, 0);
 
         // Đếm đơn hàng theo trạng thái
@@ -195,14 +201,14 @@ export class OrderStatisticsComponent implements OnInit {
         this.completedOrders = this.orders.filter(o => o.status === 4).length;
         this.cancelledOrders = this.orders.filter(o => o.status === 5).length;
 
-        // Line Chart - Doanh thu theo tháng
-        const revenueData = this.getMonthlyRevenue();
+        // Line Chart - Giá trị đơn hàng theo tháng
+        const orderValueData = this.getMonthlyOrderValue();
         this.lineChartData = {
-            labels: revenueData.labels,
+            labels: orderValueData.labels,
             datasets: [
                 {
-                    data: revenueData.data,
-                    label: 'Doanh thu (VNĐ)',
+                    data: orderValueData.data,
+                    label: 'Giá trị đơn hàng (VNĐ)',
                     borderColor: '#ff2626',
                     backgroundColor: 'rgba(255, 38, 38, 0.1)',
                     fill: true,
@@ -241,7 +247,7 @@ export class OrderStatisticsComponent implements OnInit {
         };
     }
 
-    getMonthlyRevenue(): { labels: string[], data: number[] } {
+    getMonthlyOrderValue(): { labels: string[], data: number[] } {
         const months: { [key: string]: number } = {};
         const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
             'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
@@ -253,7 +259,7 @@ export class OrderStatisticsComponent implements OnInit {
             months[key] = 0;
         }
 
-        // Chỉ tính doanh thu từ đơn hoàn thành
+        // Chỉ tính giá trị từ đơn hoàn thành
         this.orders
             .filter(o => o.status === 4)
             .forEach(order => {
@@ -341,6 +347,44 @@ export class OrderStatisticsComponent implements OnInit {
     }
 
     formatCurrency(value: number): string {
-        return value.toLocaleString('vi-VN') + ' đ';
+        return value.toLocaleString('vi-VN') + ' ₫';
+    }
+
+    showCompletedOrdersDetail(): void {
+        this.detailDialogTitle = 'Đơn hàng hoàn thành';
+        this.detailOrders = this.orders.filter(o => o.status === 4);
+        this.showDetailDialog = true;
+    }
+
+    showAllOrdersDetail(): void {
+        this.detailDialogTitle = 'Tất cả đơn hàng';
+        this.detailOrders = [...this.orders];
+        this.showDetailDialog = true;
+    }
+
+    showPendingOrdersDetail(): void {
+        this.detailDialogTitle = 'Đơn hàng đang chờ xử lý';
+        this.detailOrders = this.orders.filter(o => o.status === 0 || o.status === 1);
+        this.showDetailDialog = true;
+    }
+
+    showSuccessfulOrdersDetail(): void {
+        this.detailDialogTitle = 'Giao dịch thành công';
+        this.detailOrders = this.orders.filter(o => o.status === 4);
+        this.showDetailDialog = true;
+    }
+
+    formatDate(date: Date): string {
+        return new Date(date).toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    getDetailOrdersTotal(): number {
+        return this.detailOrders.reduce((sum, o) => sum + o.totalAmount, 0);
     }
 }

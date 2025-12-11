@@ -1,7 +1,7 @@
 <div class="statistics-container">
     <h2 class="statistics-title">
         <i class="pi pi-shopping-cart"></i>
-        Thống kê đơn hàng
+        Thống kê giao dịch trên sàn
     </h2>
 
     @if (isLoading) {
@@ -11,21 +11,25 @@
     </div>
     } @else {
     <div class="summary-cards">
-        <div class="summary-card revenue">
-            <span class="summary-value">{{ formatCurrency(totalRevenue) }}</span>
-            <span class="summary-label">Tổng doanh thu</span>
+        <div class="summary-card revenue clickable" (click)="showCompletedOrdersDetail()">
+            <span class="summary-value">{{ formatCurrency(totalOrderValue) }}</span>
+            <span class="summary-label">Tổng giá trị đơn hàng hoàn thành</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card total">
+        <div class="summary-card total clickable" (click)="showAllOrdersDetail()">
             <span class="summary-value">{{ orders.length }}</span>
-            <span class="summary-label">Tổng đơn hàng</span>
+            <span class="summary-label">Tổng đơn hàng đã xử lý</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card pending">
+        <div class="summary-card pending clickable" (click)="showPendingOrdersDetail()">
             <span class="summary-value">{{ pendingOrders }}</span>
-            <span class="summary-label">Đang xử lý</span>
+            <span class="summary-label">Đang chờ xử lý</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card completed">
+        <div class="summary-card completed clickable" (click)="showSuccessfulOrdersDetail()">
             <span class="summary-value">{{ completedOrders }}</span>
-            <span class="summary-label">Hoàn thành</span>
+            <span class="summary-label">Giao dịch thành công</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
     </div>
 
@@ -61,3 +65,41 @@
     </div>
     }
 </div>
+
+<p-dialog [(visible)]="showDetailDialog" [header]="detailDialogTitle" [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '900px' }" [contentStyle]="{ 'max-height': '70vh', 'overflow': 'auto' }"
+    [dismissableMask]="true">
+    <div class="detail-list">
+        @if (detailOrders.length === 0) {
+        <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>Không có dữ liệu</p>
+        </div>
+        } @else {
+        <div class="detail-table">
+            <div class="table-header">
+                <span class="col-order">Mã đơn hàng</span>
+                <span class="col-date">Ngày đặt</span>
+                <span class="col-status">Trạng thái</span>
+                <span class="col-payment">Thanh toán</span>
+                <span class="col-amount">Giá trị</span>
+            </div>
+            @for (order of detailOrders; track order.orderId) {
+            <div class="table-row">
+                <span class="col-order">{{ order.orderNumber }}</span>
+                <span class="col-date">{{ formatDate(order.orderDate) }}</span>
+                <span class="col-status">
+                    <span class="status-badge status-{{ order.status }}">{{ order.statusName }}</span>
+                </span>
+                <span class="col-payment">{{ order.paymentMethodName }}</span>
+                <span class="col-amount">{{ formatCurrency(order.totalAmount) }}</span>
+            </div>
+            }
+        </div>
+        <div class="detail-summary">
+            <span>Tổng: {{ detailOrders.length }} đơn hàng</span>
+            <span>Giá trị: {{ formatCurrency(getDetailOrdersTotal()) }}</span>
+        </div>
+        }
+    </div>
+</p-dialog>
