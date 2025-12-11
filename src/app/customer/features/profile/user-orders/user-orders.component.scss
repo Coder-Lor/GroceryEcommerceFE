@@ -165,6 +165,34 @@
                 color: white;
               }
             }
+
+            &.btn-invoice {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+              color: #667eea;
+              border-color: #667eea;
+
+              svg {
+                width: 16px;
+                height: 16px;
+              }
+
+              &:hover {
+                background-color: #667eea;
+                color: white;
+              }
+
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+
+                &:hover {
+                  background-color: transparent;
+                  color: #667eea;
+                }
+              }
+            }
           }
         }
       }
@@ -229,7 +257,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
 }
