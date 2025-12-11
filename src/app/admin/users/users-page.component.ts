@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { UserService } from '../../core/service/user.service';
 import { LoadingOverlayComponent } from '../layout/loading-overlay/loading-overlay.component';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService, ConfirmationService, MenuItem } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MenuModule, Menu } from 'primeng/menu';
 import {
   faPlus,
   faMagnifyingGlass,
@@ -29,6 +30,7 @@ import {
   faAnglesRight,
   faChevronLeft,
   faChevronRight,
+  faEllipsisVertical,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   User,
@@ -73,7 +75,8 @@ interface UserData {
     FaIconComponent,
     ToastModule,
     ConfirmDialogModule,
-    TooltipDirective
+    TooltipDirective,
+    MenuModule,
   ],
   providers: [MessageService, ConfirmationService],
 })
@@ -100,6 +103,12 @@ export class UsersPageComponent implements OnInit {
   faAnglesRight = faAnglesRight;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
+  faEllipsisVertical = faEllipsisVertical;
+
+  // Menu
+  @ViewChild('actionMenu') actionMenu!: Menu;
+  actionMenuItems: MenuItem[] = [];
+  selectedUserForAction: UserData | null = null;
 
   users: UserData[] = [];
   filteredUsers: UserData[] = [];
@@ -462,6 +471,40 @@ export class UsersPageComponent implements OnInit {
     this.selectedUser = null;
     this.userRoles = [];
     this.selectedRoleIds = [];
+  }
+
+  /**
+   * Hiển thị menu hành động
+   */
+  showActionMenu(event: Event, user: UserData): void {
+    this.selectedUserForAction = user;
+    this.actionMenuItems = [
+      {
+        label: 'Xem chi tiết',
+        icon: 'pi pi-eye',
+        command: () => this.viewUserDetail(user.userId!),
+      },
+      {
+        label: 'Quản lý vai trò',
+        icon: 'pi pi-shield',
+        command: () => this.openRoleModal(user),
+      },
+      {
+        label: 'Chỉnh sửa',
+        icon: 'pi pi-pencil',
+        command: () => this.openEditModal(user),
+      },
+      {
+        separator: true,
+      },
+      {
+        label: 'Xóa người dùng',
+        icon: 'pi pi-trash',
+        styleClass: 'menu-item-danger',
+        command: () => this.confirmDelete(user),
+      },
+    ];
+    this.actionMenu.toggle(event);
   }
 
   /**
