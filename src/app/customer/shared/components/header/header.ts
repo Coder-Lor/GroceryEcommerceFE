@@ -105,7 +105,7 @@ export class Header implements OnInit, OnChanges {
     }
 
     // Load categories (có TransferState xử lý cả server và browser)
-    this.loadCategories();
+    // this.loadCategories();
 
     // this.authService.isAuthenticated$.subscribe((res) => {
     //   this.isLoggedIn = res;
@@ -204,61 +204,61 @@ export class Header implements OnInit, OnChanges {
     this.router.navigate(['/category'], { queryParams: { search: query } });
   }
 
-  private loadCategories(): void {
-    // Kiểm tra xem có dữ liệu trong TransferState không
-    const cachedCategories = this.transferState.get(HEADER_CATEGORIES_KEY, null);
+  // private loadCategories(): void {
+  //   // Kiểm tra xem có dữ liệu trong TransferState không
+  //   const cachedCategories = this.transferState.get(HEADER_CATEGORIES_KEY, null);
 
-    if (cachedCategories) {
-      console.log('📦 Header - Using cached categories from TransferState');
-      // Sử dụng dữ liệu từ cache
-      this.buildCategoryMenu(cachedCategories);
+  //   if (cachedCategories) {
+  //     console.log('📦 Header - Using cached categories from TransferState');
+  //     // Sử dụng dữ liệu từ cache
+  //     this.buildCategoryMenu(cachedCategories);
 
-      // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
-      if (isPlatformBrowser(this.platformId)) {
-        this.transferState.remove(HEADER_CATEGORIES_KEY);
-      }
-      return;
-    }
+  //     // Xóa dữ liệu khỏi TransferState sau khi sử dụng (chỉ trên browser)
+  //     if (isPlatformBrowser(this.platformId)) {
+  //       this.transferState.remove(HEADER_CATEGORIES_KEY);
+  //     }
+  //     return;
+  //   }
 
-    // CHỈ gọi API trên browser để tránh lỗi SSR
-    if (!isPlatformBrowser(this.platformId)) {
-      console.log('⚠️ Header - Server side, skipping API call');
-      return;
-    }
+  //   // CHỈ gọi API trên browser để tránh lỗi SSR
+  //   if (!isPlatformBrowser(this.platformId)) {
+  //     console.log('⚠️ Header - Server side, skipping API call');
+  //     return;
+  //   }
 
-    // Gọi API để lấy danh sách danh mục (CHỈ TRÊN BROWSER)
-    console.log('🌐 Header - Fetching categories from API (browser)');
-    this.categoryService.getCategoryTree().subscribe({
-      next: (categories) => {
-        console.log('✅ Header - Categories loaded successfully:', categories.length);
-        if (categories.length > 0) {
-          this.buildCategoryMenu(categories);
-        }
-      },
-      error: (err) => {
-        console.error('❌ Lỗi khi load danh mục trong header:', err);
-      },
-    });
-  }
+  //   // Gọi API để lấy danh sách danh mục (CHỈ TRÊN BROWSER)
+  //   console.log('🌐 Header - Fetching categories from API (browser)');
+  //   this.categoryService.getCategoryTree().subscribe({
+  //     next: (categories) => {
+  //       console.log('✅ Header - Categories loaded successfully:', categories.length);
+  //       if (categories.length > 0) {
+  //         this.buildCategoryMenu(categories);
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error('❌ Lỗi khi load danh mục trong header:', err);
+  //     },
+  //   });
+  // }
 
-  private buildCategoryMenu(categories: CategoryDto[]): void {
-    // Chỉ lấy danh sách tên danh mục cha
-    const parentCategories = categories.filter(cat => !cat.parentCategoryId);
+  // private buildCategoryMenu(categories: CategoryDto[]): void {
+  //   // Chỉ lấy danh sách tên danh mục cha
+  //   const parentCategories = categories.filter(cat => !cat.parentCategoryId);
 
-    this.categoryMenuItems = [
-      {
-        label: 'Danh mục sản phẩm',
-        items: [
-          parentCategories.map(cat => ({
-            label: cat.name,
-            command: () => {
-              this.router.navigate(['/category'], {
-                queryParams: { categoryId: cat.categoryId }
-              });
-            }
-          }))
-        ]
-      }
-    ];
-  }
+  //   this.categoryMenuItems = [
+  //     {
+  //       label: 'Danh mục sản phẩm',
+  //       items: [
+  //         parentCategories.map(cat => ({
+  //           label: cat.name,
+  //           command: () => {
+  //             this.router.navigate(['/category'], {
+  //               queryParams: { categoryId: cat.categoryId }
+  //             });
+  //           }
+  //         }))
+  //       ]
+  //     }
+  //   ];
+  // }
 }

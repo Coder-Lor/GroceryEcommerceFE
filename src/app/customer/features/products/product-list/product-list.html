@@ -4,42 +4,56 @@
     <aside class="col-lg-2 col-md-4 filter-sidebar">
       <div class="filter-section category">
         <h6 class="filter-title"><i class="pi pi-list mr-2"></i> Tất Cả Danh Mục</h6>
-        <ul class="filter-list">
-          <li class="category-main">Thời Trang Nam</li>
-          <li>Áo Khoác</li>
-          <li>Áo Vest và Blazer</li>
-          <li>Áo Hoodie, Áo Len & Áo Nỉ</li>
-          <li>Quần Jeans</li>
-          <li>Quần Dài/Quần Âu</li>
-          <li class="see-more" (click)="toggleCategory()">
-            {{ showMoreCategory ? 'Thu gọn ▲' : 'Thêm ▼' }}
-          </li>
-          <ng-container *ngIf="showMoreCategory">
-            <li>Áo Polo</li>
-            <li>Đồ Bộ</li>
-          </ng-container>
-        </ul>
-      </div>
 
-      <!-- <div class="filter-section location mt-4">
-        <h6 class="filter-title"><i class="pi pi-filter mr-2"></i> BỘ LỌC TÌM KIẾM</h6>
-        <div class="filter-subtitle">Nơi Bán</div>
-        <div class="checkbox-list">
-          <div *ngFor="let city of cities">
-            <input type="checkbox" [id]="city" />
-            <label [for]="city">{{ city }}</label>
-          </div>
-          <p class="see-more" (click)="toggleLocation()">
-            {{ showMoreLocation ? 'Thu gọn ▲' : 'Thêm ▼' }}
-          </p>
-          <div *ngIf="showMoreLocation">
-            <div *ngFor="let city of moreCities">
-              <input type="checkbox" [id]="city" />
-              <label [for]="city">{{ city }}</label>
+        <!-- Loading skeleton for categories -->
+        @if (loadingCategories) {
+        <ul class="filter-list">
+          @for (item of [1,2,3,4,5]; track $index) {
+          <li>
+            <p-skeleton width="100%" height="1.2rem" styleClass="mb-2"></p-skeleton>
+          </li>
+          }
+        </ul>
+        }
+        @else {
+        <ul class="filter-list">
+          <!-- Tất cả sản phẩm -->
+          <li class="category-item" [class.active]="!categoryId" (click)="filterByCategory(undefined)">
+            <span class="category-name">Tất cả sản phẩm</span>
+          </li>
+
+          <!-- Parent categories with sub-categories -->
+          @for (category of categories; track category.categoryId) {
+          <li class="category-item parent" [class.active]="isCategoryActive(category.categoryId)"
+            [class.expanded]="isCategoryExpanded(category.categoryId!)">
+            <div class="category-header">
+              <span class="category-name" (click)="filterByCategory(category.categoryId)">
+                {{ category.name }}
+              </span>
+              @if (category.subCategories && category.subCategories.length > 0) {
+              <i class="pi toggle-icon" [class.pi-chevron-down]="!isCategoryExpanded(category.categoryId!)"
+                [class.pi-chevron-up]="isCategoryExpanded(category.categoryId!)"
+                (click)="toggleCategoryExpand(category.categoryId!)"></i>
+              }
             </div>
-          </div>
-        </div>
-      </div> -->
+
+            <!-- Sub categories -->
+            @if (category.subCategories && category.subCategories.length > 0 &&
+            isCategoryExpanded(category.categoryId!)) {
+            <ul class="sub-category-list">
+              @for (subCategory of category.subCategories; track subCategory.categoryId) {
+              <li class="category-item sub" [class.active]="isCategoryActive(subCategory.categoryId)"
+                (click)="filterByCategory(subCategory.categoryId)">
+                {{ subCategory.name }}
+              </li>
+              }
+            </ul>
+            }
+          </li>
+          }
+        </ul>
+        }
+      </div>
     </aside>
 
     <!-- RIGHT PRODUCT LIST -->
@@ -48,11 +62,11 @@
         <div class="mb-3" *ngIf="keyword">
           Kết quả cho: "<strong>{{ keyword }}</strong>"
         </div>
-        <p-dataview #dv [value]="products" [layout]="layout">
+        <p-dataview #dv [value]="products" [layout]="layout" [emptyMessage]="' '">
           <!-- Header -->
           <ng-template #header>
             <div class="d-flex" style="gap: 10px">
-              <p style="color: #111; margin-top: 6px">Sort by</p>
+              <p style="color: #111; margin-top: 6px">Sắp xếp bởi</p>
               <p-button label="Phổ biến" severity="secondary" />
               <p-button label="Mới nhất" severity="secondary" />
               <p-button label="Bán chạy" severity="secondary" />
@@ -63,6 +77,43 @@
 
           <!-- GRID layout -->
           <ng-template #grid let-items>
+            <!-- Loading Skeleton -->
+            @if (loading) {
+            <div class="row g-4">
+              @for (item of [1,2,3,4,5,6,7,8]; track $index) {
+              <div class="col-12 col-sm-6 col-lg-3">
+                <div class="skeleton-card">
+                  <p-skeleton width="100%" height="200px" styleClass="skeleton-image"></p-skeleton>
+                  <div class="skeleton-content">
+                    <p-skeleton width="100%" height="1rem" styleClass="mb-2"></p-skeleton>
+                    <p-skeleton width="70%" height="1rem" styleClass="mb-2"></p-skeleton>
+                    <p-skeleton width="40%" height="1.5rem"></p-skeleton>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            }
+            <!-- Empty State -->
+            @else {
+            @if (products.length === 0) {
+            <div class="empty-state">
+              <div class="empty-state-content">
+                <i class="pi pi-search empty-icon"></i>
+                <h3 class="empty-title">Không tìm thấy sản phẩm</h3>
+                <p class="empty-description">
+                  @if (keyword) {
+                  Không có sản phẩm nào phù hợp với từ khóa "<strong>{{ keyword }}</strong>"
+                  } @else {
+                  Danh mục này hiện chưa có sản phẩm nào.
+                  }
+                </p>
+                <p class="empty-suggestion">Vui lòng thử tìm kiếm với từ khóa khác hoặc khám phá các danh mục khác.</p>
+              </div>
+            </div>
+            }
+            <!-- Products Grid -->
+            @else {
             <div class="row g-4">
               @for (item of products; track $index) {
               <div class="col-12 col-sm-6 col-lg-3">
@@ -70,6 +121,8 @@
               </div>
               }
             </div>
+            }
+            }
           </ng-template>
         </p-dataview>
       </div>

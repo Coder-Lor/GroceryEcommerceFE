@@ -6,10 +6,13 @@ import { DataViewModule } from 'primeng/dataview';
 import { Select } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
 import { PaginatorState } from 'primeng/paginator';
+import { SkeletonModule } from 'primeng/skeleton';
 import { ProductCard } from '../../../shared/components/product-card/product-card';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { InventoryService } from '@core/service/inventory.service';
+import { CategoryService } from '@core/service/category.service';
+import { CategoryDto } from '@core/service/system-admin.service';
 
 @Component({
   selector: 'product-list',
@@ -21,6 +24,7 @@ import { InventoryService } from '@core/service/inventory.service';
     DataViewModule,
     Select,
     PaginatorModule,
+    SkeletonModule,
     ProductCard,
   ],
   templateUrl: './product-list.html',
@@ -31,6 +35,7 @@ export class ProductList implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private inventoryService = inject(InventoryService);
+  private categoryService = inject(CategoryService);
   private destroy$ = new Subject<void>();
 
   layout: 'list' | 'grid' = 'grid';
@@ -46,6 +51,12 @@ export class ProductList implements OnInit, OnDestroy {
   totalRecords: number = 0;
   keyword: string = '';
   categoryId: string = '';
+  loading: boolean = true;
+
+  // categories state
+  categories: CategoryDto[] = [];
+  loadingCategories: boolean = true;
+  expandedCategories: Set<string> = new Set();
 
   onPageChange(event: PaginatorState) {
     const newFirst = event.first ?? 0;
@@ -97,12 +108,16 @@ export class ProductList implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Load categories
+    this.loadCategories();
+
     // Subscribe products and paging info from service
     this.inventoryService
       .getProducts()
       .pipe(takeUntil(this.destroy$))
       .subscribe((items) => {
         this.products = items as any[];
+        this.loading = false;
       });
     this.inventoryService
       .getPagingInfo()
@@ -115,6 +130,7 @@ export class ProductList implements OnInit, OnDestroy {
 
     // React to query params changes
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      this.loading = true;
       this.keyword = (params['search'] ?? '').toString().trim();
       this.categoryId = (params['categoryId'] ?? '').toString().trim();
       const page = +(params['page'] ?? 1);
@@ -122,6 +138,45 @@ export class ProductList implements OnInit, OnDestroy {
       this.first = (page - 1) * size;
       this.inventoryService.loadProducts(page, size, this.keyword || undefined, this.categoryId || undefined);
     });
+  }
+
+  loadCategories(): void {
+    this.loadingCategories = true;
+    this.categoryService
+      .getCategoryTree()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((categories) => {
+        this.categories = categories;
+        this.loadingCategories = false;
+      });
+  }
+
+  filterByCategory(categoryId: string | undefined): void {
+    this.router.navigate(['/category'], {
+      queryParams: {
+        categoryId: categoryId || null,
+        page: 1,
+        size: this.rows,
+        search: this.keyword || null
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  toggleCategoryExpand(categoryId: string): void {
+    if (this.expandedCategories.has(categoryId)) {
+      this.expandedCategories.delete(categoryId);
+    } else {
+      this.expandedCategories.add(categoryId);
+    }
+  }
+
+  isCategoryExpanded(categoryId: string): boolean {
+    return this.expandedCategories.has(categoryId);
+  }
+
+  isCategoryActive(categoryId: string | undefined): boolean {
+    return this.categoryId === categoryId;
   }
 
   ngOnDestroy(): void {
