@@ -11,6 +11,7 @@ import {
   faXmark,
   faGift,
   faTicket,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   GiftCardClient,
@@ -88,6 +89,7 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
   faXmark = faXmark;
   faGift = faGift;
   faTicket = faTicket;
+  faDownload = faDownload;
 
   ngOnInit(): void {
     this.loadGiftCards();
@@ -465,6 +467,110 @@ export class VouchersPageComponent implements OnInit, OnDestroy {
     } else {
       this.currentGiftCard.validTo = new Date();
     }
+  }
+
+  /**
+   * Xuất báo cáo CSV cho Gift Cards
+   */
+  exportGiftCardsReport(): void {
+    const csvContent = this.generateGiftCardsCSV();
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `giftcards_report_${new Date().getTime()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /**
+   * Tạo nội dung CSV cho Gift Cards
+   */
+  private generateGiftCardsCSV(): string {
+    const headers = [
+      'Mã thẻ',
+      'Tên',
+      'Mô tả',
+      'Số tiền ban đầu',
+      'Số dư hiện tại',
+      'Ngày hiệu lực',
+      'Ngày hết hạn',
+      'Trạng thái',
+    ];
+    const dataToExport = this.filteredGiftCards.length > 0 ? this.filteredGiftCards : this.giftCards;
+    const rows = dataToExport.map((giftCard) => [
+      this.escapeCSV(giftCard.code || ''),
+      this.escapeCSV(giftCard.name || ''),
+      this.escapeCSV(giftCard.description || ''),
+      (giftCard.initialAmount || 0).toString(),
+      (giftCard.currentBalance || 0).toString(),
+      this.formatDateForCSV(giftCard.validFrom),
+      this.formatDateForCSV(giftCard.validTo),
+      giftCard.isValid ? 'Hoạt động' : 'Ngừng',
+    ]);
+
+    return [headers, ...rows].map((row) => row.join(',')).join('\n');
+  }
+
+  /**
+   * Xuất báo cáo CSV cho Coupon Usages
+   */
+  exportCouponUsagesReport(): void {
+    const csvContent = this.generateCouponUsagesCSV();
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `coupon_usages_report_${new Date().getTime()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /**
+   * Tạo nội dung CSV cho Coupon Usages
+   */
+  private generateCouponUsagesCSV(): string {
+    const headers = [
+      'ID Coupon',
+      'ID Người dùng',
+      'ID Đơn hàng',
+      'Giá trị đơn hàng',
+      'Số tiền giảm',
+    ];
+    const dataToExport = this.filteredCouponUsages.length > 0 ? this.filteredCouponUsages : this.couponUsages;
+    const rows = dataToExport.map((coupon) => [
+      this.escapeCSV(coupon.couponId || ''),
+      this.escapeCSV(coupon.userId || ''),
+      this.escapeCSV(coupon.orderId || ''),
+      (coupon.orderAmount || 0).toString(),
+      (coupon.discountAmount || 0).toString(),
+    ]);
+
+    return [headers, ...rows].map((row) => row.join(',')).join('\n');
+  }
+
+  /**
+   * Escape CSV special characters
+   */
+  private escapeCSV(value: string): string {
+    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  }
+
+  /**
+   * Format date for CSV
+   */
+  private formatDateForCSV(date?: Date | string | null): string {
+    if (!date) return '';
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('vi-VN');
   }
 }
 

@@ -31,6 +31,7 @@ import {
   faChevronLeft,
   faChevronRight,
   faEllipsisVertical,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   User,
@@ -104,6 +105,7 @@ export class UsersPageComponent implements OnInit {
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
   faEllipsisVertical = faEllipsisVertical;
+  faDownload = faDownload;
 
   // Menu
   @ViewChild('actionMenu') actionMenu!: Menu;
@@ -869,4 +871,78 @@ export class UsersPageComponent implements OnInit {
       );
     });
   }
+
+  /**
+   * Xuất báo cáo CSV
+   */
+  exportReport(): void {
+    const csvContent = this.generateCSV();
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `users_report_${new Date().getTime()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /**
+   * Tạo nội dung CSV
+   */
+  private generateCSV(): string {
+    const headers = [
+      'Username',
+      'Email',
+      'Họ',
+      'Tên',
+      'Số điện thoại',
+      'Trạng thái',
+      'Email xác thực',
+      'Ngày tạo',
+      'Đăng nhập cuối',
+    ];
+    const dataToExport = this.filteredUsers.length > 0 ? this.filteredUsers : this.users;
+    const rows = dataToExport.map((user) => [
+      this.escapeCSV(user.username || ''),
+      this.escapeCSV(user.email || ''),
+      this.escapeCSV(user.lastName || ''),
+      this.escapeCSV(user.firstName || ''),
+      this.escapeCSV(user.phoneNumber || ''),
+      this.getStatusLabel(user.status),
+      user.emailVerified ? 'Đã xác thực' : 'Chưa xác thực',
+      this.formatDateForCSV(user.createdAt),
+      this.formatDateForCSV(user.lastLoginAt),
+    ]);
+
+    return [headers, ...rows].map((row) => row.join(',')).join('\n');
+  }
+
+  /**
+   * Escape CSV special characters
+   */
+  private escapeCSV(value: string): string {
+    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  }
+
+  /**
+   * Format date for CSV
+   */
+  private formatDateForCSV(date?: Date): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString('vi-VN');
+  }
+
+  /**
+   * Get status label
+   */
+  // private getStatusLabel(status?: number): string {
+  //   const option = this.statusOptions.find(o => o.value === status);
+  //   return option?.label || 'Không xác định';
+  // }
 }

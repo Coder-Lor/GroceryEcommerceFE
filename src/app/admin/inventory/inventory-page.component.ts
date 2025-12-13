@@ -71,7 +71,7 @@ import { TooltipDirective } from '@shared/directives/tooltip';
     ConfirmDialogModule,
     ToastModule,
     TooltipDirective
-],
+  ],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'inventory-page.component.html',
   styleUrls: ['inventory-page.component.scss'],
@@ -99,13 +99,13 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   detailProduct: Product | null = null;
   isDetailEditMode: boolean = false;
   editingProduct: UpdateProductCommand | null = null;
-  
+
   // Variant management modal
   showVariantModal: boolean = false;
   variantSourceProduct: Product | null = null;
   productVariants: ProductVariantDto[] = [];
   isLoadingVariants: boolean = false;
-  
+
   // Variant form (add/edit)
   showVariantForm: boolean = false;
   variantFormMode: 'add' | 'edit' = 'add';
@@ -216,7 +216,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       this.updateVariantRequest.status = value;
     }
   }
-  
+
   // Image management for editing
   newImageFiles: File[] = [];
   imageIdsToDelete: string[] = [];
@@ -280,7 +280,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -315,7 +315,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         // Don't update pageSize from service to keep component's initial value
         this.cdr.detectChanges();
       });
-    
+
     // Load products with component's pageSize instead of using initialize()
     this.inventoryService.loadProducts(this.currentPage, this.pageSize);
 
@@ -451,7 +451,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-    
+
     // Update display after sorting
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
@@ -487,7 +487,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   viewProductDetail(product: Product): void {
     console.log('viewProductDetail called with product:', product);
     console.log('Product ID:', product.productId);
-    
+
     if (!product.productId) {
       console.error('Product ID is missing!');
       this.messageService.add({
@@ -501,7 +501,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
     console.log('Calling API getById with productId:', product.productId);
     this.isLoading = true;
-    
+
     // Call API to get full product details
     this.productClient
       .getById(product.productId)
@@ -510,7 +510,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         next: (response) => {
           console.log('API Response received:', response);
           this.isLoading = false;
-          
+
           if (response.isSuccess && response.data) {
             console.log('Response data:', response.data);
             // Map API response to Product type
@@ -546,7 +546,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
               averageRating: response.data.averageRating,
               reviewCount: response.data.reviewCount
             });
-            
+
             this.showDetailModal = true;
             this.isDetailEditMode = false;
             this.cdr.detectChanges();
@@ -562,7 +562,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error loading product details:', error);
           this.isLoading = false;
-          
+
           this.messageService.add({
             severity: 'error',
             summary: 'Lỗi',
@@ -589,7 +589,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   enableEditMode(): void {
     if (this.detailProduct) {
       this.isDetailEditMode = true;
-      
+
       // Tạo UpdateProductCommand từ detailProduct
       this.editingProduct = UpdateProductCommand.fromJS({
         productId: this.detailProduct.productId,
@@ -615,7 +615,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
 
       // Copy existing images
-      this.existingImages = this.detailProduct.images ? 
+      this.existingImages = this.detailProduct.images ?
         JSON.parse(JSON.stringify(this.detailProduct.images)) : [];
       this.newImageFiles = [];
       this.imageIdsToDelete = [];
@@ -656,7 +656,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
           const imageUrl = e.target?.result as string;
-          
+
           // Add to existing images for preview
           const newImage = {
             productImageId: `new-${Date.now()}-${Math.random()}`,
@@ -692,7 +692,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   removeEditImage(index: number): void {
     if (this.existingImages && this.existingImages.length > 0) {
       const removedImage = this.existingImages[index];
-      
+
       // If it's an existing image (has productImageId without 'new-' prefix), mark for deletion
       if (removedImage.productImageId && !removedImage.productImageId.startsWith('new-')) {
         this.imageIdsToDelete.push(removedImage.productImageId);
@@ -744,7 +744,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     console.log('Updating product with data:', this.editingProduct);
     console.log('New images:', this.newImageFiles.length);
     console.log('Images to delete:', this.imageIdsToDelete.length);
-    
+
     this.isLoading = true;
 
     // Nếu có ảnh mới hoặc ảnh cần xóa, sử dụng updateWithFiles
@@ -753,7 +753,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       const newImageAltTexts: string[] = [];
       const newImageDisplayOrders: number[] = [];
       const newImageIsPrimary: boolean[] = [];
-      
+
       // Get info for new images
       let displayOrder = 0;
       this.existingImages.forEach((img, index) => {
@@ -972,7 +972,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
           const imageUrl = e.target?.result as string;
-          
+
           // Add to currentProduct images
           if (!this.currentProduct.images) {
             this.currentProduct.images = [];
@@ -1182,21 +1182,42 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       'Tên sản phẩm',
       'Giá vốn',
       'Giá bán',
+      'Giá giảm',
       'Tồn kho',
       'Mức tồn tối thiểu',
       'Trạng thái',
+      'Danh mục',
     ];
-    const rows = this.filteredProducts.map((p) => [
-      p.sku,
-      p.name,
+    // Sử dụng products array thay vì filteredProducts
+    const dataToExport = this.products.length > 0 ? this.products : this.currentPageProducts;
+    const rows = dataToExport.map((p) => [
+      this.escapeCSV(p.sku || ''),
+      this.escapeCSV(p.name || ''),
       (p.cost || 0).toString(),
       (p.price || 0).toString(),
+      (p.discountPrice || 0).toString(),
       (p.stockQuantity || 0).toString(),
       (p.minStockLevel || 0).toString(),
       this.getStockStatus(p),
+      this.escapeCSV(this.getCategoryName(p.categoryId) || ''),
     ]);
 
     return [headers, ...rows].map((row) => row.join(',')).join('\n');
+  }
+
+  // Escape CSV special characters
+  private escapeCSV(value: string): string {
+    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  }
+
+  // Get category name by ID
+  private getCategoryName(categoryId: string | undefined): string {
+    if (!categoryId || !this.categories) return '';
+    const category = this.categories.find(c => c.categoryId === categoryId);
+    return category?.name || '';
   }
 
   // Lấy trạng thái tồn kho
@@ -1307,13 +1328,13 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.variantSourceProduct = product;
     this.showVariantForm = false;
     this.variantFormMode = 'add';
-    
+
     // Load product images for variant creation
     if (product.productId) {
       this.loadProductImages(product.productId);
       this.loadProductVariants(product.productId);
     }
-    
+
     this.showVariantModal = true;
   }
 
@@ -1382,7 +1403,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   // Show form to add new variant
   openAddVariantForm(): void {
     if (!this.variantSourceProduct) return;
-    
+
     this.variantFormMode = 'add';
     this.createVariantRequest = new CreateProductVariantRequest();
     this.createVariantRequest.productId = this.variantSourceProduct.productId;
@@ -1395,7 +1416,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.createVariantRequest.weight = this.variantSourceProduct.weight;
     this.createVariantRequest.dimensions = this.variantSourceProduct.dimensions;
     this.createVariantRequest.status = this.variantSourceProduct.status || 1;
-    
+
     this.editingVariantId = null;
     this.selectedImageUrl = null;
     this.variantImageFile = null;
@@ -1407,7 +1428,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   openEditVariantForm(variant: ProductVariantDto): void {
     this.variantFormMode = 'edit';
     this.editingVariantId = variant.productVariantId || null;
-    
+
     // Create UpdateProductVariantRequest from existing variant
     this.updateVariantRequest = new UpdateProductVariantRequest();
     this.updateVariantRequest.sku = variant.sku;
@@ -1419,7 +1440,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     this.updateVariantRequest.weight = variant.weight;
     this.updateVariantRequest.dimensions = variant.dimensions;
     this.updateVariantRequest.status = variant.status;
-    
+
     this.selectedImageUrl = variant.imageUrl || null;
     this.variantImageFile = null;
     this.variantImagePreview = null;
@@ -1526,7 +1547,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         const base64Content = (e.target?.result as string).split(',')[1]; // Remove data:image/...;base64, prefix
-        
+
         currentRequest.imageFile = {
           content: base64Content,
           fileName: this.variantImageFile!.name,
@@ -1676,7 +1697,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   // Delete variant
   private deleteVariant(variantId: string): void {
     this.isLoading = true;
-    
+
     this.productVariantClient
       .deleteVariant(variantId)
       .pipe(takeUntil(this.destroy$))
@@ -1721,7 +1742,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   // Validate variant
   private validateVariant(): boolean {
     const currentRequest = this.variantFormMode === 'add' ? this.createVariantRequest : this.updateVariantRequest;
-    
+
     // Check productId only for create mode
     if (this.variantFormMode === 'add') {
       if (!this.createVariantRequest.productId) {

@@ -31,10 +31,15 @@
   <div class="tab-content" *ngIf="activeTab === 'giftcards'">
     <div class="section-header">
       <h3>Thẻ quà tặng</h3>
-      <button class="btn btn-success" (click)="openAddGiftCardModal()">
-        <fa-icon [icon]="faPlus"></fa-icon>
-        <span>Thêm thẻ quà tặng</span>
-      </button>
+      <div class="section-actions">
+        <button class="btn btn-secondary" (click)="exportGiftCardsReport()" title="Xuất CSV">
+          <fa-icon [icon]="faDownload"></fa-icon>
+        </button>
+        <button class="btn btn-success" (click)="openAddGiftCardModal()">
+          <fa-icon [icon]="faPlus"></fa-icon>
+          <span>Thêm thẻ quà tặng</span>
+        </button>
+      </div>
     </div>
 
     <div class="info-box">
@@ -94,10 +99,15 @@
   <div class="tab-content" *ngIf="activeTab === 'coupons'">
     <div class="section-header">
       <h3>Sử dụng Coupon</h3>
-      <button class="btn btn-success" (click)="openAddCouponUsageModal()">
-        <fa-icon [icon]="faPlus"></fa-icon>
-        <span>Thêm sử dụng coupon</span>
-      </button>
+      <div class="section-actions">
+        <button class="btn btn-secondary" (click)="exportCouponUsagesReport()" title="Xuất CSV">
+          <fa-icon [icon]="faDownload"></fa-icon>
+        </button>
+        <button class="btn btn-success" (click)="openAddCouponUsageModal()">
+          <fa-icon [icon]="faPlus"></fa-icon>
+          <span>Thêm sử dụng coupon</span>
+        </button>
+      </div>
     </div>
 
     <div class="info-box">

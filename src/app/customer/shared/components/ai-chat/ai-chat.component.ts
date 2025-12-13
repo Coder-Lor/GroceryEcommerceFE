@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, PLATFORM_ID, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { InjectionToken } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -7,6 +8,8 @@ import { GoogleGenAI } from '@google/genai';
 import { environment } from '../../../../../environments/environment';
 import { ProductService } from '@core/service/product.service';
 import { ProductBaseResponse } from '@services/system-admin.service';
+
+export const API_KEY = new InjectionToken<string>('API_BASE_URL');
 
 interface ChatMessage {
     role: 'user' | 'assistant';
@@ -49,9 +52,10 @@ export class AiChatComponent implements OnInit, OnDestroy {
     products: ProductBaseResponse[] = [];
     isLoadingProducts: boolean = false;
 
+    apiKey = inject(API_KEY);
     // Gemini AI
     private ai = new GoogleGenAI({
-        apiKey: environment.geminiAI.apiKey
+        apiKey: this.apiKey
     });
 
     ngOnInit(): void {

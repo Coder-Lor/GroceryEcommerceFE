@@ -25,6 +25,7 @@ import {
   faRefresh,
   faFileInvoice,
   faEllipsisVertical,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   OrderClient,
@@ -82,6 +83,7 @@ export class OrderListComponent implements OnInit {
   faRefresh = faRefresh;
   faFileInvoice = faFileInvoice;
   faEllipsisVertical = faEllipsisVertical;
+  faDownload = faDownload;
 
   // Menu
   @ViewChild('actionMenu') actionMenu!: Menu;
@@ -604,6 +606,61 @@ export class OrderListComponent implements OnInit {
       { value: 3, label: 'Thanh toán thất bại' },
       { value: 4, label: 'Đã hoàn tiền' },
     ];
+  }
+
+  /**
+   * Xuất báo cáo CSV
+   */
+  exportReport(): void {
+    const csvContent = this.generateCSV();
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_report_${new Date().getTime()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /**
+   * Tạo nội dung CSV
+   */
+  private generateCSV(): string {
+    const headers = [
+      'Mã đơn hàng',
+      'Khách hàng',
+      'Ngày đặt',
+      'Tổng tiền',
+      'Trạng thái đơn',
+      'Trạng thái thanh toán',
+      'Phương thức thanh toán',
+      'Ngày tạo',
+    ];
+    const dataToExport = this.filteredOrders.length > 0 ? this.filteredOrders : this.orders;
+    const rows = dataToExport.map((order) => [
+      this.escapeCSV(order.orderNumber || order.orderId || ''),
+      this.escapeCSV(order.userName || ''),
+      this.formatDate(order.orderDate),
+      (order.totalAmount || 0).toString(),
+      OrderStatusMapper.getOrderStatusDisplay(order.status || 1),
+      OrderStatusMapper.getPaymentStatusDisplay(order.paymentStatus || 1),
+      OrderStatusMapper.getPaymentMethodDisplay(order.paymentMethod || 1),
+      this.formatDate(order.createdAt),
+    ]);
+
+    return [headers, ...rows].map((row) => row.join(',')).join('\n');
+  }
+
+  /**
+   * Escape CSV special characters
+   */
+  private escapeCSV(value: string): string {
+    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
   }
 }
 

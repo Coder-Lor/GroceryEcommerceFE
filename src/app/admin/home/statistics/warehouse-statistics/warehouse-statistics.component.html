@@ -11,21 +11,25 @@
     </div>
     } @else {
     <div class="summary-cards">
-        <div class="summary-card total">
+        <div class="summary-card total clickable" (click)="showTotalStockDetail()">
             <span class="summary-value">{{ totalStock | number }}</span>
             <span class="summary-label">Tổng tồn kho</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card products">
+        <div class="summary-card products clickable" (click)="showAllProductsDetail()">
             <span class="summary-value">{{ products.length }}</span>
             <span class="summary-label">Tổng sản phẩm</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card warning">
+        <div class="summary-card warning clickable" (click)="showLowStockDetail()">
             <span class="summary-value">{{ lowStockCount }}</span>
             <span class="summary-label">Sắp hết hàng</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card danger">
+        <div class="summary-card danger clickable" (click)="showOutOfStockDetail()">
             <span class="summary-value">{{ outOfStockCount }}</span>
             <span class="summary-label">Hết hàng</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
     </div>
 
@@ -54,3 +58,49 @@
     </div>
     }
 </div>
+
+<p-dialog [(visible)]="showDetailDialog" [header]="detailDialogTitle" [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '800px' }" [contentStyle]="{ 'max-height': '70vh', 'overflow': 'auto' }"
+    [dismissableMask]="true">
+    <div class="detail-list">
+        @if (detailProducts.length === 0) {
+        <div class="empty-state">
+            <i class="pi pi-box"></i>
+            <p>Không có dữ liệu</p>
+        </div>
+        } @else {
+        <div class="detail-table">
+            <div class="table-header">
+                <span class="col-name">Tên sản phẩm</span>
+                <span class="col-category">Danh mục</span>
+                <span class="col-price">Giá</span>
+                <span class="col-stock">Tồn kho</span>
+                <span class="col-status">Trạng thái</span>
+            </div>
+            @for (product of detailProducts; track product.productId) {
+            <div class="table-row">
+                <span class="col-name">{{ product.name }}</span>
+                <span class="col-category">{{ product.categoryName }}</span>
+                <span class="col-price">{{ formatCurrency(product.price) }}</span>
+                <span class="col-stock" [class.low-stock]="product.stock > 0 && product.stock <= 10"
+                    [class.out-of-stock]="product.stock === 0">
+                    {{ product.stock | number }}
+                </span>
+                <span class="col-status">
+                    @if (product.stock === 0) {
+                    <span class="status-badge danger">Hết hàng</span>
+                    } @else if (product.stock <= 10) { <span class="status-badge warning">Sắp hết</span>
+                } @else {
+                <span class="status-badge success">Còn hàng</span>
+                }
+                </span>
+            </div>
+            }
+        </div>
+        <div class="detail-summary">
+            <span>Tổng: {{ detailProducts.length }} sản phẩm</span>
+            <span>Tổng tồn kho: {{ getDetailProductsStock() | number }}</span>
+        </div>
+        }
+    </div>
+</p-dialog>

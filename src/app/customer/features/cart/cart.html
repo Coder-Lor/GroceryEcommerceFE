@@ -17,7 +17,8 @@
                                 <h6 class="fw-semibold fs-7 text-dark mb-0">
                                     {{item.productName}}
                                 </h6>
-                                <span class="fw-bold fs-8 text-dark">{{item.unitPrice * item.quantity | number:'1.0-0'}}₫</span>
+                                <span class="fw-bold fs-8 text-dark">{{item.unitPrice * item.quantity |
+                                    number:'1.0-0'}}₫</span>
                             </div>
                             <p class="mb-2 text-muted">{{item.unitPrice | number:'1.0-0'}}₫</p>
 
@@ -26,7 +27,8 @@
                                     <!-- Quantity Selector -->
                                     <div class="d-flex align-items-center px-2">
                                         <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [step]="1"
-                                            [showButtons]="true" buttonLayout="horizontal" inputId="{{item.cartItemId}}" (onInput)="onUpdateQuantity(item.cartItemId, item.quantity)">
+                                            [showButtons]="true" buttonLayout="horizontal" inputId="{{item.cartItemId}}"
+                                            (onInput)="onUpdateQuantity(item.cartItemId, item.quantity)">
                                             <ng-template pTemplate="incrementbuttonicon">
                                                 <span class="pi pi-plus"></span>
                                             </ng-template>
@@ -39,7 +41,8 @@
 
                                 <!-- Save & Delete -->
                                 <div class="d-flex gap-4">
-                                    <button class="btn text-muted d-flex align-items-center gap-2 p-0" (click)="onRemove(item.cartItemId)">
+                                    <button class="btn text-muted d-flex align-items-center gap-2"
+                                        (click)="onRemove(item.cartItemId)">
                                         <i class="pi pi-trash"></i> Xóa
                                     </button>
                                 </div>
@@ -79,12 +82,13 @@
             <div class="col-lg-4">
                 <div class="card shadow-lg border-0 rounded-4 p-4 mb-4">
                     <!-- <h6 class="fw-semibold mb-3">Tóm tắt đơn hàng</h6> -->
-                    
+
                     <!-- Thông báo miễn phí vận chuyển -->
                     @if ((amountToFreeShipping$ | async) ?? 0 > 0) {
                     <div class="alert alert-info py-2 px-3 mb-3 small">
                         <i class="pi pi-info-circle me-2"></i>
-                        Đơn hàng trên {{ (amountToFreeShipping$ | async) | number:'1.0-0' }}₫ sẽ được miễn phí vận chuyển
+                        Đơn hàng trên {{ (amountToFreeShipping$ | async) | number:'1.0-0' }}₫ sẽ được miễn phí vận
+                        chuyển
                     </div>
                     } @else {
                     <div class="alert alert-success py-2 px-3 mb-3 small">
@@ -92,7 +96,7 @@
                         Bạn được miễn phí vận chuyển!
                     </div>
                     }
-                    
+
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tổng số sản phẩm</span>
                         <span class="fw-semibold">{{ (itemCount$ | async) }}</span>
@@ -110,7 +114,8 @@
                         <span>Tổng cộng</span>
                         <span>{{ (finalTotal$ | async) | number:'1.0-0' }}₫</span>
                     </div>
-                    <button class="btn btn-warning w-100 rounded-pill fw-medium py-3" routerLink="/checkout">Tiến hành thanh toán</button>
+                    <button class="btn btn-warning w-100 rounded-pill fw-medium py-3" routerLink="/checkout">Tiến hành
+                        thanh toán</button>
                 </div>
 
                 <!-- 🎁 Gift Card -->

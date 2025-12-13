@@ -29,12 +29,12 @@ export class Cart implements OnInit {
   Cart$ = this.cartService.cartItems$;
   totalPrice$ = this.cartService.cartSubtotal$;
   itemCount$ = this.cartService.cartCount$;
-  
+
   // Phí vận chuyển: Miễn phí nếu >= 200,000đ, ngược lại là 30,000đ
   shippingFee$: Observable<number> = this.totalPrice$.pipe(
     map(subtotal => subtotal >= 200000 ? 0 : 30000)
   );
-  
+
   // Tổng cuối cùng = Subtotal + Shipping
   finalTotal$: Observable<number> = this.totalPrice$.pipe(
     map(subtotal => {

@@ -77,9 +77,6 @@ export class ProductList implements OnInit, OnDestroy {
   showMoreCategory = false;
   showMoreLocation = false;
 
-  cities = ['Vĩnh Phúc', 'Hà Nội', 'TP. Hồ Chí Minh', 'Thái Nguyên'];
-  moreCities = ['Đà Nẵng', 'Cần Thơ', 'Huế', 'Bình Dương'];
-
   toggleCategory() {
     this.showMoreCategory = !this.showMoreCategory;
   }

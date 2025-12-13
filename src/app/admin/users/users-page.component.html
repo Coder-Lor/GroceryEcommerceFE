@@ -25,6 +25,9 @@
           Bỏ chọn
         </button>
       </div>
+      <button class="btn btn-secondary" (click)="exportReport()" appTooltip="Xuất CSV">
+        <fa-icon [icon]="faDownload"></fa-icon>
+      </button>
       <button class="btn btn-info" (click)="loadUsers()" appTooltip="Tải lại">
         <i class="pi pi-sync"></i>
       </button>

@@ -35,18 +35,60 @@
     </div>
 
     <div class="summary-cards">
-        <div class="summary-card">
+        <div class="summary-card total clickable" (click)="showAllUsersDetail()">
             <span class="summary-value">{{ users.length }}</span>
             <span class="summary-label">Tổng người dùng</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card">
+        <div class="summary-card active clickable" (click)="showActiveUsersDetail()">
             <span class="summary-value">{{ getStatusDistribution()[0] }}</span>
             <span class="summary-label">Đang hoạt động</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
-        <div class="summary-card">
+        <div class="summary-card inactive clickable" (click)="showInactiveUsersDetail()">
             <span class="summary-value">{{ getStatusDistribution()[1] }}</span>
             <span class="summary-label">Không hoạt động</span>
+            <i class="pi pi-external-link card-icon"></i>
         </div>
     </div>
     }
 </div>
+
+<p-dialog [(visible)]="showDetailDialog" [header]="detailDialogTitle" [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '800px' }" [contentStyle]="{ 'max-height': '70vh', 'overflow': 'auto' }"
+    [dismissableMask]="true">
+    <div class="detail-list">
+        @if (detailUsers.length === 0) {
+        <div class="empty-state">
+            <i class="pi pi-users"></i>
+            <p>Không có dữ liệu</p>
+        </div>
+        } @else {
+        <div class="detail-table">
+            <div class="table-header">
+                <span class="col-name">Tên người dùng</span>
+                <span class="col-email">Email</span>
+                <span class="col-role">Vai trò</span>
+                <span class="col-date">Ngày tạo</span>
+                <span class="col-status">Trạng thái</span>
+            </div>
+            @for (user of detailUsers; track user.userId) {
+            <div class="table-row">
+                <span class="col-name">{{ user.userName }}</span>
+                <span class="col-email">{{ user.email }}</span>
+                <span class="col-role">{{ user.roleName }}</span>
+                <span class="col-date">{{ formatDate(user.createdAt) }}</span>
+                <span class="col-status">
+                    <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+                        {{ user.isActive ? 'Hoạt động' : 'Không hoạt động' }}
+                    </span>
+                </span>
+            </div>
+            }
+        </div>
+        <div class="detail-summary">
+            <span>Tổng: {{ detailUsers.length }} người dùng</span>
+        </div>
+        }
+    </div>
+</p-dialog>

@@ -22,7 +22,7 @@
             <span class="category-name">Tất cả sản phẩm</span>
           </li>
 
-          <!-- Parent categories with sub-categories -->
+          <!-- Parent categories with sub-categories (Level 1) -->
           @for (category of categories; track category.categoryId) {
           <li class="category-item parent" [class.active]="isCategoryActive(category.categoryId)"
             [class.expanded]="isCategoryExpanded(category.categoryId!)">
@@ -37,14 +37,36 @@
               }
             </div>
 
-            <!-- Sub categories -->
+            <!-- Sub categories (Level 2) -->
             @if (category.subCategories && category.subCategories.length > 0 &&
             isCategoryExpanded(category.categoryId!)) {
             <ul class="sub-category-list">
               @for (subCategory of category.subCategories; track subCategory.categoryId) {
               <li class="category-item sub" [class.active]="isCategoryActive(subCategory.categoryId)"
-                (click)="filterByCategory(subCategory.categoryId)">
-                {{ subCategory.name }}
+                [class.expanded]="isCategoryExpanded(subCategory.categoryId!)">
+                <div class="category-header">
+                  <span class="category-name" (click)="filterByCategory(subCategory.categoryId)">
+                    {{ subCategory.name }}
+                  </span>
+                  @if (subCategory.subCategories && subCategory.subCategories.length > 0) {
+                  <i class="pi toggle-icon" [class.pi-chevron-down]="!isCategoryExpanded(subCategory.categoryId!)"
+                    [class.pi-chevron-up]="isCategoryExpanded(subCategory.categoryId!)"
+                    (click)="toggleCategoryExpand(subCategory.categoryId!)"></i>
+                  }
+                </div>
+
+                <!-- Sub-sub categories (Level 3) -->
+                @if (subCategory.subCategories && subCategory.subCategories.length > 0 &&
+                isCategoryExpanded(subCategory.categoryId!)) {
+                <ul class="sub-sub-category-list">
+                  @for (subSubCategory of subCategory.subCategories; track subSubCategory.categoryId) {
+                  <li class="category-item sub-sub" [class.active]="isCategoryActive(subSubCategory.categoryId)"
+                    (click)="filterByCategory(subSubCategory.categoryId)">
+                    {{ subSubCategory.name }}
+                  </li>
+                  }
+                </ul>
+                }
               </li>
               }
             </ul>

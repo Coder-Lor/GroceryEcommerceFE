@@ -13,6 +13,9 @@
   <div class="page-header">
     <h2>Quản lý đơn hàng</h2>
     <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportReport()" appTooltip="Xuất CSV">
+        <fa-icon [icon]="faDownload" size="1x"></fa-icon>
+      </button>
       <button class="btn btn-info" (click)="loadOrders()" appTooltip="Tải lại">
         <fa-icon [icon]="faRefresh" size="1x"></fa-icon>
       </button>
