@@ -3,6 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { DialogModule } from 'primeng/dialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import {
   ShopClient,
@@ -15,7 +20,17 @@ import {
 @Component({
   selector: 'app-shop-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ToastModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    ToastModule,
+    InputTextModule,
+    ButtonModule,
+    TagModule,
+    DialogModule,
+    ProgressSpinnerModule,
+  ],
   providers: [MessageService],
   templateUrl: './shop-management.component.html',
   styleUrl: './shop-management.component.scss',
@@ -31,6 +46,10 @@ export class ShopManagementComponent implements OnInit {
 
   SortDirection = SortDirection;
   Math = Math;
+
+  // Chi tiết shop
+  selectedShop: ShopDto | null = null;
+  showDetail = false;
 
   constructor(
     private readonly shopClient: ShopClient,
@@ -95,6 +114,16 @@ export class ShopManagementComponent implements OnInit {
     if (next < 1 || next > totalPages) return;
     this.currentPage = next;
     this.loadShops();
+  }
+
+  viewShopDetail(shop: ShopDto): void {
+    this.selectedShop = shop;
+    this.showDetail = true;
+  }
+
+  closeDetail(): void {
+    this.showDetail = false;
+    this.selectedShop = null;
   }
 
   toggleStatus(shop: ShopDto): void {

@@ -41,6 +41,7 @@ export class AdminLayoutComponent {
         { label: 'Trang chủ', icon: 'pi pi-home', routerLink: '/admin/home', routerLinkActiveOptions: this.exactActiveOptions },
         { label: 'Người dùng', icon: 'pi pi-users', routerLink: '/admin/users' },
         { label: 'Kho hàng', icon: 'pi pi-box', routerLink: '/admin/inventory' },
+        { label: 'Quản lý shop', icon: 'pi pi-briefcase', routerLink: '/admin/shops' },
         { label: 'Đơn hàng', icon: 'pi pi-shopping-bag', routerLink: '/admin/orders' },
         { label: 'Danh mục', icon: 'pi pi-list', routerLink: '/admin/categories' },
         { label: 'Voucher', icon: 'pi pi-ticket', routerLink: '/admin/vouchers' }
