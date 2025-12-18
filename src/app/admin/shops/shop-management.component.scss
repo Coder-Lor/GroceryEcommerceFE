@@ -1,0 +1,19 @@
+.shop-management {
+  .card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  table {
+    th,
+    td {
+      vertical-align: middle;
+    }
+  }
+
+  .btn-group .btn {
+    min-width: 80px;
+  }
+}
+

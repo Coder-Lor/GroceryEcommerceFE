@@ -39,6 +39,10 @@ import { AboutUsPage } from './customer/pages/info-pages/about-us/about-us-page'
 import { LegalInfoPage } from './customer/pages/info-pages/legal-info/legal-info-page';
 import { TermsOfUsePage } from './customer/pages/info-pages/terms-of-use/terms-of-use-page';
 import { SecurePaymentPage } from './customer/pages/info-pages/secure-payment/secure-payment-page';
+import { ShopManagementComponent } from './admin/shops/shop-management.component';
+import { ShopDetailPage } from './customer/features/shops/shop-detail';
+import { ShopRegisterPage } from './customer/features/shops/shop-register';
+import { MyShopPage } from './customer/features/shops/my-shop';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -55,6 +59,9 @@ export const routes: Routes = [
       { path: 'cart', component: Cart },
       { path: 'login', component: Login },
       { path: 'register', component: Register },
+      { path: 'shop/register', component: ShopRegisterPage },
+      { path: 'shop/:shopId', component: ShopDetailPage },
+      { path: 'my-shop', component: MyShopPage },
       { path: 'product-detail/:slug', component: ProductDetail },
       { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
@@ -114,6 +121,10 @@ export const routes: Routes = [
       {
         path: 'vouchers',
         component: VouchersPageComponent,
+      },
+      {
+        path: 'shops',
+        component: ShopManagementComponent,
       },
     ],
   },

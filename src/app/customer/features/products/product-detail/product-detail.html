@@ -61,7 +61,15 @@
       <!-- Right: Info -->
       <div class="col-lg-6 col-md-12">
         <div class="product-info">
-          <h1 class="product-name">{{ product.name }}</h1>
+          <h1 class="product-name d-flex align-items-center gap-2">
+            {{ product.name }}
+            @if (shopId) {
+            <button class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2" (click)="navigateToShop()">
+              <i class="pi pi-shop"></i>
+              <span>{{ shopName }}</span>
+            </button>
+            }
+          </h1>
 
           <!-- Selected Variant Info -->
           @if (selectedVariantId && getSelectedVariant()) {

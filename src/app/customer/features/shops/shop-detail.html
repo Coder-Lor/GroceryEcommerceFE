@@ -1,0 +1,72 @@
+<div class="shop-detail container py-4">
+  <p-toast></p-toast>
+
+  <div class="mb-3">
+    <a routerLink="/home" class="text-decoration-none text-muted small">
+      ← Trở về trang chủ
+    </a>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      @if (isLoadingShop) {
+      <div class="d-flex align-items-center gap-3">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span class="text-muted">Đang tải thông tin shop...</span>
+      </div>
+      } @else if (shop) {
+      <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="shop-logo rounded-circle d-flex align-items-center justify-content-center">
+          <span class="fw-semibold text-uppercase">
+            {{ shop.name?.charAt(0) || 'S' }}
+          </span>
+        </div>
+        <div>
+          <h3 class="mb-1">{{ shop.name }}</h3>
+          <p class="mb-1 text-muted">{{ shop.description || 'Chưa có mô tả' }}</p>
+          <span class="badge" [ngClass]="shop.status === 1 ? 'bg-success' : 'bg-secondary'">
+            {{ shop.status === 1 ? 'Hoạt động' : 'Ngưng hoạt động' }}
+          </span>
+        </div>
+      </div>
+      } @else {
+      <div class="text-muted">Không tìm thấy thông tin shop.</div>
+      }
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-semibold">Sản phẩm của shop</h5>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-outline-secondary btn-sm" (click)="changePage(-1)" [disabled]="page === 1">
+        Trước
+      </button>
+      <span class="small text-muted">Trang {{ page }}</span>
+      <button
+        class="btn btn-outline-secondary btn-sm"
+        (click)="changePage(1)"
+        [disabled]="page >= Math.ceil(totalCount / pageSize)"
+      >
+        Sau
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    @if (isLoadingProducts) {
+    <div class="col-12 text-center py-4 text-muted">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 mb-0">Đang tải sản phẩm...</p>
+    </div>
+    } @else if (products.length === 0) {
+    <div class="col-12 text-center text-muted py-4">Chưa có sản phẩm nào.</div>
+    } @else {
+      @for (product of products; track product.productId) {
+      <div class="col-6 col-md-4 col-lg-3">
+        <product-card [product]="product" [layout]="'grid'"></product-card>
+      </div>
+      }
+    }
+  </div>
+</div>
+

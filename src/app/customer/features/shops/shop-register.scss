@@ -1,0 +1,30 @@
+.shop-register {
+  .card {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.logo-upload-area {
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: #e9ecef !important;
+  }
+}
+
+.logo-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  
+  .logo-preview {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+    border: 1px solid #dee2e6;
+    padding: 8px;
+  }
+}
+

@@ -15,7 +15,7 @@ import { UtilityPanel } from './utility-panel/utility-panel';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/service/auth.service';
 import { log } from 'console';
-import { LogoutCommand } from '@core/service/system-admin.service';
+import { LogoutCommand, ShopClient, SortDirection } from '@core/service/system-admin.service';
 import { CartService } from '../../../../core/service/cart.service';
 import { Ripple } from 'primeng/ripple';
 import { tap } from 'rxjs';
@@ -43,6 +43,7 @@ export class Header implements OnInit, OnChanges {
   private cartService: CartService = inject(CartService);
   private categoryService: CategoryService = inject(CategoryService);
   private transferState = inject(TransferState);
+  private shopClient: ShopClient = inject(ShopClient);
 
   @ViewChild('userMenu', { static: false }) userMenu!: ElementRef;
 
@@ -64,6 +65,11 @@ export class Header implements OnInit, OnChanges {
 
   cartCount$ = this.cartService.cartCount$;
   miniItems$ = this.cartService.cartItems$;
+
+  hasShop: boolean = false;
+  myShopId?: string;
+  myShopName?: string;
+  isCheckingShop = false;
 
   categoryMenuItems: MegaMenuItem[] = [
     {
@@ -100,6 +106,7 @@ export class Header implements OnInit, OnChanges {
     if (isPlatformBrowser(this.platformId)) {
       console.log('🛒 Header ngOnInit - Loading cart...');
       this.cartService.loadCartSummary();
+      this.checkMyShop();
     } else {
       console.log('⚠️ Header ngOnInit - Server side, skipping cart load');
     }
@@ -202,6 +209,59 @@ export class Header implements OnInit, OnChanges {
       return;
     }
     this.router.navigate(['/category'], { queryParams: { search: query } });
+  }
+
+  private checkMyShop(): void {
+    this.isCheckingShop = true;
+    this.authService.currentUser.subscribe((user) => {
+      if (!user?.id) {
+        this.hasShop = false;
+        this.myShopId = undefined;
+        this.myShopName = undefined;
+        this.isCheckingShop = false;
+        return;
+      }
+
+      this.shopClient
+        .getByOwner(
+          user.id,
+          1,
+          1,
+          undefined,
+          'createdAt',
+          SortDirection.Descending,
+          undefined,
+          undefined,
+          undefined,
+          false,
+          false,
+          true
+        )
+        .subscribe({
+          next: (res) => {
+            const shop = res?.data?.items?.[0];
+            this.hasShop = !!shop;
+            this.myShopId = shop?.shopId;
+            this.myShopName = shop?.name;
+            this.isCheckingShop = false;
+          },
+          error: (err) => {
+            console.error('Lỗi kiểm tra shop của tôi', err);
+            this.hasShop = false;
+            this.isCheckingShop = false;
+          },
+        });
+    });
+  }
+
+  goToMyShop(): void {
+    this.router.navigate(['/my-shop']);
+    this.isOpen = false;
+  }
+
+  goToRegisterShop(): void {
+    this.router.navigate(['/shop/register']);
+    this.isOpen = false;
   }
 
   // private loadCategories(): void {

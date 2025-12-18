@@ -225,6 +225,19 @@ export class ProductDetail implements OnInit, OnDestroy {
     this.activeIndex = 0;
   }
 
+  get shopId(): string | undefined {
+    return (this.product as any)?.shopId;
+  }
+
+  get shopName(): string {
+    return (this.product as any)?.shopName || 'Shop';
+  }
+
+  navigateToShop(): void {
+    if (!this.shopId) return;
+    this.router.navigate(['/shop', this.shopId]);
+  }
+
   // Phương thức để chuyển đến ảnh tiếp theo (nếu cần custom logic)
   nextImage(): void {
     if (this.productImages.length > 0) {

@@ -1,0 +1,99 @@
+<div class="shop-management container-fluid py-4">
+  <p-toast></p-toast>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0 fw-semibold">Quản lý shop</h4>
+    <div class="d-flex gap-2">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Tìm theo tên hoặc slug..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onSearch()"
+        style="max-width: 260px"
+      />
+      <button class="btn btn-primary" (click)="onSearch()" [disabled]="isLoading">
+        Tìm kiếm
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Tên shop</th>
+              <th>Slug</th>
+              <th>Chủ sở hữu</th>
+              <th>Trạng thái</th>
+              <th>Ngày tạo</th>
+              <th class="text-end">Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoading">
+              <td colspan="6" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 mb-0 text-muted small">Đang tải dữ liệu...</p>
+              </td>
+            </tr>
+
+            <tr *ngIf="!isLoading && shops.length === 0">
+              <td colspan="6" class="text-center py-4 text-muted">
+                Chưa có shop nào
+              </td>
+            </tr>
+
+            <tr *ngFor="let shop of shops">
+              <td class="fw-semibold">{{ shop.name }}</td>
+              <td>{{ shop.slug || '-' }}</td>
+              <td>{{ shop.ownerUserId || 'N/A' }}</td>
+              <td>
+                <span class="badge" [ngClass]="shop.status === 1 ? 'bg-success' : 'bg-secondary'">
+                  {{ shop.status === 1 ? 'Hoạt động' : 'Ngưng' }}
+                </span>
+              </td>
+              <td>{{ shop.createdAt | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a class="btn btn-outline-primary" [routerLink]="['/shop', shop.shopId]" target="_blank">
+                    Xem
+                  </a>
+                  <button
+                    class="btn btn-outline-secondary"
+                    (click)="toggleStatus(shop)"
+                    [disabled]="isLoading"
+                  >
+                    {{ shop.status === 1 ? 'Tắt' : 'Kích hoạt' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center p-3 border-top">
+        <small class="text-muted">
+          {{ totalCount }} bản ghi
+        </small>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm" (click)="changePage(-1)" [disabled]="currentPage === 1">
+            Trước
+          </button>
+          <span class="small">Trang {{ currentPage }}</span>
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            (click)="changePage(1)"
+            [disabled]="currentPage >= Math.ceil(totalCount / pageSize)"
+          >
+            Sau
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

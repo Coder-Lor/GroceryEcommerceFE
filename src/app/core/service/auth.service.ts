@@ -194,6 +194,8 @@ export class AuthService {
   }
 
   private setAuthState(token: string, user: User): void {
+    // Token được lưu trong HTTP-only cookie bởi backend, không cần lưu ở frontend
+    // Chỉ lưu trong memory để biết đã đăng nhập
     this.accessToken = token;
     this.currentUserSubject.next(user);
   }
@@ -250,16 +252,22 @@ export class AuthService {
         role: data.role,
       };
 
+      // Restore user state - token đã ở trong HTTP-only cookie
       this.currentUserSubject.next(user);
+      // Set token trong memory để biết đã đăng nhập (token thực tế ở cookie)
+      this.accessToken = 'authenticated';
 
+      // Gọi refreshOnLoad để đảm bảo cookie token còn hợp lệ
       this.refreshOnLoad().subscribe({
         next: (result) => {
           if (!result) {
+            // Refresh thất bại, có thể cookie đã hết hạn
             this.clearAuthState();
             this.clearLocalStorage();
           }
         },
         error: () => {
+          // Refresh thất bại
           this.clearAuthState();
           this.clearLocalStorage();
         },

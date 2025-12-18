@@ -123,6 +123,15 @@
               <li (click)="redirectToProfile()">
                 <i class="pi pi-id-card"></i> Quản lý hồ sơ
               </li>
+              @if(hasShop) {
+              <li (click)="goToMyShop()">
+                <i class="pi pi-shop"></i> Quản lý shop {{ myShopName ? '(' + myShopName + ')' : '' }}
+              </li>
+              } @else {
+              <li (click)="goToRegisterShop()">
+                <i class="pi pi-plus-circle"></i> Đăng ký làm nhà bán
+              </li>
+              }
               @if((user$ | async)?.role === 'Admin') {
               <li (click)="redirectToAdmin()">
                 <i style="font-size: 14px" class="pi pi-cog"></i> Trang quản trị

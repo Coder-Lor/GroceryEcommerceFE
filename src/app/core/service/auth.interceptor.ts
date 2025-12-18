@@ -22,16 +22,11 @@ export class AuthInterceptor implements HttpInterceptor {
   );
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // 1. Thêm accessToken vào header nếu có
-    const token = this.authService.currentAccessToken;
-    if (token) {
-      request = this.addToken(request, token);
-    }
-
-    // 2. Luôn gắn withCredentials
+    // Backend sử dụng HTTP-only cookies, không cần thêm Authorization header
+    // Chỉ cần đảm bảo withCredentials: true để gửi cookies
     request = request.clone({ withCredentials: true });
 
-    // 3. Xử lý request và bắt lỗi 401
+    // Xử lý request và bắt lỗi 401
     return next.handle(request).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
@@ -40,17 +35,6 @@ export class AuthInterceptor implements HttpInterceptor {
         return throwError(() => error);
       })
     );
-  }
-
-  /**
-   * Thêm Authorization header với Bearer token
-   */
-  private addToken(request: HttpRequest<any>, token: string): HttpRequest<any> {
-    return request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
   }
 
   /**
@@ -74,8 +58,8 @@ export class AuthInterceptor implements HttpInterceptor {
         switchMap((newToken: string) => {
           this.isRefreshing = false;
           this.refreshTokenSubject.next(newToken);
-          // Retry request với token mới
-          return next.handle(this.addToken(request, newToken));
+          // Retry request - token mới đã được set vào cookie bởi backend
+          return next.handle(request.clone({ withCredentials: true }));
         }),
         catchError((err) => {
           this.isRefreshing = false;
@@ -91,7 +75,8 @@ export class AuthInterceptor implements HttpInterceptor {
         filter((token) => token != null),
         take(1),
         switchMap((token) => {
-          return next.handle(this.addToken(request, token!));
+          // Token mới đã được set vào cookie bởi backend
+          return next.handle(request.clone({ withCredentials: true }));
         })
       );
     }
