@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -77,6 +77,8 @@ import { TooltipDirective } from '@shared/directives/tooltip';
   styleUrls: ['inventory-page.component.scss'],
 })
 export class InventoryPageComponent implements OnInit, OnDestroy {
+  // Nếu có shopId => chạy chế độ inventory theo shop, ngược lại là inventory tổng
+  @Input() shopId?: string;
   products: Product[] = [];
   filteredProducts: Product[] = [];
   currentPageProducts: Product[] = [];
@@ -317,7 +319,11 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
       });
 
     // Load products with component's pageSize instead of using initialize()
-    this.inventoryService.loadProducts(this.currentPage, this.pageSize);
+    if (this.shopId) {
+      this.inventoryService.loadProductsByShop(this.shopId, this.currentPage, this.pageSize);
+    } else {
+      this.inventoryService.loadProducts(this.currentPage, this.pageSize);
+    }
 
     this.categoryClient
       .getCategoryTree()
@@ -347,21 +353,33 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   onSearch(): void {
     this.currentPage = 1; // Reset to first page on search
     const keyword = this.searchTerm.trim() || undefined;
-    this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+    if (this.shopId) {
+      this.inventoryService.loadProductsByShop(this.shopId, this.currentPage, this.pageSize, keyword);
+    } else {
+      this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+    }
   }
 
   // Pagination methods
   onPageSizeChange(): void {
     this.currentPage = 1;
     const keyword = this.searchTerm.trim() || undefined;
-    this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+    if (this.shopId) {
+      this.inventoryService.loadProductsByShop(this.shopId, this.currentPage, this.pageSize, keyword);
+    } else {
+      this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+    }
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       const keyword = this.searchTerm.trim() || undefined;
-      this.inventoryService.loadProducts(page, this.pageSize, keyword);
+      if (this.shopId) {
+        this.inventoryService.loadProductsByShop(this.shopId, page, this.pageSize, keyword);
+      } else {
+        this.inventoryService.loadProducts(page, this.pageSize, keyword);
+      }
     }
   }
 
@@ -433,7 +451,11 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   filterProducts(): void {
     this.currentPage = 1;
     const keyword = this.searchTerm.trim() || undefined;
-    this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+    if (this.shopId) {
+      this.inventoryService.loadProductsByShop(this.shopId, this.currentPage, this.pageSize, keyword);
+    } else {
+      this.inventoryService.loadProducts(this.currentPage, this.pageSize, keyword);
+    }
   }
 
   // Sort products - Note: For full server-side sorting, modify API call
@@ -480,7 +502,13 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
 
   // Mở modal thêm sản phẩm - Giờ chuyển sang navigate
   openAddModal(): void {
-    this.router.navigate(['/admin/inventory/add-new-product']);
+    if (this.shopId) {
+      // Đang dùng trong My Shop (seller) => điều hướng tới route dành cho seller
+      this.router.navigate(['/my-shop/add-product']);
+    } else {
+      // Ngữ cảnh admin
+      this.router.navigate(['/admin/inventory/add-new-product']);
+    }
   }
 
   // Xem chi tiết sản phẩm

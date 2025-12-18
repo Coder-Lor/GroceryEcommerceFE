@@ -11,11 +11,12 @@ import {
 } from '@core/service/system-admin.service';
 import { AuthService } from '@core/service/auth.service';
 import { FormsModule } from '@angular/forms';
+import { InventoryPageComponent } from '../../../admin/inventory/inventory-page.component';
 
 @Component({
   selector: 'app-my-shop',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastModule, FormsModule],
+  imports: [CommonModule, RouterModule, ToastModule, FormsModule, InventoryPageComponent],
   providers: [MessageService],
   templateUrl: './my-shop.html',
   styleUrl: './my-shop.scss',
@@ -150,7 +151,7 @@ export class MyShopPage implements OnInit {
   }
 
   goToAddProduct(): void {
-    this.router.navigate(['/admin/inventory/add-new-product']);
+    this.router.navigate(['/my-shop/add-product']);
   }
 
   viewProduct(product: ProductBaseResponse): void {

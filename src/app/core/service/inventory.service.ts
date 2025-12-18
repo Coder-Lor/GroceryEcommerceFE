@@ -43,6 +43,12 @@ export class InventoryService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
+  // Ngữ cảnh hiện tại: inventory tổng hay theo shop
+  private currentMode: 'all' | 'shop' = 'all';
+  private currentShopId: string | null = null;
+  private currentSearch?: string;
+  private currentCategoryId?: string;
+
   private nextId = 8;
   private isInitialized = false; // Track if data has been loaded
 
@@ -59,9 +65,15 @@ export class InventoryService {
   //   }
   // }
 
-  // Load products from API with paging and optional search keyword
+  // Load products từ API (inventory tổng) với paging và optional search
   loadProducts(page: number = 1, pageSize: number = 12, search?: string, categoryId?: string): void {
     this.loadingSubject.next(true); // Start loading
+
+    // Lưu ngữ cảnh hiện tại
+    this.currentMode = 'all';
+    this.currentShopId = null;
+    this.currentSearch = search;
+    this.currentCategoryId = categoryId;
 
     // Build filters array
     const filters: FilterCriteria[] = [];
@@ -132,10 +144,87 @@ export class InventoryService {
       });
   }
 
-  // Refresh products from server
+  // Load products theo shop (dùng cho My Shop)
+  loadProductsByShop(shopId: string, page: number = 1, pageSize: number = 12, search?: string): void {
+    this.loadingSubject.next(true); // Start loading
+
+    // Lưu ngữ cảnh hiện tại
+    this.currentMode = 'shop';
+    this.currentShopId = shopId;
+    this.currentSearch = search;
+    this.currentCategoryId = undefined;
+
+    this.productClient
+      .getProductsByShop(
+        shopId,
+        page,
+        pageSize,
+        search, // search keyword
+        undefined, // sortBy
+        SortDirection.Ascending, // sortDirection
+        undefined, // filters
+        undefined, // entityType
+        undefined, // availableFields
+        !!search, // hasSearch
+        false, // hasFilters
+        false // hasSorting
+      )
+      .pipe(
+        tap(() => {
+          // Data is being loaded
+        }),
+        map((response) => {
+          if (response.isSuccess && response.data) {
+            return response.data;
+          }
+          return null;
+        }),
+        catchError((error) => {
+          console.error('Error loading products by shop:', error);
+          this.loadingSubject.next(false); // Stop loading on error
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (pagedResult) => {
+          if (pagedResult) {
+            this.productsSubject.next(pagedResult.items || []);
+
+            // Update paging info
+            this.pagingInfoSubject.next({
+              totalCount: pagedResult.totalCount || 0,
+              totalPages: pagedResult.totalPages || 0,
+              currentPage: pagedResult.page || 1,
+              pageSize: pagedResult.pageSize || pageSize,
+              hasPreviousPage: pagedResult.hasPreviousPage || false,
+              hasNextPage: pagedResult.hasNextPage || false,
+            });
+          } else {
+            // If no data, emit empty array
+            this.productsSubject.next([]);
+          }
+
+          this.loadingSubject.next(false); // Stop loading when done
+        },
+        error: (error) => {
+          console.error('Fatal error loading products by shop:', error);
+          this.productsSubject.next([]);
+          this.loadingSubject.next(false); // Stop loading on error
+        },
+      });
+  }
+
+  // Refresh products từ server
   refreshProducts(page?: number, pageSize?: number): void {
     const currentPaging = this.pagingInfoSubject.value;
-    this.loadProducts(page || currentPaging.currentPage, pageSize || currentPaging.pageSize);
+    const targetPage = page || currentPaging.currentPage;
+    const targetPageSize = pageSize || currentPaging.pageSize;
+
+    if (this.currentMode === 'shop' && this.currentShopId) {
+      this.loadProductsByShop(this.currentShopId, targetPage, targetPageSize, this.currentSearch);
+    } else {
+      this.loadProducts(targetPage, targetPageSize, this.currentSearch, this.currentCategoryId);
+    }
   }
 
   // Get current paging info

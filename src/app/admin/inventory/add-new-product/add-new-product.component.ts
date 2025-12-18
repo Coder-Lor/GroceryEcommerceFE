@@ -477,7 +477,13 @@ Lưu ý quan trọng:
             this.inventoryService.refreshProducts();
             // Navigate sau khi toast hiển thị
             setTimeout(() => {
-              this.router.navigate(['/admin/inventory']);
+              // Nếu đang trong khu vực admin => quay về inventory admin,
+              // ngược lại (ví dụ: /my-shop/add-product) => quay về trang My Shop
+              if (this.router.url.startsWith('/admin')) {
+                this.router.navigate(['/admin/inventory']);
+              } else {
+                this.router.navigate(['/my-shop']);
+              }
             }, 500);
           } else {
             this.messageService.add({
@@ -514,11 +520,19 @@ Lưu ý quan trọng:
         rejectButtonStyleClass: 'p-button-secondary p-button-text',
         defaultFocus: 'reject',
         accept: () => {
-          this.router.navigate(['/admin/inventory']);
+          if (this.router.url.startsWith('/admin')) {
+            this.router.navigate(['/admin/inventory']);
+          } else {
+            this.router.navigate(['/my-shop']);
+          }
         },
       });
     } else {
-      this.router.navigate(['/admin/inventory']);
+      if (this.router.url.startsWith('/admin')) {
+        this.router.navigate(['/admin/inventory']);
+      } else {
+        this.router.navigate(['/my-shop']);
+      }
     }
   }
 

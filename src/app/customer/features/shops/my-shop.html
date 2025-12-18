@@ -43,75 +43,8 @@
   </div>
   }
 
-  <div class="card">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>Tên sản phẩm</th>
-              <th>Giá</th>
-              <th>Kho</th>
-              <th>Trạng thái</th>
-              <th class="text-end">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            @if (isLoadingProducts) {
-            <tr>
-              <td colspan="5" class="text-center py-4 text-muted">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 mb-0">Đang tải sản phẩm...</p>
-              </td>
-            </tr>
-            } @else if (products.length === 0) {
-            <tr>
-              <td colspan="5" class="text-center py-4 text-muted">Chưa có sản phẩm nào</td>
-            </tr>
-            } @else {
-            @for (p of products; track p.productId) {
-            <tr>
-              <td>
-                <div class="fw-semibold">{{ p.name }}</div>
-                <small class="text-muted">{{ p.sku }}</small>
-              </td>
-              <td>{{ p.price | currency : 'VND' : 'symbol' : '1.0-0' }}</td>
-              <td>{{ p.stockQuantity }}</td>
-              <td>
-                <span class="badge" [ngClass]="p.status === 1 ? 'bg-success' : 'bg-secondary'">
-                  {{ p.status === 1 ? 'Hoạt động' : 'Ngưng' }}
-                </span>
-              </td>
-              <td class="text-end">
-                <div class="btn-group btn-group-sm">
-                  <button class="btn btn-outline-primary" (click)="viewProduct(p)">Xem</button>
-                  <button class="btn btn-outline-danger" (click)="deleteProduct(p)">Xóa</button>
-                </div>
-              </td>
-            </tr>
-            }
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <div class="d-flex justify-content-between align-items-center p-3 border-top">
-        <small class="text-muted">{{ totalCount }} bản ghi</small>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-outline-secondary btn-sm" (click)="changePage(-1)" [disabled]="page === 1">
-            Trước
-          </button>
-          <span class="small text-muted">Trang {{ page }}</span>
-          <button
-            class="btn btn-outline-secondary btn-sm"
-            (click)="changePage(1)"
-            [disabled]="page >= Math.ceil(totalCount / pageSize)"
-          >
-            Sau
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  @if (shopId) {
+  <app-inventory-page [shopId]="shopId"></app-inventory-page>
+  }
 </div>
 

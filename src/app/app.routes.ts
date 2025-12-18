@@ -62,6 +62,7 @@ export const routes: Routes = [
       { path: 'shop/register', component: ShopRegisterPage },
       { path: 'shop/:shopId', component: ShopDetailPage },
       { path: 'my-shop', component: MyShopPage },
+      { path: 'my-shop/add-product', component: AddNewProductComponent },
       { path: 'product-detail/:slug', component: ProductDetail },
       { path: 'category', component: ProductList },
       { path: 'checkout', component: Checkout },
@@ -125,6 +126,10 @@ export const routes: Routes = [
       {
         path: 'shops',
         component: ShopManagementComponent,
+      },
+      {
+        path: 'shops/inventory',
+        component: InventoryPageComponent,
       },
     ],
   },
