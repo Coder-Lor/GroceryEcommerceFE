@@ -25,6 +25,8 @@ export class MyShopPage implements OnInit {
   shopId?: string;
   shopName?: string;
   shopSlug?: string;
+  shopLogoUrl?: string;
+  shopDescription?: string;
 
   products: ProductBaseResponse[] = [];
   isLoadingShop = false;
@@ -89,6 +91,8 @@ export class MyShopPage implements OnInit {
               this.shopId = shop.shopId;
               this.shopName = shop.name;
               this.shopSlug = shop.slug;
+              this.shopLogoUrl = shop.logoUrl;
+              this.shopDescription = shop.description;
               this.loadProducts();
             }
             this.isLoadingShop = false;
