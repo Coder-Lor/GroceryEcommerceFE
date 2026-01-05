@@ -34,12 +34,24 @@ export class ShopDetailPage implements OnInit {
 
   Math = Math;
 
+  // Function to determine severity for discount tag
+  getSeverity = (product: ProductBaseResponse): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' | undefined => {
+    if (!product.discountPrice || product.discountPrice >= product.price!) {
+      return 'secondary';
+    }
+    const discountPercent = ((product.price! - product.discountPrice) / product.price!) * 100;
+    if (discountPercent >= 50) return 'danger';
+    if (discountPercent >= 30) return 'warn';
+    if (discountPercent >= 10) return 'info';
+    return 'success';
+  };
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly shopClient: ShopClient,
     private readonly productClient: ProductClient,
     private readonly messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const shopId = this.route.snapshot.paramMap.get('shopId');
@@ -95,9 +107,12 @@ export class ShopDetailPage implements OnInit {
       )
       .subscribe({
         next: (response) => {
+          console.log('📦 Products response:', response);
+          console.log('📦 Products items:', response?.data?.items);
           if (response?.isSuccess && response.data) {
             this.products = response.data.items || [];
             this.totalCount = response.data.totalCount ?? 0;
+            console.log('📦 First product:', this.products[0]);
           }
           this.isLoadingProducts = false;
         },

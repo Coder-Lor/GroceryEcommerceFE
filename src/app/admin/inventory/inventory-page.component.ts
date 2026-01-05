@@ -52,6 +52,8 @@ import {
   UpdateProductVariantRequest,
   ProductVariantDto,
   ProductImageClient,
+  ShopClient,
+  ShopDto,
 } from '@services/system-admin.service';
 import { Subject, take, takeUntil } from 'rxjs';
 import { Product } from './models/product.model';
@@ -83,6 +85,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
   filteredProducts: Product[] = [];
   currentPageProducts: Product[] = [];
   categories: CategoryDto[] | undefined = [];
+  shops: ShopDto[] = [];
   private destroy$ = new Subject<void>();
   searchTerm: string = '';
   layout: 'list' | 'grid' = 'grid';
@@ -278,6 +281,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     private productClient: ProductClient,
     private productVariantClient: ProductVariantClient,
     private productImageClient: ProductImageClient,
+    private shopClient: ShopClient,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -341,6 +345,21 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
             });
           }
         },
+      });
+
+    // Load shops
+    this.shopClient
+      .getShopsPaging(1, 100, undefined, undefined, undefined, undefined, undefined, undefined, false, false, false)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response?.isSuccess && response?.data?.items) {
+            this.shops = response.data.items;
+          }
+        },
+        error: (err) => {
+          console.error('Lỗi tải danh sách shop:', err);
+        }
       });
   }
 
@@ -560,6 +579,8 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
               categoryName: response.data.categoryName,
               brandId: response.data.brandId,
               brandName: response.data.brandName,
+              shopId: response.data.shopId,
+              shopName: response.data.shopName,
               status: response.data.status,
               isFeatured: response.data.isFeatured,
               isDigital: response.data.isDigital,
@@ -635,6 +656,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
         dimensions: this.detailProduct.dimensions,
         categoryId: this.detailProduct.categoryId,
         brandId: this.detailProduct.brandId,
+        shopId: this.detailProduct.shopId,
         status: this.detailProduct.status,
         isFeatured: this.detailProduct.isFeatured,
         isDigital: this.detailProduct.isDigital,
@@ -816,6 +838,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
           this.editingProduct.dimensions,
           this.editingProduct.categoryId,
           this.editingProduct.brandId,
+          this.editingProduct.shopId,
           this.editingProduct.status,
           this.editingProduct.isFeatured,
           this.editingProduct.isDigital,
@@ -1330,6 +1353,7 @@ export class InventoryPageComponent implements OnInit, OnDestroy {
     product.status = 1;
     product.isFeatured = false;
     product.isDigital = false;
+    product.shopId = undefined;
     return product;
   }
 

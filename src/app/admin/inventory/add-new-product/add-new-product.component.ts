@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -41,6 +41,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { GoogleGenAI } from '@google/genai';
 import { environment } from '../../../../environments/environment'
+import { API_KEY } from 'app/customer/shared/components/ai-chat/ai-chat.component';
 
 @Component({
   selector: 'app-add-new-product',
@@ -102,10 +103,11 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   faCubes = faCubes;
   faSpinner = faSpinner;
 
+  apiKey: string = inject(API_KEY);
   // Gemini AI
   geminiRes: any = "Không có dữ liệu";
   ai = new GoogleGenAI({
-    apiKey: "AIzaSyBfnLfv5Rmjq0vFBkTCGCiSIEY-wTjqQog"
+    apiKey: this.apiKey
   });
   isGeneratingWithAI: boolean = false;
 
@@ -450,6 +452,7 @@ Lưu ý quan trọng:
         formValue.dimensions || null,
         formValue.categoryId,
         formValue.brandId,
+        undefined, // shopId
         formValue.status,
         formValue.isFeatured,
         formValue.isDigital,

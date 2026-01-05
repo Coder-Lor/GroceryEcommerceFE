@@ -42,11 +42,8 @@
         Trước
       </button>
       <span class="small text-muted">Trang {{ page }}</span>
-      <button
-        class="btn btn-outline-secondary btn-sm"
-        (click)="changePage(1)"
-        [disabled]="page >= Math.ceil(totalCount / pageSize)"
-      >
+      <button class="btn btn-outline-secondary btn-sm" (click)="changePage(1)"
+        [disabled]="page >= Math.ceil(totalCount / pageSize)">
         Sau
       </button>
     </div>
@@ -61,12 +58,11 @@
     } @else if (products.length === 0) {
     <div class="col-12 text-center text-muted py-4">Chưa có sản phẩm nào.</div>
     } @else {
-      @for (product of products; track product.productId) {
-      <div class="col-6 col-md-4 col-lg-3">
-        <product-card [product]="product" [layout]="'grid'"></product-card>
-      </div>
-      }
+    @for (product of products; track product.productId) {
+    <div class="col-6 col-md-4 col-lg-3">
+      <product-card [product]="product" [layout]="'grid'" [getSeverity]="getSeverity"></product-card>
+    </div>
+    }
     }
   </div>
 </div>
-

@@ -6,10 +6,6 @@
       <h4 class="fw-semibold mb-1">Shop của tôi</h4>
       <p class="text-muted mb-0">Quản lý sản phẩm thuộc shop</p>
     </div>
-    <div class="d-flex gap-2">
-      <button class="btn btn-outline-secondary" routerLink="/shop/register">Đăng ký shop</button>
-      <button class="btn btn-primary" (click)="goToAddProduct()" [disabled]="!shopId">Thêm sản phẩm</button>
-    </div>
   </div>
 
   @if (isLoadingShop) {
@@ -63,4 +59,3 @@
   <app-inventory-page [shopId]="shopId"></app-inventory-page>
   }
 </div>
-

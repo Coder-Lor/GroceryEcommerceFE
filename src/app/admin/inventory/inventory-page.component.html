@@ -220,6 +220,18 @@
             <span class="detail-label">Mô tả chi tiết:</span>
             <span class="detail-value">{{ detailProduct.description || 'Chưa có' }}</span>
           </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Danh mục:</span>
+            <span class="detail-value">{{ detailProduct.categoryName || 'Chưa có' }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Cửa hàng:</span>
+            <span class="detail-value" [class.text-muted]="!detailProduct.shopName">
+              {{ detailProduct.shopName || 'Chưa gán cửa hàng' }}
+            </span>
+          </div>
         </div>
 
         <div class="detail-section">
@@ -461,6 +473,14 @@
             <input type="text" [(ngModel)]="editingProduct.brandId" name="brandId" class="form-control"
               placeholder="ID thương hiệu (nếu có)" />
           </div>
+
+          <div class="form-group">
+            <label>Cửa hàng</label>
+            <select [(ngModel)]="editingProduct.shopId" name="editShopId" class="form-control">
+              <option [ngValue]="undefined">-- Chọn cửa hàng --</option>
+              <option *ngFor="let shop of shops" [ngValue]="shop.shopId">{{ shop.name }}</option>
+            </select>
+          </div>
         </div>
 
         <!-- Status Section -->
@@ -574,6 +594,14 @@
           <label>Mô tả chi tiết</label>
           <textarea [(ngModel)]="currentProduct.description" name="description" class="form-control"
             rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Cửa hàng</label>
+          <select [(ngModel)]="currentProduct.shopId" name="shopId" class="form-control">
+            <option [ngValue]="undefined">-- Chọn cửa hàng --</option>
+            <option *ngFor="let shop of shops" [ngValue]="shop.shopId">{{ shop.name }}</option>
+          </select>
         </div>
 
         <div class="form-row">

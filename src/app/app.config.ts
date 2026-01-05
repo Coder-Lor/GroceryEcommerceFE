@@ -56,6 +56,6 @@ export const appConfig: ApplicationConfig = {
     ConfirmationService,
     { provide: API_BASE_URL, useValue: 'https://localhost:44394' },
     // { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
-    { provide: API_KEY, useValue: "AIzaSyDl5rflkXLW8_NOh14qHKopAQdPRbuNQFM" }
+    { provide: API_KEY, useValue: "AIzaSyBF8oMhqlgIExmjfNM4D41V8PWQJCbG25s" }
   ],
 };
