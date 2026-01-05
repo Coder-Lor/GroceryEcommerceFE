@@ -60,7 +60,7 @@
   background: #f8f9fa;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -69,12 +69,12 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   &:hover {
     border-color: #FFB700;
     transform: translateY(-4px) scale(1.05);
     box-shadow: 0 8px 16px rgba(255, 183, 0, 0.2);
-    
+
     &::before {
       opacity: 1;
     }
@@ -188,7 +188,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border: 2px solid transparent;
     opacity: 0;
-    
+
     &:not(:disabled) {
       opacity: 1;
     }
@@ -289,7 +289,7 @@
   // Loading animation
   .p-galleria-item-container {
     position: relative;
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -305,6 +305,7 @@
       transform: translateX(-100%);
       opacity: 1;
     }
+
     100% {
       transform: translateX(100%);
       opacity: 0;
@@ -345,11 +346,11 @@
   background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%) !important;
   border: 1px solid #81c784;
   animation: slideIn 0.3s ease-out;
-  
+
   i {
     font-size: 1.1rem;
   }
-  
+
   strong {
     color: #2e7d32;
   }
@@ -360,6 +361,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -574,7 +576,7 @@
     border-color: #FFB700;
     background: linear-gradient(135deg, #FFB700, #FF8A00);
     box-shadow: 0 4px 16px rgba(255, 183, 0, 0.3);
-    
+
     .variant-text {
       color: #fff;
       font-weight: 700;
@@ -695,9 +697,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -1134,6 +1139,14 @@
     &:focus {
       border-color: #FFB700;
       box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.1);
+    }
+  }
+}
+
+.shop-actions {
+  .btn {
+    &:hover {
+      transform: translateY(0px) !important;
     }
   }
 }

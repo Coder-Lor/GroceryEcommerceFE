@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
@@ -48,8 +48,8 @@ export class ShopDetailPage implements OnInit {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly shopClient: ShopClient,
-    private readonly productClient: ProductClient,
+    @Inject(ShopClient) private readonly shopClient: ShopClient,
+    @Inject(ProductClient) private readonly productClient: ProductClient,
     private readonly messageService: MessageService
   ) { }
 
