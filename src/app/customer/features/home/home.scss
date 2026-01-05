@@ -53,6 +53,7 @@
   display: flex;
   height: 300px;
   gap: 20px;
+  flex: 1;
 
   .hero-overlay {
     position: absolute;
@@ -460,5 +461,3 @@ swiper-container {
   color: #111 !important;
   font-family: "Be Vietnam Pro", "Montserrat", sans-serif !important;
 }
-
-.product-card {}

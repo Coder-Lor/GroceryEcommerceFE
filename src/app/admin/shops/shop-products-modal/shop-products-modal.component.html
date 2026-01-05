@@ -1,0 +1,275 @@
+<p-dialog [header]="'Sản phẩm của shop: ' + (shop?.name || '')" [(visible)]="visible" [modal]="true"
+    [style]="{ width: '95vw', maxWidth: '1400px' }" [dismissableMask]="true" (onHide)="onHide()">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+
+    <ng-template pTemplate="content">
+        <!-- Search bar -->
+        <div class="shop-products-search mb-3">
+            <div class="d-flex gap-2 align-items-center">
+                <span class="p-input-icon-left flex-grow-1">
+                    <input pInputText type="text" placeholder="Tìm kiếm sản phẩm..." [(ngModel)]="searchTerm"
+                        (keyup.enter)="onSearch()" class="w-100" />
+                </span>
+                <button pButton type="button" label="Tìm" icon="pi pi-search" class="p-button-primary"
+                    (click)="onSearch()" [disabled]="isLoading"></button>
+            </div>
+        </div>
+
+        <!-- Loading state -->
+        <div *ngIf="isLoading" class="text-center py-4">
+            <p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4"></p-progressSpinner>
+            <p class="mt-2 mb-0 text-muted small">Đang tải sản phẩm...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoading && products.length === 0" class="text-center py-4 text-muted">
+            <i class="pi pi-inbox" style="font-size: 3rem; opacity: 0.3"></i>
+            <p class="mt-2 mb-0">Chưa có sản phẩm nào</p>
+        </div>
+
+        <!-- Products table -->
+        <div *ngIf="!isLoading && products.length > 0" class="products-table-wrapper">
+            <p-table [value]="products" [tableStyle]="{ 'min-width': '60rem' }"
+                styleClass="p-datatable-sm p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 60px">Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th style="width: 120px">SKU</th>
+                        <th style="width: 130px">Giá gốc</th>
+                        <th style="width: 130px">Giá khuyến mãi</th>
+                        <th style="width: 80px">Tồn kho</th>
+                        <th style="width: 100px">Trạng thái</th>
+                        <th style="width: 120px">Danh mục</th>
+                        <th style="width: 80px; text-align: center">Thao tác</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product>
+                    <tr>
+                        <td>
+                            <img *ngIf="product.primaryImageUrl" [src]="product.primaryImageUrl" [alt]="product.name"
+                                class="product-thumbnail" />
+                            <div *ngIf="!product.primaryImageUrl" class="product-thumbnail-placeholder">
+                                <i class="pi pi-image"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="product-name" [pTooltip]="product.name" tooltipPosition="top">
+                                {{ product.name }}
+                            </div>
+                            <small class="text-muted d-block">{{ product.slug }}</small>
+                        </td>
+                        <td>
+                            <code class="product-sku">{{ product.sku || '-' }}</code>
+                        </td>
+                        <td>
+                            <span class="price-original">{{ formatPrice(product.price) }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="price-discount" *ngIf="product.discountPrice">
+                                    {{ formatPrice(product.discountPrice) }}
+                                </span>
+                                <span *ngIf="!product.discountPrice" class="text-muted">-</span>
+                                <p-tag *ngIf="getDiscountPercent(product) !== null"
+                                    [value]="'-' + getDiscountPercent(product) + '%'" severity="danger"
+                                    class="ms-1"></p-tag>
+                            </div>
+                        </td>
+                        <td>
+                            <span [class.text-danger]="(product.stockQuantity ?? 0) <= 0"
+                                [class.text-warning]="(product.stockQuantity ?? 0) > 0 && (product.stockQuantity ?? 0) <= 10"
+                                [class.fw-semibold]="(product.stockQuantity ?? 0) <= 10">
+                                {{ product.stockQuantity ?? 0 }}
+                            </span>
+                        </td>
+                        <td>
+                            <p-tag [value]="getStatusLabel(product.status)"
+                                [severity]="getStatusSeverity(product.status)"></p-tag>
+                        </td>
+                        <td>
+                            <span class="category-name">{{ product.categoryName || '-' }}</span>
+                        </td>
+                        <td>
+                            <button pButton type="button" icon="pi pi-ellipsis-v"
+                                class="p-button-rounded p-button-text p-button-sm p-button-secondary"
+                                (click)="openMenu($event, actionMenu, product)" [disabled]="isLoading"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
+                <small class="text-muted">
+                    {{ totalCount }} sản phẩm • Trang {{ currentPage }} /
+                    {{ Math.max(1, Math.ceil(totalCount / pageSize)) }}
+                </small>
+                <div class="d-flex align-items-center gap-2">
+                    <button pButton type="button" icon="pi pi-chevron-left" class="p-button-text p-button-sm"
+                        (click)="changePage(-1)" [disabled]="currentPage === 1"></button>
+                    <span class="small px-2 rounded-pill bg-light border">
+                        {{ currentPage }}
+                    </span>
+                    <button pButton type="button" icon="pi pi-chevron-right" class="p-button-text p-button-sm"
+                        (click)="changePage(1)" [disabled]="currentPage >= Math.ceil(totalCount / pageSize)"></button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton type="button" label="Đóng" class="p-button-text" (click)="onHide()"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Menu actions (duy nhất cho tất cả rows) -->
+<p-menu #actionMenu [popup]="true" [model]="menuItems" appendTo="body"></p-menu>
+
+<!-- Modal chi tiết sản phẩm (clone từ inventory-page) -->
+<p-dialog [header]="isDetailEditMode ? 'Chỉnh sửa sản phẩm' : 'Chi tiết sản phẩm'" [(visible)]="showDetailModal"
+    [modal]="true" [style]="{ width: '800px', maxWidth: '95vw' }" [dismissableMask]="true"
+    (onHide)="closeDetailModal()">
+    <ng-template pTemplate="content">
+        <div *ngIf="detailProduct" class="product-detail-content">
+            <!-- Chế độ xem -->
+            <div *ngIf="!isDetailEditMode">
+                <div class="row">
+                    <!-- Ảnh sản phẩm -->
+                    <div class="col-md-4 mb-3">
+                        <img *ngIf="detailProduct.primaryImageUrl" [src]="detailProduct.primaryImageUrl"
+                            [alt]="detailProduct.name" class="img-fluid rounded border"
+                            style="max-height: 250px; object-fit: cover; width: 100%;" />
+                        <div *ngIf="!detailProduct.primaryImageUrl"
+                            class="bg-light rounded border d-flex align-items-center justify-content-center"
+                            style="height: 200px;">
+                            <i class="pi pi-image" style="font-size: 3rem; color: #ccc;"></i>
+                        </div>
+                    </div>
+                    <!-- Thông tin cơ bản -->
+                    <div class="col-md-8">
+                        <h5 class="fw-bold mb-2">{{ detailProduct.name }}</h5>
+                        <p class="text-muted small mb-2">SKU: {{ detailProduct.sku || '-' }}</p>
+                        <p class="text-muted small mb-3">Slug: {{ detailProduct.slug || '-' }}</p>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <span class="text-muted small">Giá bán:</span>
+                                <div class="fw-bold text-primary">{{ formatPrice(detailProduct.price) }}</div>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small">Giá khuyến mãi:</span>
+                                <div class="fw-bold text-danger">{{ detailProduct.discountPrice ?
+                                    formatPrice(detailProduct.discountPrice) : '-' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <span class="text-muted small">Tồn kho:</span>
+                                <div [class]="getStockStatusClass(detailProduct)">
+                                    {{ detailProduct.stockQuantity ?? 0 }} ({{ getStockStatus(detailProduct) }})
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small">Trạng thái:</span>
+                                <div>
+                                    <p-tag [value]="getStatusLabel(detailProduct.status)"
+                                        [severity]="getStatusSeverity(detailProduct.status)"></p-tag>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <span class="text-muted small">Danh mục:</span>
+                                <div>{{ detailProduct.categoryName || '-' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted small">Shop:</span>
+                                <div>{{ detailProduct.shopName || '-' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mô tả -->
+                <div class="mt-3" *ngIf="detailProduct.description">
+                    <h6 class="fw-semibold">Mô tả</h6>
+                    <p class="text-muted small mb-0">{{ detailProduct.description }}</p>
+                </div>
+            </div>
+
+            <!-- Chế độ sửa -->
+            <div *ngIf="isDetailEditMode && editingProduct">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mã SKU <span class="text-danger">*</span></label>
+                        <input pInputText type="text" [(ngModel)]="editingProduct.sku" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <input pInputText type="text" [(ngModel)]="editingProduct.name" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá bán <span class="text-danger">*</span></label>
+                        <input pInputText type="number" [(ngModel)]="editingProduct.price" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá khuyến mãi</label>
+                        <input pInputText type="number" [(ngModel)]="editingProduct.discountPrice" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá vốn</label>
+                        <input pInputText type="number" [(ngModel)]="editingProduct.cost" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tồn kho</label>
+                        <input pInputText type="number" [(ngModel)]="editingProduct.stockQuantity" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mức tồn tối thiểu</label>
+                        <input pInputText type="number" [(ngModel)]="editingProduct.minStockLevel" class="w-100" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Danh mục</label>
+                        <select class="form-select" [(ngModel)]="editingProduct.categoryId">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.name }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Trạng thái</label>
+                        <select class="form-select" [(ngModel)]="editingProduct.status">
+                            <option [ngValue]="1">Hoạt động</option>
+                            <option [ngValue]="0">Ngưng</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Mô tả ngắn</label>
+                        <textarea pInputText [(ngModel)]="editingProduct.shortDescription" class="w-100"
+                            rows="2"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Mô tả chi tiết</label>
+                        <textarea pInputText [(ngModel)]="editingProduct.description" class="w-100" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="d-flex justify-content-between w-100">
+            <div>
+                <button *ngIf="!isDetailEditMode" pButton type="button" label="Sửa" icon="pi pi-pencil"
+                    class="p-button-warning" (click)="enableEditMode()"></button>
+            </div>
+            <div class="d-flex gap-2">
+                <button pButton type="button" label="Đóng" class="p-button-text" (click)="closeDetailModal()"></button>
+                <button *ngIf="isDetailEditMode" pButton type="button" label="Lưu" icon="pi pi-check"
+                    class="p-button-primary" (click)="saveDetailChanges()" [loading]="isLoading"></button>
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

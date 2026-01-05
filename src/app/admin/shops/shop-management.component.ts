@@ -16,6 +16,7 @@ import {
   UpdateShopStatusCommand,
   ResultOfPagedResultOfShopDto,
 } from '@core/service/system-admin.service';
+import { ShopProductsModalComponent } from './shop-products-modal/shop-products-modal.component';
 
 @Component({
   selector: 'app-shop-management',
@@ -30,6 +31,7 @@ import {
     TagModule,
     DialogModule,
     ProgressSpinnerModule,
+    ShopProductsModalComponent,
   ],
   providers: [MessageService],
   templateUrl: './shop-management.component.html',
@@ -51,10 +53,14 @@ export class ShopManagementComponent implements OnInit {
   selectedShop: ShopDto | null = null;
   showDetail = false;
 
+  // Xem sản phẩm shop
+  showProductsModal = false;
+  selectedShopForProducts: ShopDto | null = null;
+
   constructor(
     private readonly shopClient: ShopClient,
     private readonly messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadShops();
@@ -124,6 +130,11 @@ export class ShopManagementComponent implements OnInit {
   closeDetail(): void {
     this.showDetail = false;
     this.selectedShop = null;
+  }
+
+  viewShopProducts(shop: ShopDto): void {
+    this.selectedShopForProducts = shop;
+    this.showProductsModal = true;
   }
 
   toggleStatus(shop: ShopDto): void {
