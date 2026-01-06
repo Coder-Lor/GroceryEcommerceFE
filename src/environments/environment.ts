@@ -1,7 +1,7 @@
 export const environment = {
     production: false,
     geminiAI: {
-        apiKey: 'AIzaSyBb5G2z4AAXiJPBxlxUijT6o8955PHZMHg',
-        model: 'gemini-2.5-flash'
+        apiKey: process.env['API_KEY'],
+        model: 'gemini-2.0-flash'
     }
 };
