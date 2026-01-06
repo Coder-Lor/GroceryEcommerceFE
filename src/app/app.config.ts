@@ -48,8 +48,8 @@ export const appConfig: ApplicationConfig = {
     }),
     provideCharts(withDefaultRegisterables()),
     // Tạm thời bỏ withFetch() để test - có thể không tương thích với responseType blob
-    provideHttpClient(withFetch()),
-    // provideHttpClient(),
+    // provideHttpClient(withFetch()),
+    provideHttpClient(),
     { provide: HTTP_INTERCEPTORS, useClass: ResponseTransformInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'vi-VN' },
