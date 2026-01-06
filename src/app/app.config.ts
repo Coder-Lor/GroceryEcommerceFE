@@ -49,16 +49,16 @@ export const appConfig: ApplicationConfig = {
     }),
     provideCharts(withDefaultRegisterables()),
     // Tạm thời bỏ withFetch() để test - có thể không tương thích với responseType blob
-    // provideHttpClient(withFetch()),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
+    // provideHttpClient(),
     { provide: HTTP_INTERCEPTORS, useClass: ResponseTransformInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'vi-VN' },
     { provide: RouteReuseStrategy, useClass: CustomReuseStrategy },
     MessageService,
     ConfirmationService,
-    // { provide: API_BASE_URL, useValue: 'https://localhost:44394' },
-    { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
+    { provide: API_BASE_URL, useValue: 'https://localhost:44394' },
+    // { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
     { provide: API_KEY, useValue: environment.geminiAI.apiKey }
   ],
 };

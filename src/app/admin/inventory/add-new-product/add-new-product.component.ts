@@ -42,6 +42,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { GoogleGenAI } from '@google/genai';
 import { environment } from '../../../../environments/environment'
 import { API_KEY } from 'app/customer/shared/components/ai-chat/ai-chat.component';
+import { MinimalService } from '@core/service/minimal.service';
 
 @Component({
   selector: 'app-add-new-product',
@@ -59,6 +60,7 @@ import { API_KEY } from 'app/customer/shared/components/ai-chat/ai-chat.componen
   styleUrls: ['./add-new-product.component.scss'],
 })
 export class AddNewProductComponent implements OnInit, OnDestroy {
+  minimalService = inject(MinimalService);
   productForm!: FormGroup;
   categories: CategoryDto[] = [];
   selectedCategory: CategoryDto | null = null;
@@ -103,12 +105,9 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
   faCubes = faCubes;
   faSpinner = faSpinner;
 
-  apiKey: string = inject(API_KEY);
   // Gemini AI
   geminiRes: any = "Không có dữ liệu";
-  ai = new GoogleGenAI({
-    apiKey: this.apiKey
-  });
+  ai!: GoogleGenAI;
   isGeneratingWithAI: boolean = false;
 
   constructor(
@@ -121,9 +120,15 @@ export class AddNewProductComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.initializeForm();
     this.loadCategories();
+    try {
+      const apiKey = await this.minimalService.getKey();
+      this.ai = new GoogleGenAI({ apiKey });
+    } catch (err) {
+      console.error('Cannot initialize AI:', err);
+    }
   }
 
   ngOnDestroy(): void {

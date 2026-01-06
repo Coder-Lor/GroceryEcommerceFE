@@ -8,6 +8,8 @@ import { GoogleGenAI } from '@google/genai';
 import { environment } from '../../../../../environments/environment';
 import { ProductService } from '@core/service/product.service';
 import { ProductBaseResponse } from '@services/system-admin.service';
+import { MinimalService } from '@core/service/minimal.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export const API_KEY = new InjectionToken<string>('API_BASE_URL');
 
@@ -38,6 +40,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
     private platformId = inject(PLATFORM_ID);
     private productService = inject(ProductService);
     private router = inject(Router);
+    private minimalService = inject(MinimalService);
     private destroy$ = new Subject<void>();
 
     @ViewChild('chatContainer') chatContainer!: ElementRef;
@@ -52,15 +55,19 @@ export class AiChatComponent implements OnInit, OnDestroy {
     products: ProductBaseResponse[] = [];
     isLoadingProducts: boolean = false;
 
-    apiKey = inject(API_KEY);
     // Gemini AI
-    private ai = new GoogleGenAI({
-        apiKey: this.apiKey
-    });
+    private ai!: GoogleGenAI;
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         if (isPlatformBrowser(this.platformId)) {
             this.addWelcomeMessage();
+
+            try {
+                const apiKey = await this.minimalService.getKey();
+                this.ai = new GoogleGenAI({ apiKey });
+            } catch (err) {
+                console.error('Cannot initialize AI:', err);
+            }
         }
     }
 
@@ -130,7 +137,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
     }
 
     async sendMessage(): Promise<void> {
-        if (!this.userMessage.trim() || this.isLoading) return;
+        if (!this.userMessage.trim() || this.isLoading || !this.ai) return;
 
         const userMsg = this.userMessage.trim();
         this.messages.push({
