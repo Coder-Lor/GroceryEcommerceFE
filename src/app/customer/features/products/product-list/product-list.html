@@ -89,11 +89,11 @@
           <ng-template #header>
             <div class="d-flex" style="gap: 10px">
               <p style="color: #111; margin-top: 6px">Sắp xếp bởi</p>
-              <p-button label="Phổ biến" severity="secondary" />
-              <p-button label="Mới nhất" severity="secondary" />
-              <p-button label="Bán chạy" severity="secondary" />
+              <!-- <p-button label="Phổ biến" severity="secondary" /> -->
+              <p-button label="Mới nhất" severity="secondary" (click)="filterByNewest()" />
+              <!-- <p-button label="Bán chạy" severity="secondary" /> -->
               <p-select [options]="sortByPrice" [(ngModel)]="selectField" optionLabel="title" placeholder="Giá: "
-                class="w-full md:w-56" (click)="filter(categoryId)" />
+                class="w-full md:w-56" (click)="filterByPrice(categoryId)" />
             </div>
           </ng-template>
 

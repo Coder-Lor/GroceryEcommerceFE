@@ -53,6 +53,7 @@ export class ProductList implements OnInit, OnDestroy {
   categoryId: string = '';
   loading: boolean = true;
 
+
   // categories state
   categories: CategoryDto[] = [];
   loadingCategories: boolean = true;
@@ -178,7 +179,7 @@ export class ProductList implements OnInit, OnDestroy {
     return this.categoryId === categoryId;
   }
 
-  filter(categoryId: string): void {
+  filterByPrice(categoryId: string): void {
     this.router.navigate(['/category'], {
       queryParams: {
         categoryId: categoryId || null,
@@ -187,6 +188,20 @@ export class ProductList implements OnInit, OnDestroy {
         search: this.keyword || null,
         sortBy: 'discountPrice',
         sortDirection: this.selectField.value
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  filterByNewest(): void {
+    this.router.navigate(['/category'], {
+      queryParams: {
+        categoryId: this.categoryId || null,
+        page: 1,
+        size: this.rows,
+        search: this.keyword || null,
+        sortBy: 'createdAt',
+        sortDirection: SortDirection.Descending
       },
       queryParamsHandling: 'merge',
     });
