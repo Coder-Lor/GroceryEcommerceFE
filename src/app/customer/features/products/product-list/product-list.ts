@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { InventoryService } from '@core/service/inventory.service';
 import { CategoryService } from '@core/service/category.service';
-import { CategoryDto } from '@core/service/system-admin.service';
+import { CategoryDto, SortDirection } from '@core/service/system-admin.service';
 
 @Component({
   selector: 'product-list',
@@ -85,7 +85,7 @@ export class ProductList implements OnInit, OnDestroy {
     this.showMoreLocation = !this.showMoreLocation;
   }
 
-  sortByPrice: any[] = [{ title: 'Giá: Thấp đến cao' }, { title: 'Giá: Cao đến thấp' }];
+  sortByPrice: any[] = [{ title: 'Giá: Thấp đến cao', value: SortDirection.Ascending }, { title: 'Giá: Cao đến thấp', value: SortDirection.Descending }];
   selectField: any;
 
   getSeverity(product: any) {
@@ -133,7 +133,9 @@ export class ProductList implements OnInit, OnDestroy {
       const page = +(params['page'] ?? 1);
       const size = +(params['size'] ?? this.rows);
       this.first = (page - 1) * size;
-      this.inventoryService.loadProducts(page, size, this.keyword || undefined, this.categoryId || undefined);
+      const sortBy = (params['sortBy'] ?? '').toString().trim();
+      const sortDirection = (params['sortDirection'] ?? SortDirection.Ascending).toString().trim();
+      this.inventoryService.loadProducts(page, size, this.keyword || undefined, this.categoryId || undefined, sortBy || undefined, sortDirection || undefined);
     });
   }
 
@@ -174,6 +176,20 @@ export class ProductList implements OnInit, OnDestroy {
 
   isCategoryActive(categoryId: string | undefined): boolean {
     return this.categoryId === categoryId;
+  }
+
+  filter(categoryId: string): void {
+    this.router.navigate(['/category'], {
+      queryParams: {
+        categoryId: categoryId || null,
+        page: 1,
+        size: this.rows,
+        search: this.keyword || null,
+        sortBy: 'discountPrice',
+        sortDirection: this.selectField.value
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   ngOnDestroy(): void {

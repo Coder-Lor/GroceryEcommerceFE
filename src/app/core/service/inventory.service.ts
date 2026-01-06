@@ -66,7 +66,7 @@ export class InventoryService {
   // }
 
   // Load products từ API (inventory tổng) với paging và optional search
-  loadProducts(page: number = 1, pageSize: number = 12, search?: string, categoryId?: string): void {
+  loadProducts(page: number = 1, pageSize: number = 12, search?: string, categoryId?: string, sortBy?: string, sortDirection?: SortDirection): void {
     this.loadingSubject.next(true); // Start loading
 
     // Lưu ngữ cảnh hiện tại
@@ -90,14 +90,14 @@ export class InventoryService {
         page,
         pageSize,
         search, // search
-        undefined, // sortBy
-        SortDirection.Ascending, // sortDirection
+        sortBy, // sortBy
+        sortDirection, // sortDirection
         filters, // filters
         undefined, // entityType
         undefined, // availableFields
         filters.length > 0, // hasFilters
         !!search, // hasSearch
-        false // hasSorting
+        !!sortBy // hasSorting
       )
       .pipe(
         tap(() => {

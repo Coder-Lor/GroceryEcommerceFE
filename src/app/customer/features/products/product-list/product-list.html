@@ -93,7 +93,7 @@
               <p-button label="Mới nhất" severity="secondary" />
               <p-button label="Bán chạy" severity="secondary" />
               <p-select [options]="sortByPrice" [(ngModel)]="selectField" optionLabel="title" placeholder="Giá: "
-                class="w-full md:w-56" />
+                class="w-full md:w-56" (click)="filter(categoryId)" />
             </div>
           </ng-template>
 
