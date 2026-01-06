@@ -11,8 +11,6 @@ import { ProductBaseResponse } from '@services/system-admin.service';
 import { MinimalService } from '@core/service/minimal.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-export const API_KEY = new InjectionToken<string>('API_BASE_URL');
-
 interface ChatMessage {
     role: 'user' | 'assistant';
     content: string;

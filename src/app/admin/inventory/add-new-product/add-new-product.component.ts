@@ -41,7 +41,6 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { GoogleGenAI } from '@google/genai';
 import { environment } from '../../../../environments/environment'
-import { API_KEY } from 'app/customer/shared/components/ai-chat/ai-chat.component';
 import { MinimalService } from '@core/service/minimal.service';
 
 @Component({
