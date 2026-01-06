@@ -57,8 +57,8 @@ export const appConfig: ApplicationConfig = {
     { provide: RouteReuseStrategy, useClass: CustomReuseStrategy },
     MessageService,
     ConfirmationService,
-    { provide: API_BASE_URL, useValue: 'https://localhost:44394' },
-    // { provide: API_BASE_URL, useValue: "https://groceryecommercebe-bscbhpd4bgcma3gf.southeastasia-01.azurewebsites.net" },
+    // { provide: API_BASE_URL, useValue: 'https://localhost:44394' },
+    { provide: API_BASE_URL, useValue: "https://api.sellervn.net" },
     { provide: API_KEY, useValue: environment.geminiAI.apiKey }
   ],
 };
