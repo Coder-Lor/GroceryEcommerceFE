@@ -4,7 +4,7 @@ import {
   provideZoneChangeDetection,
   LOCALE_ID,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
@@ -23,6 +23,7 @@ import localeVi from '@angular/common/locales/vi';
 
 import { API_BASE_URL } from '@core/service/system-admin.service';
 import { API_KEY } from './customer/shared/components/ai-chat/ai-chat.component';
+import { CustomReuseStrategy } from '@core/service/route.reuse.strategy';
 
 registerLocaleData(localeVi);
 
@@ -52,6 +53,7 @@ export const appConfig: ApplicationConfig = {
     { provide: HTTP_INTERCEPTORS, useClass: ResponseTransformInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: LOCALE_ID, useValue: 'vi-VN' },
+    { provide: RouteReuseStrategy, useClass: CustomReuseStrategy },
     MessageService,
     ConfirmationService,
     // { provide: API_BASE_URL, useValue: 'https://localhost:44394' },
