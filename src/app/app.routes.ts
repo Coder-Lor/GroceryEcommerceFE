@@ -6,43 +6,7 @@ import {
   withPreloading,
   PreloadAllModules,
 } from '@angular/router';
-import { Cart } from './customer/features/cart/cart';
-import { Home } from './customer/features/home/home';
-import { ProductDetail } from './customer/features/products/product-detail/product-detail';
-import { Login } from './customer/features/auth/login/login';
-import { Register } from './customer/features/auth/register/register';
-import { ProductList } from './customer/features/products/product-list/product-list';
-import { CustomerPage } from './customer/pages/customer-page/customer-page';
-import { AdminLayoutComponent } from './admin/layout/admin-layout.component';
-import { HomePageComponent } from './admin/home/home-page.component';
-import { UsersPageComponent } from './admin/users/users-page.component';
-import { InventoryPageComponent } from './admin/inventory/inventory-page.component';
-import { AddNewProductComponent } from './admin/inventory/add-new-product/add-new-product.component';
-import { CategoriesPageComponent } from './admin/categories/categories-page.component';
-import { OrderListComponent } from './admin/order-management/order-list/order-list.component';
-import { VouchersPageComponent } from './admin/vouchers/vouchers-page.component';
 import { authGuard } from './core/service/auth.guard';
-import { NotFoundComponent } from './core/components/not-found/not-found.component';
-import { Checkout } from './customer/features/checkout/checkout';
-import { Profile } from './customer/features/profile/profile';
-import { DiscoverPage } from './customer/pages/customer-page/discover-page/discover-page';
-import { OrderResult } from './customer/features/order-result/order-result';
-import { PaymentPending } from './customer/features/payment-pending/payment-pending';
-import { PersonalInfoComponent } from './customer/features/profile/personal-info/personal-info.component';
-import { UserAddressComponent } from './customer/features/profile/user-address/user-address.component';
-import { UserContactComponent } from './customer/features/profile/user-contact/user-contact.component';
-import { UserBankComponent } from './customer/features/profile/user-bank/user-bank.component';
-import { UserOrdersComponent } from './customer/features/profile/user-orders/user-orders.component';
-import { UserWishlistComponent } from './customer/features/profile/user-wishlist/user-wishlist.component';
-import { UserVouchersComponent } from './customer/features/profile/user-vouchers/user-vouchers.component';
-import { AboutUsPage } from './customer/pages/info-pages/about-us/about-us-page';
-import { LegalInfoPage } from './customer/pages/info-pages/legal-info/legal-info-page';
-import { TermsOfUsePage } from './customer/pages/info-pages/terms-of-use/terms-of-use-page';
-import { SecurePaymentPage } from './customer/pages/info-pages/secure-payment/secure-payment-page';
-import { ShopManagementComponent } from './admin/shops/shop-management.component';
-import { ShopDetailPage } from './customer/features/shops/shop-detail';
-import { ShopRegisterPage } from './customer/features/shops/shop-register';
-import { MyShopPage } from './customer/features/shops/my-shop';
 
 const scrollOpts: InMemoryScrollingOptions = {
   scrollPositionRestoration: 'top',
@@ -53,87 +17,87 @@ export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: '',
-    component: CustomerPage,
+    loadComponent: () => import('./customer/pages/customer-page/customer-page').then(m => m.CustomerPage),
     children: [
-      { path: 'home', component: Home },
-      { path: 'cart', component: Cart },
-      { path: 'login', component: Login },
-      { path: 'register', component: Register },
-      { path: 'shop/register', component: ShopRegisterPage },
-      { path: 'shop/:shopId', component: ShopDetailPage },
-      { path: 'my-shop', component: MyShopPage },
-      { path: 'my-shop/add-product', component: AddNewProductComponent },
-      { path: 'product-detail/:slug', component: ProductDetail },
-      { path: 'category', component: ProductList },
-      { path: 'checkout', component: Checkout },
-      { path: 'payment-pending', component: PaymentPending },
-      { path: 'order-result', component: OrderResult },
+      { path: 'home', loadComponent: () => import('./customer/features/home/home').then(m => m.Home) },
+      { path: 'cart', loadComponent: () => import('./customer/features/cart/cart').then(m => m.Cart) },
+      { path: 'login', loadComponent: () => import('./customer/features/auth/login/login').then(m => m.Login) },
+      { path: 'register', loadComponent: () => import('./customer/features/auth/register/register').then(m => m.Register) },
+      { path: 'shop/register', loadComponent: () => import('./customer/features/shops/shop-register').then(m => m.ShopRegisterPage) },
+      { path: 'shop/:shopId', loadComponent: () => import('./customer/features/shops/shop-detail').then(m => m.ShopDetailPage) },
+      { path: 'my-shop', loadComponent: () => import('./customer/features/shops/my-shop').then(m => m.MyShopPage) },
+      { path: 'my-shop/add-product', loadComponent: () => import('./admin/inventory/add-new-product/add-new-product.component').then(m => m.AddNewProductComponent) },
+      { path: 'product-detail/:slug', loadComponent: () => import('./customer/features/products/product-detail/product-detail').then(m => m.ProductDetail) },
+      { path: 'category', loadComponent: () => import('./customer/features/products/product-list/product-list').then(m => m.ProductList) },
+      { path: 'checkout', loadComponent: () => import('./customer/features/checkout/checkout').then(m => m.Checkout) },
+      { path: 'payment-pending', loadComponent: () => import('./customer/features/payment-pending/payment-pending').then(m => m.PaymentPending) },
+      { path: 'order-result', loadComponent: () => import('./customer/features/order-result/order-result').then(m => m.OrderResult) },
       {
         path: 'profile',
-        component: Profile,
+        loadComponent: () => import('./customer/features/profile/profile').then(m => m.Profile),
         children: [
           { path: '', redirectTo: 'personal-info', pathMatch: 'full' },
-          { path: 'personal-info', component: PersonalInfoComponent },
-          { path: 'address', component: UserAddressComponent },
-          { path: 'contact', component: UserContactComponent },
-          { path: 'bank', component: UserBankComponent },
-          { path: 'orders', component: UserOrdersComponent },
-          { path: 'wishlist', component: UserWishlistComponent },
-          { path: 'vouchers', component: UserVouchersComponent },
+          { path: 'personal-info', loadComponent: () => import('./customer/features/profile/personal-info/personal-info.component').then(m => m.PersonalInfoComponent) },
+          { path: 'address', loadComponent: () => import('./customer/features/profile/user-address/user-address.component').then(m => m.UserAddressComponent) },
+          { path: 'contact', loadComponent: () => import('./customer/features/profile/user-contact/user-contact.component').then(m => m.UserContactComponent) },
+          { path: 'bank', loadComponent: () => import('./customer/features/profile/user-bank/user-bank.component').then(m => m.UserBankComponent) },
+          { path: 'orders', loadComponent: () => import('./customer/features/profile/user-orders/user-orders.component').then(m => m.UserOrdersComponent) },
+          { path: 'wishlist', loadComponent: () => import('./customer/features/profile/user-wishlist/user-wishlist.component').then(m => m.UserWishlistComponent) },
+          { path: 'vouchers', loadComponent: () => import('./customer/features/profile/user-vouchers/user-vouchers.component').then(m => m.UserVouchersComponent) },
         ]
       },
-      { path: 'discover-page', component: DiscoverPage },
-      { path: 'about-us', component: AboutUsPage },
-      { path: 'legal-info', component: LegalInfoPage },
-      { path: 'terms-of-use', component: TermsOfUsePage },
-      { path: 'secure-payment', component: SecurePaymentPage },
+      { path: 'discover-page', loadComponent: () => import('./customer/pages/customer-page/discover-page/discover-page').then(m => m.DiscoverPage) },
+      { path: 'about-us', loadComponent: () => import('./customer/pages/info-pages/about-us/about-us-page').then(m => m.AboutUsPage) },
+      { path: 'legal-info', loadComponent: () => import('./customer/pages/info-pages/legal-info/legal-info-page').then(m => m.LegalInfoPage) },
+      { path: 'terms-of-use', loadComponent: () => import('./customer/pages/info-pages/terms-of-use/terms-of-use-page').then(m => m.TermsOfUsePage) },
+      { path: 'secure-payment', loadComponent: () => import('./customer/pages/info-pages/secure-payment/secure-payment-page').then(m => m.SecurePaymentPage) },
     ],
   },
   {
     path: 'admin',
-    component: AdminLayoutComponent,
+    loadComponent: () => import('./admin/layout/admin-layout.component').then(m => m.AdminLayoutComponent),
     // canActivate: [authGuard], // Bảo vệ toàn bộ route admin
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'home' },
       {
         path: 'home',
-        component: HomePageComponent,
+        loadComponent: () => import('./admin/home/home-page.component').then(m => m.HomePageComponent),
       },
       {
         path: 'users',
-        component: UsersPageComponent,
+        loadComponent: () => import('./admin/users/users-page.component').then(m => m.UsersPageComponent),
       },
       {
         path: 'inventory',
-        component: InventoryPageComponent,
+        loadComponent: () => import('./admin/inventory/inventory-page.component').then(m => m.InventoryPageComponent),
       },
       {
         path: 'inventory/add-new-product',
-        component: AddNewProductComponent,
+        loadComponent: () => import('./admin/inventory/add-new-product/add-new-product.component').then(m => m.AddNewProductComponent),
       },
       {
         path: 'orders',
-        component: OrderListComponent,
+        loadComponent: () => import('./admin/order-management/order-list/order-list.component').then(m => m.OrderListComponent),
       },
       {
         path: 'categories',
-        component: CategoriesPageComponent,
+        loadComponent: () => import('./admin/categories/categories-page.component').then(m => m.CategoriesPageComponent),
       },
       {
         path: 'vouchers',
-        component: VouchersPageComponent,
+        loadComponent: () => import('./admin/vouchers/vouchers-page.component').then(m => m.VouchersPageComponent),
       },
       {
         path: 'shops',
-        component: ShopManagementComponent,
+        loadComponent: () => import('./admin/shops/shop-management.component').then(m => m.ShopManagementComponent),
       },
       {
         path: 'shops/inventory',
-        component: InventoryPageComponent,
+        loadComponent: () => import('./admin/inventory/inventory-page.component').then(m => m.InventoryPageComponent),
       },
     ],
   },
-  { path: '**', component: NotFoundComponent }, // Trang 404
+  { path: '**', loadComponent: () => import('./core/components/not-found/not-found.component').then(m => m.NotFoundComponent) }, // Trang 404
 ];
 
 export const appRouter = provideRouter(
