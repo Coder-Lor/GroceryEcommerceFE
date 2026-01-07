@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProxyImagePipe],
   templateUrl: './footer.html',
   styleUrl: './footer.scss'
 })

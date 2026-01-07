@@ -12,11 +12,12 @@ import {
 import { AuthService } from '@core/service/auth.service';
 import { FormsModule } from '@angular/forms';
 import { InventoryPageComponent } from '../../../admin/inventory/inventory-page.component';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-my-shop',
   standalone: true,
-  imports: [CommonModule, RouterModule, ToastModule, FormsModule, InventoryPageComponent],
+  imports: [CommonModule, RouterModule, ToastModule, FormsModule, InventoryPageComponent, ProxyImagePipe],
   providers: [MessageService],
   templateUrl: './my-shop.html',
   styleUrl: './my-shop.scss',
@@ -44,7 +45,7 @@ export class MyShopPage implements OnInit {
     private readonly productClient: ProductClient,
     private readonly router: Router,
     private readonly messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.fetchMyShop();

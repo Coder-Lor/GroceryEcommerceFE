@@ -24,6 +24,7 @@ import { MegaMenuItem } from 'primeng/api';
 import { CategoryService } from '../../../../core/service/category.service';
 import { CategoryDto } from '../../../../core/service/system-admin.service';
 import { AiChatComponent } from '../ai-chat/ai-chat.component';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 // State key for TransferState
 const HEADER_CATEGORIES_KEY = makeStateKey<CategoryDto[]>('header-categories');
@@ -31,7 +32,7 @@ const HEADER_CATEGORIES_KEY = makeStateKey<CategoryDto[]>('header-categories');
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, UtilityPanel, RouterModule, MegaMenuModule, AiChatComponent],
+  imports: [CommonModule, UtilityPanel, RouterModule, MegaMenuModule, AiChatComponent, ProxyImagePipe],
   templateUrl: './header.html',
   styleUrl: './header.scss',
   host: { ngSkipHydration: 'true' },  // ← Skip SSR cho component này

@@ -61,6 +61,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { TooltipDirective } from '@shared/directives/tooltip';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-inventory-page',
@@ -72,7 +73,8 @@ import { TooltipDirective } from '@shared/directives/tooltip';
     LoadingOverlayComponent,
     ConfirmDialogModule,
     ToastModule,
-    TooltipDirective
+    TooltipDirective,
+    ProxyImagePipe
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'inventory-page.component.html',

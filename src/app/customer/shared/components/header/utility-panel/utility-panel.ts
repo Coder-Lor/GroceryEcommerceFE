@@ -5,11 +5,12 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { Router } from '@angular/router';
 import { CartService } from '@services/cart.service';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-utility-panel',
   standalone: true,
-  imports: [CommonModule, InputTextModule, FormsModule, InputNumberModule],
+  imports: [CommonModule, InputTextModule, FormsModule, InputNumberModule, ProxyImagePipe],
   templateUrl: './utility-panel.html',
   styleUrl: './utility-panel.scss',
 })

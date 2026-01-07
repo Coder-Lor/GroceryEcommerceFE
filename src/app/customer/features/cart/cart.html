@@ -10,7 +10,7 @@
                     <!-- Product Item -->
                     @for (item of (Cart$ | async); track item.cartItemId) {
                     <div class="cart-item d-flex gap-4 align-items-center border-bottom pb-4 mb-2">
-                        <img [src]="item.imageUrl" class="rounded img-fluid"
+                        <img [src]="item.imageUrl | proxyImage" class="rounded img-fluid"
                             style="width:175px; height:172px; object-fit:cover;" alt="Coffee Beans">
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-start mb-2">

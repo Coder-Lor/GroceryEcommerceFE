@@ -5,8 +5,8 @@
       pagination="false" navigation="true">
       <swiper-slide *ngFor="let slide of heroSlides">
         <div class="hero-slide position-relative overflow-hidden">
-          <img [src]="slide.image1" class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover" />
-          <img [src]="slide.image2" class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover" />
+          <img [src]="slide.image1 | proxyImage" class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover" />
+          <img [src]="slide.image2 | proxyImage" class="w-100 h-100 rounded-4 overflow-hidden object-fit-cover" />
         </div>
       </swiper-slide>
     </swiper-container>
@@ -45,7 +45,7 @@
       @for (item of categories; track $index) {
       <swiper-slide (click)="navigationToCategory(item)" class="category-slide">
         <div class="category-card text-center">
-          <img [src]="item.imageUrl" [alt]="item.name" class="category-img" />
+          <img [src]="item.imageUrl | proxyImage" [alt]="item.name" class="category-img" />
           <p class="category-name mt-2">{{ item.name }}</p>
         </div>
       </swiper-slide>
@@ -84,8 +84,8 @@
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
           <div class="product-image">
-            <img [src]="product.primaryImageUrl || '/images/no-image.png'" [alt]="product.name || 'Sản phẩm'"
-              onerror="this.src='/images/no-image.png'" />
+            <img [src]="(product.primaryImageUrl || '/images/no-image.png') | proxyImage"
+              [alt]="product.name || 'Sản phẩm'" onerror="this.src='/images/no-image.png'" />
           </div>
           <div class="sale-status">
             <div class="progress-bar">
@@ -116,7 +116,7 @@
     <swiper-container slides-per-view="6" space-between="20" navigation="true" loop="true" class="brands-swiper">
       <swiper-slide *ngFor="let brand of brands" class="brand-slide">
         <div class="brand-card">
-          <img [src]="brand.logo" [alt]="brand.name" class="brand-logo" />
+          <img [src]="brand.logo | proxyImage" [alt]="brand.name" class="brand-logo" />
         </div>
       </swiper-slide>
     </swiper-container>

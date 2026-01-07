@@ -134,7 +134,7 @@
 
     <div class="product-item" *ngFor="let item of products">
       <div class="col-product d-flex align-items-center">
-        <img [src]="item.imageUrl" alt="Ảnh sản phẩm" class="product-img" />
+        <img [src]="item.imageUrl | proxyImage" alt="Ảnh sản phẩm" class="product-img" />
         <div class="product-name">{{ item.productName }}</div>
       </div>
       <div class="col-price">{{ item.unitPrice | currency : 'VND' }}</div>

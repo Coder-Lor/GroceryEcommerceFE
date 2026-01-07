@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { CartService } from '../../../core/service/cart.service';
 import { inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 
 @Component({
@@ -18,7 +19,8 @@ import { Observable, map } from 'rxjs';
       InputNumberModule,
       FormsModule,
       InputTextModule,
-      RouterModule
+      RouterModule,
+      ProxyImagePipe
     ],
   templateUrl: './cart.html',
   styleUrl: './cart.scss'

@@ -39,7 +39,7 @@
 
           @if (orderInfo.qrCodeUrl) {
           <div class="qr-wrapper mb-3">
-            <img [src]="orderInfo.qrCodeUrl" alt="QR code thanh toán" class="qr-image" />
+            <img [src]="orderInfo.qrCodeUrl | proxyImage" alt="QR code thanh toán" class="qr-image" />
           </div>
           } @else {
           <div class="alert alert-warning">

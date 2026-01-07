@@ -43,7 +43,8 @@
               <div class="shop-card-header mb-3">
                 <div class="d-flex align-items-start justify-content-between mb-3">
                   <div class="shop-logo">
-                    <img *ngIf="shop.logoUrl" [src]="shop.logoUrl" [alt]="shop.name" class="shop-logo-img" />
+                    <img *ngIf="shop.logoUrl" [src]="shop.logoUrl | proxyImage" [alt]="shop.name"
+                      class="shop-logo-img" />
                     <div *ngIf="!shop.logoUrl" class="shop-logo-placeholder">
                       {{ (shop.name || 'S')[0] | uppercase }}
                     </div>

@@ -7,6 +7,7 @@ import {
   ProductBaseResponse,
 } from '@core/service/system-admin.service';
 import { TruncatePipe } from '@shared/pipes/truncate-pipe.pipe';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 import { Tag } from 'primeng/tag';
 import { Rating } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,7 @@ type Product = ProductBaseResponse;
 @Component({
   selector: 'product-card',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, Tag, TruncatePipe, Rating],
+  imports: [CommonModule, RouterModule, FormsModule, Tag, TruncatePipe, ProxyImagePipe, Rating],
   templateUrl: './product-card.html',
   styleUrl: './product-card.scss',
   encapsulation: ViewEncapsulation.None,

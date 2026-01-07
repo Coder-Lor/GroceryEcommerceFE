@@ -17,6 +17,7 @@ import {
   ResultOfPagedResultOfShopDto,
 } from '@core/service/system-admin.service';
 import { ShopProductsModalComponent } from './shop-products-modal/shop-products-modal.component';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-shop-management',
@@ -32,6 +33,7 @@ import { ShopProductsModalComponent } from './shop-products-modal/shop-products-
     DialogModule,
     ProgressSpinnerModule,
     ShopProductsModalComponent,
+    ProxyImagePipe,
   ],
   providers: [MessageService],
   templateUrl: './shop-management.component.html',

@@ -12,6 +12,7 @@ import { Subject, takeUntil, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/service/auth.service';
 import { ProductCard } from '../../../shared/components/product-card/product-card';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 interface Review {
   id: number;
@@ -39,6 +40,7 @@ interface ProductImage {
     ImageModule,
     ToastModule,
     ProductCard,
+    ProxyImagePipe,
   ],
   providers: [MessageService],
   templateUrl: './product-detail.html',

@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-user-wishlist',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ProxyImagePipe],
   templateUrl: './user-wishlist.component.html',
   styleUrl: './user-wishlist.component.scss',
 })

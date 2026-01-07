@@ -27,6 +27,7 @@ import { Subject, finalize, takeUntil } from 'rxjs';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CountdownEvent, CountdownModule } from 'ngx-countdown';
 import { CategoryService } from '@core/service/category.service';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 type Product = ProductBaseResponse;
 type UrlObject = {
@@ -49,6 +50,7 @@ type ResponsiveOp = { breakpoint: string; numVisible: number; numScroll: number 
     SelectButtonModule,
     CountdownModule,
     SkeletonModule,
+    ProxyImagePipe,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './home.html',

@@ -10,6 +10,7 @@ import { ProductService } from '@core/service/product.service';
 import { ProductBaseResponse } from '@services/system-admin.service';
 import { MinimalService } from '@core/service/minimal.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 interface ChatMessage {
     role: 'user' | 'assistant';
@@ -30,7 +31,7 @@ interface SuggestedProduct {
 @Component({
     selector: 'app-ai-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, ProxyImagePipe],
     templateUrl: './ai-chat.component.html',
     styleUrls: ['./ai-chat.component.scss'],
 })

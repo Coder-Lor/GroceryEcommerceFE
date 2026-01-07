@@ -46,7 +46,7 @@
         <div class="admin-product-card">
           <div class="card-image">
             @if (item.primaryImageUrl) {
-            <img [src]="item.primaryImageUrl" [alt]="item.name" />
+            <img [src]="item.primaryImageUrl | proxyImage" [alt]="item.name" />
             } @else {
             <div class="no-image">
               <fa-icon [icon]="faBox" size="3x"></fa-icon>
@@ -180,7 +180,7 @@
           <div class="product-images-grid">
             @for (img of detailProduct.images; track img.productImageId) {
             <div class="image-item" [class.primary]="img.isPrimary">
-              <img [src]="img.imageUrl" [alt]="img.altText || detailProduct.name" />
+              <img [src]="img.imageUrl | proxyImage" [alt]="img.altText || detailProduct.name" />
               @if (img.isPrimary) {
               <span class="primary-badge">Ảnh chính</span>
               }
@@ -323,7 +323,7 @@
               <div class="images-grid-edit">
                 @for (img of existingImages; track img.productImageId; let idx = $index) {
                 <div class="image-edit-item">
-                  <img [src]="img.imageUrl" [alt]="img.altText || 'Product image'" />
+                  <img [src]="img.imageUrl | proxyImage" [alt]="img.altText || 'Product image'" />
 
                   <div class="image-overlay">
                     <button type="button" class="btn-image-action" (click)="setEditPrimaryImage(idx)"
@@ -817,7 +817,7 @@
           <div class="variant-card">
             <div class="variant-image">
               @if (variant.imageUrl) {
-              <img [src]="variant.imageUrl" [alt]="variant.name" />
+              <img [src]="variant.imageUrl | proxyImage" [alt]="variant.name" />
               } @else {
               <div class="no-image-placeholder">
                 <fa-icon [icon]="faBox" size="2x"></fa-icon>
@@ -893,7 +893,7 @@
           <div class="images-gallery">
             <div class="image-item" *ngFor="let imageUrl of productImageUrls"
               [class.selected]="selectedImageUrl === imageUrl" (click)="selectProductImage(imageUrl)">
-              <img [src]="imageUrl" alt="Product image" />
+              <img [src]="imageUrl | proxyImage" alt="Product image" />
               <div class="selected-badge" *ngIf="selectedImageUrl === imageUrl">
                 <fa-icon [icon]="faCheck"></fa-icon>
               </div>

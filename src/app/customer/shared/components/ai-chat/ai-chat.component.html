@@ -89,7 +89,7 @@
                             @for (product of message.suggestedProducts; track product.productId) {
                             <div class="product-card" (click)="viewProduct(product)">
                                 @if (product.imageUrl) {
-                                <img [src]="product.imageUrl" [alt]="product.name" class="product-image" />
+                                <img [src]="product.imageUrl | proxyImage" [alt]="product.name" class="product-image" />
                                 } @else {
                                 <div class="product-image-placeholder">📦</div>
                                 }

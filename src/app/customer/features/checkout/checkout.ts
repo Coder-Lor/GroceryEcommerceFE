@@ -9,6 +9,7 @@ import { UserAddressClient, UserAddress, PagedRequest, GiftCardClient, GiftCardD
 import { UserService } from '@core/service/user.service';
 import { Observable, of, forkJoin } from 'rxjs';
 import { switchMap, take, catchError } from 'rxjs/operators';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 interface CheckoutProduct {
   productId: string;
@@ -28,7 +29,7 @@ interface TemporaryAddress {
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, ProxyImagePipe],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss',
 })

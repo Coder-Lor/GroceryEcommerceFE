@@ -48,8 +48,8 @@
                 <ng-template pTemplate="body" let-product>
                     <tr>
                         <td>
-                            <img *ngIf="product.primaryImageUrl" [src]="product.primaryImageUrl" [alt]="product.name"
-                                class="product-thumbnail" />
+                            <img *ngIf="product.primaryImageUrl" [src]="product.primaryImageUrl | proxyImage"
+                                [alt]="product.name" class="product-thumbnail" />
                             <div *ngIf="!product.primaryImageUrl" class="product-thumbnail-placeholder">
                                 <i class="pi pi-image"></i>
                             </div>
@@ -138,7 +138,7 @@
                 <div class="row">
                     <!-- Ảnh sản phẩm -->
                     <div class="col-md-4 mb-3">
-                        <img *ngIf="detailProduct.primaryImageUrl" [src]="detailProduct.primaryImageUrl"
+                        <img *ngIf="detailProduct.primaryImageUrl" [src]="detailProduct.primaryImageUrl | proxyImage"
                             [alt]="detailProduct.name" class="img-fluid rounded border"
                             style="max-height: 250px; object-fit: cover; width: 100%;" />
                         <div *ngIf="!detailProduct.primaryImageUrl"

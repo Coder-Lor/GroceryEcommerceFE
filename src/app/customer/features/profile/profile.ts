@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ImageModule } from 'primeng/image';
 import { ImageCropperDialogComponent } from './image-cropper-dialog/image-cropper-dialog.component';
 import { Router, RouterModule } from '@angular/router';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ImageModule, ImageCropperDialogComponent, RouterModule],
+  imports: [CommonModule, ImageModule, ImageCropperDialogComponent, RouterModule, ProxyImagePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })

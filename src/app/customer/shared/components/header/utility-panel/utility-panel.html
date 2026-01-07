@@ -12,20 +12,13 @@
       @for (item of (Cart$ | async); track item.cartItemId) {
       <div class="item">
         <div class="item-img">
-          <img [src]="item.imageUrl" alt="item-image" />
+          <img [src]="item.imageUrl | proxyImage" alt="item-image" />
         </div>
         <div class="item-detail">
           <h4>{{ item.productName }}</h4>
           <p>{{ item.unitPrice | number:'1.0-0' }}₫</p>
-          <p-inputNumber
-            [(ngModel)]="item.quantity"
-            [min]="1"
-            [step]="1"
-            [showButtons]="true"
-            buttonLayout="horizontal"
-            inputId="{{ item.cartItemId }}"
-            (onInput)="onUpdateQuantity(item.cartItemId, item.quantity)"
-          >
+          <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [step]="1" [showButtons]="true" buttonLayout="horizontal"
+            inputId="{{ item.cartItemId }}" (onInput)="onUpdateQuantity(item.cartItemId, item.quantity)">
             <ng-template pTemplate="incrementbuttonicon">
               <span class="pi pi-plus"></span>
             </ng-template>
@@ -35,12 +28,8 @@
           </p-inputNumber>
         </div>
         <span style="position: absolute; bottom: 24px; right: 14px">
-          <i
-            class="pi pi-trash"
-            style="display: flex; justify-content: center; gap: 4px; opacity: 0.7; cursor: pointer"
-            (click)="onRemove(item.cartItemId)"
-            >Delete</i
-          >
+          <i class="pi pi-trash" style="display: flex; justify-content: center; gap: 4px; opacity: 0.7; cursor: pointer"
+            (click)="onRemove(item.cartItemId)">Delete</i>
         </span>
       </div>
       }

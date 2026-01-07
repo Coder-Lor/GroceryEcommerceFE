@@ -31,7 +31,7 @@
       <div class="d-flex align-items-start gap-4">
         <div class="shop-logo-container">
           @if (shopLogoUrl) {
-          <img [src]="shopLogoUrl" [alt]="shopName" class="shop-logo-img" />
+          <img [src]="shopLogoUrl | proxyImage" [alt]="shopName" class="shop-logo-img" />
           } @else {
           <div class="shop-logo-placeholder">
             {{ (shopName || 'S')[0] | uppercase }}

@@ -41,7 +41,7 @@
             [autoPlay]="false" [transitionInterval]="3000">
             <ng-template pTemplate="item" let-item>
               <div class="gallery-item">
-                <p-image [src]="item.itemImageSrc" [alt]="item.alt" [preview]="true" [imageStyle]="{
+                <p-image [src]="item.itemImageSrc | proxyImage" [alt]="item.alt" [preview]="true" [imageStyle]="{
                     width: '100%',
                     height: '480px',
                     'max-height': '480px',
@@ -51,7 +51,8 @@
             </ng-template>
             <ng-template pTemplate="thumbnail" let-item>
               <div class="gallery-thumbnail">
-                <img [src]="item.thumbnailImageSrc" [alt]="item.alt" [title]="item.title" class="thumbnail-image" />
+                <img [src]="item.thumbnailImageSrc | proxyImage" [alt]="item.alt" [title]="item.title"
+                  class="thumbnail-image" />
               </div>
             </ng-template>
           </p-galleria>

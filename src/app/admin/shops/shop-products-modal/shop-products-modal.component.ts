@@ -22,6 +22,7 @@ import {
     CategoryDto,
 } from '@core/service/system-admin.service';
 import { Subject, takeUntil } from 'rxjs';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
     selector: 'app-shop-products-modal',
@@ -39,6 +40,7 @@ import { Subject, takeUntil } from 'rxjs';
         ConfirmDialogModule,
         ToastModule,
         MenuModule,
+        ProxyImagePipe,
     ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './shop-products-modal.component.html',

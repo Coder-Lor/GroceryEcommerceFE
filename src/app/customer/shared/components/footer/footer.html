@@ -11,16 +11,10 @@
           The Mantu is the biggest market of grocery products. Get your daily needs from our store.
         </p> -->
         <div class="app-buttons">
-          <a href="#"
-            ><img
-              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-              alt="Google Play"
-          /></a>
-          <a href="#"
-            ><img
-              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-              alt="App Store"
-          /></a>
+          <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+              alt="Google Play" /></a>
+          <a href="#"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+              alt="App Store" /></a>
         </div>
       </div>
 
@@ -29,24 +23,20 @@
         <h4 class="fw-semibold border-bottom border-dashed pb-2 mb-3 text-dark">Thông tin</h4>
         <ul class="list-unstyled">
           <li class="list-item">
-            <a routerLink="/about-us" class="item-link text-secondary text-decoration-none d-block py-1"
-              >Về chúng tôi</a
-            >
+            <a routerLink="/about-us" class="item-link text-secondary text-decoration-none d-block py-1">Về chúng
+              tôi</a>
           </li>
           <li class="list-item">
-            <a routerLink="/legal-info" class="item-link text-secondary text-decoration-none d-block py-1"
-              >Thông tin pháp lý</a
-            >
+            <a routerLink="/legal-info" class="item-link text-secondary text-decoration-none d-block py-1">Thông tin
+              pháp lý</a>
           </li>
           <li class="list-item">
-            <a routerLink="/terms-of-use" class="item-link text-secondary text-decoration-none d-block py-1"
-              >Điều khoản sử dụng</a
-            >
+            <a routerLink="/terms-of-use" class="item-link text-secondary text-decoration-none d-block py-1">Điều khoản
+              sử dụng</a>
           </li>
           <li class="list-item">
-            <a routerLink="/secure-payment" class="item-link text-secondary text-decoration-none d-block py-1"
-              >Thanh toán an toàn</a
-            >
+            <a routerLink="/secure-payment" class="item-link text-secondary text-decoration-none d-block py-1">Thanh
+              toán an toàn</a>
           </li>
         </ul>
       </div>
@@ -73,8 +63,7 @@
 
     <!-- Bottom -->
     <div
-      class="footer-bottom border-top mt-4 pt-3 d-flex justify-content-between align-items-center flex-wrap small text-secondary"
-    >
+      class="footer-bottom border-top mt-4 pt-3 d-flex justify-content-between align-items-center flex-wrap small text-secondary">
       <p class="mb-0">
         &copy; 2025 <span class="text-primary fw-semibold">GroceryMart</span> all rights
         reserved.
@@ -82,7 +71,7 @@
       <div class="payment-icons d-flex align-items-center">
         @for (item of paymentImages; track $index) {
         <span class="payment-icon me-2">
-          <img [src]="item.image" [alt]="item.name" />
+          <img [src]="item.image | proxyImage" [alt]="item.name" />
         </span>
         }
       </div>

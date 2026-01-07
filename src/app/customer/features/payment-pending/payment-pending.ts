@@ -7,11 +7,12 @@ import {
   PaymentNotification,
   PaymentNotificationService,
 } from '@core/service/payment-notification.service';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-payment-pending',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProxyImagePipe],
   templateUrl: './payment-pending.html',
   styleUrl: './payment-pending.scss',
 })

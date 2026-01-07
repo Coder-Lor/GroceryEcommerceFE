@@ -9,11 +9,12 @@ import {
   CategoryDto
 } from '../../../core/service/system-admin.service';
 import { ImageUploadService } from '../../../core/service/image-upload.service';
+import { ProxyImagePipe } from '@shared/pipes/proxy-image.pipe';
 
 @Component({
   selector: 'app-category-form-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, FaIconComponent],
+  imports: [CommonModule, FormsModule, FaIconComponent, ProxyImagePipe],
   templateUrl: './category-form-modal.component.html',
   styleUrls: ['./category-form-modal.component.scss']
 })
@@ -22,9 +23,9 @@ export class CategoryFormModalComponent implements OnInit {
   @Input() mode: 'add' | 'edit' = 'add';
   @Input() category!: CreateCategoryCommand | UpdateCategoryCommand;
   @Input() allCategories: CategoryDto[] = [];
-  
+
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<{category: CreateCategoryCommand | UpdateCategoryCommand, imageFile: File | null}>();
+  @Output() save = new EventEmitter<{ category: CreateCategoryCommand | UpdateCategoryCommand, imageFile: File | null }>();
 
   // Icons
   faXmark = faXmark;
@@ -37,7 +38,7 @@ export class CategoryFormModalComponent implements OnInit {
   imagePreview: string | null = null;
   isDragging: boolean = false;
 
-  constructor(private imageUploadService: ImageUploadService) {}
+  constructor(private imageUploadService: ImageUploadService) { }
 
   ngOnInit(): void {
     // Load existing image if in edit mode
