@@ -1,0 +1,204 @@
+<div class="shop-orders-container">
+    <p-toast></p-toast>
+
+    <div class="section-header">
+        <h3>Đơn hàng của shop</h3>
+        <button class="btn btn-info" (click)="loadOrders()">
+            <fa-icon [icon]="faRefresh" size="1x"></fa-icon>
+        </button>
+    </div>
+
+    <!-- Tìm kiếm -->
+    <div class="search-box">
+        <div class="search-wrapper">
+            <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"
+                placeholder="Tìm kiếm theo mã đơn hàng, khách hàng..." class="search-input" />
+            <button type="button" class="btn search-button" (click)="onSearch()" [disabled]="isLoading">
+                <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+            </button>
+        </div>
+        <span class="search-result">{{ totalRecords }} đơn hàng</span>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading) {
+    <div class="loading-box">
+        <div class="spinner-border text-primary" role="status"></div>
+        <span>Đang tải...</span>
+    </div>
+    }
+
+    <!-- Bảng đơn hàng -->
+    @if (!isLoading && filteredOrders.length > 0) {
+    <div class="table-container">
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th (click)="changeSortColumn('orderNumber')" class="sortable">
+                        Mã đơn hàng
+                        <span class="sort-icon">
+                            <fa-icon
+                                [icon]="sortColumn === 'orderNumber' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+                        </span>
+                    </th>
+                    <th>Khách hàng</th>
+                    <th (click)="changeSortColumn('orderDate')" class="sortable">
+                        Ngày đặt
+                        <span class="sort-icon">
+                            <fa-icon
+                                [icon]="sortColumn === 'orderDate' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+                        </span>
+                    </th>
+                    <th (click)="changeSortColumn('totalAmount')" class="sortable text-right">
+                        Tổng tiền
+                        <span class="sort-icon">
+                            <fa-icon
+                                [icon]="sortColumn === 'totalAmount' ? (sortDirection === 'asc' ? faSortUp : faSortDown) : faSort"></fa-icon>
+                        </span>
+                    </th>
+                    <th>Trạng thái</th>
+                    <th>Thanh toán</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (order of filteredOrders; track order.orderId) {
+                <tr>
+                    <td>
+                        <div class="order-number">
+                            <fa-icon [icon]="faTag" class="order-icon"></fa-icon>
+                            <strong>{{ order.orderNumber || order.orderId || 'N/A' }}</strong>
+                        </div>
+                    </td>
+                    <td>{{ order.userName || 'N/A' }}</td>
+                    <td>
+                        <fa-icon [icon]="faCalendar" class="icon-small"></fa-icon>
+                        {{ formatDate(order.orderDate) }}
+                    </td>
+                    <td class="text-right">
+                        <strong class="amount">{{ formatCurrency(order.totalAmount) }}</strong>
+                    </td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusBadgeClass(order.status || 1)">
+                            {{ getStatusDisplay(order.status || 1) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getPaymentBadgeClass(order.paymentStatus || 1)">
+                            {{ getPaymentStatusDisplay(order.paymentStatus || 1) }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn-icon" (click)="showActionMenu($event, order)">
+                            <fa-icon [icon]="faEllipsisVertical"></fa-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+        <div class="pagination-info">
+            <span>Trang {{ currentPage }} / {{ totalPages }}</span>
+            <div class="page-size-selector">
+                <label>Hiển thị:</label>
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="pagination-controls">
+            <button class="btn-pagination" (click)="onPageChange(1)" [disabled]="currentPage === 1">
+                <fa-icon [icon]="faAnglesLeft"></fa-icon>
+            </button>
+            <button class="btn-pagination" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+                <fa-icon [icon]="faChevronLeft"></fa-icon>
+            </button>
+
+            <div class="page-numbers">
+                @for (page of getPageNumbers(); track page) {
+                <button class="btn-page" [class.active]="page === currentPage" (click)="onPageChange(page)">
+                    {{ page }}
+                </button>
+                }
+            </div>
+
+            <button class="btn-pagination" (click)="onPageChange(currentPage + 1)"
+                [disabled]="currentPage === totalPages">
+                <fa-icon [icon]="faChevronRight"></fa-icon>
+            </button>
+            <button class="btn-pagination" (click)="onPageChange(totalPages)" [disabled]="currentPage === totalPages">
+                <fa-icon [icon]="faAnglesRight"></fa-icon>
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Empty state -->
+    @if (!isLoading && filteredOrders.length === 0) {
+    <div class="empty-state">
+        <p>Chưa có đơn hàng nào</p>
+    </div>
+    }
+</div>
+
+<!-- Modal xem chi tiết -->
+@if (isDetailModalOpen && selectedOrder) {
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>
+                <fa-icon [icon]="faEye"></fa-icon>
+                Chi tiết đơn hàng
+            </h3>
+            <button class="btn-close" (click)="closeModal()">
+                <fa-icon [icon]="faXmark"></fa-icon>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="detail-row">
+                <span class="label">Mã đơn hàng:</span>
+                <span class="value">{{ selectedOrder.orderNumber || selectedOrder.orderId }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Khách hàng:</span>
+                <span class="value">{{ selectedOrder.userName || 'N/A' }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Ngày đặt:</span>
+                <span class="value">{{ formatDate(selectedOrder.orderDate) }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Tổng tiền:</span>
+                <span class="value amount">{{ formatCurrency(selectedOrder.totalAmount) }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Trạng thái:</span>
+                <span class="status-badge" [ngClass]="getStatusBadgeClass(selectedOrder.status || 1)">
+                    {{ getStatusDisplay(selectedOrder.status || 1) }}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Thanh toán:</span>
+                <span class="status-badge" [ngClass]="getPaymentBadgeClass(selectedOrder.paymentStatus || 1)">
+                    {{ getPaymentStatusDisplay(selectedOrder.paymentStatus || 1) }}
+                </span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModal()">Đóng</button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Action Menu -->
+<p-menu #actionMenu [model]="actionMenuItems" [popup]="true" appendTo="body"></p-menu>

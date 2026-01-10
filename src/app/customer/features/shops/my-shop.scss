@@ -81,5 +81,42 @@
         }
       }
     }
+
+    .shop-nav-tabs {
+      display: flex;
+      gap: 8px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+
+      .nav-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #64748b;
+        background: #f1f5f9;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+
+        i {
+          font-size: 14px;
+        }
+
+        &:hover {
+          background: #e2e8f0;
+          color: #334155;
+        }
+
+        &.active {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-color: transparent;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+      }
+    }
   }
 }

@@ -4,7 +4,7 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h4 class="fw-semibold mb-1">Shop của tôi</h4>
-      <p class="text-muted mb-0">Quản lý sản phẩm thuộc shop</p>
+      <p class="text-muted mb-0">Quản lý shop của bạn</p>
     </div>
   </div>
 
@@ -51,11 +51,22 @@
           </div>
         </div>
       </div>
+
+      <!-- Navigation Tabs -->
+      <div class="shop-nav-tabs mt-3">
+        <a routerLink="inventory" routerLinkActive="active" class="nav-tab-btn">
+          <i class="pi pi-box me-2"></i>
+          Sản phẩm
+        </a>
+        <a routerLink="orders" routerLinkActive="active" class="nav-tab-btn">
+          <i class="pi pi-shopping-bag me-2"></i>
+          Đơn hàng
+        </a>
+      </div>
     </div>
   </div>
-  }
 
-  @if (shopId) {
-  <app-inventory-page [shopId]="shopId"></app-inventory-page>
+  <!-- Router Outlet for child routes -->
+  <router-outlet></router-outlet>
   }
 </div>

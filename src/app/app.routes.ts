@@ -25,8 +25,16 @@ export const routes: Routes = [
       { path: 'register', loadComponent: () => import('./customer/features/auth/register/register').then(m => m.Register) },
       { path: 'shop/register', loadComponent: () => import('./customer/features/shops/shop-register').then(m => m.ShopRegisterPage) },
       { path: 'shop/:shopId', loadComponent: () => import('./customer/features/shops/shop-detail').then(m => m.ShopDetailPage) },
-      { path: 'my-shop', loadComponent: () => import('./customer/features/shops/my-shop').then(m => m.MyShopPage) },
-      { path: 'my-shop/add-product', loadComponent: () => import('./admin/inventory/add-new-product/add-new-product.component').then(m => m.AddNewProductComponent) },
+      {
+        path: 'my-shop',
+        loadComponent: () => import('./customer/features/shops/my-shop').then(m => m.MyShopPage),
+        children: [
+          { path: '', redirectTo: 'inventory', pathMatch: 'full' },
+          { path: 'inventory', loadComponent: () => import('./admin/inventory/inventory-page.component').then(m => m.InventoryPageComponent) },
+          { path: 'orders', loadComponent: () => import('./customer/features/shops/shop-orders').then(m => m.ShopOrdersComponent) },
+          { path: 'add-product', loadComponent: () => import('./admin/inventory/add-new-product/add-new-product.component').then(m => m.AddNewProductComponent) },
+        ]
+      },
       { path: 'product-detail/:slug', loadComponent: () => import('./customer/features/products/product-detail/product-detail').then(m => m.ProductDetail) },
       { path: 'category', loadComponent: () => import('./customer/features/products/product-list/product-list').then(m => m.ProductList) },
       { path: 'checkout', loadComponent: () => import('./customer/features/checkout/checkout').then(m => m.Checkout) },
